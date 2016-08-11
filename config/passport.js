@@ -48,7 +48,7 @@ passport.use('local-login', new LocalStrategy({
 }, function (req, email, password, done) {
     process.nextTick(function() {
         User.findOne({ email: email }, function (err, user) {
-            if (err) {
+            if (err) { var x;
                 return done(err);
             } 
             if (!user) {
