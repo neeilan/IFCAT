@@ -1,5 +1,6 @@
 var _ = require('underscore');
 
+// models
 var Quiz = require('../models/quiz');
 
 // Retrieve many quizzes
@@ -24,11 +25,6 @@ exports.getQuiz = function (req, res) {
             res.status(200).send(quiz);
         }
     });
-};
-
-// Start quiz
-exports.startQuiz = function (req, res) {
-
 };
 
 // Add quiz model
@@ -79,13 +75,6 @@ exports.deleteQuiz = function (req, res) {
                 if (err) {
                     res.status(500).send("Sorry, unable to delete quiz at this time (" + err.message + ")");
                     return;
-                }
-                if (quiz.poster.indexOf(UPLOADS_PATH) === 0) {
-                    fs.unlink(PUBLIC_DIR + quiz.poster, function (err) {
-                        if (err) {
-                            console.log("Error trying to unlink image: " + err.message);
-                        }
-                    });
                 }
                 res.status(200).send({ 'responseText': 'The quiz has successfully deleted' }); 
             });

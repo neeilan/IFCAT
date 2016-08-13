@@ -1,6 +1,7 @@
 module.exports = function (req, res, next) {
-    if (req.isAuthenticated()) {
+    var urls = ['/api/login', '/api/register'];
+    if (urls.indexOf(req.originalUrl) !== -1 || req.isAuthenticated()) {
         return next();
     }
-    res.redirect('/login');
+    res.send('not authenticated!');
 };
