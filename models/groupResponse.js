@@ -6,7 +6,8 @@ var GroupResponseSchema = new mongoose.Schema({
     students: [{ type: Schema.Types.ObjectId, ref : 'User' }],
     quiz: { type: Schema.Types.ObjectId, ref : 'Quiz' },
     responses: [Number], // Answer chosen for (i+1)th question, with i being index of quiz.questions (and this array)
-    numberOfAttempts: [Number] // Number of attempts taken to answer (i+1)th question correctly
+    numberOfAttempts: [Number], // Number of attempts taken to answer (i+1)th question correctly
+    score: Number
 }, {
     timestamps: true
 });

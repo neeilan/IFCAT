@@ -1,7 +1,8 @@
 var mongoose = require('mongoose');
 
 var QuestionSchema = new mongoose.Schema({
-    question: { type: String, required: true, trim: true },
+    // quiz:
+    text: { type: String, required: true, trim: true },
     correctAnswers: Array,
     choices: [ { choiceNumber: Number, text: String } ],
 }, {

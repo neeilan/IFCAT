@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
 
 var TutorialSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true },
+    tutorialNumber: { type: String, required: true, trim: true},
     teachingAssistants: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }]
