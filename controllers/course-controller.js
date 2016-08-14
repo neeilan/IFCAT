@@ -1,12 +1,13 @@
 var _ = require('underscore');
 
+// models
 var Course = require('../models/course');
 
 // Retrieve many courses
 exports.getCourses = function (req, res) {
     Course.find(function (err, courses) {
         if (err) {
-            res.status(500).send("Sorry, unable to retrieve any courses at this time (" + err.message + ")");
+            res.status(500).send("Unable to retrieve any courses at this time (" + err.message + ").");
         } else {
             res.status(200).send(courses);
         }
@@ -15,11 +16,11 @@ exports.getCourses = function (req, res) {
 
 // Retrieve course
 exports.getCourse = function (req, res) {
-    Course.findById(req.params.id, function (err, course) {
+    Course.findById(req.params.course, function (err, course) {
         if (err) {
-            res.status(500).send("Sorry, unable to retrieve course at this time (" + err.message + ")");
+            res.status(500).send("Unable to retrieve course at this time (" + err.message + ").");
         } else if (!course) {
-            res.status(404).send("Sorry, that course doesn't exist; try reselecting from Browse view");
+            res.status(404).send("This course doesn't exist.");
         } else {
             res.status(200).send(course);
         }
@@ -28,10 +29,10 @@ exports.getCourse = function (req, res) {
 
 // Add course model
 exports.addCourse = function (req, res) {
-    var course = new Course(_.extend(req.body/*, { userId: req.session.userId }*/));
+    var course = new Course(_.extend(req.body));
     course.save(function (err) {
         if (err) {
-            res.status(500).send("Sorry, unable to save course at this time (" + err.message + ")");
+            res.status(500).send("Unable to save course at this time (" + err.message + ").");
         } else {
             res.status(200).send(course); 
         }
@@ -40,15 +41,15 @@ exports.addCourse = function (req, res) {
 
 // Update course
 exports.editCourse = function (req, res) {
-    Course.findById(req.params.id, function (err, course) {  
+    Course.findById(req.params.course, function (err, course) {  
         if (err) {
-            res.status(500).send("Sorry, unable to retrieve course at this time (" + err.message + ")");
+            res.status(500).send("Unable to retrieve course at this time (" + err.message + ").");
         } else if (!course) {
-            res.status(404).send("Sorry, that course doesn't exist");
+            res.status(404).send("This course doesn't exist");
         } else {
             _.extend(course, req.body).save(function (err) {
                 if (err) {
-                    res.status(500).send("Sorry, unable to save course at this time (" + err.message + ")");
+                    res.status(500).send("Unable to save course at this time (" + err.message + ").");
                 } else {
                     res.status(200).send(course); 
                 }
@@ -61,13 +62,13 @@ exports.editCourse = function (req, res) {
 exports.deleteCourse = function (req, res) {
     Course.findById(req.params.id, function (err, course) {
         if (err) {
-            res.status(500).send("Sorry, unable to retrieve course at this time (" + err.message + ")");
+            res.status(500).send("Unable to retrieve course at this time (" + err.message + ").");
         } else if (!course) {
-            res.status(404).send("Sorry, that course doesn't exist");
+            res.status(404).send("This course doesn't exist.");
         } else {
             course.remove(function (err) {
                 if (err) {
-                    res.status(500).send("Sorry, unable to delete course at this time (" + err.message + ")");
+                    res.status(500).send("Unable to delete course at this time (" + err.message + ").");
                     return;
                 }
                 res.status(200).send({ 'responseText': 'The course has successfully deleted' }); 

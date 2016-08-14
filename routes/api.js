@@ -17,46 +17,46 @@ module.exports = function (app, passport, acl) {
     router.post('/api/logout', UserController.logout);
 
     router.get('/courses', CourseController.getCourses);
-    router.get('/courses/:id', CourseController.getCourse);
-    router.post('/courses/:id', CourseController.addCourse);
-    router.put('/courses/:id', CourseController.editCourse);
-    router.delete('/courses/:id', CourseController.deleteCourse);
+    router.get('/courses/:course', CourseController.getCourse);
+    router.post('/courses', CourseController.addCourse);
+    router.put('/courses/:course', CourseController.editCourse);
+    router.delete('/courses/:course', CourseController.deleteCourse);
 
-    /*router.get('/courses/:courseId/students', UserController.getStudentsByCourse);
-    router.post('/courses/:courseId/students/import', UserController.importStudents);
+    /*router.get('/courses/:course/students', UserController.getStudentsByCourse);
+    router.post('/courses/:course/students/import', UserController.importStudents);
     
-    router.get('/courses/:courseId/tutorials', TutorialController.getTutorials);
-    router.get('/courses/:courseId/tutorials/:id', TutorialController.getTutorial);
-    router.post('/courses/:courseId/tutorials/:id', TutorialController.addTutorial);
-    router.put('/courses/:courseId/tutorials/:id', TutorialController.editTutorial);
-    router.delete('/courses/:courseId/tutorials/:id', TutorialController.deleteTutorial);
+    router.get('/courses/:course/tutorials', TutorialController.getTutorials);
+    router.get('/courses/:course/tutorials/:tutorial', TutorialController.getTutorial);
+    router.post('/courses/:course/tutorials', TutorialController.addTutorial);
+    router.put('/courses/:course/tutorials/:tutorial', TutorialController.editTutorial);
+    router.delete('/courses/:course/tutorials/:tutorial', TutorialController.deleteTutorial);
     
-    router.get('/courses/:courseId/tutorials/:tutorialId/students', UserController.getStudentsByTutorial);
-    router.post('/courses/:courseId/tutorials/:tutorialId/students/:id', UserController.addStudentInTutorial);
-    router.delete('/courses/:courseId/tutorials/:tutorialId/students/:id', UserController.deleteStudentInTutorial);
+    router.get('/courses/:course/tutorials/:tutorial/students', UserController.getStudentsByTutorial);
+    router.post('/courses/:course/tutorials/:tutorial/students/:student', UserController.addStudentInTutorial);
+    router.delete('/courses/:course/tutorials/:tutorial/students/:student', UserController.deleteStudentInTutorial);
 
-    router.get('/courses/:courseId/tutorials/:tutorialId/groups', GroupController.getGroups);
-    router.get('/courses/:courseId/tutorials/:tutorialId/groups/:id', GroupController.getGroup);
-    router.post('/courses/:courseId/tutorials/:tutorialId/groups', GroupController.addGroup);
-    router.delete('/courses/:courseId/tutorials/:tutorialId/groups/:id', GroupController.deleteGroup);
+    router.get('/courses/:course/tutorials/:tutorial/groups', GroupController.getGroups);
+    router.get('/courses/:course/tutorials/:tutorial/groups/:group', GroupController.getGroup);
+    router.post('/courses/:course/tutorials/:tutorial/groups', GroupController.addGroup);
+    router.delete('/courses/:course/tutorials/:tutorial/groups/:group', GroupController.deleteGroup);
 
-    router.get('/courses/:courseId/quizzes', QuizController.getQuizzes);
-    router.get('/courses/:courseId/quizzes/:id', QuizController.getQuiz);
-    router.post('/courses/:courseId/quizzes/:id', QuizController.addQuiz);
-    router.put('/courses/:courseId/quizzes/:id', QuizController.editQuiz);
-    router.delete('/courses/:courseId/quizzes/:id', QuizController.deleteQuiz);
+    router.get('/courses/:course/quizzes', QuizController.getQuizzes);
+    router.get('/courses/:course/quizzes/:quiz', QuizController.getQuiz);
+    router.post('/courses/:course/quizzes', QuizController.addQuiz);
+    router.put('/courses/:course/quizzes/:quiz', QuizController.editQuiz);
+    router.delete('/courses/:course/quizzes/:quiz', QuizController.deleteQuiz);
 
-    router.get('/courses/:courseId/quizzes/:quizId/questions', QuestionController.getQuestions);
-    router.get('/courses/:courseId/quizzes/:quizId/questions/:id', QuestionController.getQuestion);
-    router.post('/courses/:courseId/quizzes/:quizId/questions/:id', QuestionController.addQuestion);
-    router.put('/courses/:courseId/quizzes/:quizId/questions/:id', QuestionController.editQuestion);
-    router.delete('/courses/:courseId/quizzes/:quizId/questions/:id', QuestionController.deleteQuestion);
+    router.get('/courses/:course/quizzes/:quiz/questions', QuestionController.getQuestions);
+    router.get('/courses/:course/quizzes/:quiz/questions/:question', QuestionController.getQuestion);
+    router.post('/courses/:course/quizzes/:quiz/questions', QuestionController.addQuestion);
+    router.put('/courses/:course/quizzes/:quiz/questions/:question', QuestionController.editQuestion);
+    router.delete('/courses/:course/quizzes/:quiz/questions/:question', QuestionController.deleteQuestion);
 
     router.get('/files', UserController.getFiles);
     router.post('/files', UserController.addFiles);
     router.delete('/files', UserController.deleteFiles);
-    router.get('/files/:id', UserController.getFile);
-    router.put('/files/:id', UserController.editFile);*/
+    router.get('/files/:file', UserController.getFile);
+    router.put('/files/:file', UserController.editFile);*/
 
     app.use('/api', [authenticate, acl.middleware()], router);
 };
