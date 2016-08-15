@@ -4,21 +4,25 @@ var bcrypt = require('bcryptjs'),
 var UserSchema = new mongoose.Schema({
     email: {
         type: String,
-        required: true,
         unique: true
     },
-    password: {
-        type: String,
-        required: true
-    },
-
+    password: String,
+    utorId: String,
     roles: {
         type: Array,
-        enum: ['admin', 'instructor', 'teaching assistant', 'student']
+        enum: ['admin', 'instructor', 'teachingAssistant', 'student']
     },
-    lectures: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Lecture'  } ],
-    tutorials: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Tutorial'  } ],
-    groups: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Tutorial'  } ]
+    teachingAssistant: {
+        tutorials: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Tutorial'  } ],
+    },
+    instructor: {
+        courses: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Course'  } ],
+    },
+    student: {
+        courses: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Course'  } ],
+        tutorials: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Tutorial'  } ],
+        groups: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Group'  } ]
+    }
 });
 
 // hash password using salt before saving

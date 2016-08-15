@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
 
 var CourseSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true },
-    courseCode: { type: String,  required: true, trim: true },
+    code: { type: String,  required: true, trim: true },
     instructors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     teachingAssistants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -13,4 +13,4 @@ var CourseSchema = new mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('CourseSchema', CourseSchema);
+module.exports = mongoose.model('Course', CourseSchema);

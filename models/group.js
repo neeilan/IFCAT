@@ -1,11 +1,10 @@
 var mongoose = require('mongoose');
 
 var GroupSchema = new mongoose.Schema({
-    name: { type: String, required: true, trim: true },
-    tutorial: { type: mongoose.Schema.Types.ObjectId, ref: 'Tutorial' },
+    number: { type: Number, required: true },
     members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    quizzes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' }],
+    leader: { type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     responses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GroupResponse' }],
   });
 
-module.exports = mongoose.model('GroupSchema', GroupSchema);
+module.exports = mongoose.model('Group', GroupSchema);

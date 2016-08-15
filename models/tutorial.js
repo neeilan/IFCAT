@@ -3,11 +3,11 @@ var mongoose = require('mongoose'),
   ArrayUtils = require('../utilities/Array.js');
 
 var TutorialSchema = new mongoose.Schema({
-    name: { type: String, required: true, trim: true },
-    tutorialCode: { type: String, required: true, trim: true},
+    number: { type: String, required: true, trim: true},
     teachingAssistants: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     students: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }]
+    groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
+    quizzes: [{ type: Schema.Types.ObjectId, ref: 'Quiz' }]
 }, {
     timestamps: true
 });
@@ -32,4 +32,4 @@ var TutorialSchema = new mongoose.Schema({
 //   // return this.save();
 // }
 
-module.exports = mongoose.model('tutorial', TutorialSchema);
+module.exports = mongoose.model('Tutorial', TutorialSchema);
