@@ -7,6 +7,7 @@ var UserSchema = new mongoose.Schema({
         unique: true
     },
     password: String,
+    name: String,
     utorId: String,
     roles: {
         type: Array,

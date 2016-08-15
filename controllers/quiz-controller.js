@@ -7,7 +7,7 @@ var Course = require('../models/course'),
 
 // Retrieve many quizzes
 exports.getQuizzesByCourse = function (req, res) {
-    Course.findById(req.params.course).populate('quizzes').find(function (err, quizzes) {
+    Course.findById(req.params.course).find(function (err, course) {
         if (err) {
             return res.status(500).send("Unable to retrieve any quizzes at this time (" + err.message + ").");
         }
@@ -17,14 +17,13 @@ exports.getQuizzesByCourse = function (req, res) {
 
 // Retrieve quiz
 exports.getQuiz = function (req, res) {
-    Quiz.findById(req.params.id, function (err, quiz) {
-        if (err) {
-            return res.status(500).send("Unable to retrieve quiz at this time (" + err.message + ").");
-        } else if (!quiz) {
-            return res.status(404).send("This quiz doesn't exist.");
-        }
+    return Quiz.findById(req.params.id).populate('questions')
+    .exec().then(function(quiz){
         res.status(200).send(quiz);
-    });
+    })
+    .catch(function(err){
+        res.status(505).send("Unable to retrieve quiz at this time (" + err.message + ").");
+    })
 };
 
 // Add quiz to course
@@ -58,7 +57,7 @@ exports.addQuizToTutorial = function (req, res) {
             return res.status(500).send("Unable to find quiz at this time (" + err.message + ").");
         }
         Tutorial.findByIdAndUpdate(req.params.tutorial, { 
-            $push: { quizzes: quiz } 
+            $push: { quizzes: quiz._id } 
         }, { 
             new: true 
         }, function (err, tutorial) {
