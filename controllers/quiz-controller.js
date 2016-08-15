@@ -99,7 +99,7 @@ exports.editQuiz = function (req, res) {
 };
 
 // Delete quiz
-exports.deleteQuiz = function (req, res) {
+exports.deleteQuizFromCourse = function (req, res) {
     Course.findByIdAndUpdate(req.params.course, {
         $pull: { quizzes: { _id: req.params.quiz } }
     }, function (err, course) {
