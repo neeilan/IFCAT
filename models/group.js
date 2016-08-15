@@ -6,8 +6,6 @@ var GroupSchema = new mongoose.Schema({
     members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     quizzes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' }],
     responses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GroupResponse' }],
-  }, {
-    timestamps: true
-});
+  });
 
 module.exports = mongoose.model('GroupSchema', GroupSchema);
