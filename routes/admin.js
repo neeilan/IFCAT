@@ -49,11 +49,14 @@ module.exports = function (app, passport, acl) {
     router.post('/courses/:course/tutorials/:tutorial/groups', GroupController.addGroup);
     router.delete('/courses/:course/tutorials/:tutorial/groups/:group', GroupController.deleteGroup);*/
 
-    router.get('/courses/:course/quizzes', QuizController.getQuizzes);
+    router.get('/courses/:course/quizzes', QuizController.getQuizzesByCourse);
     router.get('/courses/:course/quizzes/:quiz', QuizController.getQuiz);
-    router.post('/courses/:course/quizzes', QuizController.addQuiz);
+    router.post('/courses/:course/quizzes', QuizController.addQuizToCourse);
     router.put('/courses/:course/quizzes/:quiz', QuizController.editQuiz);
     router.delete('/courses/:course/quizzes/:quiz', QuizController.deleteQuiz);
+
+    router.post('/courses/:course/tutorials/:tutorial/quizzes/:quiz', QuizController.addQuizToTutorial);
+    router.delete('/courses/:course/tutorials/:tutorial/quizzes/:quiz', QuizController.deleteQuizFromTutorial);
 
     /*router.get('/courses/:course/quizzes/:quiz/questions', QuestionController.getQuestions);
     router.get('/courses/:course/quizzes/:quiz/questions/:question', QuestionController.getQuestion);
@@ -67,5 +70,5 @@ module.exports = function (app, passport, acl) {
     router.get('/files/:file', UserController.getFile);
     router.put('/files/:file', UserController.editFile);*/
 
-    app.use('/api', /*[authenticate, acl.middleware()],*/ router);
+    app.use('/api/admin', /*[authenticate, acl.middleware()],*/ router);
 };
