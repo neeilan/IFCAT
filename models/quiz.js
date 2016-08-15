@@ -1,14 +1,13 @@
-var mongoose = require('mongoose'),
-  Schema = mongoose.Schema;
+var mongoose = require('mongoose');
 
 var QuizSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true },
-    questions: [ { type: Schema.Types.ObjectId, ref : 'Question' } ],
-    randomizeChoices: Boolean,
+    questions: [{ type: mongoose.Schema.Types.ObjectId, ref : 'Question' }],
+    randomizeChoices: { type: Boolean, default: false },
     availableToAll: { type: Boolean, default: false },
-    availableTo: [ { type: Schema.Types.ObjectId, ref : 'Tutorial' } ], // complete
-    scoreByAttempt : [ Number ],  // score to assign if student answers correctly on (i + 1)th attempt (i being index)
-    groupRsponses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GroupResponse' }],
+    availableTo: [{ type: mongoose.Schema.Types.ObjectId, ref : 'Tutorial' }], // complete
+    scoreByAttempt : [Number],  // score to assign if student answers correctly on (i + 1)th attempt (i being index)
+    groupResponses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GroupResponse' }],
     responses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Response' }],
 }, {
     timestamps: true

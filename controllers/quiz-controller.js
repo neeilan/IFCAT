@@ -2,10 +2,11 @@ var _ = require('underscore');
 
 // models
 var Course = require('../models/course'),
+    Tutorial = require('../models/tutorial'),
     Quiz = require('../models/quiz');
 
 // Retrieve many quizzes
-exports.getQuizzes = function (req, res) {
+exports.getQuizzesByCourse = function (req, res) {
     Course.findById(req.params.course).populate('quizzes').find(function (err, quizzes) {
         if (err) {
             return res.status(500).send("Unable to retrieve any quizzes at this time (" + err.message + ").");
@@ -26,8 +27,8 @@ exports.getQuiz = function (req, res) {
     });
 };
 
-// Add quiz model
-exports.addQuiz = function (req, res) {
+// Add quiz to course
+exports.addQuizToCourse = function (req, res) {
     Course.findById(req.params.course, function (err, course) {
         if (err) {
             return res.status(500).send("Unable to retrieve course at this time (" + err.message + ").");
@@ -46,6 +47,44 @@ exports.addQuiz = function (req, res) {
                 }
                 res.status(200).send(quiz);
             });
+        });
+    });
+};
+
+// Add quiz to tutorial
+exports.addQuizToTutorial = function (req, res) {
+    Quiz.findById(req.params.quiz, function (err, quiz) {
+        if (err) {
+            return res.status(500).send("Unable to find quiz at this time (" + err.message + ").");
+        }
+        Tutorial.findByIdAndUpdate(req.params.tutorial, { 
+            $push: { quizzes: quiz } 
+        }, { 
+            new: true 
+        }, function (err, tutorial) {
+            if (err) {
+                return res.status(500).send("Unable to save tutorial at this time (" + err.message + ").");
+            }
+            res.status(200).send(tutorial);
+        });
+    });
+};
+
+// Delete quiz from tutorial
+exports.deleteQuizFromTutorial = function (req, res) {
+    Quiz.findById(req.params.quiz, function (err, quiz) {
+        if (err) {
+            return res.status(500).send("Unable to find quiz at this time (" + err.message + ").");
+        }
+        Tutorial.findByIdAndUpdate(req.params.tutorial, { 
+            $pull: { quizzes: quiz } 
+        }, { 
+            new: true 
+        }, function (err, tutorial) {
+            if (err) {
+                return res.status(500).send("Unable to save tutorial at this time (" + err.message + ").");
+            }
+            res.status(200).send(tutorial);
         });
     });
 };

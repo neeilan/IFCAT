@@ -36,7 +36,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // routes
-require('./routes/api')(app, passport, acl);
+require('./routes/student')(app, passport, acl);
+require('./routes/admin')(app, passport, acl);
 
 app.listen(app.get('port'), function () {
     console.log('Express server listening on port %d in %s mode', 
