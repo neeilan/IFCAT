@@ -25,7 +25,9 @@ var UserSchema = new mongoose.Schema({
 UserSchema.pre('save', function (next) {
     if (this.password) {
         bcrypt.genSalt(10, function (err, salt) {
+            if (err) throw err;
             bcrypt.hash(this.password, salt, function (err, hash) {
+                if (err) throw err;
                 this.password = hash;
                 next();
             });
