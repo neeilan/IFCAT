@@ -1,13 +1,12 @@
 var _ = require('underscore');
 
 // models
-var Course = require('../models/course');
+var Course = require('../models/course'),
+    User = require('../models/user');
 
 // Retrieve many courses
 exports.getCourses = function (req, res) {
-
     // TODO: filter out courses based on user's role + permission + course!
-
     Course.find(function (err, courses) {
         if (err) {
             return res.status(500).send("Unable to retrieve any courses at this time (" + err.message + ").");
@@ -41,6 +40,26 @@ exports.getCourseByCode = function (req, res) {
         res.status(200).send(course);
     });
 };
+
+// Retrieve list of courses a user is a instructor/student in
+exports.getCoursesByUser = function (req, res) {
+    return User.findOne({ _id: req.params.id }, 'student.courses instructor.courses' )
+    .populate([{path : 'student.courses', select : 'name code'},
+               {path : 'instructor.courses', select : 'name code'}])
+    .exec()
+    .then(function(user){
+        return {
+            instructor : user.instructor.courses,
+            student    : user.student.courses
+        }
+    })
+    .then(function(courses){
+        res.status(200).send(courses);
+    })
+    .catch(function(err){
+        res.status(500).send("Unable to retrieve courses at this time (" + err.message + ").");
+    })
+}
 
 // Add course model
 exports.addCourse = function (req, res) {
