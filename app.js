@@ -11,12 +11,13 @@ var bodyParser = require('body-parser'),
     morgan = require('morgan'),
     mongoose = require('mongoose'),
     multer = require('multer'), 
-    session = require('express-session');
+    session = require('express-session'),
+    dbConfig = require('./config/db.js');
 
 var app = express();
 
 // configuration
-mongoose.connect('mongodb://localhost:27017/uteach');
+mongoose.connect(dbConfig.url);
 
 var passport = require('./config/passport');
 var acl = require('./config/acl');
