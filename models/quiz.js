@@ -5,7 +5,7 @@ var QuizSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true },
     questions: [ { type: Schema.Types.ObjectId, ref : 'Question' } ],
     randomizeChoices: Boolean,
-    availableToAll: { type: Boolean, default: False }
+    availableToAll: { type: Boolean, default: false },
     availableTo: [ { type: Schema.Types.ObjectId, ref : 'Tutorial' } ], // complete
     scoreByAttempt : [ Number ],  // score to assign if student answers correctly on (i + 1)th attempt (i being index)
     groupRsponses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GroupResponse' }],

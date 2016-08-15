@@ -12,20 +12,20 @@ var ResponseSchema = new mongoose.Schema({
     timestamps: true
 });
 ResponseSchema.methods.calculateScore = function(){
-  Quiz.findById(this.quiz, 'gradeByAttempt questions')
-    .populate('questions')
-    .exec()
-    .then((quiz)=>{
-      var studentScore = 0;
-      for (var i = 0; i < quiz.questions.length; i++){
-        /* If student skipped/didn't answer a question we assign 0
-        Note that a skipped question can be any falsy Js value
-        like null or false */
-        var attemptsNeeded = this.numberOfAttempts[i] || 0;
-        if (attemptsNeeded in quiz.scoreByAttempt)
-          score += quiz.scoreByAttempt[attemptsNeeded];
-      }
-    return score;
-  }
+  // Quiz.findById(this.quiz, 'gradeByAttempt questions')
+  //   .populate('questions')
+  //   .exec()
+  //   .then((quiz)=>{
+  //     var studentScore = 0;
+  //     for (var i = 0; i < quiz.questions.length; i++){
+  //       /* If student skipped/didn't answer a question we assign 0
+  //       Note that a skipped question can be any falsy Js value
+  //       like null or false */
+  //       var attemptsNeeded = this.numberOfAttempts[i] || 0;
+  //       if (attemptsNeeded in quiz.scoreByAttempt)
+  //         score += quiz.scoreByAttempt[attemptsNeeded];
+  //     }
+  //   return score;
+  // }
 }
 module.exports = mongoose.model('Response', ResponseSchema);
