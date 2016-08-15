@@ -13,10 +13,20 @@ exports.logout = function (req, res) {
 };
 
 // Get list of students for course
-exports.getStudentsByCourse = function (req, res) { };
+exports.getStudentsByCourse = function (req, res) { 
+    Course.findById(req.params.course).populate('students').exec(function (err, course) {
+        if (err) {
+            return res.status(500).send("Unable to retrieve any students at this time (" + err.message + ").");
+        }
+        res.status(200).send(course.students);
+    });
+};
 
 // Import list of students for course
-exports.importStudents = function (req, res) { };
+exports.importStudents = function (req, res) { 
+
+    console.log(req.file);
+};
 
 // Retrieve list of students for tutorial
 exports.getStudentsByTutorial = function (req, res) { };
