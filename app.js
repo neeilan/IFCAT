@@ -36,6 +36,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // routes
+var path = require('path');
+app.get('/', function(req,res){
+    res.sendFile(path.join(__dirname + '/public/index.html'));
+})
 require('./routes/student')(app, passport, acl);
 require('./routes/admin')(app, passport, acl);
 

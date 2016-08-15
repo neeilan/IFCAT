@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <script src="https://code.jquery.com/jquery-3.0.0.js"></script>
+  <title>QuizApp</title>
+</head>
+<body>
+  Admin Login
+  <form id = "login">
+    <input type = "text" name = "email" placeholder = "Email"/><br/>
+    <input type = "password" name = "password" placeholder = "Password"/><br/>
+    <button id="loginBtn">Login</button>
+  </form>
+  <hr/>
+  Admin Registraton
+  <form id = "register">
+    <input type = "text" name = "name" placeholder = "Name"/><br/>
+    <input type = "text" name = "email" placeholder = "Email"/><br/>
+    <input type = "password" name = "password" placeholder = "Password"/> <br/>
+    <button id="registerBtn">Register</button>
+  </form>
+  <hr/>
+  <button id="uteachBtn">Student login with UTeach</button>
+  <div id = "response" />
+</body>
+<script>
+  $(document).ready(function(){
+      
+    $("#loginBtn").click(function(e)
+    {
+      var url = "/api/admin/login"
+      $.post(url, $("#login").serialize(),
+      function(response){
+          $("#response").html(JSON.parse(response));
+      })
+    })
+    $("#registerBtn").click(function(e){
+     var url = "/api/admin/register";
+      $.post(url, $("#register").serialize(), function(response){
+        $("#response").html(JSON.parse(response));
+      })
+    })
+    $("#uteachBtn").click(function(e){
+      
+    })
+  })
+</script>
+</html>
