@@ -9,7 +9,7 @@ var authenticate = require('../middlewares/authenticate');
 var UserController = require('../controllers/user-controller'),
     CourseController = require('../controllers/course-controller'),
     TutorialController = require('../controllers/tutorial-controller'),
-    //GroupController = require('../controllers/group-controller'),
+    GroupController = require('../controllers/group-controller'),
     QuizController = require('../controllers/quiz-controller')/*,
     QuestionController = require('../controllers/question-controller')*/;
 
@@ -42,20 +42,19 @@ module.exports = function (app, passport, acl) {
     
     /*router.get('/courses/:course/tutorials/:tutorial/students', UserController.getStudentsByTutorial);
     router.post('/courses/:course/tutorials/:tutorial/students/:student', UserController.addStudentInTutorial);
-    router.delete('/courses/:course/tutorials/:tutorial/students/:student', UserController.deleteStudentInTutorial);
+    router.delete('/courses/:course/tutorials/:tutorial/students/:student', UserController.deleteStudentInTutorial);*/
 
-    router.get('/courses/:course/tutorials/:tutorial/groups', GroupController.getGroups);
+    router.get('/courses/:course/tutorials/:tutorial/groups', GroupController.getGroupsByTutorial);
     router.get('/courses/:course/tutorials/:tutorial/groups/:group', GroupController.getGroup);
-    router.post('/courses/:course/tutorials/:tutorial/groups', GroupController.addGroup);
-    router.delete('/courses/:course/tutorials/:tutorial/groups/:group', GroupController.deleteGroup);*/
+    router.post('/courses/:course/tutorials/:tutorial/groups', GroupController.addGroupTutorial);
+    router.delete('/courses/:course/tutorials/:tutorial/groups/:group', GroupController.deleteGroupFromTutorial);
 
     router.get('/courses/:course/quizzes', QuizController.getQuizzesByCourse);
     router.get('/courses/:course/quizzes/:quiz', QuizController.getQuiz);
     router.post('/courses/:course/quizzes', QuizController.addQuizToCourse);
-    router.put('/courses/:course/quizzes/:quiz', QuizController.editQuiz);
-    router.delete('/courses/:course/quizzes/:quiz', QuizController.deleteQuiz);
-
     router.post('/courses/:course/tutorials/:tutorial/quizzes/:quiz', QuizController.addQuizToTutorial);
+    router.put('/courses/:course/quizzes/:quiz', QuizController.editQuiz);
+    router.delete('/courses/:course/quizzes/:quiz', QuizController.deleteQuizFromCourse);
     router.delete('/courses/:course/tutorials/:tutorial/quizzes/:quiz', QuizController.deleteQuizFromTutorial);
 
     /*router.get('/courses/:course/quizzes/:quiz/questions', QuestionController.getQuestions);
