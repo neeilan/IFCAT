@@ -1,3 +1,4 @@
+'use strict'
 var _ = require('underscore');
 
 // models
@@ -41,15 +42,19 @@ exports.getCourseByCode = function (req, res) {
     });
 };
 
-// Retrieve list of courses a user is a instructor/student in
-exports.getCoursesByUser = function (req, res) {
-    return User.findOne({ _id: req.params.id }, 'student.courses instructor.courses' )
+// Retrieve list of courses a user is a instructor/student in ("Relevant courses function")
+exports.getUserCourses = function (req, res) {
+    return User.findOne({ _id: req.user.id }, 'student.courses instructor.courses' )
     .populate([{path : 'student.courses', select : 'name code'},
-               {path : 'instructor.courses', select : 'name code'}])
+               {path : 'instructor.courses', select : 'name code'},
+               {path : 'teachingAssistant.courses', select : 'name code'},
+               {path : 'admin.courses', select : 'name code'}])
     .exec()
     .then(function(user){
         return {
+            admin      : user.admin.courses,
             instructor : user.instructor.courses,
+            teachingAssistant : user.teachingAssistant.courses,
             student    : user.student.courses
         }
     })

@@ -1,5 +1,5 @@
-var mongoose = require('mongoose'),
-  Quiz = require('quiz');
+var mongoose = require('mongoose');
+  // Quiz = require('./quiz');
 
 var CourseSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true },

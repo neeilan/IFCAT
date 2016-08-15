@@ -12,7 +12,11 @@ var UserSchema = new mongoose.Schema({
         type: Array,
         enum: ['admin', 'instructor', 'teachingAssistant', 'student']
     },
+    admin: {
+        courses: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Course'  } ],
+    },
     teachingAssistant: {
+        courses: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Course'  } ],
         tutorials: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Tutorial'  } ],
     },
     instructor: {
