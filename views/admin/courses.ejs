@@ -2,14 +2,14 @@
 
 <h1>Courses</h1>
 
-
+<a class="btn btn-default btn-sm" href="/admin/courses/new">Add New Course</a>
 
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Code</th>
             <th>Name</th>
-            <th>Actions</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -18,7 +18,18 @@
             <th><%= course.code %></th>
             <th><%= course.name %></th>
             <th>
-
+                <div class="dropdown">
+                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                        Actions<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="/admin/courses/<%= course.id %>">Edit Course</a></li>
+                        <li><a href="/admin/courses/<%= course.id %>/tutorials">Manage Tutorials</a></li>
+                        <li><a href="/admin/courses/<%= course.id %>/quizzes">Manage Quizzes</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/admin/courses/<%= course.id %>">Delete Course</a></li>
+                    </ul>
+                </div>
             </th>
         </tr>
     <% }) %>

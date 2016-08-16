@@ -1,0 +1,36 @@
+<%- include ../partials/header -%>
+
+<h1>Tutorials</h1>
+
+<a class="btn btn-default btn-sm" href="/admin/course/<%= course.id %>/tutorials/new">Add New Tutorial</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tutorial</th>
+            <th>TA</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% course.tutorials.forEach(function (tutorial) { %>
+        <tr>
+            <th>TUT <%= tutorial.number %></th>
+            <th><%= tutorial.teachingAssistants.join('<br>') %></th>
+            <th>
+                <div class="dropdown">
+                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                        Actions<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="/admin/course/<%= course.id %>/tutorials/<%= tutorial.id %>">Edit Tutorial</a></li>
+                        <li><a href="/admin/course/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes">Manage Groups</a></li>
+                    </ul>
+                </div>
+            </th>
+        </tr>
+    <% }) %>
+    </tbody>
+</table>
+
+<%- include ../partials/footer -%>

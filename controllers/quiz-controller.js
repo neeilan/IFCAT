@@ -8,10 +8,10 @@ var Course = require('../models/course'),
 // Retrieve many quizzes
 exports.getQuizzesByCourse = function (req, res) {
     Course.findById(req.params.course).find(function (err, course) {
-        if (err) {
+        /*if (err) {
             return res.status(500).send("Unable to retrieve any quizzes at this time (" + err.message + ").");
-        }
-        res.status(200).send(course.quizzes);
+        }*/
+        res.render('admin/quizzes', { course: course });
     });
 };
 

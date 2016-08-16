@@ -1,10 +1,10 @@
-var _ = require('underscore');
-
 // models
 var User = require('../models/user');
 
 // Login user
-exports.login = function (req, res) { };
+exports.getLogin = function (req, res) { 
+    res.render('login');
+};
 
 // Logout user
 exports.logout = function (req, res) {

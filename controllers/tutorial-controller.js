@@ -7,34 +7,22 @@ var Course = require('../models/course'),
 // Retrieve list of tutorials for course
 exports.getTutorials = function (req, res) { 
     Course.findById(req.params.course).populate('tutorials').exec(function (err, course) {
-        if (err) {
+        /*if (err) {
             return res.status(500).send("Unable to retrieve any tutorials at this time (" + err.message + ").");
-        }
-        res.status(200).send(course.tutorials);
+        }*/
+        res.render('admin/tutorials', { course: course });
     });
 };
 
 // Retrieve specific tutorial for tutorial
-exports.getTutorialById = function (req, res) { 
+exports.getTutorialForm = function (req, res) { 
     Tutorial.findById(req.params.tutorial, function (err, tutorial) {
-        if (err) {
+        /*if (err) {
             return res.status(500).send("Unable to retrieve tutorial at this time (" + err.message + ").");
         } else if (!tutorial) {
             return res.status(404).send("This tutorial doesn't exist.");
-        }
-        res.status(200).send(tutorial);
-    });
-};
-
-// Retrieve specific tutorial for tutorial
-exports.getTutorialByNumber = function (req, res) { 
-    Tutorial.findOne({ number: req.params.tutorial }, function (err, tutorial) {
-        if (err) {
-            return res.status(500).send("Unable to retrieve tutorial at this time (" + err.message + ").");
-        } else if (!tutorial) {
-            return res.status(404).send("This tutorial doesn't exist.");
-        }
-        res.status(200).send(tutorial);
+        }*/
+        res.render('admin/tutorial', { course: course });
     });
 };
 

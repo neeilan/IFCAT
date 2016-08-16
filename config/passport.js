@@ -5,7 +5,7 @@ var User = require('../models/user');
 
 // store user ID into session
 passport.serializeUser(function (user, done) {
-    done(null, user._id);
+    done(null, user.id);
 });
 
 passport.deserializeUser(function (id, done) {
@@ -46,25 +46,23 @@ passport.use('local-login', new LocalStrategy({
     passwordField: 'password',
     passReqToCallback : true
 }, function (req, email, password, done) {
-    process.nextTick(function() {
-        User.findOne({ email: email }, function (err, user) {
-            if (err) { var x;
-                return done(err);
-            } 
-            if (!user) {
-                return done(null, false, { message: 'Invalid email address.' });
-            }
-            User.authenticate(password, function (err, res) {
-                if (res) {
-                    return done(null, user);
-                }
+    
+    User.findOne({ email: email }, function (err, user) {
+        if (err) {
+            return done(err);
+        } 
+        if (!user) {
+            return done(null, false, { message: 'Invalid email address.' });
+        }
+        User.authenticate(password, function (err, res) {
+            if (err) {
                 return done(null, false, { message: 'Invalid password.' });
-            });    
-        });
+            }
+            return done(null, user);
+        });    
     });
+
 }));
-
-
 
 // TODO: add another strategy
 
