@@ -1,5 +1,6 @@
-var router = require('express').Router(),
-    upload = require('multer')();
+var path = require('path');
+
+var router = require('express').Router();
 
 // controllers
 var UserController = require('../controllers/user-controller'),
@@ -12,6 +13,9 @@ var UserController = require('../controllers/user-controller'),
 // routes
 module.exports = function (app, passport, acl) {
 
+    router.get('/', function (req, res) {
+        res.sendFile(path.join(__dirname + '/public/index.html'));
+    });
 
-    app.use('/api', /*[authenticate, acl.middleware()],*/ router);
+    app.use(/*[authenticate, acl.middleware()],*/ router);
 };

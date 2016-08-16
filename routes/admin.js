@@ -3,8 +3,6 @@ var router = require('express').Router(),
 
 var authenticate = require('../middlewares/authenticate');
 
-
-
 // controllers
 var UserController = require('../controllers/user-controller'),
     CourseController = require('../controllers/course-controller'),
@@ -16,12 +14,9 @@ var UserController = require('../controllers/user-controller'),
 // routes
 module.exports = function (app, passport, acl) {
 
-    var Tutorial = require('../models/tutorial'),
-        Course = require('../models/course');
-
-    //router.post('/api/register', passport.authenticate('local-register', { successRedirect : '/', failureRedirect : '/api/login' }));
-    //router.post('/api/login', UserController.login);
-    //router.post('/api/logout', UserController.logout);
+    //router.post('/register', passport.authenticate('local-register', { successRedirect : '/', failureRedirect : '/admin/login' }));
+    //router.post('/login', UserController.login);
+    //router.post('/logout', UserController.logout);
 
     router.get('/courses', CourseController.getCourses);
     router.get('/courses/:course(\\w{6,8})', CourseController.getCourseByCode);
@@ -46,7 +41,7 @@ module.exports = function (app, passport, acl) {
 
     router.get('/courses/:course/tutorials/:tutorial/groups', GroupController.getGroupsByTutorial);
     router.get('/courses/:course/tutorials/:tutorial/groups/:group', GroupController.getGroup);
-    router.post('/courses/:course/tutorials/:tutorial/groups', GroupController.addGroupTutorial);
+    router.post('/courses/:course/tutorials/:tutorial/groups', GroupController.addGroupToTutorial);
     router.delete('/courses/:course/tutorials/:tutorial/groups/:group', GroupController.deleteGroupFromTutorial);
 
     router.get('/courses/:course/quizzes', QuizController.getQuizzesByCourse);
@@ -69,5 +64,5 @@ module.exports = function (app, passport, acl) {
     router.get('/files/:file', UserController.getFile);
     router.put('/files/:file', UserController.editFile);*/
 
-    app.use('/api/admin', /*[authenticate, acl.middleware()],*/ router);
+    app.use('/admin', /*[authenticate, acl.middleware()],*/ router);
 };

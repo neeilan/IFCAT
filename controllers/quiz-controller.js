@@ -17,13 +17,30 @@ exports.getQuizzesByCourse = function (req, res) {
 
 // Retrieve quiz
 exports.getQuiz = function (req, res) {
-    return Quiz.findById(req.params.id).populate('questions')
-    .exec().then(function(quiz){
+    return Quiz.findById(req.params.id).populate('questions').exec().then(function(quiz){
         res.status(200).send(quiz);
-    })
-    .catch(function(err){
+    }).catch(function (err) {
         res.status(505).send("Unable to retrieve quiz at this time (" + err.message + ").");
-    })
+    });
+};
+
+// Add quiz to tutorial
+exports.addQuizToTutorial = function (req, res) {
+    Quiz.findById(req.params.quiz, function (err, quiz) {
+        if (err) {
+            return res.status(500).send("Unable to find quiz at this time (" + err.message + ").");
+        }
+        Tutorial.findByIdAndUpdate(req.params.tutorial, { 
+            $push: { quizzes: quiz._id } 
+        }, { 
+            new: true 
+        }, function (err, tutorial) {
+            if (err) {
+                return res.status(500).send("Unable to save tutorial at this time (" + err.message + ").");
+            }
+            res.status(200).send(tutorial);
+        });
+    });
 };
 
 // Add quiz to course
@@ -50,43 +67,7 @@ exports.addQuizToCourse = function (req, res) {
     });
 };
 
-// Add quiz to tutorial
-exports.addQuizToTutorial = function (req, res) {
-    Quiz.findById(req.params.quiz, function (err, quiz) {
-        if (err) {
-            return res.status(500).send("Unable to find quiz at this time (" + err.message + ").");
-        }
-        Tutorial.findByIdAndUpdate(req.params.tutorial, { 
-            $push: { quizzes: quiz._id } 
-        }, { 
-            new: true 
-        }, function (err, tutorial) {
-            if (err) {
-                return res.status(500).send("Unable to save tutorial at this time (" + err.message + ").");
-            }
-            res.status(200).send(tutorial);
-        });
-    });
-};
 
-// Delete quiz from tutorial
-exports.deleteQuizFromTutorial = function (req, res) {
-    Quiz.findById(req.params.quiz, function (err, quiz) {
-        if (err) {
-            return res.status(500).send("Unable to find quiz at this time (" + err.message + ").");
-        }
-        Tutorial.findByIdAndUpdate(req.params.tutorial, { 
-            $pull: { quizzes: quiz } 
-        }, { 
-            new: true 
-        }, function (err, tutorial) {
-            if (err) {
-                return res.status(500).send("Unable to save tutorial at this time (" + err.message + ").");
-            }
-            res.status(200).send(tutorial);
-        });
-    });
-};
 
 // Update quiz
 exports.editQuiz = function (req, res) {
@@ -111,6 +92,25 @@ exports.deleteQuizFromCourse = function (req, res) {
                 return res.status(500).send("Unable to delete quiz at this time (" + err.message + ").");
             }
             res.status(200).send({ 'responseText': 'The quiz has successfully deleted' });
+        });
+    });
+};
+
+// Delete quiz from tutorial
+exports.deleteQuizFromTutorial = function (req, res) {
+    Quiz.findById(req.params.quiz, function (err, quiz) {
+        if (err) {
+            return res.status(500).send("Unable to find quiz at this time (" + err.message + ").");
+        }
+        Tutorial.findByIdAndUpdate(req.params.tutorial, { 
+            $pull: { quizzes: quiz } 
+        }, { 
+            new: true 
+        }, function (err, tutorial) {
+            if (err) {
+                return res.status(500).send("Unable to save tutorial at this time (" + err.message + ").");
+            }
+            res.status(200).send(tutorial);
         });
     });
 };

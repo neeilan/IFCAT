@@ -1,6 +1,3 @@
-'use strict'
-var _ = require('underscore');
-
 // models
 var Course = require('../models/course'),
     User = require('../models/user');
@@ -12,7 +9,7 @@ exports.getCourses = function (req, res) {
         if (err) {
             return res.status(500).send("Unable to retrieve any courses at this time (" + err.message + ").");
         }
-        res.status(200).send(courses);
+        res.render('admin/courses', { courses: courses });
     });
 };
 

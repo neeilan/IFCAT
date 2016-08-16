@@ -3,7 +3,7 @@ var Tutorial = require('../models/tutorial'),
     Group = require('../models/group');
 
 // Retrieve list of groups for tutorial
-exports.getGroups = function (req, res) { 
+exports.getGroupsByTutorial = function (req, res) { 
     Tutorial.findById(req.params.tutorial).populate('groups').exec(function (err, tutorial) {
         if (err) {
             return res.status(500).send("Unable to retrieve any tutorial at this time (" + err.message + ").");

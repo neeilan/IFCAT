@@ -1,0 +1,28 @@
+<%- include ../partials/header -%>
+
+<h1>Courses</h1>
+
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    <% courses.forEach(function (course) { %>
+        <tr>
+            <th><%= course.code %></th>
+            <th><%= course.name %></th>
+            <th>
+
+            </th>
+        </tr>
+    <% }) %>
+    </tbody>
+</table>
+
+<%- include ../partials/footer -%>
