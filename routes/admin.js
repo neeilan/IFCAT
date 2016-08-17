@@ -3,8 +3,8 @@ var router = require('express').Router(),
 
 // controllers
 var UserController = require('../controllers/user-controller'),
-    CourseController = require('../controllers/course-controller')/*,
-    TutorialController = require('../controllers/tutorial-controller'),
+    CourseController = require('../controllers/course-controller'),
+    TutorialController = require('../controllers/tutorial-controller')/*,
     GroupController = require('../controllers/group-controller'),
     QuizController = require('../controllers/quiz-controller'),
     QuestionController = require('../controllers/question-controller')*/;
@@ -24,11 +24,11 @@ module.exports = function (app, passport, acl) {
     //router.get('/courses/:course/students', UserController.getStudentsByCourse);
     // router.post('/courses/:course/students/import', upload.single('file'), UserController.importStudents);
     
-    // router.get('/courses/:course/tutorials', TutorialController.getTutorials);
-    // router.get('/courses/:course/tutorials/new', TutorialController.getNewTutorialForm);
-    // router.get('/courses/:course/tutorials/:tutorial/edit', TutorialController.getTutorialForm);
-    // router.post('/courses/:course/tutorials', TutorialController.addTutorial);
-    // router.put('/courses/:course/tutorials/:tutorial', TutorialController.editTutorial);
+    router.get('/courses/:course/tutorials', TutorialController.getTutorialsByAdmin);
+    router.get('/courses/:course/tutorials/new', TutorialController.getNewTutorialForm);
+    router.get('/courses/:course/tutorials/:tutorial/edit', TutorialController.getTutorialForm);
+    router.post('/courses/:course/tutorials', TutorialController.addTutorial);
+    router.put('/courses/:course/tutorials/:tutorial', TutorialController.editTutorial);
     // router.delete('/courses/:course/tutorials/:tutorial', TutorialController.deleteTutorial);
     
     // /*router.get('/courses/:course/tutorials/:tutorial/students', UserController.getStudentsByTutorial);
