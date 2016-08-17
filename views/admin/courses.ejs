@@ -23,11 +23,11 @@
                         Actions<span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a href="/admin/courses/<%= course.id %>">Edit Course</a></li>
-                        <li><a href="/admin/courses/<%= course.id %>/tutorials">Manage Tutorials</a></li>
-                        <li><a href="/admin/courses/<%= course.id %>/quizzes">Manage Quizzes</a></li>
+                        <li><a href="/admin/courses/<%= course.code %>/edit">Edit Course</a></li>
+                        <li><a href="/admin/courses/<%= course.code %>/tutorials">Manage Tutorials</a></li>
+                        <li><a href="/admin/courses/<%= course.code %>/quizzes">Manage Quizzes</a></li>
                         <li class="divider"></li>
-                        <li><a href="/admin/courses/<%= course.id %>">Delete Course</a></li>
+                        <li><a href="/admin/courses/<%= course.code %>">Delete Course</a></li>
                     </ul>
                 </div>
             </th>

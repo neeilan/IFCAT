@@ -1,0 +1,27 @@
+<%- include ../partials/header -%>
+
+<h1>Manage quiz</h1>
+<form action='/admin/courses/new'>
+  <div class="form-group">
+    <label for="name">Quiz name</label>
+    <input type="text" name="name" class="form-control" placeholder="Ex: Quiz 3">
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" name="randomizeChoices"> Randomize choices order</input>
+    </label>
+  </div>
+  <label for="name">Selects points awarded for correct answer on each attempt</label>
+  <div class = "row">
+  <div id="attempts" class="col-sm-2">
+      <input type="text" name="0" class="form-control" placeholder="1st attempt">
+      <input type="text" name="1" class="form-control" placeholder="2nd attempt">
+      <input type="text" name="2" class="form-control" placeholder="3rd attempt">
+      <input type="text" name="3" class="form-control" placeholder="4th attempt">  
+      <input type="text" name="4" class="form-control" placeholder="4+ attempts">
+  </div>
+  </div>
+  </div>
+  <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<%- include ../partials/footer -%>

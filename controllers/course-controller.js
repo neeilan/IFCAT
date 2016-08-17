@@ -15,7 +15,7 @@ exports.getCoursesByAdmin = function (req, res) {
 
 // Retrieve course by code
 exports.getNewCourseForm = function (req, res) {
-    res.render('admin/course', { course: new Course() });
+    res.render('admin/course', { course: new Course(), method: 'POST' });
 };
 
 // Retrieve course by code
@@ -27,7 +27,7 @@ exports.getCourseForm = function (req, res) {
         if (!course) {
             return res.status(404).send("This course doesn't exist.");
         } */
-        res.render('admin/course', { course: course });
+        res.render('admin/course', { course: course, method : 'PUT' });
     });
 };
 
@@ -61,13 +61,13 @@ exports.addCourse = function (req, res) {
         /*if (err) {
             return res.status(500).send("Unable to save course at this time (" + err.message + ").");
         }*/
-        res.redirect('/admin/courses/' + course.code + '/edit');
+        res.redirect('/admin/courses/');
     });
 };
 
 // Update course
 exports.editCourse = function (req, res) {
-    Course.findByIdAndUpdate(req.params.course, { $set: req.body }, { new: true }, function (err, course) {  
+    Course.findOneAndUpdate({ code : req.params.course}, { $set: req.body }, { new: true }, function (err, course) {  
         /*if (err) {
             return res.status(500).send("Unable to retrieve course at this time (" + err.message + ").");
         }*/
