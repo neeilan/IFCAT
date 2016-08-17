@@ -1,0 +1,15 @@
+<%- include ../partials/header -%>
+
+<h1>Tutorials</h1>
+
+<a class="btn btn-default btn-sm" href="/admin/courses/<%- course.code %>/tutorials">Back to tutorials</a>
+
+<form action="/admin/courses/<%- course.id %>/tutorials/<%- tutorial.isNew ? '' : tutorial.id %>?_method=<%- tutorial.isNew ? 'post' : 'put' %>" method="post">
+    <div class="form-group">
+        <label for="number">Number</label>
+        <input type="text" name="number" value="<%- tutorial.number %>" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-default">Submit</button>
+</form>
+
+<%- include ../partials/footer -%>

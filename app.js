@@ -32,7 +32,7 @@ app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist'));
 
 app.use(morgan('dev'));
-app.use(methodOverride());
+app.use(methodOverride('_method'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({ secret: 'thisisasecret', saveUninitialized: true, resave: true }));

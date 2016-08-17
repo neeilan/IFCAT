@@ -2,7 +2,7 @@
 
 <h1>Tutorials</h1>
 
-<a class="btn btn-default btn-sm" href="/admin/course/<%= course.id %>/tutorials/new">Add New Tutorial</a>
+<a class="btn btn-default btn-sm" href="/admin/courses/<%= course.code %>/tutorials/new">Add New Tutorial</a>
 
 <table class="table table-striped">
     <thead>
@@ -23,8 +23,8 @@
                         Actions<span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a href="/admin/course/<%= course.id %>/tutorials/<%= tutorial.id %>">Edit Tutorial</a></li>
-                        <li><a href="/admin/course/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes">Manage Groups</a></li>
+                        <li><a href="/admin/courses/<%= course.code %>/tutorials/<%= tutorial.number %>/edit">Edit Tutorial</a></li>
+                        <li><a href="/admin/courses/<%= course.code %>/tutorials/<%= tutorial.number %>/quizzes">Manage Groups</a></li>
                     </ul>
                 </div>
             </th>
