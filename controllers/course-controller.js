@@ -55,6 +55,32 @@ exports.getUserCourses = function (req, res) {
     });
 };
 
+
+// Retrieves all courses in the database
+exports.getAllCourses = function (req,res){
+    return Course.find({})
+    .exec()
+    .then(function(allCourses){
+        res.render('/student/allcourses', { courses: allCourses} )
+    }).catch(function(err){
+        res.status(500).send("Unable to retrieve courses at this time (" + err.message + ").");
+        // later : render error page with back button or flash message
+    })
+}
+
+// Retrieve all enrolled courses for a student
+exports.getCoursesByStudent = function (req, res) {
+    User.findOne({_id : req.user._id }, 'student.courses').populate({ path : 'student.courses', select : 'name code'})
+    .exec()
+    .then(function(user){
+        res.render('student/courses', { courses : user.student.courses })
+    })
+    .catch(function(err){
+        res.status(500).send("Unable to retrieve courses at this time (" + err.message + ").");
+        // later : render error page with back button or flash message
+    })
+};
+
 // Add course model
 exports.addCourse = function (req, res) {
     Course.create(req.body, function (err, course) {

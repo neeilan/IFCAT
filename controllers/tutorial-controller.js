@@ -2,7 +2,8 @@ var _ = require('underscore');
 
 // models
 var Course = require('../models/course'),
-    Tutorial = require('../models/tutorial');
+    Tutorial = require('../models/tutorial'),
+    User = require('../models/tutorial');
     
 // Retrieve list of tutorials for course
 exports.getTutorialsByAdmin = function (req, res) { 
@@ -13,6 +14,25 @@ exports.getTutorialsByAdmin = function (req, res) {
         res.render('admin/tutorials', { course: course });
     });
 };
+
+exports.getTutorialsByStudent = function (req, res) { // requires req.user object (ensure via middleware)
+    User.findById(req.user._id).populate('student.tutorials')
+    .populate({ path: 'student.tutorials', select: 'name number' })
+    .exec(function (user) {
+        /*if (err) {
+            return res.status(500).send("Unable to retrieve any tutorials at this time (" + err.message + ").");
+        }*/
+        res.render('student/tutorials', { tutorials: user.student.tutorials });
+    })
+    .catch(function(err){
+        res.status(500).send("Unable to retrieve tutorials at this time (" + err.message + ").");
+    });
+};
+
+// Retrieve all tutorials in a course
+exports.getTutorialsByCourse = function (req,res) {
+    //
+}
 
 // Retrieve specific tutorial for tutorial
 exports.getNewTutorialForm = function (req, res) { 
