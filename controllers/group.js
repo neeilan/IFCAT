@@ -1,19 +1,25 @@
 // models
-var Tutorial = require('../models/tutorial'),
+var Course = require('../models/course'),
+    Tutorial = require('../models/tutorial'),
     Group = require('../models/group');
 
 // Retrieve list of groups for tutorial
 exports.getGroupsByTutorial = function (req, res) { 
-    Tutorial.findById(req.params.tutorial).populate('groups').exec(function (err, tutorial) {
-        if (err) {
-            return res.status(500).send("Unable to retrieve any tutorial at this time (" + err.message + ").");
+    async.series([
+        function (cb) {
+            Course.findById(req.params.course, cb);
+        },
+        function (cb) {
+            Tutorial.findById(req.params.quiz).populate({ path: 'groups', options: { sort: { number: 1 } } }).exec(cb);
         }
-        res.status(200).send(tutorial.groups);
+    ], 
+    function (err, results) {
+        res.render('admin/groups', { course: results[0], tutorial: results[1] });
     });
 };
 
 // Retrieve group for tutorial
-exports.getGroup = function (req, res) { 
+exports.getNewGroupForm = function (req, res) { 
     Group.findById(req.params.group).populate('members').exec(function (err, group) {
         if (err) {
             return res.status(500).send("Unable to retrieve group at this time (" + err.message + ").");

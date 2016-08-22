@@ -1,53 +1,67 @@
 var bcrypt = require('bcryptjs'),
-    mongoose = require('mongoose');
+    mongoose = require('mongoose'),
+    _ = require('lodash');
+
+var roles = ['student', 'teachingAssistant', 'instructor', 'admin'];
+
 
 var UserSchema = new mongoose.Schema({
-    email: {
+    local: {
+        email: { 
+            type: String,
+            lowercase: true,
+            trim: true
+        },
+        password: String
+    },
+    oauth: {
+        id: String,
+        token: String,
+    },
+    firstName: { 
         type: String,
-        unique: true
+        lowercase: true,
+        trim: true
     },
-    password: String,
-    name: String,
-    utorId: String,
+    lastName: { 
+        type: String,
+        lowercase: true,
+        trim: true
+    },
     roles: {
-        type: Array,
-        enum: ['admin', 'instructor', 'teachingAssistant', 'student']
-    },
-    admin: {
-        courses: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Course'  } ],
+        type: [ { type: String, enum: roles } ]
+    },/*,
+    instructor: {
+        courses: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Course' } ],
     },
     teachingAssistant: {
-        courses: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Course'  } ],
-        tutorials: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Tutorial'  } ],
-    },
-    instructor: {
-        courses: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Course'  } ],
-    },
+        courses: [ { type: mongoose.Schema.Types.Mixed } ] // [0] => course ref, [1] tutorial ref
+    },*/
     student: {
-        courses: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Course'  } ],
-        tutorials: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Tutorial'  } ],
-        groups: [ { type : mongoose.Schema.Types.ObjectId, ref: 'Group'  } ]
+        courses: [ { type: mongoose.Schema.Types.Mixed } ] // [0] => course ref, [1] tutorial ref, [2] => group ref 
     }
 });
 
-// hash password using salt before saving
-UserSchema.pre('save', function (next) {
-    if (this.password) {
-        bcrypt.genSalt(10, function (err, salt) {
-            if (err) throw err;
-            bcrypt.hash(this.password, salt, function (err, hash) {
-                if (err) throw err;
-                this.password = hash;
-                next();
-            });
-        });
-    }
-});
-
-UserSchema.methods = {
-    authenticate: function (password, callback) {
-        bcrypt.compare(password, this.password, callback);
-    }
+UserSchema.methods.generateHash = function (s) {
+    return bcrypt.hashSync(s, bcrypt.genSaltSync(10), null);
 };
+
+UserSchema.methods.isValidPassword = function (password) {
+    return bcrypt.compareSync(password, this.local.password);
+};
+
+UserSchema.methods.hasRole = function () {
+    return _.intersection(this.roles, arguments).length > 0;
+};
+
+UserSchema.methods.addRole = function () {
+    this.roles = _.union(this.roles, arguments);
+};
+
+UserSchema.methods.removeRole = function () {
+    this.roles = _.pull(this.roles, arguments);
+};
+
+
 
 module.exports = mongoose.model('User', UserSchema);

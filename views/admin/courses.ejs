@@ -1,8 +1,10 @@
-<%- include ../partials/header -%>
+<%- include ../partials/admin-header -%>
 
 <h1>Courses</h1>
 
-<a class="btn btn-default btn-sm" href="/admin/courses/new">Add New Course</a>
+<% if (user.hasRole('admin')) { %>
+    <a class="btn btn-default btn-sm" href="/admin/courses/new">Add New Course</a>
+<% } %>
 
 <table class="table table-striped">
     <thead>
@@ -23,11 +25,19 @@
                         Actions<span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a href="/admin/courses/<%= course.code %>/edit">Edit Course</a></li>
-                        <li><a href="/admin/courses/<%= course.code %>/tutorials">Manage Tutorials</a></li>
-                        <li><a href="/admin/courses/<%= course.code %>/quizzes">Manage Quizzes</a></li>
+                    <% if (user.hasRole('admin')) { %>
+                        <li><a href="/admin/courses/<%= course.id %>/edit">Edit Course</a></li>
+                    <% } %>
+                        <li><a href="/admin/courses/<%= course.id %>/tutorials">Manage Tutorials</a></li>
+                        <li><a href="/admin/courses/<%= course.id %>/quizzes">Manage Quizzes</a></li>
+                    <% if (user.hasRole('admin')) { %>
+                        <li><a href="/admin/courses/<%= course.id %>/files">Manage Files</a></li>
+                    <% } %>
+                        <li><a href="/admin/courses/<%= course.id %>/students">Manage Students</a></li>
+                    <% if (user.hasRole('admin')) { %>
                         <li class="divider"></li>
-                        <li><a href="/admin/courses/<%= course.code %>">Delete Course</a></li>
+                        <li><a href="/admin/courses/<%= course.id %>">Delete Course</a></li>
+                    <% } %>
                     </ul>
                 </div>
             </th>
@@ -36,4 +46,4 @@
     </tbody>
 </table>
 
-<%- include ../partials/footer -%>
+<%- include ../partials/admin-footer -%>

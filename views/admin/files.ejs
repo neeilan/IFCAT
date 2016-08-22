@@ -1,0 +1,40 @@
+<%- include ../partials/admin-header -%>
+
+<h1>Media</h1>
+
+<a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/files/new">Add New File</a>
+
+<a class="btn btn-default btn-sm" href="#" class="delete-all">Delete Files</a>
+
+<table class="table table-striped">
+    <tdead>
+        <tr>
+            <th><input type="checkbox" value="1" class="select-all"></th>
+            <th></th>
+            <th>Name</th>
+            <th>Last modified</th>
+            <th></th>
+        </tr>
+    </tdead>
+    <tbody>
+    <% course.files.forEach(function (file) { %>
+        <tr>
+            <td><input type="checkbox" name="files[]" value="<%= file.id %>"></td>
+            <td><%= file.name %></td>
+            <td><%= moment(file.updatedAt).format(dateFormat) %></td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                        Actions<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="/admin/courses/<%= course.id %>/files/<%= file.id %>/edit">Edit File</a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    <% }) %>
+    </tbody>
+</table>
+
+<%- include ../partials/admin-footer -%>

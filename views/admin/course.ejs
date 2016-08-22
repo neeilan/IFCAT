@@ -1,25 +1,26 @@
-<%- include ../partials/header -%>
+<%- include ../partials/admin-header -%>
 
-<%if (course.name) { %>
-<h1><%= course.name %></h1>
-<% } %>
+<h1><%= course.isNew ? 'Add new course' : 'Edit course' %></h1>
 
-
-<h1>Course.name</h1>
-<form action='/admin/courses/<%=course.code || ''%>?_method=<%- method %>' method="POST">
-  <div class="form-group">
-    <label for="name">Course name</label>
-    <input type="text" name="name" class="form-control"
-    value = "<%= course.name || '' %>"
-    placeholder="Ex: Intro to Computer Science - Fall 2017">
-    <label for="code">Course code</label>
-    <input type="text" name="code" class="form-control" 
-    value = "<%= course.code || '' %>"
-    placeholder="Ex: CSCA48">   
-    <small id="codeHelp" class="form-text text-muted">This is a unique identifier for your course. It will be used in URL's, for example.</small>
-  </div>
-  <button type="submit" class="btn btn-primary">Save</button>
+<form action="/admin/courses/<%= course.isNew  ? '' : course.id + '?_method=put' %>" method="post" class="form-horizontal">
+    <div class="form-group">
+        <label for="code" class="col-sm-2 control-label">Code</label>
+        <div class="col-sm-10">
+            <input type="text" name="code" value="<%= course.code %>" class="form-control" maxlength="8">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="name" class="col-sm-2 control-label">Name</label>
+        <div class="col-sm-10">
+            <input type="text" name="name" value="<%= course.name %>" class="form-control">
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <a href="/admin/courses" class="btn btn-default btn-sm">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-sm">Save</button>
+        </div>
+    </div>
 </form>
-<button class="btn btn-danger">Delete course</button>
 
-<%- include ../partials/footer -%>
+<%- include ../partials/admin-footer -%>

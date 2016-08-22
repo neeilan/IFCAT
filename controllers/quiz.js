@@ -1,5 +1,3 @@
-var _ = require('underscore');
-
 // models
 var Course = require('../models/course'),
     Tutorial = require('../models/tutorial'),
@@ -7,7 +5,10 @@ var Course = require('../models/course'),
 
 // Retrieve many quizzes
 exports.getQuizzesByCourse = function (req, res) {
-    Course.findById(req.params.course).find(function (err, course) {
+    Course.findById(req.params.course).populate({
+        path: 'quizzes', 
+        options: { sort: { name: 1 } }
+    }).exec(function (err, course) {
         /*if (err) {
             return res.status(500).send("Unable to retrieve any quizzes at this time (" + err.message + ").");
         }*/
@@ -15,67 +16,60 @@ exports.getQuizzesByCourse = function (req, res) {
     });
 };
 
-// Retrieve quiz
-exports.getQuiz = function (req, res) {
-    return Quiz.findById(req.params.id).populate('questions').exec().then(function(quiz){
-        res.status(200).send(quiz);
-    }).catch(function (err) {
-        res.status(505).send("Unable to retrieve quiz at this time (" + err.message + ").");
+// Retrieve quiz form
+exports.getNewQuizForm = function (req, res) {
+    Course.findById(req.params.course, function (err, course) { 
+        res.render('admin/quiz', { course: course, quiz: new Quiz() });
+    });
+};
+
+// Retrieve quiz form
+exports.getQuizForm = function (req, res) {
+    Course.findById(req.params.course, function (err, course) { 
+        Quiz.findById(req.params.quiz, function (err, quiz) {
+            res.render('admin/quiz', { course: course, quiz: quiz });
+        });
     });
 };
 
 // Add quiz to tutorial
 exports.addQuizToTutorial = function (req, res) {
-    Quiz.findById(req.params.quiz, function (err, quiz) {
-        if (err) {
-            return res.status(500).send("Unable to find quiz at this time (" + err.message + ").");
-        }
-        Tutorial.findByIdAndUpdate(req.params.tutorial, { 
-            $push: { quizzes: quiz._id } 
-        }, { 
-            new: true 
-        }, function (err, tutorial) {
-            if (err) {
-                return res.status(500).send("Unable to save tutorial at this time (" + err.message + ").");
-            }
-            res.status(200).send(tutorial);
-        });
-    });
+
 };
 
 // Add quiz to course
 exports.addQuizToCourse = function (req, res) {
     Course.findById(req.params.course, function (err, course) {
-        if (err) {
+        /*if (err) {
             return res.status(500).send("Unable to retrieve course at this time (" + err.message + ").");
         } else if (!course) {
             return res.status(404).send("This course doesn't exist.");
-        }
+        }*/
         Quiz.create(req.body, function (err, quiz) {
-            if (err) {
+            /*if (err) {
                 return res.status(500).send("Unable to save quiz at this time (" + err.message + ").");
-            }
+            }*/
             // add quiz to course
             course.quizzes.push(quiz);
             course.save(function (err) {
-                if (err) {
+                /*if (err) {
                     return res.status(500).send("Unable to save course at this time (" + err.message + ").");
-                }
-                res.status(200).send(quiz);
+                }*/
+                res.redirect('/admin/courses/' + course.id + '/quizzes');
             });
         });
     });
 };
 
-
-
 // Update quiz
 exports.editQuiz = function (req, res) {
-    Quiz.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true }, function (err, quiz) {  
-        if (err) {
-            return res.status(500).send("Unable to retrieve quiz at this time (" + err.message + ").");
-        } 
-        res.status(200).send(quiz);
+    Course.findById(req.params.course, function (err, course) {
+        Quiz.findByIdAndUpdate(req.params.quiz, { $set: req.body }, { new: true }, function (err, quiz) {  
+            /*if (err) {
+                return res.status(500).send("Unable to retrieve quiz at this time (" + err.message + ").");
+            } */
+            res.redirect('/admin/courses/' + course.id + '/quizzes/' + quiz.id + '/edit');
+        });
     });
 };
 

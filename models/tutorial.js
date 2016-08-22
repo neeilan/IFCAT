@@ -1,13 +1,11 @@
-var mongoose = require('mongoose'),
-  Schema = mongoose.Schema,
-  ArrayUtils = require('../utilities/Array.js');
+var mongoose = require('mongoose');
 
 var TutorialSchema = new mongoose.Schema({
     number: { type: String, required: true, trim: true},
-    teachingAssistants: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    students: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
-    quizzes: [{ type: Schema.Types.ObjectId, ref: 'Quiz' }]
+    teachingAssistants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
+    quizzes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' }]
 }, {
     timestamps: true
 });

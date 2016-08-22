@@ -1,0 +1,58 @@
+<%- include ../partials/admin-header -%>
+
+<h1>Questions</h1>
+
+<% if (user.hasRole('admin', 'instructor')) { %>
+    <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/new">Add New Question</a>
+<% } %>
+
+<table class="table table-striped sortable">
+    <thead>
+        <tr>
+            <th>Question</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% quiz.questions.forEach(function (question) { %>
+        <tr data-id="<%= question.id %>">
+            <td><%= question.question %></td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                        Actions<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <!--li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= question.id %>/view">View Question</a></li-->
+                    <% if (user.hasRole('admin', 'instructor')) { %>
+                        <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= question.id %>/edit">Edit Question</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Delete Question</a></li>
+                    <% } %>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    <% }) %>
+    </tbody>
+</table>
+
+<script>
+/*$(function() {
+    $('tbody').sortable();
+
+    $('#sort').click(function () {
+        var data = $('tr[data-id]').map(function () { 
+            return { 'name': 'id[]', 'value': $(this).data('id') }; 
+        }).get();
+
+        //console.log(data);
+
+        $.post('/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/sort', data, function (res) {
+            window.location.reload();
+        }, 'json');
+    });
+});*/
+</script>
+
+<%- include ../partials/admin-footer -%>

@@ -1,0 +1,27 @@
+
+<div class="modal fade" tabindex="-1" role="dialog" id="file-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <h4 class="modal-title">Select files</h4>
+            </div>
+            <div class="modal-body" style="padding: 0 15px;">
+                <div class="row flush-col">
+                    <div class="col-xs-6 list-group" data-toggle="items">
+                    <% course.files.forEach(function (file) { %>
+                        <a href="#" class="list-group-item" data-id="<%= file.id %>"><%= file.name %></a> 
+                    <% }) %>  
+                    </div>
+                    <div class="col-xs-6">
+                    Preview goes here
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary add-files" data-dismiss="modal">Add files</button>
+            </div>
+        </div>
+    </div>
+</div>

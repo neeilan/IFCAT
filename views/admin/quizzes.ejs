@@ -1,8 +1,10 @@
-<%- include ../partials/header -%>
+<%- include ../partials/admin-header -%>
 
 <h1>Quizzes</h1>
 
-<a class="btn btn-default btn-sm" href="/admin/course/<%= course.id %>/quizzes/new">Add New Quiz</a>
+<% if (user.hasRole('admin', 'instructor')) { %>
+    <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/quizzes/new">Add New Quiz</a>
+<% } %>
 
 <table class="table table-striped">
     <thead>
@@ -21,9 +23,14 @@
                         Actions<span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a href="/admin/course/<%= course.id %>/quizzes/<%= quiz.id %>">Edit Quiz</a></li>
-                        <li><a href="/admin/course/<%= course.id %>/quizzes/<%= quiz.id %>/questions">Manage Questions</a></li>
+                    <% if (user.hasRole('admin', 'instructor')) { %>
+                        <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/edit">Edit Quiz</a></li>
+                    <% } %>
+                        <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions">Manage Questions</a></li>
+                    <% if (user.hasRole('admin', 'instructor')) { %>
+                        <li class="divider"></li>
                         <li><a href="#">Delete Quiz</a></li>
+                    <% } %>
                     </ul>
                 </div>
             </th>
@@ -32,4 +39,4 @@
     </tbody>
 </table>
 
-<%- include ../partials/footer -%>
+<%- include ../partials/admin-footer -%>
