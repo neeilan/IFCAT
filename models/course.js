@@ -8,7 +8,13 @@ var CourseSchema = new mongoose.Schema({
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     tutorials: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tutorial' }],
     quizzes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' }],
-    files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }]
+    files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
+    // default settings for quizzes
+    settings: {
+        gradingScheme: [Number],
+        randomizeChoices: Boolean,
+        useLaTeX: Boolean
+    }
 }, {
     timestamps: true
 });

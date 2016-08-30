@@ -1,94 +1,60 @@
-var async = require('async'),
-    moment = require('moment');
-
-// models
 var Course = require('../models/course'),
     File = require('../models/file');
 
-// Retrieve all files in a course
-exports.getFilesByCourse = function (req,res) {
-    Course.findById(req.params.course).populate({
-        path: 'files', options: { sort: { name: 1 }}
-    }).exec(function (err, course) {
-        /*if (err) {
-            return res.status(500).send("Unable to retrieve any files at this time (" + err.message + ").");
-        }*/
-        res.render('admin/files', { course: course, moment: moment });
+// Retrieve course
+exports.getFile = function (req, res, next, fil3) {
+    File.findById(fil3, function (err, fil3) {
+        if (err) {
+            return next(err);
+        }
+        if (!fil3) {
+            return next(new Error('No file is found.'));
+        }
+        console.log('got file');
+        req.fil3 = fil3; // !careful: fil3 not file b/c multer uses req.file
+        next();
     });
 };
 
-// Retrieve specific file for file
-exports.getNewFileForm = function (req, res) { 
-    Course.findById(req.params.course, function (err, course) {
-        res.render('admin/file', { course: course, file: new File() });
+// Retrieve all files in a course
+exports.getFileList = function (req, res) {
+    Course.populate(req.course, {
+        path: 'files', options: { sort: { name: 1 }}
+    }, function (err, course) {
+        /*if (err) {
+            return res.status(500).send("Unable to retrieve any files at this time (" + err.message + ").");
+        }*/
+        res.render('admin/course-files', { course: course });
     });
 };
 
 // Retrieve specific file for file
 exports.getFileForm = function (req, res) { 
-    async.series([
-        function (cb) { Course.findById(req.params.course, cb); },
-        function (cb) { File.findById(req.params.file, cb); }
-    ], 
-    function (err, results) {
-        res.render('admin/file', { course: results[0], file: results[1] });
-    });
+    res.render('admin/course-file', { course: req.course, file: req.fil3 || new File() });
 };
 
 // Add new file for file
 exports.addFile = function (req, res) {
-    async.waterfall([
-        function (next) { 
-            Course.findById(req.params.course, next); 
-        },
-        function (course, next) { 
-            File.create({ 
-                name: req.file.filename, 
-                type: req.file.mimetype 
-            }, function (err, file) { 
-                next(err, course, file);
-            });
-        },
-        function (course, file, next) { 
-            course.files.push(file);
-            course.save(function (err) {
-                /*if (err) {
-                    return res.status(500).send("Unable to save course at this time (" + err.message + ").");
-                }*/
-                next(null, course);
-            }); 
-        }
-    ], 
-    function (err, course) {
-        if (err) {
-            console.log(err);
-        }
-        res.redirect('/admin/courses/' + course.id + '/files');
+    File.create({ 
+        name: req.file.filename, 
+        type: req.file.mimetype 
+    }, function (err, file) { 
+        req.course.files.push(file);
+        req.course.save(function (err) {
+            if (err) {
+                console.log(err);
+            }
+            res.redirect('/admin/courses/' + req.course.id + '/files');
+        }); 
     });
 };
 
 // Update specific file for course
 exports.editFile = function (req, res) {
-    async.waterfall([
-        function (next) { 
-            Course.findById(req.params.course, next); 
-        },
-        function (course, next) { 
-            File.findById(req.params.file, function (err, file) { 
-                next(err, course, file);
-            });
-        },
-        function (course, file, next) { 
-            file.title = req.body.title;
-            file.name = req.file.filename;
-            file.type = req.file.mimetype;
-            file.save(function (err, file) {
-                next(err, course, file);
-            });
-        }
-    ], 
-    function (err, course, file) {
-        res.redirect('/admin/courses/' + course.id + '/files/' + file.id + '/edit');
+    req.fil3.name = req.file.filename;
+    req.fil3.type = req.file.mimetype;
+    req.fil3.save(function (err) {
+        res.redirect('/admin/courses/' + req.course.id + '/files/' + req.fil3.id + '/edit');
     });
 };
 

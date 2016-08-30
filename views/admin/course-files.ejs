@@ -2,16 +2,17 @@
 
 <h1>Media</h1>
 
-<a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/files/new">Add New File</a>
+<h4 class="todo">@TODO: ability to delete files</h4>
 
+<a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/files/new">Add New File</a>
 <a class="btn btn-default btn-sm" href="#" class="delete-all">Delete Files</a>
 
 <table class="table table-striped">
     <tdead>
         <tr>
             <th><input type="checkbox" value="1" class="select-all"></th>
-            <th></th>
             <th>Name</th>
+            <th>Type</th>
             <th>Last modified</th>
             <th></th>
         </tr>
@@ -21,6 +22,7 @@
         <tr>
             <td><input type="checkbox" name="files[]" value="<%= file.id %>"></td>
             <td><%= file.name %></td>
+            <td><%= file.type %></td>
             <td><%= moment(file.updatedAt).format(dateFormat) %></td>
             <td>
                 <div class="dropdown">

@@ -1,6 +1,11 @@
-.row.flush-col > [class*="col-"] {padding:0;}
+.row.flush-col > [class*="col-"] {
+    padding: 0px;
+}
+body > .navbar {
+    border-radius: 0px;
+}
 #file-modal .list-group {
-    margin: 0;
+    margin: 0px;
 }
 #file-modal .list-group-item { 
     border-radius: 0!important;
@@ -11,4 +16,7 @@
 }
 #file-modal .list-group-item:first-child { 
     border-top: 0px solid #ddd;
+}
+.todo {
+    color: red;
 }

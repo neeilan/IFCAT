@@ -15,6 +15,8 @@ var config = require('./config/common');
 var app = express();
 
 // locals
+app.locals._ = require('lodash');
+app.locals.moment = require('moment');
 app.locals.dateFormat = 'MMMM Do YYYY @ h:mm a';
 
 mongoose.connect(config.db.url);
@@ -35,7 +37,7 @@ app.use(morgan('dev'));
 
 app.use(methodOverride('_method'));
 app.use(bodyParser.json({ limit: '5mb' }));
-app.use(bodyParser.urlencoded({ extended: false, limit: '5mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 
 app.use(cookieParser());
 app.use(session({ 
@@ -52,11 +54,13 @@ app.use(passport.session());
 
 // pass the user object to all responses
 app.use(function (req, res, next) {
+    res.locals.url = req.originalUrl;
     res.locals.user = req.user;
     next();
 });
 
-app.use('/', require('./routes/user'));
+app.use('/', require('./routes/guest'));
+app.use('/student', require('./routes/student'));
 app.use('/admin', require('./routes/admin'));
 
 app.use(function (err, req, res, next) {

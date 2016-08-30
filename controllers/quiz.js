@@ -1,110 +1,130 @@
-// models
-var Course = require('../models/course'),
-    Tutorial = require('../models/tutorial'),
-    Quiz = require('../models/quiz');
+var async = require('async'),
+    _ = require('lodash');
 
-// Retrieve many quizzes
-exports.getQuizzesByCourse = function (req, res) {
-    Course.findById(req.params.course).populate({
-        path: 'quizzes', 
-        options: { sort: { name: 1 } }
-    }).exec(function (err, course) {
-        /*if (err) {
-            return res.status(500).send("Unable to retrieve any quizzes at this time (" + err.message + ").");
-        }*/
-        res.render('admin/quizzes', { course: course });
+var Course = require('../models/course'),
+    Quiz = require('../models/quiz'),
+    Question = require('../models/question');
+
+// Retrieve course
+exports.getQuiz = function (req, res, next, quiz) {
+    Quiz.findById(quiz).exec(function (err, quiz) {
+        if (err) {
+            return next(err);
+        }
+        if (!quiz) {
+            return next(new Error('No quiz is found.'));
+        }
+        console.log('got quiz');
+        req.quiz = quiz;
+        next();
     });
 };
 
-// Retrieve quiz form
-exports.getNewQuizForm = function (req, res) {
-    Course.findById(req.params.course, function (err, course) { 
-        res.render('admin/quiz', { course: course, quiz: new Quiz() });
+// Retrieve quizzes within course
+exports.getQuizList = function (req, res) {
+    Course.populate(req.course, {
+        path: 'quizzes', options: { sort: { name: 1 } }
+    }, function (err) {
+        /*if (err) {
+            return res.status(500).send("Unable to retrieve any quizzes at this time (" + err.message + ").");
+        }*/
+        res.render('admin/course-quizzes', { course: req.course });
     });
 };
 
 // Retrieve quiz form
 exports.getQuizForm = function (req, res) {
-    Course.findById(req.params.course, function (err, course) { 
-        Quiz.findById(req.params.quiz, function (err, quiz) {
-            res.render('admin/quiz', { course: course, quiz: quiz });
-        });
+    Course.populate(req.course, {
+        path: 'tutorials',
+        sort: { number: 1 } 
+    }, function () {
+        var quiz = req.quiz || new Quiz();
+   
+        //quiz.setDefault(req.course);
+
+//console.log(quiz.settings, quiz.settings.gradingScheme.length);
+
+        res.render('admin/course-quiz', { course: req.course, quiz: quiz });
     });
 };
 
-// Add quiz to tutorial
-exports.addQuizToTutorial = function (req, res) {
-
-};
-
 // Add quiz to course
-exports.addQuizToCourse = function (req, res) {
-    Course.findById(req.params.course, function (err, course) {
-        /*if (err) {
-            return res.status(500).send("Unable to retrieve course at this time (" + err.message + ").");
-        } else if (!course) {
-            return res.status(404).send("This course doesn't exist.");
-        }*/
-        Quiz.create(req.body, function (err, quiz) {
-            /*if (err) {
-                return res.status(500).send("Unable to save quiz at this time (" + err.message + ").");
-            }*/
-            // add quiz to course
-            course.quizzes.push(quiz);
-            course.save(function (err) {
-                /*if (err) {
-                    return res.status(500).send("Unable to save course at this time (" + err.message + ").");
-                }*/
-                res.redirect('/admin/courses/' + course.id + '/quizzes');
+exports.addQuiz = function (req, res) {
+    async.waterfall([
+        function (next) {
+            Quiz.create(req.body, next);
+        },
+        function (quiz, next) {
+            req.course.quizzes.push(quiz);
+            req.course.save(function (err) {
+                next(err, quiz);
             });
-        });
+        }
+    ], function (err) {
+        res.redirect('/admin/courses/' + req.course.id + '/quizzes');
     });
 };
 
 // Update quiz
 exports.editQuiz = function (req, res) {
-    Course.findById(req.params.course, function (err, course) {
-        Quiz.findByIdAndUpdate(req.params.quiz, { $set: req.body }, { new: true }, function (err, quiz) {  
-            /*if (err) {
-                return res.status(500).send("Unable to retrieve quiz at this time (" + err.message + ").");
-            } */
-            res.redirect('/admin/courses/' + course.id + '/quizzes/' + quiz.id + '/edit');
-        });
+    _.extend(req.quiz, req.body).save(function (err) {  
+        /*if (err) {
+            return res.status(500).send("Unable to retrieve quiz at this time (" + err.message + ").");
+        } */
+        res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/edit');
     });
 };
 
 // Delete quiz
-exports.deleteQuizFromCourse = function (req, res) {
-    Course.findByIdAndUpdate(req.params.course, {
-        $pull: { quizzes: { _id: req.params.quiz } }
-    }, function (err, course) {
-        if (err) {
-            return res.status(500).send("Unable to delete course at this time (" + err.message + ").");
-        }
-        Quiz.findByIdAndRemove(req.params.quiz, function (err, quiz) {
-            if (err) {
-                return res.status(500).send("Unable to delete quiz at this time (" + err.message + ").");
-            }
-            res.status(200).send({ 'responseText': 'The quiz has successfully deleted' });
-        });
-    });
+exports.deleteQuiz = function (req, res) {
+
 };
 
-// Delete quiz from tutorial
-exports.deleteQuizFromTutorial = function (req, res) {
-    Quiz.findById(req.params.quiz, function (err, quiz) {
-        if (err) {
-            return res.status(500).send("Unable to find quiz at this time (" + err.message + ").");
-        }
-        Tutorial.findByIdAndUpdate(req.params.tutorial, { 
-            $pull: { quizzes: quiz } 
-        }, { 
-            new: true 
-        }, function (err, tutorial) {
-            if (err) {
-                return res.status(500).send("Unable to save tutorial at this time (" + err.message + ").");
+// TO-BE-REMOVED
+
+exports.getQuizzesDemo = function (req, res) {
+    Course.findById(req.params.course).populate('quizzes').exec(function (err, course) { 
+        res.render('student/quizzes', { course: course });
+    });   
+};
+
+exports.startQuizDemo = function (req, res) {
+    /*async.waterfall([
+        function (next) {
+            Course.findById(req.params.course, next);
+        },
+        function (course, next) {
+            Quiz.findById(req.params.quiz, function (err, quiz) {
+                next(err, course, quiz);
+            });
+        },
+        function (course, quiz, next) {
+            if (quiz.questions.length) {
+                Question.findById(quiz.questions[0], function (err, question) {
+                    next(err, course, quiz, question);
+                });
+            } else {
+                res.redirect('/courses/' + req.params.course + '/quizzes');
             }
-            res.status(200).send(tutorial);
-        });
-    });
+        }
+    ],
+    function (err, course, quiz, question, i) {
+        res.render('student/start', { course: course, quiz: quiz, question: question });
+    });*/
+};
+
+exports.endQuizDemo = function (req, res) {
+    /*async.waterfall([
+        function (next) {
+            Course.findById(req.params.course, next);
+        },
+        function (course, next) {
+            Quiz.findById(req.params.quiz, function (err, quiz) {
+                next(err, course, quiz);
+            });
+        }
+    ],
+    function (err, course, quiz, question, i) {
+        res.render('student/end', { course: course, quiz: quiz });
+    });*/
 };

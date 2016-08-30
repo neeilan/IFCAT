@@ -1,21 +1,50 @@
-var async = require('async');
+var async = require('async'),
+    _ = require('lodash');
 
 // models
 var Course = require('../models/course'),
-    Tutorial = require('../models/tutorial');
-    
+    Tutorial = require('../models/tutorial'),
+    TutorialQuiz = require('../models/tutorialQuiz');
+
+// Retrieve course
+exports.getTutorial = function (req, res, next, tutorial) {
+    Tutorial.findById(tutorial, function (err, tutorial) {
+        if (err) {
+            return next(err);
+        }
+        if (!tutorial) {
+            return next(new Error('No tutorial is found.'));
+        }
+        console.log('got tutorial');
+        req.tutorial = tutorial;
+        next();
+    });
+};
+
 // Retrieve list of tutorials for course
-exports.getTutorials = function (req, res) { 
-    
+exports.getTutorialList = function (req, res) { 
     if (req.user.hasRole('admin')) {
-        Course.findById(req.params.course).populate({
+        Course.populate(req.course, { 
             path: 'tutorials', 
-            options: { sort: { number: 1 }}
-        }).exec(function (err, course) {
-            res.render('admin/tutorials', { course: course });
+            options: { 
+                sort: { number: 1 }
+            },
+            populate: {
+                path: 'teachingAssistants', 
+                options: { 
+                    sort: { 'name.first': 1, 'name.last': 1 }
+                }
+            }
+        }, function (err, course) {
+            res.render('admin/course-tutorials', { course: course });
         });
-    } else if (req.user.hasRole('teachingAssistant')) {
-        
+    
+
+
+    } else {
+        Course.find(req.params.course).populate('tutorials').exec(function (err, courses) { 
+            res.render('student/tutorials', { course: course });
+        });
     }
 };
 
@@ -31,66 +60,49 @@ exports.getTutorials = function (req, res) {
     });
 };*/
 
-// Retrieve all tutorials in a course
-exports.getTutorialsByCourse = function (req,res) {
-    //
-};
-
-// Retrieve specific tutorial for tutorial
-exports.getNewTutorialForm = function (req, res) { 
-    Course.findById(req.params.course, function (err, course) {
-        res.render('admin/tutorial', { course: course, tutorial: new Tutorial() });
-    });
-};
-
 // Retrieve specific tutorial for tutorial
 exports.getTutorialForm = function (req, res) { 
-    Course.findById(req.params.course, function (err, course) { 
-        Tutorial.findById(req.params.tutorial, function (err, tutorial) {
-            res.render('admin/tutorial', { course: course, tutorial: tutorial });
-        });
+    res.render('admin/course-tutorial', { 
+        course: req.course, 
+        tutorial: req.tutorial || new Tutorial() 
     });
 };
 
 // Add new tutorial for tutorial
 exports.addTutorial = function (req, res) {
-    Course.findById(req.params.course, function (err, course) {
+    Tutorial.create(req.body, function (err, tutorial) {
+        console.log(err);
         /*if (err) {
-            return res.send("Unable to retrieve course at this time (" + err.message + ").");
-        }
-        if (!course) {
-            return res.send("This course doesn't exist.");
+            return res.status(500).send("Unable to save tutorial at this time (" + err.message + ").");
         }*/
-        Tutorial.create(req.body, function (err, tutorial) {
+        req.course.tutorials.push(tutorial);
+        req.course.save(function (err) {
+
             /*if (err) {
-                return res.status(500).send("Unable to save tutorial at this time (" + err.message + ").");
+                return res.status(500).send("Unable to save course at this time (" + err.message + ").");
             }*/
-            course.tutorials.push(tutorial);
-            course.save(function (err) {
-                /*if (err) {
-                    return res.status(500).send("Unable to save course at this time (" + err.message + ").");
-                }*/
-                res.redirect('/admin/courses/' + course.id + '/tutorials');
-            });
+            res.redirect('/admin/courses/' + req.course.id + '/tutorials');
         });
     });
 };
 
 // Update specific tutorial for course
-exports.editTutorial = function (req, res) {
-    Course.findById(req.params.course, function (err, course) {
-        Tutorial.findByIdAndUpdate(req.params.tutorial, { $set: req.body }, { new: true }, function (err, tutorial) {  
-            /*if (err) {
-                return res.status(500).send("Unable to retrieve tutorial at this time (" + err.message + ").");
-            }*/
-            res.redirect('/admin/courses/' + course.id + '/tutorials/' + tutorial.id + '/edit');
-        });
+exports.editTutorial = function (req, res) {    
+    _.extend(req.tutorial, req.body).save(function (err) {  
+        /*if (err) {
+            return res.status(500).send("Unable to retrieve tutorial at this time (" + err.message + ").");
+        }*/
+        res.redirect(
+            '/admin/courses/' + req.course.id + 
+            '/tutorials/' + req.tutorial.id + 
+            '/edit'
+        );
     });
 };
 
 // Delete specific tutorial for course
-exports.deleteTutorial = function (req, res) {
-   /* 
+/* exports.deleteTutorial = function (req, res) {
+   
 
    Course.findByIdAndUpdate(req.params.course, {
         $pull: { tutorials: { _id: req.params.tutorial } }
@@ -104,5 +116,5 @@ exports.deleteTutorial = function (req, res) {
             }
             res.status(200).send({ 'responseText': 'The tutorial has successfully deleted' });
         });
-    });*/
-};
+    });
+};*/

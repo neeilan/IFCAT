@@ -2,15 +2,14 @@ var bcrypt = require('bcryptjs'),
     mongoose = require('mongoose'),
     _ = require('lodash');
 
-var roles = ['student', 'teachingAssistant', 'instructor', 'admin'];
+var roles = ['student', 'teachingAsst', 'instructor', 'admin'];
 
 
 var UserSchema = new mongoose.Schema({
     local: {
         email: { 
             type: String,
-            lowercase: true,
-            trim: true
+            lowercase: true
         },
         password: String
     },
@@ -18,27 +17,29 @@ var UserSchema = new mongoose.Schema({
         id: String,
         token: String,
     },
-    firstName: { 
-        type: String,
-        lowercase: true,
-        trim: true
+    UTORid: String,
+    name: {
+        first: {
+            type: String,
+            lowercase: true
+        },
+        last: { 
+            type: String,
+            lowercase: true
+        }
     },
-    lastName: { 
-        type: String,
-        lowercase: true,
-        trim: true
-    },
-    roles: {
-        type: [ { type: String, enum: roles } ]
-    },/*,
+    roles: Array,
     instructor: {
-        courses: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Course' } ],
+        courses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
     },
-    teachingAssistant: {
-        courses: [ { type: mongoose.Schema.Types.Mixed } ] // [0] => course ref, [1] tutorial ref
-    },*/
+    teachingAsst: {
+        courses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
+        //tutorials: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tutorial' }]
+    },
     student: {
-        courses: [ { type: mongoose.Schema.Types.Mixed } ] // [0] => course ref, [1] tutorial ref, [2] => group ref 
+        courses: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Course' } ],
+        //tutorials: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tutorial' }],
+        //groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }]
     }
 });
 
@@ -62,6 +63,13 @@ UserSchema.methods.removeRole = function () {
     this.roles = _.pull(this.roles, arguments);
 };
 
+UserSchema.methods.getFullName = function () {
+    return this.name.first + ' ' + this.name.last;
+};
+
+UserSchema.methods.isRepresentativeOf = function (group) {
+    return group.representative && this.id === group.representative.id;
+};
 
 
 module.exports = mongoose.model('User', UserSchema);

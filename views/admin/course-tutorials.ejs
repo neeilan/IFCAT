@@ -2,6 +2,10 @@
 
 <h1>Tutorials</h1>
 
+
+<h4 class="todo">@TODO: ability to delete tutorials</h4>
+<h4 class="todo">@TODO: ability to manage TAs</h4>
+
 <% if (user.hasRole('admin', 'instructor')) { %>
     <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/tutorials/new">Add New Tutorial</a>
 <% } %>
@@ -11,31 +15,29 @@
         <tr>
             <th>Tutorial</th>
             <th>TA</th>
+            <th># of students</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
     <% course.tutorials.forEach(function (tutorial) { %>
         <tr>
-            <th>TUT <%= tutorial.number %></th>
-            <th><%= tutorial.teachingAssistants.join('<br>') %></th>
-            <th>
+            <td><%= tutorial.getTUT() %></td>
+            <td><%= tutorial.teachingAssistants.map(function (ta) { return ta.getFullName(); }).join('<br>') %></td>
+            <td><%= tutorial.students.length %></td>
+            <td>
                 <div class="dropdown">
                     <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
                         Actions<span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                    <% if (user.hasRole('admin', 'instructor')) { %>
                         <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/edit">Edit Tutorial</a></li>
-                    <% } %>
-                        <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes">Manage Groups</a></li>
-                    <% if (user.hasRole('admin', 'instructor')) { %>
+                        <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes">Manage Quizzes</a></li>
                         <li class="divider"></li>
                         <li><a href="#">Delete Tutorial</a></li>
-                    <% } %>
                     </ul>
                 </div>
-            </th>
+            </td>
         </tr>
     <% }) %>
     </tbody>

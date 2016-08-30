@@ -1,0 +1,11 @@
+<%- include ../partials/student-header -%>
+
+<h1><%- course.name + ' - ' + tutorial.getTUT() %></h2>
+
+<div class="list-group">
+<% tutorial.quizzes.forEach(function (tutorialQuiz) { %>
+    <a href="/student/courses/<%= course.id %>/quizzes/<%= tutorialQuiz.id %>/start" class="list-group-item"><%= tutorialQuiz.quiz.name %></a>
+<% }) %>
+</div>
+
+<%- include ../partials/student-footer -%>

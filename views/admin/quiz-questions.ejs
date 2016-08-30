@@ -1,14 +1,16 @@
 <%- include ../partials/admin-header -%>
 
 <h1>Questions</h1>
+<h4 class="todo">@TODO: ability to sort questions</h4>
+<h4 class="todo">@TODO: maybe render latex</h4>
 
-<% if (user.hasRole('admin', 'instructor')) { %>
-    <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/new">Add New Question</a>
-<% } %>
+<a class="btn btn-default btn-sm" 
+    href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/new">Add New Question</a>
 
 <table class="table table-striped sortable">
     <thead>
         <tr>
+            <th><input type="checkbox" value="1"></th>
             <th>Question</th>
             <th></th>
         </tr>
@@ -16,6 +18,7 @@
     <tbody>
     <% quiz.questions.forEach(function (question) { %>
         <tr data-id="<%= question.id %>">
+            <td><input type="checkbox" name="questions" value="<%= question.id %>"></td>
             <td><%= question.question %></td>
             <td>
                 <div class="dropdown">
@@ -24,11 +27,9 @@
                     </button>
                     <ul class="dropdown-menu">
                         <!--li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= question.id %>/view">View Question</a></li-->
-                    <% if (user.hasRole('admin', 'instructor')) { %>
                         <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= question.id %>/edit">Edit Question</a></li>
                         <li class="divider"></li>
                         <li><a href="#">Delete Question</a></li>
-                    <% } %>
                     </ul>
                 </div>
             </td>

@@ -1,0 +1,55 @@
+<%- include ../partials/admin-header -%>
+
+<h1><%= quiz.isNew ? 'Add new quiz' : 'Edit quiz' %></h1>
+
+<h4 class="todo">@TODO: ability to add/remove attempt</h4>
+
+<form action="/admin/courses/<%= course.id %>/quizzes/<%= quiz.isNew ? '' : quiz.id + '?_method=put' %>" 
+    method="post" class="form-horizontal">
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Name</label>
+        <div class="col-sm-10">
+            <input type="text" name="name" value="<%= quiz.name %>" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Grading Scheme</label>
+        <div class="col-sm-6">
+            <% for (var i = 0, len = Math.max(quiz.settings.gradingScheme.length, 4); i < len; i++) { %>    
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">Attempt #<%= i + 1 %></label>
+                    <div class="col-xs-4"> 
+                        <input name="settings[gradingScheme][]" value="<%= quiz.settings.gradingScheme[i] !== 'undefined' ?
+                            quiz.settings.gradingScheme[i] : '' %>" class="form-control" maxlength="2">
+                    </div>
+                </div>
+            <% } %>
+            <div class="form-group">
+                <div class="col-sm-offset-4 col-sm-10">
+                    <a href="#" id="add-attempt">Add another attempt</a>
+                </div>
+            </div>
+        </div> 
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <a href="/admin/courses/<%= course.id %>/quizzes" class="btn btn-default btn-sm">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-sm">Save</button>
+        </div>
+    </div>
+</form>
+
+<script type="text/template" id="grading-scheme-item">
+    <div class="form-group">
+        <label class="col-xs-4 control-label">Attempt #${ i }</label>
+        <div class="col-xs-4"> 
+            <input name="gradingScheme[]" value="" class="form-control" maxlength="2">
+        </div>
+    </div>
+</script>
+
+
+<%- include ../partials/admin-footer -%>

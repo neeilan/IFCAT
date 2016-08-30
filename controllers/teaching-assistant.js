@@ -10,6 +10,8 @@ exports.getTeachingAssistantsByCourse = function (req, res) {
     });*/
 };
 
+// WRONG WAY: top-down only
+
 // Retrieve list of teachingAssistants for tutorial
 exports.getTeachingAssistantsByTutorial = function (req, res) { 
     async.series([

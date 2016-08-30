@@ -1,34 +1,14 @@
-<%- include ../partials/header -%>
+<%- include ../partials/student-header -%>
 
-<h1>My Courses</h1> &nbsp; <a class="btn btn-default btn-sm" href="/courses/all">View all courses</a>
-<hr/>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Code</th>
-            <th>Name</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    <% courses.forEach(function (course) { %>
-        <tr>
-            <th><%= course.code %></th>
-            <th><%= course.name %></th>
-            <th>
-                <!--<div class="dropdown">-->
-                <!--    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">-->
-                <!--        Actions<span class="caret"></span>-->
-                <!--    </button>-->
-                <!--    <ul class="dropdown-menu">-->
-                <!--        <li><a href="/courses/<%= course.code %>/edit">Join a tutorial</a></li>-->
-                <!--        <li><a href="/courses/<%= course.code %>/tutorials">Manage Tutorials</a></li>-->
-                <!--    </ul>-->
-                <!--</div>-->
-            </th>
-        </tr>
-    <% }) %>
-    </tbody>
-</table>
+<h1>Your Courses</h1>
 
-<%- include ../partials/footer -%>
+<div class="list-group">
+<% courses.forEach(function (course) { %>
+    <a href="/student/courses/<%= course.id %>/quizzes" class="list-group-item">
+        <span class="code"><%= course.code %></span> -
+        <span class="name"><%= course.name %></span>
+    </a>
+<% }) %>
+</div>
+
+<%- include ../partials/student-footer -%>

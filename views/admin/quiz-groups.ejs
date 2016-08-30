@@ -1,0 +1,49 @@
+<%- include ../partials/admin-header -%>
+
+<h1>Groups</h1>
+
+
+<h4 class="todo">@TODO: ability to delete groups</h4>
+
+<a href="#" class="btn btn-default btn-sm" 
+    data-url="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= tutorialQuiz.id %>/groups/generate">Generate groups</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Group</th>
+            <th>Members</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% tutorialQuiz.groups.forEach(function (group) { %>
+        <tr data-id="<%= group.id %>">
+            <td><%= group.number %></td>
+            <td>
+            <% group.members.forEach(function (member) { %>
+                <div>
+                    <span><%= member.getFullName() %></span>
+                    <% if (member.isRepresentativeOf(group)) { %>
+                        <span class="glyphicon glyphicon-user" title="Representative of this group"></span>
+                    <% } %> 
+                </div>
+            <% }) %>
+            </td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                        Actions<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li class="divider"></li>
+                        <li><a href="#">Delete Group</a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    <% }) %>
+    </tbody>
+</table>
+
+<%- include ../partials/admin-footer -%>

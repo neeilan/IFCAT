@@ -1,70 +1,84 @@
-// models
-var Course = require('../models/course'),
-    Tutorial = require('../models/tutorial'),
+var async = require('async'),
+    mongoose = require('mongoose'),
+    _ = require('lodash');
+
+var Tutorial = require('../models/tutorial'),
+    TutorialQuiz = require('../models/tutorial'),
     Group = require('../models/group');
 
-// Retrieve list of groups for tutorial
-exports.getGroupsByTutorial = function (req, res) { 
-    async.series([
-        function (cb) {
-            Course.findById(req.params.course, cb);
-        },
-        function (cb) {
-            Tutorial.findById(req.params.quiz).populate({ path: 'groups', options: { sort: { number: 1 } } }).exec(cb);
+// Retrieve group
+exports.getGroup = function (req, res, next, group) { 
+    Group.findById(group).exec(function (err, group) {
+        if (err) {
+            return next(err);
         }
-    ], 
-    function (err, results) {
-        res.render('admin/groups', { course: results[0], tutorial: results[1] });
+        if (!group) {
+            return next(new Error('No group is found.'));
+        }
+        console.log('got group');
+        req.group = group;
+        next();
     });
 };
 
-// Retrieve group for tutorial
-exports.getNewGroupForm = function (req, res) { 
-    Group.findById(req.params.group).populate('members').exec(function (err, group) {
-        if (err) {
-            return res.status(500).send("Unable to retrieve group at this time (" + err.message + ").");
-        }
-        res.status(200).send(group);
+// Retrieve list of groups for tutorial
+exports.getGroupList = function (req, res) { 
+    TutorialQuiz.populate(req.tutorialQuiz, { 
+        path: 'groups',
+        model: Group, // !important
+        populate: [{
+            path: 'members',
+            options: {
+                sort: { 'name.first': 1, 'name.last': 1 }
+            }
+        }, {
+            path: 'representative'
+        }]
+    }, function (err) {
+        res.render('admin/quiz-groups', { 
+            course: req.course, 
+            tutorial: req.tutorial, 
+            tutorialQuiz: req.tutorialQuiz 
+        });
     });
 };
 
 // Create new group for tutorial
-exports.addGroupToTutorial = function (req, res) { 
-    Tutorial.findById(req.params.tutorial, function (err, tutorial) {
-        if (err) {
-            return res.status(500).send("Unable to retrieve tutorial at this time (" + err.message + ").");
-        }
-        if (!tutorial) {
-            return res.status(404).send("This tutorial doesn't exist.");
-        }
-        Group.create(req.body, function (err, group) {
-            if (err) {
-                return res.status(500).send("Unable to retrieve group at this time (" + err.message + ").");
-            }
-            tutorial.groups.push(group);
-            tutorial.save(function (err) {
+exports.generateGroups = function (req, res) { 
+    // randomize + split students into groups
+    var chunks = _.chunk(_.shuffle(req.tutorial.students), 3);
+    // delete original groups
+    Group.remove({ _id: { $in: req.tutorialQuiz.groups } }, function (err) {
+        req.tutorialQuiz.groups = [];
+        // create new groups
+        async.eachOfSeries(chunks, function (members, n, done) {
+            Group.create({ 
+                number: n + 1, 
+                members: members,
+                representative: members[0]
+            }, function (err, group) {
                 if (err) {
-                    return res.status(500).send("Unable to save tutorial at this time (" + err.message + ").");
+                    return done(err);
                 }
-                res.status(200).send(group);
+                req.tutorialQuiz.groups.push(group);
+                done();
+            });
+        }, function (err) {
+            // add groups to tutorial
+            req.tutorialQuiz.save(function (err) {
+                if (err) {
+                    return done(err);
+                }
+                res.redirect(
+                    '/admin/courses/' + req.course.id + 
+                    '/tutorials/' + req.tutorial.id + 
+                    '/quizzes/' + req.tutorialQuiz.id +
+                    '/groups'
+                ); 
             });
         });
     });
 };
 
 // Delete group
-exports.deleteGroupFromTutorial = function (req, res) {
-    Tutorial.findByIdAndUpdate(req.params.tutorial, {
-        $pull: { groups: { _id: req.params.group } }
-    }, function (err, tutorial) {
-        if (err) {
-            return res.status(500).send("Unable to delete tutorial at this time (" + err.message + ").");
-        }
-        Group.findByIdAndRemove(req.params.group, function (err, group) {
-            if (err) {
-                return res.status(500).send("Unable to delete group at this time (" + err.message + ").");
-            }
-            res.status(200).send({ 'responseText': 'The group has been deleted.' });
-        });
-    });
-};
+exports.deleteGroup = function (req, res) { };

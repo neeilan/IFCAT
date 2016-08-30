@@ -2,6 +2,9 @@
 
 <h1>Quizzes</h1>
 
+
+<h4 class="todo">@TODO: ability to delete quizzes at course level</h4>
+
 <% if (user.hasRole('admin', 'instructor')) { %>
     <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/quizzes/new">Add New Quiz</a>
 <% } %>
@@ -11,13 +14,17 @@
         <tr>
             <th>Name</th>
             <th></th>
+            <th></th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
-    <% course.quizzes.forEach(function (quiz) { %>
+    <% course.quizzes.forEach(function (quiz, i) { %>
         <tr>
-            <th><%= quiz.name %></th>
-            <th>
+            <td><%= quiz.name %></td>
+            <td></td>
+            <td></td>
+            <td>
                 <div class="dropdown">
                     <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
                         Actions<span class="caret"></span>
@@ -33,7 +40,7 @@
                     <% } %>
                     </ul>
                 </div>
-            </th>
+            </td>
         </tr>
     <% }) %>
     </tbody>

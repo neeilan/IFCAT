@@ -1,178 +1,73 @@
-var async = require('async'),
-    _ = require('lodash');
+var _ = require('lodash');
 
-// models
 var Course = require('../models/course'),
     Quiz = require('../models/quiz'),
-    Question = require('../models/question').Generic,
-    MultipleChoiceQuestion = require('../models/question').MultipleChoice,
-    TrueOrFalseQuestion = require('../models/question').TrueOrFalse;
+    Question = require('../models/question');
 
-// Retrieve list of questions for quiz
-exports.getQuestions = function (req, res) { 
-    async.series([
-        function (cb) {
-            Course.findById(req.params.course, cb);
-        },
-        function (cb) {
-            Quiz.findById(req.params.quiz).populate({ path: 'questions', options: { sort: { name: 1 } } }).exec(cb);
+// Retrieve course
+exports.getQuestion = function (req, res, next, question) {
+    Question.findById(question).populate('files').exec(function (err, question) {
+        if (err) {
+            return next(err);
         }
-    ], 
-    function (err, results) {
-        res.render('admin/questions', { course: results[0], quiz: results[1] });
-    }); 
+        if (!question) {
+            return next(new Error('No question is found.'));
+        }
+        console.log('got question'); 
+        req.question = question;         
+        next();
+    });
 };
 
-// Retrieve specific question for quiz
-exports.getNewQuestionForm = function (req, res) {
-    async.series([
-        function (cb) { 
-            Course.findById(req.params.course).populate('files').exec(cb); 
-        },
-        function (cb) { 
-            Quiz.findById(req.params.quiz, cb); 
-        }
-    ], 
-    function (err, results) {
-        res.render('admin/question', { course: results[0], quiz: results[1], question: new Question() });
+// Retrieve list of questions for quiz
+exports.getQuestionList = function (req, res) { 
+    Quiz.populate(req.quiz, { 
+        path: 'questions', options: { sort: { name: 1 } } 
+    }, function (err, results) {
+        res.render('admin/quiz-questions', { course: req.course, quiz: req.quiz });
     });
 };
 
 // Retrieve specific question for quiz
 exports.getQuestionForm = function (req, res) {
-    async.series([
-        function (cb) { 
-            Course.findById(req.params.course).populate('files').exec(cb); 
-        },
-        function (cb) { 
-            Quiz.findById(req.params.quiz, cb); 
-        },
-        function (cb) { 
-            Question.findById(req.params.question).populate('files').exec(cb); 
-        }
-    ], 
-    function (err, results) {
-        res.render('admin/question', { course: results[0], quiz: results[1], question: results[2] });
+    var question = req.question || new Question();
+    // set quiz default values
+    //question.setDefault(req.quiz);
+    
+    Course.populate(req.course, { path: 'files', sort: { name: 1 } }, function (err) {
+        res.render('admin/quiz-question', { 
+            course: req.course, 
+            quiz: req.quiz, 
+            question: question
+        });
     });
 };
 
 // Add new question for quiz
-exports.addQuestion = function (req, res, next) { 
-    var question;
-    async.waterfall([
-        function (next) { 
-            Quiz.findById(req.params.quiz, next); 
-        },
-        function (quiz, next) {
-            if (req.body.type === 'MultipleChoice') {
-                question = new MultipleChoiceQuestion();
-                var items = { choices: {}, answers: {} };
-                // sort choices + answers
-                for (var key in req.body) {
-                    var matches = /^(choices|answers)\[(\d+)\]$/g.exec(key);
-                    if (matches) {
-                        items[matches[1]][matches[2]] = req.body[key];  
-                    }
-                }
-                // add choices + answers 
-                for (var n in items.choices) {
-                    question.choices.push(items.choices[n]);
-                    // check if choice was selected as an answer
-                    if (items.answers[n] !== undefined) {
-                        question.answers.push(question.choices.length - 1);
-                    }
-                }
-            } else {
-                question = new TrueOrFalseQuestion();
-                question.choices = req.body['choices[]'];
-                question.answer = parseInt(req.body.answer, 10);
-            }
-            question.question = req.body.question;
-            question.files = req.body['files[]'];
-            question.randomizeChoices = req.body.randomizeChoices;
-            question.useLaTeX = req.body.useLaTeX;
-            question.save(function (err) {
-                next(err, quiz, question);
-            });
-        },
-        function (quiz, question, next) {
-            quiz.questions.push(question);
-            quiz.save(function (err) {
-                next(err, quiz, question);
-            });
-        }
-    ], 
-    function (err, results) {
-        if (err) {
-            console.log(err);
-        }
-        res.redirect(
-            '/admin/courses/' + req.params.course + 
-            '/quizzes/' + req.params.quiz + 
-            '/questions'
-        );
+exports.addQuestion = function (req, res, next) {
+    var question = new Question();
+    question.loadAndSave(req, function (err) {
+        req.quiz.questions.push(question);
+        req.quiz.save(function (err) {
+            res.redirect(
+                '/admin/courses/' + req.course.id + 
+                '/quizzes/' + req.quiz.id + 
+                '/questions'
+            );
+        });
     });
 };
 
 // Update specific question for quiz
 exports.editQuestion = function (req, res, next) { 
-    console.log('body', req.body);
-
-    async.waterfall([
-        function (next) {
-            Quiz.findById(req.params.quiz, next);
-        },
-        function (quiz, next) {
-            Question.findById(req.params.question, function (err, question) {
-                next(err, quiz, question);
-            });
-        },
-        function (quiz, question, next) { 
-            if (question.type === 'MultipleChoice') {
-                var items = { choices: {}, answers: {} };
-                // sort choices + answers
-                for (var key in req.body) {
-                    var matches = /^(choices|answers)\[(\d+)\]$/g.exec(key);
-                    if (matches) {
-                        items[matches[1]][matches[2]] = req.body[key];  
-                    }
-                }
-                // clear choices + answers
-                question.choices = [];
-                question.answers = [];
-                // add choices + answers
-                for (var n in items.choices) {
-                    question.choices.push(items.choices[n]);
-                    // check if choice was selected as an answer
-                    if (items.answers[n] !== undefined) {
-                        question.answers.push(question.choices.length - 1);
-                    }
-                }
-            } else {
-                question.choices = req.body['choices[]'];
-                question.answer = parseInt(req.body.answer, 10);
-            }
-            question.question = req.body.question;
-            question.files = req.body['files[]'];
-            question.randomizeChoices = req.body.randomizeChoices;
-            question.useLaTeX = req.body.useLaTeX;
-
-            question.save(function (err) {
-                next(err, quiz, question);
-            });
-        }
-    ], 
-    function (err, results) {
-        if (err) {
-            console.log(err);
-        }
+    req.question.loadAndSave(req, function (err) {
         res.redirect(
-            '/admin/courses/' + req.params.course + 
-            '/quizzes/' + req.params.quiz + 
-            '/questions/' + req.params.question + 
+            '/admin/courses/' + req.course.id + 
+            '/quizzes/' + req.quiz.id + 
+            '/questions/' + req.question.id + 
             '/edit'
         );
-    });
+    });      
 };
 
 // Delete specific question for quiz
