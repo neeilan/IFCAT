@@ -5,7 +5,6 @@
 <h4 class="todo">@TODO: ability to delete files</h4>
 
 <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/files/new">Add New File</a>
-<a class="btn btn-default btn-sm" href="#" class="delete-all">Delete Files</a>
 
 <table class="table table-striped">
     <tdead>
@@ -31,6 +30,8 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li><a href="/admin/courses/<%= course.id %>/files/<%= file.id %>/edit">Edit File</a></li>
+                        <li class="divider">
+                        <li><a href="#">Delete File</a></li>
                     </ul>
                 </div>
             </td>

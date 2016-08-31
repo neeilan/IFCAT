@@ -1,6 +1,6 @@
 <%- include ../partials/admin-header -%>
 
-<h1><%= tutorialQuiz.isNew ? 'Add new quiz' : 'Edit quiz' %></h1>
+<h1><%= tutorialQuiz.isNew ? 'Add quiz for tutorial' : 'Edit quiz for tutorial' %></h1>
 
 <form action="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= tutorialQuiz.isNew ? '' : 
     tutorialQuiz.id + '?_method=put' %>" method="post" class="form-horizontal">

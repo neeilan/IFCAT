@@ -7,7 +7,7 @@ var Course = require('../models/course'),
 
 // Retrieve course
 exports.getQuiz = function (req, res, next, tutorialQuiz) {
-    TutorialQuiz.findById(tutorialQuiz).populate('quiz').exec(function (err, tutorialQuiz) {
+    TutorialQuiz.findById(tutorialQuiz).populate('tutorial quiz').exec(function (err, tutorialQuiz) {
         if (err) {
             return next(err);
         }
@@ -22,16 +22,20 @@ exports.getQuiz = function (req, res, next, tutorialQuiz) {
 
 // Retrieve quizzes within tutorial
 exports.getQuizListForAdmin = function (req, res) {
-    Tutorial.populate(req.tutorial, {
-        path: 'quizzes',
-        populate: {
-            path: 'quiz'
+    TutorialQuiz.find({
+        path: 'tutorial',
+        match: { 
+            tutorial: req.tutorial.id 
         }
-    }, function (err) {
+    }).populate('quiz').exec(function (err, tutorialQuizzes) {
         /*if (err) {
             return res.status(500).send("Unable to retrieve any quizzes at this time (" + err.message + ").");
         }*/
-        res.render('admin/tutorial-quizzes', { course: req.course, tutorial: req.tutorial });
+        res.render('admin/tutorial-quizzes', { 
+            course: req.course, 
+            tutorial: req.tutorial,
+            tutorialQuizzes: tutorialQuizzes 
+        });
     });
 };
 
@@ -42,9 +46,7 @@ exports.getQuizListForStudent = function (req, res) {
         path: 'tutorials',
         model: Tutorial,
         match: {
-            'students': {
-                $in: [req.user.id]
-            }
+            students: { $in: [req.user.id] }
         },
         // find the quizzes within the tutorial
         populate: {
@@ -116,23 +118,18 @@ exports.startQuiz = function (req, res) {
     TutorialQuiz.populate(req.tutorialQuiz, {
         // get group with user as a member
         path: 'groups',
+        model: Group,
         match: {
-            members: {
-                $in: [req.user.id]
-            }
+            members: { $in: [req.user.id] }
         },
-        // get representative of the group
+        // get driver of the group
         populate: {
-            path: 'representative'
+            path: 'driver'
         }
     }, function (err) {
         var group = req.tutorialQuiz.groups[0];
         // check if user belongs to a group
         if (!group) {
-            return res.redirect('/admin/courses');
-        }
-        // check if group has representative
-        if (!req.user.isRepresentativeOf(group)) {
             return res.redirect('/admin/courses');
         }
 

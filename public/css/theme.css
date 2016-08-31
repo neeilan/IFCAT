@@ -20,3 +20,7 @@ body > .navbar {
 .todo {
     color: red;
 }
+
+.ui-sortable-helper {
+    display: table !important;
+}

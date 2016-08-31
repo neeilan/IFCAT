@@ -2,6 +2,7 @@ var async = require('async'),
     _ = require('lodash');
 
 var Course = require('../models/course'),
+    TutorialQuiz = require('../models/tutorialQuiz'),
     Quiz = require('../models/quiz'),
     Question = require('../models/question');
 
@@ -34,18 +35,8 @@ exports.getQuizList = function (req, res) {
 
 // Retrieve quiz form
 exports.getQuizForm = function (req, res) {
-    Course.populate(req.course, {
-        path: 'tutorials',
-        sort: { number: 1 } 
-    }, function () {
-        var quiz = req.quiz || new Quiz();
-   
-        //quiz.setDefault(req.course);
-
-//console.log(quiz.settings, quiz.settings.gradingScheme.length);
-
-        res.render('admin/course-quiz', { course: req.course, quiz: quiz });
-    });
+    var quiz = req.quiz || new Quiz();
+    res.render('admin/course-quiz', { course: req.course, quiz: quiz });
 };
 
 // Add quiz to course
@@ -78,53 +69,4 @@ exports.editQuiz = function (req, res) {
 // Delete quiz
 exports.deleteQuiz = function (req, res) {
 
-};
-
-// TO-BE-REMOVED
-
-exports.getQuizzesDemo = function (req, res) {
-    Course.findById(req.params.course).populate('quizzes').exec(function (err, course) { 
-        res.render('student/quizzes', { course: course });
-    });   
-};
-
-exports.startQuizDemo = function (req, res) {
-    /*async.waterfall([
-        function (next) {
-            Course.findById(req.params.course, next);
-        },
-        function (course, next) {
-            Quiz.findById(req.params.quiz, function (err, quiz) {
-                next(err, course, quiz);
-            });
-        },
-        function (course, quiz, next) {
-            if (quiz.questions.length) {
-                Question.findById(quiz.questions[0], function (err, question) {
-                    next(err, course, quiz, question);
-                });
-            } else {
-                res.redirect('/courses/' + req.params.course + '/quizzes');
-            }
-        }
-    ],
-    function (err, course, quiz, question, i) {
-        res.render('student/start', { course: course, quiz: quiz, question: question });
-    });*/
-};
-
-exports.endQuizDemo = function (req, res) {
-    /*async.waterfall([
-        function (next) {
-            Course.findById(req.params.course, next);
-        },
-        function (course, next) {
-            Quiz.findById(req.params.quiz, function (err, quiz) {
-                next(err, course, quiz);
-            });
-        }
-    ],
-    function (err, course, quiz, question, i) {
-        res.render('student/end', { course: course, quiz: quiz });
-    });*/
 };

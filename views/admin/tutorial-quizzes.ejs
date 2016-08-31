@@ -1,6 +1,6 @@
 <%- include ../partials/admin-header -%>
 
-<h1>Quizzes</h1>
+<h1>Tutorial Quizzes</h1>
 
 <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/new">Add New Quiz</a>
 
@@ -14,8 +14,8 @@
         </tr>
     </thead>
     <tbody>
-    <% tutorial.quizzes.forEach(function (tutorialQuiz) { %>
-        <tr data-id="<%= tutorialQuiz.id %>">
+    <% tutorialQuizzes.forEach(function (tutorialQuiz) { %>
+        <tr>
             <td><%= tutorialQuiz.quiz.name %></td>
             <td><%= tutorialQuiz.published ? 'Published' : 'Unpublished' %></td>
             <td><%= tutorialQuiz.active ? 'Active' : 'Inactive' %></td>

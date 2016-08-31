@@ -52,4 +52,7 @@ $(function () {
             window.location.reload(true);
         });
     });
+
+    $('tbody').sortable({ connectWith: 'tbody' });
+
 });

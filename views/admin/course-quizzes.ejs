@@ -9,9 +9,10 @@
     <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/quizzes/new">Add New Quiz</a>
 <% } %>
 
-<table class="table table-striped">
+<table class="table table-striped sortable">
     <thead>
         <tr>
+            <th><input type="checkbox" value="1"></th>
             <th>Name</th>
             <th></th>
             <th></th>
@@ -21,6 +22,7 @@
     <tbody>
     <% course.quizzes.forEach(function (quiz, i) { %>
         <tr>
+            <td><input type="checkbox" name="groups[]" value="<%= quiz.id %>"></td>
             <td><%= quiz.name %></td>
             <td></td>
             <td></td>

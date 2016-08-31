@@ -19,7 +19,6 @@
         <div class="col-sm-6">
             <% for (var i = 0, len = Math.max(quiz.settings.gradingScheme.length, 4); i < len; i++) { %>    
                 <div class="form-group">
-                    <label class="col-xs-4 control-label">Attempt #<%= i + 1 %></label>
                     <div class="col-xs-4"> 
                         <input name="settings[gradingScheme][]" value="<%= quiz.settings.gradingScheme[i] !== 'undefined' ?
                             quiz.settings.gradingScheme[i] : '' %>" class="form-control" maxlength="2">

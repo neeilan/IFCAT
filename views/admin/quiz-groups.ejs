@@ -8,42 +8,31 @@
 <a href="#" class="btn btn-default btn-sm" 
     data-url="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= tutorialQuiz.id %>/groups/generate">Generate groups</a>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Group</th>
-            <th>Members</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    <% tutorialQuiz.groups.forEach(function (group) { %>
-        <tr data-id="<%= group.id %>">
-            <td><%= group.number %></td>
-            <td>
+<a href="#" class="btn btn-default btn-sm" 
+    data-url="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= tutorialQuiz.id %>/groups/generate">Save</a>
+
+<% tutorialQuiz.groups.forEach(function (group, i) { %>
+    <div class="panel panel-default" style="max-width: 600px">
+        <div class="panel-heading" style="font-weight: bold">Group <%= group.name %></div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th style="width: 40%">First</th>
+                    <th style="width: 40%">Last</th>
+                </tr>
+            </thead>
+            <tbody class="sortable">
             <% group.members.forEach(function (member) { %>
-                <div>
-                    <span><%= member.getFullName() %></span>
-                    <% if (member.isRepresentativeOf(group)) { %>
-                        <span class="glyphicon glyphicon-user" title="Representative of this group"></span>
-                    <% } %> 
-                </div>
+                <tr>
+                    <td></td>
+                    <td><%= member.name.first %></td>
+                    <td><%= member.name.last %></td>
+                </tr>
             <% }) %>
-            </td>
-            <td>
-                <div class="dropdown">
-                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                        Actions<span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li class="divider"></li>
-                        <li><a href="#">Delete Group</a></li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
-    <% }) %>
-    </tbody>
-</table>
+            </tbody>
+        </table>
+    </div>
+<% }) %>
 
 <%- include ../partials/admin-footer -%>

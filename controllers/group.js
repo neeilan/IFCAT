@@ -1,5 +1,4 @@
 var async = require('async'),
-    mongoose = require('mongoose'),
     _ = require('lodash');
 
 var Tutorial = require('../models/tutorial'),
@@ -23,21 +22,23 @@ exports.getGroup = function (req, res, next, group) {
 
 // Retrieve list of groups for tutorial
 exports.getGroupList = function (req, res) { 
-    TutorialQuiz.populate(req.tutorialQuiz, { 
+    TutorialQuiz.populate(req.tutorialQuiz, {
+        // find groups with members
         path: 'groups',
-        model: Group, // !important
+        model: Group,
         populate: [{
             path: 'members',
+            model: User,
             options: {
                 sort: { 'name.first': 1, 'name.last': 1 }
             }
         }, {
-            path: 'representative'
+            path: 'driver',
+            model: User
         }]
     }, function (err) {
         res.render('admin/quiz-groups', { 
             course: req.course, 
-            tutorial: req.tutorial, 
             tutorialQuiz: req.tutorialQuiz 
         });
     });
@@ -45,30 +46,24 @@ exports.getGroupList = function (req, res) {
 
 // Create new group for tutorial
 exports.generateGroups = function (req, res) { 
-    // randomize + split students into groups
-    var chunks = _.chunk(_.shuffle(req.tutorial.students), 3);
     // delete original groups
     Group.remove({ _id: { $in: req.tutorialQuiz.groups } }, function (err) {
+        // clear groups from tutorial + quiz
         req.tutorialQuiz.groups = [];
-        // create new groups
+        // randomize + split students into groups
+        var chunks = _.chunk(_.shuffle(req.tutorial.students), 3);
+        // create new groups in tutorial + quiz
         async.eachOfSeries(chunks, function (members, n, done) {
             Group.create({ 
-                number: n + 1, 
-                members: members,
-                representative: members[0]
+                name: n + 1, 
+                members: members
             }, function (err, group) {
-                if (err) {
-                    return done(err);
-                }
                 req.tutorialQuiz.groups.push(group);
                 done();
             });
         }, function (err) {
             // add groups to tutorial
             req.tutorialQuiz.save(function (err) {
-                if (err) {
-                    return done(err);
-                }
                 res.redirect(
                     '/admin/courses/' + req.course.id + 
                     '/tutorials/' + req.tutorial.id + 

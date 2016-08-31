@@ -2,8 +2,7 @@ var bcrypt = require('bcryptjs'),
     mongoose = require('mongoose'),
     _ = require('lodash');
 
-var roles = ['student', 'teachingAsst', 'instructor', 'admin'];
-
+var roles = ['student', 'teachingAssistant', 'instructor', 'admin'];
 
 var UserSchema = new mongoose.Schema({
     local: {
@@ -17,7 +16,7 @@ var UserSchema = new mongoose.Schema({
         id: String,
         token: String,
     },
-    UTORid: String,
+    UTORid: String, // not sure if we are using it
     name: {
         first: {
             type: String,
@@ -28,19 +27,7 @@ var UserSchema = new mongoose.Schema({
             lowercase: true
         }
     },
-    roles: Array,
-    instructor: {
-        courses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
-    },
-    teachingAsst: {
-        courses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
-        //tutorials: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tutorial' }]
-    },
-    student: {
-        courses: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Course' } ],
-        //tutorials: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tutorial' }],
-        //groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }]
-    }
+    roles: Array
 });
 
 UserSchema.methods.generateHash = function (s) {
@@ -68,7 +55,7 @@ UserSchema.methods.getFullName = function () {
 };
 
 UserSchema.methods.isRepresentativeOf = function (group) {
-    return group.representative && this.id === group.representative.id;
+    return group.driver && this.id === group.driver.id;
 };
 
 
