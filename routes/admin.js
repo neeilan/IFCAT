@@ -49,6 +49,7 @@ router.post('/login', passport.authenticate('local-login', {
 }));
 
 // lifesaver: query single objects
+router.param('us3r', UserController.getUser);
 router.param('course', CourseController.getCourse);
 router.param('tutorial', TutorialController.getTutorial);
 router.param('group', GroupController.getGroup);
@@ -71,7 +72,7 @@ router.use(function (req, res, next) {
 // e.g. Courses / Tutorials ----> Courses / CSCC09H3 / Tutorials
 router.use(function (req, res, next) {
     if (req.method === 'GET') {
-        var keywords = ['courses', 'tutorials', 'quizzes', 'questions', 'files', 'students', 'groups'];
+        var keywords = ['courses', 'tutorials', 'quizzes', 'questions', 'files', 'students', 'groups', 'users'];
         var fragments = req.url.split('/');
         // look for keywords
         res.locals.breadcrumbs = [];
@@ -101,7 +102,6 @@ router.put('/courses/:course', CourseController.editCourse);
 //router.delete('/courses/:course', CourseController.deleteCourse);
 
 router.get('/courses/:course/students', StudentController.getStudentsByCourse);
-//router.post('/courses/:course/students/import', csvUpload.single('file'), StudentController.importStudents);
 
 router.get('/courses/:course/tutorials', TutorialController.getTutorialList);
 router.get('/courses/:course/tutorials/new', TutorialController.getTutorialForm);
@@ -147,5 +147,13 @@ router.get('/courses/:course/files/:fil3/edit', FileController.getFileForm);
 router.post('/courses/:course/files', anyUpload.single('file'), FileController.addFile);
 router.put('/courses/:course/files/:fil3', anyUpload.single('file'), FileController.editFile);
 //router.delete('/courses/:course/files/:fil3', FileController.deleteFile);
+
+router.get('/users', UserController.getUserList);
+router.get('/users/new', UserController.getUserForm);
+router.get('/users/:us3r/edit', UserController.getUserForm);
+router.post('/users', UserController.addUser);
+router.put('/users/:us3r', UserController.editUser);
+//router.delete('/users/:user', UserController.deleteUser);
+router.post('/users/import', csvUpload.single('file'), UserController.importStudents);
 
 module.exports = router;

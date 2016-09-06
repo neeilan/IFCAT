@@ -10,8 +10,8 @@ exports.getFile = function (req, res, next, fil3) {
         if (!fil3) {
             return next(new Error('No file is found.'));
         }
-        console.log('got file');
-        req.fil3 = fil3; // !careful: fil3 not file b/c multer uses req.file
+        console.log('got fil3');
+        req.fil3 = fil3; // careful: req.file is used by multer
         next();
     });
 };

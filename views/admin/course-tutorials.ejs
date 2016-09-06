@@ -22,7 +22,7 @@
     <tbody>
     <% course.tutorials.forEach(function (tutorial) { %>
         <tr>
-            <td><%= tutorial.getTUT() %></td>
+            <td>TUT <%= tutorial.number %></td>
             <td><%= tutorial.teachingAssistants.map(function (ta) { return ta.getFullName(); }).join('<br>') %></td>
             <td><%= tutorial.students.length %></td>
             <td>
@@ -32,6 +32,7 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/edit">Edit Tutorial</a></li>
+                        <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/students">Manage Students</a></li>
                         <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes">Manage Quizzes</a></li>
                         <li class="divider"></li>
                         <li><a href="#">Delete Tutorial</a></li>

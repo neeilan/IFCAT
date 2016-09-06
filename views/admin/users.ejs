@@ -1,0 +1,75 @@
+<%- include ../partials/admin-header -%>
+
+<h1>Users</h1>
+
+<h4 class="todo">@TODO: ability to delete users</h4>
+<h4 class="todo">@TODO: sort in the order: admins, instructors, teaching assistants, and then students</h4>
+
+<a class="btn btn-default btn-sm" href="/admin/users/new">Add new user</a>
+<a class="btn btn-default btn-sm" href="#" data-toggle="modal" data-target="#import-modal">Import users</a>
+
+
+<table class="table table-striped">
+    <tdead>
+        <tr>
+            <th>Email</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Roles</th>
+            <th></th>
+        </tr>
+    </tdead>
+    <tbody>
+    <% users.forEach(function (user) { %>
+        <tr>
+            <td><%= user.local.email %></td>
+            <td><%= user.name.first %></td>
+            <td><%= user.name.last %></td>
+            <td><%= user.roles.join(', ') %></td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                        Actions<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="/admin/users/<%= user.id %>/edit">Edit user</a></li>
+                        <li class="divider">
+                        <li><a href="#">Delete user</a></li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    <% }) %>
+    </tbody>
+</table>
+
+<div class="modal fade" id="import-modal" role="dialog">
+    <form action="/admin/users/import" 
+        method="post" enctype="multipart/form-data" class="form-horizontal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Import students</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Upload file</label>
+                        <div class="col-sm-10">
+                            <label class="btn btn-default">
+                                <input type="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display:none;">Browse
+                            </label>
+                            <span class="label label-info"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<%- include ../partials/admin-footer -%>

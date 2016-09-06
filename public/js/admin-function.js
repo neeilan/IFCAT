@@ -53,6 +53,5 @@ $(function () {
         });
     });
 
-    $('tbody').sortable({ connectWith: 'tbody' });
-
+    $('.table-sortable > tbody').sortable({ connectWith: 'tbody' });
 });

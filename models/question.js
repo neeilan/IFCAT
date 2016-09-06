@@ -6,26 +6,10 @@ var QuestionSchema = new mongoose.Schema({
     type: { type: String, enum: ['multiple choice', 'true or false', 'multiple select'/*, 'fill in the blanks'*/] },
     choices: [String],
     answers: [Number],
-    files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
-    // override quiz settings
-    settings: {
-        gradingScheme: [Number],
-        randomizeChoices: Boolean,
-        useLaTeX: Boolean
-    }
+    files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }]
 }, { 
     timestamps: true 
 });
-
-QuestionSchema.methods.setDefault = function (parent) {
-    for (var prop in this.settings) {
-        var value = this.settings[prop];
-        // overwrite undefined, null, [] values
-        if (!value && value !== 0 && value !== false) {
-            this.settings[prop] = parent.settings[prop];
-        }
-    }
-};
 
 QuestionSchema.methods.loadAndSave = function (req, callback) {
     this.question = req.body.question;
@@ -36,8 +20,6 @@ QuestionSchema.methods.loadAndSave = function (req, callback) {
     this.useLaTeX = req.body.useLaTeX;
 
     var selected, key, matches, value, d;
-    
-    console.log(req.body);
 
     switch (this.type) {
         case 'multiple choice':

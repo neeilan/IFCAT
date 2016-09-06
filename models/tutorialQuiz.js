@@ -11,10 +11,6 @@ var TutorialQuizSchema = new mongoose.Schema({
     timestamps: true 
 });
 
-TutorialQuizSchema.methods.getStudents = function () {
-    return this.tutorial.students;
-};
-
 TutorialQuizSchema.methods.getStudentsWithGroups = function () {
     return _.reduce(this.groups, function (accum, group) {
         return _.union(accum, group.members);

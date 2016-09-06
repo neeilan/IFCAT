@@ -27,7 +27,18 @@
             </div>
             <div class="collapse navbar-collapse" id="navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#"><span class="glyphicon glyphicon-user"></span> Hi, <%= user.name.first %></a></li>
+                    <% [
+                        { text: 'Hi, ' + user.name.first },
+                        { text: 'Manage Courses', path: '/admin/courses' }, 
+                        { text: 'Manage Users', path: '/admin/users' }
+                    ].forEach(function (link) { %>
+                        <% if (link.path) { %>
+                            <li<%- url.indexOf(link.path) !== -1 ? ' class="active"' : '' %>><a 
+                                href="<%= link.path %>"><%= link.text %></a></li>
+                        <% } else { %>
+                            <li><a href="#"><%= link.text %></a></li>
+                        <% } %>
+                    <% }) %>
                     <li><a href="/admin/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                 </ul>
             </div>

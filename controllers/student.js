@@ -1,32 +1,10 @@
-var fs = require('fs');
-
-var csv = require('csv'),
+var async = require('async'),
+    csv = require('csv'),
     _ = require('lodash');
 
 var Course = require('../models/course'),
-    Tutorial = require('../models/tutorial');
-
-// Import list of students for course
-exports.importStudents = function (req, res) { 
-    var output = [];
-    var parser = csv.parse({ delimiter: ',' });
-
-    parser.on('readable', function() {
-        while (record = parser.read()) {
-            output.push(record);
-        }
-    });
-
-    parser.on('error', function (err) {
-        console.log(err.message);
-    });
-
-    parser.on('finish', function () {
-        console.log(output);
-    });
-
-    parser.end();
-};
+    Tutorial = require('../models/tutorial'),
+    User = require('../models/user');
 
 // Retrieve list of students for course
 exports.getStudentsByCourse = function (req, res) { 
@@ -38,18 +16,17 @@ exports.getStudentsByCourse = function (req, res) {
             sort: { 'name.first': 1, 'name.last': 1 }
         }
     }], function (err, course) {
-        // add tutorial #'s of students
-        course.students = _.map(course.students, function (student) { 
-            student.tut = null;
-            _.forEach(course.tutorials, function (tutorial) {
+        course.students = course.students.map(function (student) {
+            // add tutorial for each student
+            course.tutorials.filter(function (tutorial) {
                 if (tutorial.students.indexOf(student.id) !== -1) {
-                    student.tut = tutorial.getTUT();
-                    return;
+                    student.tutorial = tutorial;
+                    return true;
                 }
+                return false;
             });
             return student;
         });
-
         res.render('admin/course-students', { course: req.course });
     }); 
 };
@@ -57,7 +34,10 @@ exports.getStudentsByCourse = function (req, res) {
 // Retrieve list of students for tutorial
 exports.getStudentsByTutorial = function (req, res) { 
     Tutorial.populate(req.tutorial, { 
-        path: 'students', options: { sort: { 'name.first': 1 } }
+        path: 'students',
+        options: {
+            sort: { 'name.first': 1, 'name.last': 1 }
+        }
     }, function (err) {
         res.render('admin/students', { course: req.course, tutorial: req.tutorial });
     }); 

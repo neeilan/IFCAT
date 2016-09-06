@@ -4,7 +4,7 @@
 
 <h4 class="todo">@TODO: ability to delete students</h4>
 
-<form action="/courses/<%= course.id %>/tutorials/students/" method="post">
+<form action="#" method="post">
     <table class="table table-striped">
         <thead>
             <tr>
@@ -13,7 +13,7 @@
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Email</th>
-                <th>Tutorial</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -24,7 +24,16 @@
                 <td><%= student.name.first %></td>
                 <td><%= student.name.last %></td>
                 <td><%= student.local.email %></td>
-                <td><%= student.tutorial ? 'TUT ' + student.tutorial.number : '' %></td>
+                <th>
+                    <div class="dropdown">
+                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                            Actions<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">View </a></li>
+                        </ul>
+                    </div>
+                </th>
             </tr>
         <% }) %>
         </tbody>
