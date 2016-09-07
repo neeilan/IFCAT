@@ -11,13 +11,13 @@ var QuestionSchema = new mongoose.Schema({
     timestamps: true 
 });
 
-QuestionSchema.methods.loadAndSave = function (req, callback) {
-    this.question = req.body.question;
-    this.type = req.body.type;
-    this.files = req.body.files;
+QuestionSchema.methods.loadAndSave = function (data, callback) {
+    this.question = data.question;
+    this.type = data.type;
+    this.files = data.files;
     this.choices = []; // clear previous choices
     this.answers = []; // clear previous answers
-    this.useLaTeX = req.body.useLaTeX;
+    this.useLaTeX = data.useLaTeX;
 
     var selected, key, matches, value, d;
 
@@ -25,10 +25,10 @@ QuestionSchema.methods.loadAndSave = function (req, callback) {
         case 'multiple choice':
         case 'true or false':
         //case 'fill in the blanks':
-            selected = req.body.answer[_.kebabCase(this.type)];
+            selected = data.answer[_.kebabCase(this.type)];
             // add choices + answer
-            for (d in req.body.choices) {
-                value = _.trim(req.body.choices[d]);
+            for (d in data.choices) {
+                value = _.trim(data.choices[d]);
                 if (value) {
                     this.choices.push(value);
                     if (d === selected) {
@@ -38,10 +38,10 @@ QuestionSchema.methods.loadAndSave = function (req, callback) {
             }
             break;
         case 'multiple select':
-            selected = req.body.answers[_.kebabCase(this.type)] || [];
+            selected = data.answers[_.kebabCase(this.type)] || [];
             // add choices + answers
-            for (d in req.body.choices) {
-                value = _.trim(req.body.choices[d]);
+            for (d in data.choices) {
+                value = _.trim(data.choices[d]);
                 if (value) {
                     this.choices.push(value);
                     if (selected.indexOf(d) !== -1) {

@@ -1,14 +1,12 @@
-var async = require('async'),
-    csv = require('csv'),
-    _ = require('lodash');
+var _ = require('lodash'),
+    async = require('async'),
+    csv = require('csv');
 
-var Course = require('../models/course'),
-    Tutorial = require('../models/tutorial'),
-    User = require('../models/user');
+var models = require('../models');
 
 // Retrieve list of students for course
 exports.getStudentsByCourse = function (req, res) { 
-    Course.populate(req.course, [{
+    models.Course.populate(req.course, [{
         path: 'tutorials'
     }, { 
         path: 'students', 
@@ -33,7 +31,7 @@ exports.getStudentsByCourse = function (req, res) {
 
 // Retrieve list of students for tutorial
 exports.getStudentsByTutorial = function (req, res) { 
-    Tutorial.populate(req.tutorial, { 
+    models.Tutorial.populate(req.tutorial, { 
         path: 'students',
         options: {
             sort: { 'name.first': 1, 'name.last': 1 }

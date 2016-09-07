@@ -1,14 +1,11 @@
-var async = require('async'),
-    _ = require('lodash');
+var _ = require('lodash'),
+    async = require('async');
 
-// models
-var Course = require('../models/course'),
-    Tutorial = require('../models/tutorial'),
-    TutorialQuiz = require('../models/tutorialQuiz');
+var models = require('../models');
 
 // Retrieve course
 exports.getTutorial = function (req, res, next, tutorial) {
-    Tutorial.findById(tutorial, function (err, tutorial) {
+    models.Tutorial.findById(tutorial, function (err, tutorial) {
         if (err) {
             return next(err);
         }
@@ -24,7 +21,7 @@ exports.getTutorial = function (req, res, next, tutorial) {
 // Retrieve list of tutorials for course
 exports.getTutorialList = function (req, res) { 
     if (req.user.hasRole('admin')) {
-        Course.populate(req.course, { 
+        models.Course.populate(req.course, { 
             path: 'tutorials', 
             options: { 
                 sort: { number: 1 }
@@ -42,36 +39,28 @@ exports.getTutorialList = function (req, res) {
 
 
     } else {
-        Course.find(req.params.course).populate('tutorials').exec(function (err, courses) { 
+        models.Course.find(req.params.course).populate('tutorials').exec(function (err, courses) { 
             res.render('student/tutorials', { course: course });
         });
     }
 };
 
-/*exports.getTutorialsByStudent = function (req, res) { // requires req.user object (ensure via middleware)
-    User.findById(req.user._id).populate('student.tutorials')
-    .populate({ path: 'student.tutorials', select: 'name number' })
-    .exec(function (user) {
-
-        res.render('student/tutorials', { tutorials: user.student.tutorials });
-    })
-    .catch(function(err){
-        res.status(500).send("Unable to retrieve tutorials at this time (" + err.message + ").");
-    });
-};*/
-
 // Retrieve specific tutorial for tutorial
 exports.getTutorialForm = function (req, res) { 
-    res.render('admin/course-tutorial', { 
-        course: req.course, 
-        tutorial: req.tutorial || new Tutorial() 
+    models.Course.populate(req.course, {
+        path: 'teachingAssistants',
+        options: {
+            sort: { 'name.first': 1, 'name.last': 1 }
+        }
+    }, function (err) {
+        res.render('admin/course-tutorial', { course: req.course, tutorial: req.tutorial || new models.Tutorial() });
     });
 };
 
 // Add new tutorial for tutorial
 exports.addTutorial = function (req, res) {
-    Tutorial.create(req.body, function (err, tutorial) {
-        console.log(err);
+    models.Tutorial.create(req.body, function (err, tutorial) {
+
         /*if (err) {
             return res.status(500).send("Unable to save tutorial at this time (" + err.message + ").");
         }*/
@@ -104,13 +93,13 @@ exports.editTutorial = function (req, res) {
 /* exports.deleteTutorial = function (req, res) {
    
 
-   Course.findByIdAndUpdate(req.params.course, {
+   models.Course.findByIdAndUpdate(req.params.course, {
         $pull: { tutorials: { _id: req.params.tutorial } }
     }, function (err, course) {
         if (err) {
             return res.status(500).send("Unable to delete tutorial at this time (" + err.message + ").");
         }
-        Tutorial.findByIdAndRemove(req.params.tutorial, function (err, tutorial) {
+        models.Tutorial.findByIdAndRemove(req.params.tutorial, function (err, tutorial) {
             if (err) {
                 return res.status(500).send("Unable to delete tutorial at this time (" + err.message + ").");
             }

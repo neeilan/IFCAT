@@ -1,6 +1,6 @@
 // Get list of teachingAssistants for course
 exports.getTeachingAssistantsByCourse = function (req, res) { 
-    /*Course.findById(req.params.course).populate('{
+    /*models.Course.findById(req.params.course).populate('{
         path: 'teachingAssistants'
     }).exec(function (err, course) {
         if (err) {
@@ -16,10 +16,10 @@ exports.getTeachingAssistantsByCourse = function (req, res) {
 exports.getTeachingAssistantsByTutorial = function (req, res) { 
     async.series([
         function (cb) {
-            Course.findById(req.params.course, cb);
+            models.Course.findById(req.params.course, cb);
         },
         function (cb) {
-            Tutorial.findById(req.params.tutorial).populate({ 
+            models.Tutorial.findById(req.params.tutorial).populate({ 
                 path: 'teachingAssistants', 
                 options: { sort: { lastName: 1, firstName: 1 } } 
             }).exec(cb);
@@ -33,7 +33,7 @@ exports.getTeachingAssistantsByTutorial = function (req, res) {
 exports.addTeachingAssistantInCourse = function (req, res) { 
     async.series([
         function (cb) { 
-            Course.findByIdAndUpdate(req.params.course, {
+            models.Course.findByIdAndUpdate(req.params.course, {
                 $push: { teachingAssistants: req.params.ta } 
             }, { new: true }, cb);
         },
@@ -52,7 +52,7 @@ exports.addTeachingAssistantInCourse = function (req, res) {
 exports.addTeachingAssistantInTutorial = function (req, res) { 
     async.series([
         function (cb) { 
-            Tutorial.findByIdAndUpdate(req.params.tutorial, {
+            models.Tutorial.findByIdAndUpdate(req.params.tutorial, {
                 $push: { teachingAssistants: req.params.ta } 
             }, { new: true }, cb);
         },
@@ -71,7 +71,7 @@ exports.addTeachingAssistantInTutorial = function (req, res) {
 exports.deleteTeachingAssistantFromCourse = function (req, res) { 
     async.series([
         function (cb) { 
-            Course.findByIdAndUpdate(req.params.course, {
+            models.Course.findByIdAndUpdate(req.params.course, {
                 $pull: { teachingAssistants: { _id: req.params.ta } } 
             }, { new: true }, cb);
         },
@@ -90,7 +90,7 @@ exports.deleteTeachingAssistantFromCourse = function (req, res) {
 exports.deleteTeachingAssistantFromTutorial = function (req, res) { 
     async.series([
         function (cb) { 
-            Tutorial.findByIdAndUpdate(req.params.tutorial, {
+            models.Tutorial.findByIdAndUpdate(req.params.tutorial, {
                 $pull: { teachingAssistants: { _id: req.params.ta } } 
             }, { new: true }, cb);
         },

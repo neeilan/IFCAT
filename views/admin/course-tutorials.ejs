@@ -15,7 +15,7 @@
         <tr>
             <th>Tutorial</th>
             <th>TA</th>
-            <th># of students</th>
+            <th class="text-center"># of students</th>
             <th></th>
         </tr>
     </thead>
@@ -24,7 +24,7 @@
         <tr>
             <td>TUT <%= tutorial.number %></td>
             <td><%= tutorial.teachingAssistants.map(function (ta) { return ta.getFullName(); }).join('<br>') %></td>
-            <td><%= tutorial.students.length %></td>
+            <td class="text-center"><%= tutorial.students.length %></td>
             <td>
                 <div class="dropdown">
                     <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">

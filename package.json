@@ -30,7 +30,6 @@
     "multer": "^1.1.0",
     "passport": "^0.3.2",
     "passport-http": "^0.3.0",
-    "passport-local": "^1.0.0",
-    "streamifier": "^0.1.1"
+    "passport-local": "^1.0.0"
   }
 }

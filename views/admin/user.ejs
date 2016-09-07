@@ -1,18 +1,18 @@
 <%- include ../partials/admin-header -%>
 
-<h1><%= user.isNew ? 'Add new user' : 'Edit user' %></h1>
+<h1><%= us3r.isNew ? 'Add new user' : 'Edit user' %></h1>
 
-<form action="/admin/users/<%= user.isNew ? '' : user.id + '?_method=put' %>" method="post" class="form-horizontal">
+<form action="/admin/users/<%= us3r.isNew ? '' : us3r.id + '?_method=put' %>" method="post" class="form-horizontal">
 
     <div class="form-group">
         <label class="col-sm-2 control-label">Name</label>
         <div class="col-sm-8">
             <div class="form-group">
                 <div class="col-xs-4"> 
-                    <input type="text" name="name[first]" value="<%= user.name.first %>" placeholder="First" class="form-control">
+                    <input type="text" name="name[first]" value="<%= us3r.name.first %>" placeholder="First" class="form-control">
                 </div>
                 <div class="col-xs-4"> 
-                    <input type="text" name="name[last]" value="<%= user.name.last %>" placeholder="Last" class="form-control">
+                    <input type="text" name="name[last]" value="<%= us3r.name.last %>" placeholder="Last" class="form-control">
                 </div>
             </div>
         </div>
@@ -28,10 +28,8 @@
                 { text: 'Teaching assistant', value: 'teachingAssistant' },
                 { text: 'Student', value: 'student' }
             ].forEach(function (role) { %>
-
-                
-                <option value="<%= role.value %>"<%= user.roles.indexOf(role.value) !== -1 ? ' selected' : '' %>><%= role.text %></option>
-
+         
+                <option value="<%= role.value %>"<%= us3r.roles.indexOf(role.value) !== -1 ? ' selected' : '' %>><%= role.text %></option>
 
             <% }) %>
             </select>
@@ -41,14 +39,14 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">Email</label>
         <div class="col-sm-8">
-            <input type="text" name="local[email]" value="<%= user.local.email %>" class="form-control">   
+            <input type="text" name="local[email]" value="<%= us3r.local.email %>" class="form-control">   
         </div>
     </div>
 
     <!--div class="form-group">
         <label class="col-sm-2 control-label">Password</label>
         <div class="col-sm-8">
-            <input type="text" name="local[password]" value="" class="form-control">   
+            <input type="password" name="local[password]" value="" class="form-control">   
         </div>
     </div-->
 

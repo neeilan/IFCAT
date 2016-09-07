@@ -12,9 +12,9 @@
 <table class="table table-striped sortable">
     <thead>
         <tr>
-            <th><input type="checkbox" value="1"></th>
+            <th class="check-all"><input type="checkbox" value="1"></th>
             <th>Name</th>
-            <th></th>
+            <th class="text-center"># of questions</th>
             <th></th>
             <th></th>
         </tr>
@@ -22,9 +22,9 @@
     <tbody>
     <% course.quizzes.forEach(function (quiz, i) { %>
         <tr>
-            <td><input type="checkbox" name="groups[]" value="<%= quiz.id %>"></td>
+            <td><input type="checkbox" name="quizzes[]" value="<%= quiz.id %>"></td>
             <td><%= quiz.name %></td>
-            <td></td>
+            <td class="text-center"><%= quiz.questions.length %></td>
             <td></td>
             <td>
                 <div class="dropdown">

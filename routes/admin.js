@@ -1,20 +1,11 @@
 var fs = require('fs');
 
-var multer = require('multer'),
+var _ = require('lodash'),
+    multer = require('multer'),
     passport = require('passport'),
-    router = require('express').Router(),
-    _ = require('lodash');
+    router = require('express').Router();
 
-// controllers
-var CourseController = require('../controllers/course'),
-    TutorialController = require('../controllers/tutorial'),
-    QuizController = require('../controllers/quiz'),
-    QuestionController = require('../controllers/question'),
-    FileController = require('../controllers/file'),
-    TutorialQuizController = require('../controllers/tutorialQuiz'),
-    GroupController = require('../controllers/group'),
-    UserController = require('../controllers/user'),
-    StudentController = require('../controllers/student');
+var controllers = require('../controllers');
 
 // upload configurations
 var anyUpload = multer({ 
@@ -49,14 +40,14 @@ router.post('/login', passport.authenticate('local-login', {
 }));
 
 // lifesaver: query single objects
-router.param('us3r', UserController.getUser);
-router.param('course', CourseController.getCourse);
-router.param('tutorial', TutorialController.getTutorial);
-router.param('group', GroupController.getGroup);
-router.param('quiz', QuizController.getQuiz);
-router.param('question', QuestionController.getQuestion);
-router.param('fil3', FileController.getFile);
-router.param('tutorialQuiz', TutorialQuizController.getQuiz);
+router.param('us3r', controllers.User.getUser);
+router.param('course', controllers.Course.getCourse);
+router.param('tutorial', controllers.Tutorial.getTutorial);
+router.param('quiz', controllers.Quiz.getQuiz);
+router.param('question', controllers.Question.getQuestion);
+router.param('fil3', controllers.File.getFile);
+router.param(['tutorial', 'quiz'], controllers.TutorialQuiz.getQuiz);
+router.param('group', controllers.Group.getGroup);
 
 // check if user is authenticated
 router.use(function (req, res, next) {
@@ -92,68 +83,68 @@ router.use(function (req, res, next) {
 // @TODO: handle delete routes e.g. deleting course = deleting every related to the course
 // @TODO: handle unexpected errors
 // @TODO: model validation
-router.get('/logout', UserController.logout);
+router.get('/logout', controllers.User.logout);
 
-router.get('/courses', CourseController.getCourseListForAdmin);
-router.get('/courses/new', CourseController.getCourseForm);
-router.get('/courses/:course/edit', CourseController.getCourseForm);
-router.post('/courses', CourseController.addCourse);
-router.put('/courses/:course', CourseController.editCourse);
-//router.delete('/courses/:course', CourseController.deleteCourse);
+router.get('/courses', controllers.Course.getCourseListForAdmin);
+router.get('/courses/new', controllers.Course.getCourseForm);
+router.get('/courses/:course/edit', controllers.Course.getCourseForm);
+router.post('/courses', controllers.Course.addCourse);
+router.put('/courses/:course', controllers.Course.editCourse);
+//router.delete('/courses/:course', controllers.Course.deleteCourse);
 
-router.get('/courses/:course/students', StudentController.getStudentsByCourse);
+router.get('/courses/:course/students', controllers.Student.getStudentsByCourse);
 
-router.get('/courses/:course/tutorials', TutorialController.getTutorialList);
-router.get('/courses/:course/tutorials/new', TutorialController.getTutorialForm);
-router.get('/courses/:course/tutorials/:tutorial/edit', TutorialController.getTutorialForm);
-router.post('/courses/:course/tutorials', TutorialController.addTutorial);
-router.put('/courses/:course/tutorials/:tutorial', TutorialController.editTutorial);
-// router.delete('/courses/:course/tutorials/:tutorial', TutorialController.deleteTutorial);
+router.get('/courses/:course/tutorials', controllers.Tutorial.getTutorialList);
+router.get('/courses/:course/tutorials/new', controllers.Tutorial.getTutorialForm);
+router.get('/courses/:course/tutorials/:tutorial/edit', controllers.Tutorial.getTutorialForm);
+router.post('/courses/:course/tutorials', controllers.Tutorial.addTutorial);
+router.put('/courses/:course/tutorials/:tutorial', controllers.Tutorial.editTutorial);
+// router.delete('/courses/:course/tutorials/:tutorial', controllers.Tutorial.deleteTutorial);
 
-// // /*router.get('/courses/:course/tutorials/:tutorial/students', UserController.getStudentsByTutorial);
-// // router.post('/courses/:course/tutorials/:tutorial/students/:student', UserController.addStudentInTutorial);
-// // router.delete('/courses/:course/tutorials/:tutorial/students/:student', UserController.deleteStudentInTutorial);*/
+// // /*router.get('/courses/:course/tutorials/:tutorial/students', controllers.User.getStudentsByTutorial);
+// // router.post('/courses/:course/tutorials/:tutorial/students/:student', controllers.User.addStudentInTutorial);
+// // router.delete('/courses/:course/tutorials/:tutorial/students/:student', controllers.User.deleteStudentInTutorial);*/
 
-router.get('/courses/:course/quizzes', QuizController.getQuizList);
-router.get('/courses/:course/quizzes/new', QuizController.getQuizForm);
-router.get('/courses/:course/quizzes/:quiz/edit', QuizController.getQuizForm);
-router.post('/courses/:course/quizzes', QuizController.addQuiz);
-router.put('/courses/:course/quizzes/:quiz', QuizController.editQuiz);
-// //router.delete('/courses/:course/quizzes/:quiz', QuizController.deleteQuiz);
+router.get('/courses/:course/quizzes', controllers.Quiz.getQuizList);
+router.get('/courses/:course/quizzes/new', controllers.Quiz.getQuizForm);
+router.get('/courses/:course/quizzes/:quiz/edit', controllers.Quiz.getQuizForm);
+router.post('/courses/:course/quizzes', controllers.Quiz.addQuiz);
+router.put('/courses/:course/quizzes/:quiz', controllers.Quiz.editQuiz);
+// //router.delete('/courses/:course/quizzes/:quiz', controllers.Quiz.deleteQuiz);
 
-router.get('/courses/:course/quizzes/:quiz/questions', QuestionController.getQuestionList);
-router.get('/courses/:course/quizzes/:quiz/questions/new', QuestionController.getQuestionForm);
-router.get('/courses/:course/quizzes/:quiz/questions/:question/edit', QuestionController.getQuestionForm);
-router.post('/courses/:course/quizzes/:quiz/questions', QuestionController.addQuestion);
-router.put('/courses/:course/quizzes/:quiz/questions/:question', QuestionController.editQuestion);
-//router.delete('/courses/:course/quizzes/:quiz/questions/:question', QuestionController.deleteQuestion);
+router.get('/courses/:course/quizzes/:quiz/questions', controllers.Question.getQuestionList);
+router.get('/courses/:course/quizzes/:quiz/questions/new', controllers.Question.getQuestionForm);
+router.get('/courses/:course/quizzes/:quiz/questions/:question/edit', controllers.Question.getQuestionForm);
+router.post('/courses/:course/quizzes/:quiz/questions', controllers.Question.addQuestion);
+router.put('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.editQuestion);
+//router.delete('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.deleteQuestion);
 
-router.get('/courses/:course/tutorials/:tutorial/quizzes', TutorialQuizController.getQuizListForAdmin);
-router.get('/courses/:course/tutorials/:tutorial/quizzes/new', TutorialQuizController.getQuizForm);
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:tutorialQuiz/edit', TutorialQuizController.getQuizForm);
-router.post('/courses/:course/tutorials/:tutorial/quizzes', TutorialQuizController.addQuiz);
-router.put('/courses/:course/tutorials/:tutorial/quizzes/:tutorialQuiz', TutorialQuizController.editQuiz);
-// router.delete('/courses/:course/tutorials/:tutorial/quizzes/:quiz', QuizController.deleteQuiz);
+router.get('/courses/:course/tutorials/:tutorial/quizzes', controllers.TutorialQuiz.getQuizListForAdmin);
+router.get('/courses/:course/tutorials/:tutorial/quizzes/new', controllers.TutorialQuiz.getQuizForm);
+router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/edit', controllers.TutorialQuiz.getQuizForm);
+router.post('/courses/:course/tutorials/:tutorial/quizzes', controllers.TutorialQuiz.addQuiz);
+router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz', controllers.TutorialQuiz.editQuiz);
+// router.delete('/courses/:course/tutorials/:tutorial/quizzes/:quiz', controllers.Quiz.deleteQuiz);
 
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:tutorialQuiz/groups', GroupController.getGroupList);
-router.post('/courses/:course/tutorials/:tutorial/quizzes/:tutorialQuiz/groups/generate', GroupController.generateGroups);
-//router.get('/courses/:course/tutorials/:tutorial/quizzes/:tutorialQuiz/groups/new', GroupController.getGroupForm);
-//router.get('/courses/:course/tutorials/:tutorial/quizzes/:tutorialQuiz/groups/:group/view', GroupController.viewGroupForm);
-// router.delete('/courses/:course/tutorials/:tutorial/groups/:group', GroupController.deleteGroupFromTutorial);*/
+router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups', controllers.Group.getGroupList);
+router.post('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/generate', controllers.Group.generateGroups);
+//router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/new', controllers.Group.getGroupForm);
+//router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/:group/view', controllers.Group.viewGroupForm);
+// router.delete('/courses/:course/tutorials/:tutorial/groups/:group', controllers.Group.deleteGroupFromTutorial);*/
 
-router.get('/courses/:course/files', FileController.getFileList);
-router.get('/courses/:course/files/new', FileController.getFileForm);
-router.get('/courses/:course/files/:fil3/edit', FileController.getFileForm);
-router.post('/courses/:course/files', anyUpload.single('file'), FileController.addFile);
-router.put('/courses/:course/files/:fil3', anyUpload.single('file'), FileController.editFile);
-//router.delete('/courses/:course/files/:fil3', FileController.deleteFile);
+router.get('/courses/:course/files', controllers.File.getFileList);
+router.get('/courses/:course/files/new', controllers.File.getFileForm);
+router.get('/courses/:course/files/:fil3/edit', controllers.File.getFileForm);
+router.post('/courses/:course/files', anyUpload.single('file'), controllers.File.addFile);
+router.put('/courses/:course/files/:fil3', anyUpload.single('file'), controllers.File.editFile);
+//router.delete('/courses/:course/files/:fil3', controllers.File.deleteFile);
 
-router.get('/users', UserController.getUserList);
-router.get('/users/new', UserController.getUserForm);
-router.get('/users/:us3r/edit', UserController.getUserForm);
-router.post('/users', UserController.addUser);
-router.put('/users/:us3r', UserController.editUser);
-//router.delete('/users/:user', UserController.deleteUser);
-router.post('/users/import', csvUpload.single('file'), UserController.importStudents);
+router.get('/users', controllers.User.getUserList);
+router.get('/users/new', controllers.User.getUserForm);
+router.get('/users/:us3r/edit', controllers.User.getUserForm);
+router.post('/users', controllers.User.addUser);
+router.put('/users/:us3r', controllers.User.editUser);
+//router.delete('/users/:user', controllers.User.deleteUser);
+router.post('/users/import', csvUpload.single('file'), controllers.User.importStudents);
 
 module.exports = router;

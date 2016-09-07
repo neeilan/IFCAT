@@ -1,8 +1,8 @@
 var router = require('express').Router();
 
-var UserController = require('../controllers/user');
+var controllers = require('../controllers');
 
 // routes
-router.get('/login', UserController.login);
+router.get('/login', controllers.User.login);
 
 module.exports = router;

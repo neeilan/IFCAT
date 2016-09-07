@@ -1,12 +1,10 @@
 var _ = require('lodash');
 
-var Course = require('../models/course'),
-    Quiz = require('../models/quiz'),
-    User = require('../models/user');
+var models = require('../models');
 
 // Retrieve course
 exports.getCourse = function (req, res, next, course) {
-    Course.findById(course, function (err, course) {
+    models.Course.findById(course, function (err, course) {
         if (err) {
             return next(err);
         }
@@ -19,16 +17,19 @@ exports.getCourse = function (req, res, next, course) {
     });
 };
 
-// ROUTES
-
 // Retrieve many courses
 exports.getCourseListForAdmin = function (req, res) {
     if (req.user.hasRole('admin')) {
-        Course.find({}).sort('code').exec(function (err, courses) { 
+        models.Course.findCourses().populate({
+            path: 'instructors',
+            options: {
+                sort: { 'name.first': 1, 'name.last': 1 }
+            }
+        }).exec(function (err, courses) { 
             res.render('admin/courses', { courses: courses });
         });
     } else {
-        Course.find({
+        models.Course.find({
             $or: [
                 { 'instructors': { $in: [req.user.id] } }, 
                 { 'teachingAssistants': { $in: [req.user.id] } }
@@ -43,23 +44,21 @@ exports.getCourseListForAdmin = function (req, res) {
 };
 
 exports.getCourseListForStudent = function (req, res) {
-    Course.find({ 
-        'students': { 
-            $in: [req.user.id]
-        }
-    }, function (err, courses) { 
+    models.Course.findCoursesByStudent(req.user.id, function (err, courses) { 
         res.render('student/courses', { courses: courses });
     });
 };
 
 //
 exports.getCourseForm = function (req, res) {
-    res.render('admin/course', { course: req.course || new Course() });
+    models.User.findInstructors(function (err, instructors) {
+        res.render('admin/course', { course: req.course || new models.Course(), instructors: instructors });
+    });
 };
 
 // Add course model
 exports.addCourse = function (req, res) {
-    Course.create(req.body, function (err, course) {
+    models.Course.create(req.body, function (err, course) {
         /*if (err) {
             return res.status(500).send("Unable to save course at this time (" + err.message + ").");
         }*/

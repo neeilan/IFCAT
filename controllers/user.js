@@ -1,15 +1,18 @@
-var async = require('async'),
-    _ = require('lodash');
+var _ = require('lodash'),
+    async = require('async'),
+    csv = require('csv');
 
-var User = require('../models/user');
+var models = require('../models');
+
+// 
 
 exports.getUser = function (req, res, next, us3r) {
-    User.findById(us3r, function (err, us3r) {
+    models.User.findById(us3r, function (err, us3r) {
         if (err) {
             return next(err);
         }
         if (!us3r) {
-            return next(new Error('No user is found.'));
+            return next(new Error('No us3r is found.'));
         }
         console.log('got us3r');
         req.us3r = us3r; // careful: req.user is used by passport
@@ -18,7 +21,6 @@ exports.getUser = function (req, res, next, us3r) {
 };
 
 // route handlers
-
 
 exports.login = function (req, res) {
     res.render('login', { message: req.flash('message') }); 
@@ -30,25 +32,30 @@ exports.logout = function (req, res) {
 };
 
 exports.getUserList = function (req, res) {
-    User.find({}).sort({ 'name.first': 1, 'name.last': 1 }).exec(function (err, users) {
-        res.render('admin/users', { users: users });
+    models.User.find({}).exec(function (err, users) {
+        res.render('admin/users', { users: users.sort(models.User.compareRoles) });
     }); 
 };
 
 exports.getUserForm = function (req, res) {
-    res.render('admin/user', { user: req.us3r || new User() });
+    res.render('admin/user', { us3r: req.us3r || new models.User() });
 };
 
-// Add new user for user
+// Add new user
 exports.addUser = function (req, res) {
-    User.create(req.body, function (err, user) {
+    models.User.create(req.body, function (err, user) {
         res.redirect('/admin/users');
     });
 };
 
 // Update specific user
-exports.editUser = function (req, res) {    
-    _.extend(req.us3r, req.body).save(function (err) {
+exports.editUser = function (req, res) {
+    req.us3r.name.first = req.body.name.first;
+    req.us3r.name.last = req.body.name.last;
+    req.us3r.roles = req.body.roles;
+    req.us3r.local.email = req.body.local.email;
+    //req.us3r.local.password = req.us3r.generateHash(req.body.local.password); // @TODO: use async version
+    req.us3r.save(function (err) {
         res.redirect('/admin/users/' + req.us3r.id + '/edit');
     });
 };
@@ -67,22 +74,15 @@ exports.importStudents = function (req, res) {
     }, function (err, rows) {
         // create students
         async.mapSeries(rows, function (row, done) {
-            User.create({
-                local: {
-                    email: row.email
-                },
-                name: {
-                    first: row.first,
-                    last: row.last
-                },
-                roles: _.map(row.roles.split(','), _.trim)
-            }, done);
-        // add students into course
+            var user = new User();
+                user.name.first = row.first;
+                user.name.last = row.last;
+                user.roles = _.map(row.roles.split(','), _.trim);
+                user.local.email = row.email;
+                user.local.password = user.generateHash(row.password); // @TODO: use async version
+                user.save(done);
         }, function (err, newStudents) {
-            req.course.students.push(...newStudents);
-            req.course.save(function (err) {
-                res.redirect('/admin/courses/' + req.course.id + '/students');
-            });
+            res.redirect('/admin/users');
         });
     });
 };

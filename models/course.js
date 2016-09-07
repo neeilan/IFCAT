@@ -13,4 +13,12 @@ var CourseSchema = new mongoose.Schema({
     timestamps: true
 });
 
+CourseSchema.statics.findCourses = function (callback) {
+    return this.find({}).sort('code');
+};
+
+CourseSchema.statics.findCoursesByStudent = function (id, callback) {
+    return this.find({ 'students': { $in: [id] } }, callback);
+};
+
 module.exports = mongoose.model('Course', CourseSchema);

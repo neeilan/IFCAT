@@ -1,16 +1,7 @@
 var passport = require('passport'),
     router = require('express').Router();
 
-// controllers
-var CourseController = require('../controllers/course'),
-    TutorialController = require('../controllers/tutorial'),
-    QuizController = require('../controllers/quiz'),
-    QuestionController = require('../controllers/question'),
-    FileController = require('../controllers/file'),
-    TutorialQuizController = require('../controllers/tutorialQuiz'),
-    GroupController = require('../controllers/group'),
-    UserController = require('../controllers/user'),
-    StudentController = require('../controllers/student');
+var controllers = require('../controllers');
 
 // non-authenticated routes
 router.post('/signup', passport.authenticate('local-signup', {
@@ -26,13 +17,13 @@ router.post('/login', passport.authenticate('local-login', {
 }));
 
 // lifesaver: query single objects
-router.param('course', CourseController.getCourse);
-router.param('tutorial', TutorialController.getTutorial);
-router.param('group', GroupController.getGroup);
-router.param('quiz', QuizController.getQuiz);
-router.param('question', QuestionController.getQuestion);
-router.param('fil3', FileController.getFile);
-router.param('tutorialQuiz', TutorialQuizController.getQuiz);
+router.param('course', controllers.Course.getCourse);
+router.param('tutorial', controllers.Tutorial.getTutorial);
+router.param('group', controllers.Group.getGroup);
+router.param('quiz', controllers.Quiz.getQuiz);
+router.param('question', controllers.Question.getQuestion);
+router.param('fil3', controllers.File.getFile);
+router.param('tutorialQuiz', controllers.TutorialQuiz.getQuiz);
 
 // check if user is authenticated
 router.use(function (req, res, next) {
@@ -43,12 +34,12 @@ router.use(function (req, res, next) {
 });
 
 // authenticated routes
-router.get('/logout', UserController.logout);
+router.get('/logout', controllers.User.logout);
 
-router.get('/courses', CourseController.getCourseListForStudent);
-router.get('/courses/:course/quizzes', TutorialQuizController.getQuizListForStudent);
-router.get('/courses/:course/quizzes/:tutorialQuiz/start', TutorialQuizController.startQuiz);
-router.get('/courses/:course/quizzes/:tutorialQuiz/questions/:question', TutorialQuizController.getNextQuestion);
-router.get('/courses/:course/quizzes/:tutorialQuiz/end', TutorialQuizController.endQuiz);
+router.get('/courses', controllers.Course.getCourseListForStudent);
+router.get('/courses/:course/quizzes', controllers.TutorialQuiz.getQuizListForStudent);
+router.get('/courses/:course/quizzes/:tutorialQuiz/start', controllers.TutorialQuiz.startQuiz);
+router.get('/courses/:course/quizzes/:tutorialQuiz/questions/:question', controllers.TutorialQuiz.getNextQuestion);
+router.get('/courses/:course/quizzes/:tutorialQuiz/end', controllers.TutorialQuiz.endQuiz);
 
 module.exports = router;

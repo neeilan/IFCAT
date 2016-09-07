@@ -11,14 +11,8 @@ var TutorialQuizSchema = new mongoose.Schema({
     timestamps: true 
 });
 
-TutorialQuizSchema.methods.getStudentsWithGroups = function () {
-    return _.reduce(this.groups, function (accum, group) {
-        return _.union(accum, group.members);
-    },  []);
-};
-
-TutorialQuizSchema.methods.getStudentsWithoutGroups = function () {
-    return _.difference(this.getStudents(), this.getStudentsWithGroups());
+TutorialQuizSchema.statics.findQuizzesByTutorial = function () {
+    
 };
 
 module.exports = mongoose.model('TutorialQuiz', TutorialQuizSchema);

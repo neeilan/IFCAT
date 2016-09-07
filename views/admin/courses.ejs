@@ -13,36 +13,37 @@
         <tr>
             <th>Code</th>
             <th>Name</th>
+            <th>Instructors</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
     <% courses.forEach(function (course) { %>
         <tr>
-            <th><%= course.code %></th>
-            <th><%= course.name %></th>
-            <th>
+            <td><%= course.code %></td>
+            <td><%= course.name %></td>
+            <td><%- course.instructors.map(function (instructor) { return instructor.getFullName(); }).join('<br>') %></td>
+            <td>
                 <div class="dropdown">
                     <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
                         Actions<span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                    <% if (user.hasRole('admin')) { %>
                         <li><a href="/admin/courses/<%= course.id %>/edit">Edit Course</a></li>
-                    <% } %>
+                    
                         <li><a href="/admin/courses/<%= course.id %>/tutorials">Manage Tutorials</a></li>
                         <li><a href="/admin/courses/<%= course.id %>/quizzes">Manage Quizzes</a></li>
-                    <% if (user.hasRole('admin')) { %>
+                    
                         <li><a href="/admin/courses/<%= course.id %>/files">Manage Files</a></li>
-                    <% } %>
+  
                         <li><a href="/admin/courses/<%= course.id %>/students">Manage Students</a></li>
-                    <% if (user.hasRole('admin')) { %>
+                    
                         <li class="divider"></li>
                         <li><a href="/admin/courses/<%= course.id %>">Delete Course</a></li>
-                    <% } %>
+                    
                     </ul>
                 </div>
-            </th>
+            </td>
         </tr>
     <% }) %>
     </tbody>

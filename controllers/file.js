@@ -1,9 +1,8 @@
-var Course = require('../models/course'),
-    File = require('../models/file');
+var models = require('../models');
 
 // Retrieve course
 exports.getFile = function (req, res, next, fil3) {
-    File.findById(fil3, function (err, fil3) {
+    models.FilefindById(fil3, function (err, fil3) {
         if (err) {
             return next(err);
         }
@@ -18,7 +17,7 @@ exports.getFile = function (req, res, next, fil3) {
 
 // Retrieve all files in a course
 exports.getFileList = function (req, res) {
-    Course.populate(req.course, {
+    models.Course.populate(req.course, {
         path: 'files', options: { sort: { name: 1 }}
     }, function (err, course) {
         /*if (err) {
@@ -30,12 +29,12 @@ exports.getFileList = function (req, res) {
 
 // Retrieve specific file for file
 exports.getFileForm = function (req, res) { 
-    res.render('admin/course-file', { course: req.course, file: req.fil3 || new File() });
+    res.render('admin/course-file', { course: req.course, fil3: req.fil3 || new models.File() });
 };
 
 // Add new file for file
 exports.addFile = function (req, res) {
-    File.create({ 
+    models.File.create({ 
         name: req.file.filename, 
         type: req.file.mimetype 
     }, function (err, file) { 
@@ -62,13 +61,13 @@ exports.editFile = function (req, res) {
 exports.deleteFile = function (req, res) {
    /* 
 
-   Course.findByIdAndUpdate(req.params.course, {
+   models.Course.findByIdAndUpdate(req.params.course, {
         $pull: { files: { _id: req.params.file } }
     }, function (err, course) {
         if (err) {
             return res.status(500).send("Unable to delete file at this time (" + err.message + ").");
         }
-        File.findByIdAndRemove(req.params.file, function (err, file) {
+        models.FilefindByIdAndRemove(req.params.file, function (err, file) {
             if (err) {
                 return res.status(500).send("Unable to delete file at this time (" + err.message + ").");
             }

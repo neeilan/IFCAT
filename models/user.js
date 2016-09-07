@@ -16,18 +16,12 @@ var UserSchema = new mongoose.Schema({
     },
     UTORid: String, // not sure if we are using it
     name: {
-        first: {
-            type: String,
-            lowercase: true
-        },
-        last: { 
-            type: String,
-            lowercase: true
-        }
+        first: String,
+        last: String
     },
     roles: [{
         type: String,
-        enum: ['student', 'teachingAssistant', 'instructor', 'admin'],
+        enum: ['admin', 'instructor', 'teachingAssistant', 'student'],
         default: 'student'
     }]
 });
@@ -40,57 +34,50 @@ UserSchema.methods.isValidPassword = function (password) {
     return bcrypt.compareSync(password, this.local.password);
 };
 
-UserSchema.methods.hasRole = function () {
-    return _.intersection(this.roles, arguments).length > 0;
-};
-
-UserSchema.methods.addRole = function () {
-    this.roles = _.union(this.roles, arguments);
-};
-
-UserSchema.methods.removeRole = function () {
-    this.roles = _.pull(this.roles, arguments);
+UserSchema.methods.hasRole = function (role) {
+    return this.roles.indexOf(role) !== -1;
 };
 
 UserSchema.methods.getFullName = function () {
     return this.name.first + ' ' + this.name.last;
 };
 
-UserSchema.methods.isRepresentativeOf = function (group) {
-    return group.driver && this.id === group.driver.id;
+UserSchema.statics.findInstructors = function (callback) {
+    return this.find({ roles: { $in: ['instructor'] } }, callback);
 };
 
+// Sort users by roles;
+// - if users have same roles, sort users by first names;
+// - otherwise, sort users by last names;
+UserSchema.statics.compareRoles = function (a, b) {
 /*
-UserSchema.static.sort = function (users) {
-
-    function byRoles (a, b) {
-        ['admin', 'instructor', 'teachingAssistant', 'student'].forEach(function (role) {
-            if (a.has(role) && b.is(role)) {
-                return byFirstName(a, b);
-            } else if (a.has(role)) {
-                return 1;
-            } else if (b.has(role)) {
-                return -1;
-            }
-        });
-    };
-
-    function byFirstName (a, b) {
-        if (a.name.first === b.name.first) {
-            return byLastName(a, b);
+    ['admin', 'instructor', 'teachingAssistant', 'student'].forEach(function (role) {
+        var aHasRole = a.hasRole(role), bHasRole = b.hasRole(role);
+        if (aHasRole && bHasRole) {
+            return compareFirstNames(a, b);
+        } else if (aHasRole) {
+            return 1;
+        } else if (bHasRole) {
+            return -1;
         }
-        return a.name.first > b.name.first ? 1 : -1;
-    }
+    });
 
-    function byLastName (a, b) {
-        if (a.name.last === b.name.last) {
+    function compareFirstNames (a, b) {
+        var aFirstName = _.lowerCase(a.name.first), bFirstName = _.lowerCase(b.name.first);
+        if (aFirstName === bFirstName) {
+            return compareLastNames(a, b);
+        }
+        return aFirstName > bFirstName ? 1 : -1;
+    }
+    
+    function compareLastNames (a, b) {
+        var aLastName = _.lowerCase(a.name.last), bLastName = _.lowerCase(b.name.last);
+        if (aLastName === bLastName) {
             return 0;
         }
-        return a.name.last > b.name.last ? 1 : -1;
+        return aLastName > bLastName ? 1 : -1;
     }
-
-    return users.sort(byRoles);
+    */
 };
-*/
 
 module.exports = mongoose.model('User', UserSchema);

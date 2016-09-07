@@ -10,22 +10,31 @@
 
 
 <table class="table table-striped">
-    <tdead>
+    <thead>
         <tr>
-            <th>Email</th>
             <th>First Name</th>
             <th>Last Name</th>
-            <th>Roles</th>
+            <th>Email</th>
+            <th class="text-center">Admin</th>
+            <th class="text-center">Instructor</th>
+            <th class="text-center">Teaching Assistant</th>
+            <th class="text-center">Student</th>
             <th></th>
         </tr>
-    </tdead>
+    </thead>
     <tbody>
     <% users.forEach(function (user) { %>
         <tr>
-            <td><%= user.local.email %></td>
             <td><%= user.name.first %></td>
             <td><%= user.name.last %></td>
-            <td><%= user.roles.join(', ') %></td>
+            <td><%= user.local.email %></td>
+            <% ['admin', 'instructor', 'teachingAssistant', 'student'].forEach(function (role) { %>
+                <td class="text-center">
+                <% if (user.hasRole(role)) { %>
+                    <span class="glyphicon glyphicon-ok"></span>
+                <% } %>
+                </td>
+            <% }) %>
             <td>
                 <div class="dropdown">
                     <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
