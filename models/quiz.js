@@ -18,8 +18,7 @@ var QuizSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// population methods
-
+// populate questions
 QuizSchema.methods.withQuestions = function () {
     return this.populate({
         path: 'quizzes', 
@@ -29,52 +28,46 @@ QuizSchema.methods.withQuestions = function () {
     });
 };
 
-QuizSchema.methods.loadTutorials = function (idOnly) {
+// load quiz' tutorials
+QuizSchema.methods.loadTutorials = function () {
     var quiz = this;
-    // find quiz' tutorials
     return models.TutorialQuiz.find({ quiz: quiz }, 'tutorial').populate('tutorial').exec(function (err, tutorialQuizzes) {
-        console.log('err1', err);
-        quiz.tutorials = tutorialQuizzes.map(function (tutorialQuiz) { 
-            return idOnly ? tutorialQuiz.tutorial.id : tutorialQuiz.tutorial; 
+        quiz.tutorialQuizzes = tutorialQuizzes.map(function (tutorialQuiz) { 
+            return tutorialQuiz.tutorial.id;
         });
     });
 };
 
+// save quiz
 QuizSchema.methods.store = function (obj, callback) {
     var quiz = this;
-    
-    quiz.name = obj.name;
-    quiz.gradingScheme = obj.gradingScheme;
-    quiz.randomizeChoices = obj.randomizeChoices;
-    quiz.useLaTeX = obj.useLaTeX;
+        quiz.name = obj.name;
+        quiz.gradingScheme = obj.gradingScheme;
+        quiz.randomizeChoices = obj.randomizeChoices;
+        quiz.useLaTeX = obj.useLaTeX;
 
     async.series([
         // save quiz
         function (done) {
-            console.log('save');
             quiz.save(done);
         },
         // get quiz' tutorials
         function (done) {
-            console.log('get tutorials');
-            quiz.loadTutorials(true).then(function () { done(); });
+            quiz.loadTutorials().then(function () { done(); });
         },
         // delete old tutorials
         function (done) {
-            console.log('old', _.difference(quiz.tutorials, obj.tutorials));
             async.eachSeries(_.difference(quiz.tutorials, obj.tutorials), function (tutorial, done) {
                 models.TutorialQuiz.findOneAndRemove({ tutorial: tutorial, quiz: quiz }, done);
             }, done);
         },
         // insert new tutorials
         function (done) {
-            console.log('new', _.difference(obj.tutorials, quiz.tutorials));
             async.eachSeries(_.difference(obj.tutorials, quiz.tutorials), function (tutorial, done) {
                 models.TutorialQuiz.create({ tutorial: tutorial, quiz: quiz }, done);
             }, done);
         }
     ], function (err) {
-        console.log('err2', err);
         callback(null, quiz);
     });
 };

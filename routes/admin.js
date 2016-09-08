@@ -46,7 +46,7 @@ router.param('tutorial', controllers.Tutorial.getTutorial);
 router.param('quiz', controllers.Quiz.getQuiz);
 router.param('question', controllers.Question.getQuestion);
 router.param('fil3', controllers.File.getFile);
-router.param(['tutorial', 'quiz'], controllers.TutorialQuiz.getQuiz);
+router.param('tutorialQuiz', controllers.TutorialQuiz.getQuiz);
 router.param('group', controllers.Group.getGroup);
 
 // check if user is authenticated
@@ -120,17 +120,14 @@ router.put('/courses/:course/quizzes/:quiz/questions/:question', controllers.Que
 //router.delete('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.deleteQuestion);
 
 router.get('/courses/:course/tutorials/:tutorial/quizzes', controllers.TutorialQuiz.getQuizListForAdmin);
-router.get('/courses/:course/tutorials/:tutorial/quizzes/new', controllers.TutorialQuiz.getQuizForm);
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/edit', controllers.TutorialQuiz.getQuizForm);
-router.post('/courses/:course/tutorials/:tutorial/quizzes', controllers.TutorialQuiz.addQuiz);
-router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz', controllers.TutorialQuiz.editQuiz);
-// router.delete('/courses/:course/tutorials/:tutorial/quizzes/:quiz', controllers.Quiz.deleteQuiz);
+router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/edit', controllers.TutorialQuiz.getQuizForm);
+router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz', controllers.TutorialQuiz.editQuiz);
 
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups', controllers.Group.getGroupList);
-router.post('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/generate', controllers.Group.generateGroups);
-//router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/new', controllers.Group.getGroupForm);
-//router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/:group/view', controllers.Group.viewGroupForm);
-// router.delete('/courses/:course/tutorials/:tutorial/groups/:group', controllers.Group.deleteGroupFromTutorial);*/
+router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups', controllers.Group.getGroupList);
+router.post('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroups);
+//router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/new', controllers.Group.getGroupForm);
+//router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/view', controllers.Group.viewGroupForm);
+//router.delete('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group', controllers.Group.deleteGroupFromTutorial);*/
 
 router.get('/courses/:course/files', controllers.File.getFileList);
 router.get('/courses/:course/files/new', controllers.File.getFileForm);

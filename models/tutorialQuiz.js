@@ -15,8 +15,17 @@ var TutorialQuizSchema = new mongoose.Schema({
 
 TutorialQuizSchema.index({ tutorial: 1, quiz: 1 }, { unique: true });
 
-// population methods
+// get tutorial number
+TutorialQuizSchema.virtual('number').get(function () {
+    return this.tutorial.number;
+});
 
+// get quiz name
+TutorialQuizSchema.virtual('name').get(function () {
+    return this.quiz.name;
+});
+
+// populate groups
 TutorialQuizSchema.methods.withGroups = function () {
     return this.populate({
         path: 'groups',

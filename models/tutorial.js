@@ -11,13 +11,10 @@ var TutorialSchema = new mongoose.Schema({
     timestamps: true
 });
 
-TutorialSchema.methods.loadQuizzes = function (callback) {
+TutorialSchema.methods.loadQuizzes = function () {
     var tutorial = this;
-    // find tutorial's quizzes
-    return models.TutorialQuiz.find({ tutorial: tutorial }, 'quiz').populate('quiz').exec(function (err, tutorialQuizzes) {
-        tutorial.quizzes = tutorialQuizzes.map(function (tutorialQuiz) { 
-            return tutorialQuiz.quiz; 
-        });
+    return models.TutorialQuiz.find({ tutorial: this }).populate('quiz').exec(function (err, tutorialQuizzes) {
+        tutorial.tutorialQuizzes = tutorialQuizzes;
     });
 };
 

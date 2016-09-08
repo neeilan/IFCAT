@@ -31,27 +31,26 @@ exports.getGroupList = function (req, res) {
 // Create new group for tutorial
 exports.generateGroups = function (req, res) { 
     // delete original groups
-    models.Group.remove({ _id: { $in: req.tutorialmodels.Quiz.groups } }, function (err) {
+    models.Group.remove({ _id: { $in: req.tutorialQuiz.groups } }, function (err) {
         // clear groups from tutorial + quiz
-        req.tutorialmodels.Quiz.groups = [];
+        req.tutorialQuiz.groups = [];
         // randomize + split students into groups
-        var chunks = _.chunk(_.shuffle(req.tutorial.students), 3);
+        var chunks = _.chunk(_.shuffle(req.tutorialQuiz.tutorial.students), 3);
         // create new groups in tutorial + quiz
         async.eachOfSeries(chunks, function (members, n, done) {
             models.Group.create({ 
                 name: n + 1, 
                 members: members
             }, function (err, group) {
-                req.tutorialmodels.Quiz.groups.push(group);
+                req.tutorialQuiz.groups.push(group);
                 done();
             });
         }, function (err) {
             // add groups to tutorial
-            req.tutorialmodels.Quiz.save(function (err) {
+            req.tutorialQuiz.save(function (err) {
                 res.redirect(
                     '/admin/courses/' + req.course.id + 
-                    '/tutorials/' + req.tutorial.id + 
-                    '/quizzes/' + req.tutorialmodels.Quiz.id +
+                    '/tutorial-quizzes/' + req.tutorialQuiz.id +
                     '/groups'
                 ); 
             });

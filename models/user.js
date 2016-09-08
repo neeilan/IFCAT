@@ -26,8 +26,7 @@ var UserSchema = new mongoose.Schema({
     }]
 });
 
-// virtuals
-
+// get full name
 UserSchema.virtual('name.full').get(function () {
     return this.name.first + ' ' + this.name.last;
 });

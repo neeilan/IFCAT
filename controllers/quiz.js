@@ -31,7 +31,7 @@ exports.getQuizForm = function (req, res) {
         req.quiz = new models.Quiz();
     }
     req.course.withTutorials().execPopulate().then(function () {
-        req.quiz.loadTutorials(true).then(function () {
+        req.quiz.loadTutorials().then(function () {
             res.render('admin/course-quiz', { course: req.course, quiz: req.quiz });
         });
     });

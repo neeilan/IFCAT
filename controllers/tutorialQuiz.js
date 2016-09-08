@@ -3,9 +3,8 @@ var _ = require('lodash');
 var models = require('../models');
 
 // Retrieve course
-exports.getQuiz = function (req, res, next, tutorial, quiz) {
-    console.log('tq', tutorial, quiz);
-    /*models.TutorialQuiz.findById(tutorialQuiz).populate('tutorial quiz').exec(function (err, tutorialQuiz) {
+exports.getQuiz = function (req, res, next, tutorialQuiz) {
+    models.TutorialQuiz.findById(tutorialQuiz).populate('tutorial quiz').exec(function (err, tutorialQuiz) {
         if (err) {
             return next(err);
         }
@@ -15,25 +14,16 @@ exports.getQuiz = function (req, res, next, tutorial, quiz) {
         console.log('got tutorial quiz');
         req.tutorialQuiz = tutorialQuiz;
         next();
-    });*/
+    });
 };
 
 // Retrieve quizzes within tutorial
 exports.getQuizListForAdmin = function (req, res) {
-    models.TutorialQuiz.find({
-        path: 'tutorial',
-        match: { 
-            tutorial: req.tutorial.id 
-        }
-    }).populate('quiz').exec(function (err, tutorialQuizzes) {
+    req.tutorial.loadQuizzes().then(function (err) {
         /*if (err) {
             return res.status(500).send("Unable to retrieve any quizzes at this time (" + err.message + ").");
         }*/
-        res.render('admin/tutorial-quizzes', { 
-            course: req.course, 
-            tutorial: req.tutorial,
-            tutorialQuizzes: tutorialQuizzes 
-        });
+        res.render('admin/tutorial-quizzes', { course: req.course, tutorial: req.tutorial });
     });
 };
 
@@ -71,46 +61,24 @@ exports.getQuizListForStudent = function (req, res) {
 
 // Retrieve quiz form
 exports.getQuizForm = function (req, res) {
-    models.Course.populate(req.course, { path: 'quizzes', sort: { name: 1 } }, function () {
-        res.render('admin/tutorial-quiz', { 
-            course: req.course, 
-            tutorial: req.tutorial,
-            tutorialQuiz: req.tutorialQuiz || new models.TutorialQuiz() 
-        });
-    });
+    res.render('admin/tutorial-quiz', { course: req.course, tutorialQuiz: req.tutorialQuiz });
 };
 
-// Add quiz to tutorial
-exports.addQuiz = function (req, res) {
-    var tutorialQuiz = new models.TutorialQuiz({ tutorial: req.tutorial });
-        
-    models.TutorialQuiz.create(req.body, function (err, tutorialQuiz) {
-        
-        res.redirect(
-            '/admin/courses/' + req.course.id + 
-            '/tutorials/' + req.tutorial.id + 
-            '/quizzes'
-        );
-        
-    });
-};
-
-// Add quiz to tutorial
+// Edit quiz for tutorial
 exports.editQuiz = function (req, res) {
     _.extend(req.tutorialQuiz, req.body).save(function (err) {
         res.redirect(
             '/admin/courses/' + req.course.id + 
-            '/tutorials/' + req.tutorial.id + 
-            '/quizzes/' + req.tutorialmodels.Quiz.id +
+            '/tutorial-quizzes/' + req.tutorialQuiz.id +
             '/edit'
         );
     });
 };
 
 // Delete quiz from tutorial
-exports.deleteQuiz = function (req, res) {
+exports.deleteQuiz = function (req, res) {};
 
-};
+// --------------------------------------------------------------------------------------------------
 
 //
 exports.startQuiz = function (req, res) {

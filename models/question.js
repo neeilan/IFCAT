@@ -11,8 +11,7 @@ var QuestionSchema = new mongoose.Schema({
     timestamps: true 
 });
 
-// population methods
-
+// populate files
 QuestionSchema.methods.withFiles = function () {
     return this.populate({ 
         path: 'files', 
@@ -22,8 +21,7 @@ QuestionSchema.methods.withFiles = function () {
     });
 };
 
-//
-
+// save question
 QuestionSchema.methods.store = function (obj, callback) {
     this.question = obj.question;
     this.type = obj.type;

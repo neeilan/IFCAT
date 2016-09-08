@@ -13,8 +13,7 @@ var CourseSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// population methods
-
+// populate tutorials
 CourseSchema.methods.withTutorials = function () {
     return this.populate({
         path: 'tutorials',
@@ -24,6 +23,7 @@ CourseSchema.methods.withTutorials = function () {
     });
 };
 
+// populate quizzes
 CourseSchema.methods.withQuizzes = function () {
     return this.populate({
         path: 'quizzes', 
@@ -33,6 +33,7 @@ CourseSchema.methods.withQuizzes = function () {
     });
 };
 
+// populate files
 CourseSchema.methods.withFiles = function () {
     return this.populate({ 
         path: 'files', 
@@ -42,12 +43,12 @@ CourseSchema.methods.withFiles = function () {
     });
 };
 
-// finder methods
-
+// find courses
 CourseSchema.statics.findCourses = function () {
     return this.find({}).sort('code');
 };
 
+// find courses enrolled by student
 CourseSchema.statics.findCoursesByStudent = function (id) {
     return this.find({ 'students': { $in: [id] } });
 };

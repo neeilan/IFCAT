@@ -65,7 +65,6 @@ app.use('/student', routes.student);
 app.use('/admin', routes.admin);
 
 app.use(function (err, req, res, next) {
-    //console.log(err);
     res.status(err.status || 500).render('error', { error: err });
 });
 
