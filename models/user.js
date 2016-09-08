@@ -1,7 +1,7 @@
-var bcrypt = require('bcryptjs'),
-    mongoose = require('mongoose'),
-    _ = require('lodash');
-
+var _ = require('lodash'),
+    bcrypt = require('bcryptjs'),
+    mongoose = require('mongoose');
+    
 var UserSchema = new mongoose.Schema({
     local: {
         email: { 
@@ -26,6 +26,12 @@ var UserSchema = new mongoose.Schema({
     }]
 });
 
+// virtuals
+
+UserSchema.virtual('name.full').get(function () {
+    return this.name.first + ' ' + this.name.last;
+});
+
 UserSchema.methods.generateHash = function (s) {
     return bcrypt.hashSync(s, bcrypt.genSaltSync(10), null);
 };
@@ -36,14 +42,6 @@ UserSchema.methods.isValidPassword = function (password) {
 
 UserSchema.methods.hasRole = function (role) {
     return this.roles.indexOf(role) !== -1;
-};
-
-UserSchema.methods.getFullName = function () {
-    return this.name.first + ' ' + this.name.last;
-};
-
-UserSchema.statics.findInstructors = function (callback) {
-    return this.find({ roles: { $in: ['instructor'] } }, callback);
 };
 
 // Sort users by roles;
@@ -79,5 +77,12 @@ UserSchema.statics.compareRoles = function (a, b) {
     }
     */
 };
+
+// finder methods
+
+UserSchema.statics.findInstructors = function () {
+    return this.find({ roles: { $in: ['instructor'] } });
+};
+
 
 module.exports = mongoose.model('User', UserSchema);

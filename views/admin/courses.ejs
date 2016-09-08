@@ -22,7 +22,7 @@
         <tr>
             <td><%= course.code %></td>
             <td><%= course.name %></td>
-            <td><%- course.instructors.map(function (instructor) { return instructor.getFullName(); }).join('<br>') %></td>
+            <td><%- course.instructors.map(function (instructor) { return instructor.name.full; }).join('<br>') %></td>
             <td>
                 <div class="dropdown">
                     <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">

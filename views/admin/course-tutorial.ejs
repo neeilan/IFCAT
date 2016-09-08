@@ -19,7 +19,7 @@
             <select name="teachingAssistants[]" multiple size="2" class="form-control">
             <% course.teachingAssistants.forEach(function (ta) { %>
                 <option value="<%= ta.id %>"<%= tutorial.teachingAssistants.indexOf(ta.id) !== -1 ? 
-                    ' selected' : '' %>><%= ta.getFullName() %></option> 
+                    ' selected' : '' %>><%= ta.name.full %></option> 
             <% }) %>
             </select>
         </div>

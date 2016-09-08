@@ -38,7 +38,8 @@
         <div class="col-sm-10">
             <select name="tutorials[]" multiple class="form-control">
             <% course.tutorials.forEach(function (tutorial) { %>
-                <option value="<%= tutorial.id %>"<%= quiz.isNew ? ' selected' : '' %>><%= 'TUT ' + tutorial.number %></option> 
+                <option value="<%= tutorial.id %>"<%= quiz.isNew || quiz.tutorials.indexOf(tutorial.id) !== -1 ? 
+                    ' selected' : '' %>>TUT <%= tutorial.number %></option> 
             <% }) %>
             </select>
         </div>

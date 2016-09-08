@@ -13,12 +13,43 @@ var CourseSchema = new mongoose.Schema({
     timestamps: true
 });
 
-CourseSchema.statics.findCourses = function (callback) {
+// population methods
+
+CourseSchema.methods.withTutorials = function () {
+    return this.populate({
+        path: 'tutorials',
+        options: {
+            sort: { number: 1 }
+        }
+    });
+};
+
+CourseSchema.methods.withQuizzes = function () {
+    return this.populate({
+        path: 'quizzes', 
+        options: {
+            sort: { name: 1 }
+        }
+    });
+};
+
+CourseSchema.methods.withFiles = function () {
+    return this.populate({ 
+        path: 'files', 
+        options: {
+            sort: { name: 1 }
+        }
+    });
+};
+
+// finder methods
+
+CourseSchema.statics.findCourses = function () {
     return this.find({}).sort('code');
 };
 
-CourseSchema.statics.findCoursesByStudent = function (id, callback) {
-    return this.find({ 'students': { $in: [id] } }, callback);
+CourseSchema.statics.findCoursesByStudent = function (id) {
+    return this.find({ 'students': { $in: [id] } });
 };
 
 module.exports = mongoose.model('Course', CourseSchema);

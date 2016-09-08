@@ -1,8 +1,8 @@
 var models = require('../models');
 
-// Retrieve course
+// Retrieve file
 exports.getFile = function (req, res, next, fil3) {
-    models.FilefindById(fil3, function (err, fil3) {
+    models.File.findById(fil3, function (err, fil3) {
         if (err) {
             return next(err);
         }
@@ -15,24 +15,22 @@ exports.getFile = function (req, res, next, fil3) {
     });
 };
 
-// Retrieve all files in a course
+// Retrieve all files in the course
 exports.getFileList = function (req, res) {
-    models.Course.populate(req.course, {
-        path: 'files', options: { sort: { name: 1 }}
-    }, function (err, course) {
+    req.course.withFiles().execPopulate().then(function (err) {
         /*if (err) {
             return res.status(500).send("Unable to retrieve any files at this time (" + err.message + ").");
         }*/
-        res.render('admin/course-files', { course: course });
+        res.render('admin/course-files', { course: req.course });
     });
 };
 
-// Retrieve specific file for file
+// Retrieve specific file
 exports.getFileForm = function (req, res) { 
     res.render('admin/course-file', { course: req.course, fil3: req.fil3 || new models.File() });
 };
 
-// Add new file for file
+// Add new file
 exports.addFile = function (req, res) {
     models.File.create({ 
         name: req.file.filename, 
@@ -58,20 +56,4 @@ exports.editFile = function (req, res) {
 };
 
 // Delete specific file for course
-exports.deleteFile = function (req, res) {
-   /* 
-
-   models.Course.findByIdAndUpdate(req.params.course, {
-        $pull: { files: { _id: req.params.file } }
-    }, function (err, course) {
-        if (err) {
-            return res.status(500).send("Unable to delete file at this time (" + err.message + ").");
-        }
-        models.FilefindByIdAndRemove(req.params.file, function (err, file) {
-            if (err) {
-                return res.status(500).send("Unable to delete file at this time (" + err.message + ").");
-            }
-            res.status(200).send({ 'responseText': 'The file has successfully deleted' });
-        });
-    });*/
-};
+exports.deleteFile = function (req, res) {};

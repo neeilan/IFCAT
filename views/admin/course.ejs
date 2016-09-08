@@ -24,7 +24,7 @@
             <select name="instructors[]" multiple size="2" class="form-control">
             <% instructors.forEach(function (instructor) { %>
                 <option value="<%= instructor.id %>"<%= course.instructors.indexOf(instructor.id) !== -1 ? 
-                    ' selected' : '' %>><%= instructor.getFullName() %></option> 
+                    ' selected' : '' %>><%= instructor.name.full %></option> 
             <% }) %>
             </select>
         </div>

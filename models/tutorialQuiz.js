@@ -1,5 +1,7 @@
-var mongoose = require('mongoose'),
-    _ = require('lodash');
+var _ = require('lodash'),
+    mongoose = require('mongoose');
+
+var models = require('.');
 
 var TutorialQuizSchema = new mongoose.Schema({
     tutorial: { type: mongoose.Schema.Types.ObjectId, ref: 'Tutorial' },
@@ -11,8 +13,24 @@ var TutorialQuizSchema = new mongoose.Schema({
     timestamps: true 
 });
 
-TutorialQuizSchema.statics.findQuizzesByTutorial = function () {
-    
+TutorialQuizSchema.index({ tutorial: 1, quiz: 1 }, { unique: true });
+
+// population methods
+
+TutorialQuizSchema.methods.withGroups = function () {
+    return this.populate({
+        path: 'groups',
+        model: models.Group,
+        populate: [{
+            path: 'members',
+            model: models.User,
+            options: {
+                sort: { 'name.first': 1, 'name.last': 1 }
+            }
+        }, {
+            path: 'driver'
+        }]
+    });
 };
 
 module.exports = mongoose.model('TutorialQuiz', TutorialQuizSchema);

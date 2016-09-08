@@ -4,7 +4,7 @@ var models = require('../models');
 
 // Retrieve course
 exports.getQuestion = function (req, res, next, question) {
-    models.models.Question.findById(question).populate('files').exec(function (err, question) {
+    models.models.Question.findById(question).withFiles().exec(function (err, question) {
         if (err) {
             return next(err);
         }
@@ -19,24 +19,21 @@ exports.getQuestion = function (req, res, next, question) {
 
 // Retrieve list of questions for quiz
 exports.getQuestionList = function (req, res) { 
-    models.Quiz.populate(req.quiz, { 
-        path: 'questions', options: { sort: { name: 1 } } 
-    }, function (err, results) {
+    req.quiz.withQuestions().execPopulate().then(function (err) {
         res.render('admin/quiz-questions', { course: req.course, quiz: req.quiz });
     });
 };
 
 // Retrieve specific question for quiz
 exports.getQuestionForm = function (req, res) {
-    var question = req.question || new models.Question();
-    // set quiz default values
-    //question.setDefault(req.quiz);
-    
-    models.Course.populate(req.course, { path: 'files', sort: { name: 1 } }, function (err) {
+    if (!req.question) {
+        req.question = new models.Question();
+    }
+    req.course.withFiles().execPopulate().then(function (err) {
         res.render('admin/quiz-question', { 
             course: req.course, 
             quiz: req.quiz, 
-            question: question
+            question: req.question
         });
     });
 };
@@ -44,7 +41,7 @@ exports.getQuestionForm = function (req, res) {
 // Add new question for quiz
 exports.addQuestion = function (req, res, next) {
     var question = new Question();
-    question.loadAndSave(req.body, function (err) {
+    question.store(req.body, function (err) {
         req.quiz.questions.push(question);
         req.quiz.save(function (err) {
             res.redirect(
@@ -58,7 +55,7 @@ exports.addQuestion = function (req, res, next) {
 
 // Update specific question for quiz
 exports.editQuestion = function (req, res, next) { 
-    req.question.loadAndSave(req.body, function (err) {
+    req.question.store(req.body, function (err) {
         res.redirect(
             '/admin/courses/' + req.course.id + 
             '/quizzes/' + req.quiz.id + 

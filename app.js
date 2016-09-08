@@ -10,7 +10,8 @@ var bodyParser = require('body-parser'),
     passport = require('passport'),
     session = require('express-session');
 
-var config = require('./config/common');
+var config = require('./config/common'),
+    routes = require('./routes');
 
 var app = express();
 
@@ -59,9 +60,9 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.use('/', require('./routes/guest'));
-app.use('/student', require('./routes/student'));
-app.use('/admin', require('./routes/admin'));
+app.use('/', routes.guest);
+app.use('/student', routes.student);
+app.use('/admin', routes.admin);
 
 app.use(function (err, req, res, next) {
     //console.log(err);

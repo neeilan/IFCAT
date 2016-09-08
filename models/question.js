@@ -1,5 +1,5 @@
-var mongoose = require('mongoose'),
-    _ = require('lodash');
+var _ = require('lodash'),
+    mongoose = require('mongoose');
 
 var QuestionSchema = new mongoose.Schema({
     question: { type: String, required: true },
@@ -11,13 +11,26 @@ var QuestionSchema = new mongoose.Schema({
     timestamps: true 
 });
 
-QuestionSchema.methods.loadAndSave = function (data, callback) {
-    this.question = data.question;
-    this.type = data.type;
-    this.files = data.files;
+// population methods
+
+QuestionSchema.methods.withFiles = function () {
+    return this.populate({ 
+        path: 'files', 
+        options: {
+            sort: { name: 1 }
+        }
+    });
+};
+
+//
+
+QuestionSchema.methods.store = function (obj, callback) {
+    this.question = obj.question;
+    this.type = obj.type;
+    this.files = obj.files;
     this.choices = []; // clear previous choices
     this.answers = []; // clear previous answers
-    this.useLaTeX = data.useLaTeX;
+    this.useLaTeX = obj.useLaTeX;
 
     var selected, key, matches, value, d;
 
@@ -25,10 +38,10 @@ QuestionSchema.methods.loadAndSave = function (data, callback) {
         case 'multiple choice':
         case 'true or false':
         //case 'fill in the blanks':
-            selected = data.answer[_.kebabCase(this.type)];
+            selected = obj.answer[_.kebabCase(this.type)];
             // add choices + answer
-            for (d in data.choices) {
-                value = _.trim(data.choices[d]);
+            for (d in obj.choices) {
+                value = _.trim(obj.choices[d]);
                 if (value) {
                     this.choices.push(value);
                     if (d === selected) {
@@ -38,10 +51,10 @@ QuestionSchema.methods.loadAndSave = function (data, callback) {
             }
             break;
         case 'multiple select':
-            selected = data.answers[_.kebabCase(this.type)] || [];
+            selected = obj.answers[_.kebabCase(this.type)] || [];
             // add choices + answers
-            for (d in data.choices) {
-                value = _.trim(data.choices[d]);
+            for (d in obj.choices) {
+                value = _.trim(obj.choices[d]);
                 if (value) {
                     this.choices.push(value);
                     if (selected.indexOf(d) !== -1) {

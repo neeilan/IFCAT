@@ -44,14 +44,14 @@ exports.getCourseListForAdmin = function (req, res) {
 };
 
 exports.getCourseListForStudent = function (req, res) {
-    models.Course.findCoursesByStudent(req.user.id, function (err, courses) { 
+    models.Course.findCoursesByStudent(req.user.id).exec(function (err, courses) { 
         res.render('student/courses', { courses: courses });
     });
 };
 
 //
 exports.getCourseForm = function (req, res) {
-    models.User.findInstructors(function (err, instructors) {
+    models.User.findInstructors().exec(function (err, instructors) {
         res.render('admin/course', { course: req.course || new models.Course(), instructors: instructors });
     });
 };
@@ -77,11 +77,4 @@ exports.editCourse = function (req, res) {
 };
 
 // Delete course
-exports.deleteCourse = function (req, res) {
-    /*req.course.delete(function (err) {
-        if (err) {
-            return res.status(500).send("Unable to delete course at this time (" + err.message + ").");
-        }
-        res.redirect('/admin/courses');
-    });*/
-}; 
+exports.deleteCourse = function (req, res) {}; 

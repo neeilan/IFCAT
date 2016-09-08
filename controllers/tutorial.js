@@ -90,20 +90,4 @@ exports.editTutorial = function (req, res) {
 };
 
 // Delete specific tutorial for course
-/* exports.deleteTutorial = function (req, res) {
-   
-
-   models.Course.findByIdAndUpdate(req.params.course, {
-        $pull: { tutorials: { _id: req.params.tutorial } }
-    }, function (err, course) {
-        if (err) {
-            return res.status(500).send("Unable to delete tutorial at this time (" + err.message + ").");
-        }
-        models.Tutorial.findByIdAndRemove(req.params.tutorial, function (err, tutorial) {
-            if (err) {
-                return res.status(500).send("Unable to delete tutorial at this time (" + err.message + ").");
-            }
-            res.status(200).send({ 'responseText': 'The tutorial has successfully deleted' });
-        });
-    });
-};*/
+exports.deleteTutorial = function (req, res) {};

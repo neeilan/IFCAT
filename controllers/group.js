@@ -20,20 +20,7 @@ exports.getGroup = function (req, res, next, group) {
 
 // Retrieve list of groups for tutorial
 exports.getGroupList = function (req, res) { 
-    models.TutorialQuiz.populate(req.tutorialQuiz, {
-        // find groups with members
-        path: 'groups',
-        model: models.Group,
-        populate: [{
-            path: 'members',
-            model: models.User,
-            options: {
-                sort: { 'name.first': 1, 'name.last': 1 }
-            }
-        }, {
-            path: 'driver'
-        }]
-    }, function (err) {
+    req.tutorialQuiz.withGroups().execPopulate().then(function (err) {
         res.render('admin/quiz-groups', { 
             course: req.course, 
             tutorialQuiz: req.tutorialQuiz 

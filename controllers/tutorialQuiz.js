@@ -42,18 +42,18 @@ exports.getQuizListForStudent = function (req, res) {
     models.Course.populate(req.course, {
         // find the tutorial that student is in
         path: 'tutorials',
-        model: Tutorial,
+        model: models.Tutorial,
         match: {
             students: { $in: [req.user.id] }
         },
         // find the quizzes within the tutorial
         populate: {
             path: 'quizzes',
-            model: TutorialQuiz,
+            model: models.TutorialQuiz,
             match: { published: true },
             populate: {
                 path: 'quiz',
-                model: Quiz
+                model: models.Quiz
             }
         }
     }, function (err) {
@@ -117,7 +117,7 @@ exports.startQuiz = function (req, res) {
     models.TutorialQuiz.populate(req.tutorialQuiz, {
         // get group with user as a member
         path: 'groups',
-        model: Group,
+        model: models.Group,
         match: {
             members: { $in: [req.user.id] }
         },
@@ -126,7 +126,7 @@ exports.startQuiz = function (req, res) {
             path: 'driver'
         }
     }, function (err) {
-        var group = req.tutorialmodels.Quiz.groups[0];
+        var group = req.tutorialQuiz.groups[0];
         // check if user belongs to a group
         if (!group) {
             return res.redirect('/admin/courses');
@@ -137,7 +137,7 @@ exports.startQuiz = function (req, res) {
         res.render('student/start-quiz', {
             course: req.course,
             tutorialQuiz: req.tutorialQuiz,
-            quiz: req.tutorialmodels.Quiz.quiz
+            quiz: req.tutorialQuiz.quiz
         });
     });
 };
