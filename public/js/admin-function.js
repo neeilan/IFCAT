@@ -39,19 +39,76 @@ $(function () {
         $(this).closest('.form-group').remove();
     });
 
-    $('#question-form .form-group .add-item').click(function (e) {
-        e.preventDefault();
-        var $grp = $(this).closest('.form-group'), $tpl = $('#MultipleChoiceTemplate');
+    $('#btn-add-choice').click(function () {
         // append new choice before "add new choice" link
-        $grp.before(_.template($tpl.text())({ id: parseInt(_.uniqueId(), 10) + 999 }));
+        $(this).closest('.form-group').before(
+            _.template($('#MultipleChoiceTemplate').text())({
+                // parseInt(_.uniqueId(), 10) + 999 is an unlikely conflicting number
+                id: parseInt(_.uniqueId(), 10) + 999 
+            })
+        );
     });
 
-    $('.btn[data-url]').click(function (e) {
-        e.preventDefault();
-        $.post($(this).data('url'), function () {
-            window.location.reload(true);
+    // setup group handlers
+
+    var options = { 
+        cancel: false, 
+        connectWith: '.sortable' 
+    };
+    
+    $('.sortable').sortable(options);
+
+    $('#btn-add-group').click(function () {
+        var $tpl = $(_.template($('#panel-group-template').text())({ id: parseInt(_.uniqueId(), 10) + 999 }));
+            $tpl.find('.sortable').sortable(options);
+            $tpl.prependTo($('#panel-groups'));
+    });
+
+    $('#btn-generate-groups').click(function () {
+        var url = $('#generate-groups-url').val();
+        var $tpl = $(_.template($('#panel-group-template').text())({ id: parseInt(_.uniqueId(), 10) + 999 }));
+        var $list = $('#panel-groups').empty();
+        // send request
+        $.getJSON(url, function (res) {
+            // create groups
+            res.groups.forEach(function (group) {
+                // create group
+                var $item = $tpl.clone(),
+                    $body = $item.find('.sortable').sortable(options);
+                // create members + add them to group
+                group.members.forEach(function (member) {
+                    $body.append(
+                        $('<button/>', {
+                            type: 'button',
+                            class: 'btn btn-default btn-block',
+                            dataMemberId: member.id,
+                            text: member.name.first + ' ' + member.name.last
+                        })
+                    );
+                });
+                // add group
+                $list.append($item);
+            });
+            
         });
     });
 
-    $('.table-sortable > tbody').sortable({ connectWith: 'tbody' });
+    $('#btn-save-groups').click(function () {
+        var url = $('#save-groups-url').val(),
+            data = [];
+        // build data
+        $('[data-group-id]').each(function () {
+            var group = $(this).data('group-id');
+            $('[data-member-id]', this).each(function () {
+                data.push({
+                    name: 'groups[' + group + ']',
+                    value: $(this).data('member-id')
+                });
+            }); 
+        });
+        // send request
+        $.post(url, data, function () { 
+            window.location.reload(true);
+        });
+    });
 });

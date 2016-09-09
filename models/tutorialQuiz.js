@@ -7,23 +7,40 @@ var TutorialQuizSchema = new mongoose.Schema({
     tutorial: { type: mongoose.Schema.Types.ObjectId, ref: 'Tutorial' },
     quiz: { type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' },
     groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
-    active: { type: Boolean, default: false },
-    published: { type: Boolean, default: false }
+    allocateMembers: { 
+        type: String, 
+        enum: ['unaided', 'automatically', 'manually'],
+        default: 'automatically'
+    },
+    max: {
+        groups: Number,
+        membersPerGroup: Number
+    },
+    active: Boolean,
+    published: Boolean
 }, {
     timestamps: true 
 });
 
 TutorialQuizSchema.index({ tutorial: 1, quiz: 1 }, { unique: true });
 
-// get tutorial number
-TutorialQuizSchema.virtual('number').get(function () {
-    return this.tutorial.number;
+// get students not within groups
+TutorialQuizSchema.virtual('unassignedStudents').get(function () {
+    return _.reduce(this.groups, function (students, group) {
+        return _.differenceWith(students, group.members, function (a, b) { return a.id === b.id; });
+    }, this.tutorial.students);
 });
 
-// get quiz name
-TutorialQuizSchema.virtual('name').get(function () {
-    return this.quiz.name;
-});
+// populate students
+TutorialQuizSchema.methods.withStudents = function () {
+    return this.populate({
+        path: 'tutorial.students',
+        model: models.User,
+        options: {
+            sort: { 'name.first': 1, 'name.last': 1 }
+        }
+    });
+};
 
 // populate groups
 TutorialQuizSchema.methods.withGroups = function () {
@@ -40,6 +57,21 @@ TutorialQuizSchema.methods.withGroups = function () {
             path: 'driver'
         }]
     });
+};
+
+// save tutorial-quiz
+TutorialQuizSchema.methods.store = function (obj, callback) {
+    this.allocateMembers = obj.allocateMembers;
+    this.max = {};
+    this.max[obj.max.key] = obj.max.value;
+    this.active = obj.active;
+    this.published = obj.published;
+    this.save(callback);
+};
+
+// find quizzes within tutorial
+TutorialQuizSchema.statics.findQuizzesByTutorial = function (tutorial) {
+    return this.find({ tutorial: tutorial }).populate('quiz');
 };
 
 module.exports = mongoose.model('TutorialQuiz', TutorialQuizSchema);

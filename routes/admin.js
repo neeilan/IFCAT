@@ -124,8 +124,8 @@ router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/edit', controllers.T
 router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz', controllers.TutorialQuiz.editQuiz);
 
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups', controllers.Group.getGroupList);
-router.post('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroups);
-//router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/new', controllers.Group.getGroupForm);
+router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroups);
+router.post('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/save', controllers.Group.saveGroups);
 //router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/view', controllers.Group.viewGroupForm);
 //router.delete('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group', controllers.Group.deleteGroupFromTutorial);*/
 

@@ -11,11 +11,4 @@ var TutorialSchema = new mongoose.Schema({
     timestamps: true
 });
 
-TutorialSchema.methods.loadQuizzes = function () {
-    var tutorial = this;
-    return models.TutorialQuiz.find({ tutorial: this }).populate('quiz').exec(function (err, tutorialQuizzes) {
-        tutorial.tutorialQuizzes = tutorialQuizzes;
-    });
-};
-
 module.exports = mongoose.model('Tutorial', TutorialSchema);

@@ -32,7 +32,7 @@ QuizSchema.methods.withQuestions = function () {
 QuizSchema.methods.loadTutorials = function () {
     var quiz = this;
     return models.TutorialQuiz.find({ quiz: quiz }, 'tutorial').populate('tutorial').exec(function (err, tutorialQuizzes) {
-        quiz.tutorialQuizzes = tutorialQuizzes.map(function (tutorialQuiz) { 
+        quiz.tutorials = tutorialQuizzes.map(function (tutorialQuiz) { 
             return tutorialQuiz.tutorial.id;
         });
     });

@@ -19,11 +19,12 @@ exports.getQuiz = function (req, res, next, tutorialQuiz) {
 
 // Retrieve quizzes within tutorial
 exports.getQuizListForAdmin = function (req, res) {
-    req.tutorial.loadQuizzes().then(function (err) {
-        /*if (err) {
-            return res.status(500).send("Unable to retrieve any quizzes at this time (" + err.message + ").");
-        }*/
-        res.render('admin/tutorial-quizzes', { course: req.course, tutorial: req.tutorial });
+    models.TutorialQuiz.findQuizzesByTutorial(req.tutorial).then(function (tutorialQuizzes) {
+        res.render('admin/tutorial-quizzes', { 
+            course: req.course, 
+            tutorial: req.tutorial, 
+            tutorialQuizzes: tutorialQuizzes 
+        });
     });
 };
 
@@ -66,7 +67,7 @@ exports.getQuizForm = function (req, res) {
 
 // Edit quiz for tutorial
 exports.editQuiz = function (req, res) {
-    _.extend(req.tutorialQuiz, req.body).save(function (err) {
+    req.tutorialQuiz.store(req.body, function (err) {
         res.redirect(
             '/admin/courses/' + req.course.id + 
             '/tutorial-quizzes/' + req.tutorialQuiz.id +
@@ -74,9 +75,6 @@ exports.editQuiz = function (req, res) {
         );
     });
 };
-
-// Delete quiz from tutorial
-exports.deleteQuiz = function (req, res) {};
 
 // --------------------------------------------------------------------------------------------------
 
