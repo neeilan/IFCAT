@@ -5,6 +5,7 @@ var QuestionSchema = new mongoose.Schema({
     question: { type: String, required: true },
     type: { type: String, enum: ['multiple choice', 'true or false', 'multiple select'/*, 'fill in the blanks'*/] },
     choices: [String],
+    // indices of choices e.g. [1,2] => second and third choices are the answers
     answers: [Number],
     files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }]
 }, { 
@@ -14,11 +15,21 @@ var QuestionSchema = new mongoose.Schema({
 // populate files
 QuestionSchema.methods.withFiles = function () {
     return this.populate({ 
-        path: 'files', 
+        path: 'files',
         options: {
             sort: { name: 1 }
         }
     });
+};
+
+// check if question has file
+QuestionSchema.methods.hasFile = function (id) {
+    return this.files.indexOf(id) !== -1;
+};
+
+// check if question has nth-choice as an answer
+QuestionSchema.methods.hasAnswer = function (n) {
+    return this.answers.indexOf(n) !== -1;
 };
 
 // save question
@@ -28,7 +39,6 @@ QuestionSchema.methods.store = function (obj, callback) {
     this.files = obj.files;
     this.choices = []; // clear previous choices
     this.answers = []; // clear previous answers
-    this.useLaTeX = obj.useLaTeX;
 
     var selected, key, matches, value, d;
 

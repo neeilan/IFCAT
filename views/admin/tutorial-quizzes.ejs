@@ -7,6 +7,7 @@
         <tr>
             <th>Name</th>
             <th class="text-center">Published</th>
+            <th class="text-center">Unlocked</th>
             <th class="text-center">Active</th>
             <th></th>
         </tr>
@@ -17,6 +18,11 @@
             <td><%= tutorialQuiz.quiz.name %></td>
             <td class="text-center">
             <% if (tutorialQuiz.published) { %>
+                <span class="glyphicon glyphicon-ok"></span>
+            <% } %>
+            </td>
+            <td class="text-center">
+            <% if (tutorialQuiz.unlocked) { %>
                 <span class="glyphicon glyphicon-ok"></span>
             <% } %>
             </td>

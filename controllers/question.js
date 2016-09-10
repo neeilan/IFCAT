@@ -4,7 +4,7 @@ var models = require('../models');
 
 // Retrieve course
 exports.getQuestion = function (req, res, next, question) {
-    models.models.Question.findById(question).withFiles().exec(function (err, question) {
+    models.Question.findById(question).exec(function (err, question) {
         if (err) {
             return next(err);
         }
@@ -40,7 +40,7 @@ exports.getQuestionForm = function (req, res) {
 
 // Add new question for quiz
 exports.addQuestion = function (req, res, next) {
-    var question = new Question();
+    var question = new models.Question();
     question.store(req.body, function (err) {
         req.quiz.questions.push(question);
         req.quiz.save(function (err) {

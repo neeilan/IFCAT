@@ -18,7 +18,7 @@
     <tbody>
     <% quiz.questions.forEach(function (question) { %>
         <tr data-id="<%= question.id %>">
-            <td><input type="checkbox" name="questions" value="<%= question.id %>"></td>
+            <td><input type="checkbox" name="questions[]" value="<%= question.id %>"></td>
             <td><%= question.question %></td>
             <td>
                 <div class="dropdown">
@@ -37,23 +37,5 @@
     <% }) %>
     </tbody>
 </table>
-
-<script>
-/*$(function() {
-    $('tbody').sortable();
-
-    $('#sort').click(function () {
-        var data = $('tr[data-id]').map(function () { 
-            return { 'name': 'id[]', 'value': $(this).data('id') }; 
-        }).get();
-
-        //console.log(data);
-
-        $.post('/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/sort', data, function (res) {
-            window.location.reload();
-        }, 'json');
-    });
-});*/
-</script>
 
 <%- include ./footer -%>

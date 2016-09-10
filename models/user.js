@@ -6,7 +6,8 @@ var UserSchema = new mongoose.Schema({
     local: {
         email: { 
             type: String,
-            lowercase: true
+            lowercase: true,
+            unique: true
         },
         password: String
     },
@@ -31,14 +32,17 @@ UserSchema.virtual('name.full').get(function () {
     return this.name.first + ' ' + this.name.last;
 });
 
+// generate salt
 UserSchema.methods.generateHash = function (s) {
     return bcrypt.hashSync(s, bcrypt.genSaltSync(10), null);
 };
 
+// check password is valid
 UserSchema.methods.isValidPassword = function (password) {
     return bcrypt.compareSync(password, this.local.password);
 };
 
+// check user's role
 UserSchema.methods.hasRole = function (role) {
     return this.roles.indexOf(role) !== -1;
 };
@@ -100,6 +104,5 @@ UserSchema.statics.findTeachingAssistants = function () {
         'name.last': 1
     });
 };
-
 
 module.exports = mongoose.model('User', UserSchema);

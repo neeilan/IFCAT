@@ -28,9 +28,7 @@ var anyUpload = multer({
     })
 });
 
-var csvUpload = multer({ 
-    storage: multer.MemoryStorage 
-});
+var csvUpload = multer({ storage: multer.MemoryStorage });
 
 // non-authenticated routes
 router.post('/login', passport.authenticate('local-login', {
@@ -125,7 +123,7 @@ router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz', controllers.Tutori
 
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups', controllers.Group.getGroupList);
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroups);
-router.post('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/save', controllers.Group.saveGroups);
+//router.post('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/save', controllers.Group.saveGroups);
 //router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/view', controllers.Group.viewGroupForm);
 //router.delete('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group', controllers.Group.deleteGroupFromTutorial);*/
 

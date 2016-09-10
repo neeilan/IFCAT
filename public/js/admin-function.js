@@ -1,9 +1,7 @@
 $(function () {
 
-    //$('[checked]').prop('checked', true).closest('.radio, .checkbox').addClass("active");
-
-    $('th > input').change(function () {
-        $(this).closest('table').find('td > input').prop('checked', this.checked);
+    $('th > :checkbox').change(function () {
+        $(this).closest('table').find('td > :checkbox').prop('checked', this.checked);
     });
 
     $('.btn [type=file]').change(function () {
@@ -11,7 +9,7 @@ $(function () {
     });
 
     $('#question-form [name=type]').change(function () {
-        var type = this.value.replace(/\s/g, '-');
+        var type = _.kebabCase(this.value);
         // show related items for type
         $('.multiple-choice, .true-or-false, .multiple-select').each(function () {
             var $col = $(this);
@@ -20,7 +18,7 @@ $(function () {
         });
     }).change();
 
-    $('#file-modal .add-files').click(function (e) {
+    /*$('#file-modal .add-files').click(function (e) {
         var html = $('#file-modal .list-group-item.active').map(function () {
             return '<div>' +
                 '<span>' + $(this).text() + '</span>' +
@@ -31,20 +29,24 @@ $(function () {
         var $a = $('#question-form .add-files');
             $a.prevAll().remove();
             $a.before(html);
-    });
+    });*/
 
     
-    $('#question-form').on('click', '.remove-item', function (e) {
+    $('.multiple-choice, .multiple-select').on('click', '.btn-remove-choice', function (e) {
         e.preventDefault();
         $(this).closest('.form-group').remove();
     });
 
-    $('#btn-add-choice').click(function () {
-        // append new choice before "add new choice" link
-        $(this).closest('.form-group').before(
-            _.template($('#MultipleChoiceTemplate').text())({
-                // parseInt(_.uniqueId(), 10) + 999 is an unlikely conflicting number
-                id: parseInt(_.uniqueId(), 10) + 999 
+    $('.multiple-choice, .multiple-select').on('click', '.btn-add-choice', function (e) {
+        e.preventDefault();
+        var $col = $(e.delegateTarget), 
+            type = 'multiple-choice';
+        if ($col.hasClass('multiple-select')) {
+            type = 'multiple-select';
+        }
+        $(e.target).closest('.form-group').before(
+            _.template($('[id=' + type + '-template]').text())({
+                id: parseInt(_.uniqueId(), 10) + 999 // unlikely conflicting number
             })
         );
     });

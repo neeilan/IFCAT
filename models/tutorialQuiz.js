@@ -7,19 +7,25 @@ var TutorialQuizSchema = new mongoose.Schema({
     tutorial: { type: mongoose.Schema.Types.ObjectId, ref: 'Tutorial' },
     quiz: { type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' },
     groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
+    responses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Response' }],
+    // whether members will be unaided in picking their groups, will be automatically placed into groups,
+    // or will manually be placed into groups by the admins
     allocateMembers: { 
         type: String, 
         enum: ['unaided', 'automatically', 'manually'],
         default: 'automatically'
     },
+    // max # of groups OR members per group
     max: {
         groups: Number,
         membersPerGroup: Number
     },
+    // make quiz visible to students
     published: Boolean,
-    locked: Boolean,
-    active: Boolean,
-    responses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Response' }]
+    // allow students to enter pre-phase of the quiz
+    unlocked: Boolean,
+    // allow students to do quiz
+    active: Boolean
 }, {
     timestamps: true 
 });
@@ -66,8 +72,9 @@ TutorialQuizSchema.methods.store = function (obj, callback) {
     this.allocateMembers = obj.allocateMembers;
     this.max = {};
     this.max[obj.max.key] = obj.max.value;
-    this.active = obj.active;
     this.published = obj.published;
+    this.unlocked = obj.unlocked;
+    this.active = obj.active;
     this.save(callback);
 };
 

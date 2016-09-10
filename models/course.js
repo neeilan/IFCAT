@@ -51,9 +51,15 @@ CourseSchema.statics.findCourses = function () {
             sort: { 'name.first': 1, 'name.last': 1 }
         }
     }, {
-        path: 'teachingAssistants',
+        path: 'tutorials',
         options: {
-            sort: { 'name.first': 1, 'name.last': 1 }
+            sort: 'number'
+        },
+        populate: {
+            path: 'teachingAssistants',
+            options: {
+                sort: { 'name.first': 1, 'name.last': 1 }
+            }
         }
     }]);
 };

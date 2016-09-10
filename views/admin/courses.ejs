@@ -14,7 +14,7 @@
             <th>Code</th>
             <th>Name</th>
             <th>Instructors</th>
-            <th>Teaching Assistants</th>
+            <th>Tutorials/TAs</th>
             <th></th>
         </tr>
     </thead>
@@ -28,9 +28,18 @@
                 <div><%= instructor.name.full %></div>
             <% }) %>
             </td>
-            <td>
-            <% course.teachingAssistants.forEach(function (teachingAssistant) { %>
-                <div><%= teachingAssistant.name.full %></div>
+            <td class="tutorial">
+            <% course.tutorials.forEach(function (tutorial) { %>
+                <div>
+                    <span class="number"><%= 'TUT ' + tutorial.number %></span>
+                <% if (tutorial.teachingAssistants.length) { %>
+                    <span class="teaching-assistants"><%=  
+                        '(' + tutorial.teachingAssistants.map(function (teachingAssistant) { 
+                            return teachingAssistant.name.full; 
+                        }).join(', ') + ')'
+                    %></span>
+                <% } %>
+                </div>
             <% }) %>
             <td>
                 <div class="dropdown">

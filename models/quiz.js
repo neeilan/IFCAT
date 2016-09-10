@@ -21,7 +21,7 @@ var QuizSchema = new mongoose.Schema({
 // populate questions
 QuizSchema.methods.withQuestions = function () {
     return this.populate({
-        path: 'quizzes', 
+        path: 'questions', 
         options: { 
             sort: { name: 1 } 
         }
