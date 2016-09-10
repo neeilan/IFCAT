@@ -54,15 +54,16 @@ exports.editUser = function (req, res) {
     req.us3r.name.last = req.body.name.last;
     req.us3r.roles = req.body.roles;
     req.us3r.local.email = req.body.local.email;
-    //req.us3r.local.password = req.us3r.generateHash(req.body.local.password); // @TODO: use async version
+    if (req.body.local.password) {
+        req.us3r.local.password = req.us3r.generateHash(req.body.local.password);
+    }
     req.us3r.save(function (err) {
         res.redirect('/admin/users/' + req.us3r.id + '/edit');
     });
 };
 
 // Delete specific user
-exports.deleteUser = function (req, res) {
-};
+exports.deleteUser = function (req, res) {};
 
 // Import list of users
 exports.importStudents = function (req, res) {
@@ -74,12 +75,12 @@ exports.importStudents = function (req, res) {
     }, function (err, rows) {
         // create students
         async.mapSeries(rows, function (row, done) {
-            var user = new User();
+            var user = new models.User();
                 user.name.first = row.first;
                 user.name.last = row.last;
                 user.roles = _.map(row.roles.split(','), _.trim);
                 user.local.email = row.email;
-                user.local.password = user.generateHash(row.password); // @TODO: use async version
+                user.local.password = user.generateHash(row.password);
                 user.save(done);
         }, function (err, newStudents) {
             res.redirect('/admin/users');

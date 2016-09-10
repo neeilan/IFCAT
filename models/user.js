@@ -77,10 +77,28 @@ UserSchema.statics.compareRoles = function (a, b) {
     */
 };
 
-// finder methods
-
+// find instructors
 UserSchema.statics.findInstructors = function () {
-    return this.find({ roles: { $in: ['instructor'] } });
+    return this.find({ 
+        roles: { 
+            $in: ['instructor'] 
+        } 
+    }).sort({
+        'name.first': 1,
+        'name.last': 1
+    });
+};
+
+// find teaching assistants
+UserSchema.statics.findTeachingAssistants = function () {
+    return this.find({ 
+        roles: { 
+            $in: ['teachingAssistant'] 
+        } 
+    }).sort({
+        'name.first': 1,
+        'name.last': 1
+    });
 };
 
 

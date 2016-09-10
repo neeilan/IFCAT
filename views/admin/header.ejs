@@ -29,8 +29,8 @@
                 <ul class="nav navbar-nav navbar-right">
                     <% [
                         { text: 'Hi, ' + user.name.first },
-                        { text: 'Manage Courses', path: '/admin/courses' }, 
-                        { text: 'Manage Users', path: '/admin/users' }
+                        { text: 'Courses', path: '/admin/courses' }, 
+                        { text: 'Users', path: '/admin/users' }
                     ].forEach(function (link) { %>
                         <% if (link.path) { %>
                             <li<%- url.indexOf(link.path) !== -1 ? ' class="active"' : '' %>><a 

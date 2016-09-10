@@ -1,4 +1,5 @@
-var _ = require('lodash');
+var _ = require('lodash'),
+    async = require('async');
 
 var models = require('../models');
 
@@ -20,12 +21,7 @@ exports.getCourse = function (req, res, next, course) {
 // Retrieve many courses
 exports.getCourseListForAdmin = function (req, res) {
     if (req.user.hasRole('admin')) {
-        models.Course.findCourses().populate({
-            path: 'instructors',
-            options: {
-                sort: { 'name.first': 1, 'name.last': 1 }
-            }
-        }).exec(function (err, courses) { 
+        models.Course.findCourses().exec(function (err, courses) { 
             res.render('admin/courses', { courses: courses });
         });
     } else {
@@ -51,8 +47,19 @@ exports.getCourseListForStudent = function (req, res) {
 
 //
 exports.getCourseForm = function (req, res) {
-    models.User.findInstructors().exec(function (err, instructors) {
-        res.render('admin/course', { course: req.course || new models.Course(), instructors: instructors });
+    async.series([
+        function (done) {
+            models.User.findInstructors().exec(done);        
+        },
+        function (done) {
+            models.User.findTeachingAssistants().exec(done);        
+        }
+    ], function (err, results) {
+        res.render('admin/course', { 
+            course: req.course || new models.Course(), 
+            instructors: results[0],
+            teachingAssistants: results[1] 
+        });
     });
 };
 

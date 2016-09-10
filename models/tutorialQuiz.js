@@ -16,8 +16,10 @@ var TutorialQuizSchema = new mongoose.Schema({
         groups: Number,
         membersPerGroup: Number
     },
+    published: Boolean,
+    locked: Boolean,
     active: Boolean,
-    published: Boolean
+    responses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Response' }]
 }, {
     timestamps: true 
 });

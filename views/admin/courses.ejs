@@ -1,4 +1,4 @@
-<%- include ../partials/admin-header -%>
+<%- include ./header -%>
 
 <h1>Courses</h1>
 
@@ -14,6 +14,7 @@
             <th>Code</th>
             <th>Name</th>
             <th>Instructors</th>
+            <th>Teaching Assistants</th>
             <th></th>
         </tr>
     </thead>
@@ -22,7 +23,15 @@
         <tr>
             <td><%= course.code %></td>
             <td><%= course.name %></td>
-            <td><%- course.instructors.map(function (instructor) { return instructor.name.full; }).join('<br>') %></td>
+            <td>
+            <% course.instructors.forEach(function (instructor) { %>
+                <div><%= instructor.name.full %></div>
+            <% }) %>
+            </td>
+            <td>
+            <% course.teachingAssistants.forEach(function (teachingAssistant) { %>
+                <div><%= teachingAssistant.name.full %></div>
+            <% }) %>
             <td>
                 <div class="dropdown">
                     <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
@@ -30,14 +39,10 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li><a href="/admin/courses/<%= course.id %>/edit">Edit Course</a></li>
-                    
                         <li><a href="/admin/courses/<%= course.id %>/tutorials">Manage Tutorials</a></li>
                         <li><a href="/admin/courses/<%= course.id %>/quizzes">Manage Quizzes</a></li>
-                    
                         <li><a href="/admin/courses/<%= course.id %>/files">Manage Files</a></li>
-  
                         <li><a href="/admin/courses/<%= course.id %>/students">Manage Students</a></li>
-                    
                         <li class="divider"></li>
                         <li><a href="/admin/courses/<%= course.id %>">Delete Course</a></li>
                     
@@ -49,4 +54,4 @@
     </tbody>
 </table>
 
-<%- include ../partials/admin-footer -%>
+<%- include ./footer -%>

@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 var CourseSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    code: { type: String,  required: true },
+    code: { type: String, required: true, unique: 1, uppercase: 1 },
     instructors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     teachingAssistants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -45,12 +45,26 @@ CourseSchema.methods.withFiles = function () {
 
 // find courses
 CourseSchema.statics.findCourses = function () {
-    return this.find({}).sort('code');
+    return this.find({}).sort('code').populate([{
+        path: 'instructors',
+        options: {
+            sort: { 'name.first': 1, 'name.last': 1 }
+        }
+    }, {
+        path: 'teachingAssistants',
+        options: {
+            sort: { 'name.first': 1, 'name.last': 1 }
+        }
+    }]);
 };
 
 // find courses enrolled by student
 CourseSchema.statics.findCoursesByStudent = function (id) {
-    return this.find({ 'students': { $in: [id] } });
+    return this.find({ 
+        'students': { 
+            $in: [id] 
+        } 
+    }).sort('code');
 };
 
 module.exports = mongoose.model('Course', CourseSchema);

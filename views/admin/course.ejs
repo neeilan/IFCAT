@@ -1,4 +1,4 @@
-<%- include ../partials/admin-header -%>
+<%- include ./header -%>
 
 <h1><%= course.isNew ? 'Add new course' : 'Edit course' %></h1>
 
@@ -19,12 +19,24 @@
     </div>
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">Taught by</label>
+        <label class="col-sm-2 control-label">Instructors</label>
         <div class="col-sm-10">
             <select name="instructors[]" multiple size="2" class="form-control">
             <% instructors.forEach(function (instructor) { %>
                 <option value="<%= instructor.id %>"<%= course.instructors.indexOf(instructor.id) !== -1 ? 
                     ' selected' : '' %>><%= instructor.name.full %></option> 
+            <% }) %>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Teaching assistants</label>
+        <div class="col-sm-10">
+            <select name="teachingAssistants[]" multiple size="2" class="form-control">
+            <% teachingAssistants.forEach(function (assistant) { %>
+                <option value="<%= assistant.id %>"<%= course.teachingAssistants.indexOf(assistant.id) !== -1 ? 
+                    ' selected' : '' %>><%= assistant.name.full %></option> 
             <% }) %>
             </select>
         </div>
@@ -39,4 +51,4 @@
 
 </form>
 
-<%- include ../partials/admin-footer -%>
+<%- include ./footer -%>
