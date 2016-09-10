@@ -12,7 +12,6 @@
 <table class="table table-striped sortable">
     <thead>
         <tr>
-            <th class="check-all"><input type="checkbox" value="1"></th>
             <th>Name</th>
             <th class="text-center"># of questions</th>
             <th></th>
@@ -22,7 +21,6 @@
     <tbody>
     <% course.quizzes.forEach(function (quiz, i) { %>
         <tr>
-            <td><input type="checkbox" name="quizzes[]" value="<%= quiz.id %>"></td>
             <td><%= quiz.name %></td>
             <td class="text-center"><%= quiz.questions.length %></td>
             <td></td>

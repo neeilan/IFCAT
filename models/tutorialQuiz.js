@@ -75,7 +75,7 @@ TutorialQuizSchema.methods.store = function (obj, callback) {
     this.published = obj.published;
     this.unlocked = obj.unlocked;
     this.active = obj.active;
-    this.save(callback);
+    return this.save(callback);
 };
 
 // find quizzes within tutorial

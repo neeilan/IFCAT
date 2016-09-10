@@ -33,7 +33,7 @@ exports.logout = function (req, res) {
 
 exports.getUserList = function (req, res) {
     models.User.find({}).exec(function (err, users) {
-        res.render('admin/users', { users: users.sort(models.User.compareRoles) });
+        res.render('admin/users', { users: models.User.sortByRole(users) });
     }); 
 };
 

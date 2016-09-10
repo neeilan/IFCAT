@@ -23,7 +23,7 @@
     <% course.tutorials.forEach(function (tutorial) { %>
         <tr>
             <td>TUT <%= tutorial.number %></td>
-            <td><%= tutorial.teachingAssistants.map(function (ta) { return ta.name.full; }).join('<br>') %></td>
+            <td><%- tutorial.teachingAssistants.map(function (ta) { return ta.name.full; }).join('<br>') %></td>
             <td class="text-center"><%= tutorial.students.length %></td>
             <td>
                 <div class="dropdown">

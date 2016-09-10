@@ -7,19 +7,21 @@
 <a class="btn btn-default btn-sm" 
     href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/new">Add New Question</a>
 
-<table class="table table-striped sortable">
+<button class="btn btn-default btn-sm">Add New Questions</button>
+
+<table class="table table-striped">
     <thead>
         <tr>
-            <th><input type="checkbox" value="1"></th>
-            <th>Question</th>
+            <th style="width: 10px;">#</th>
+            <th style="max-width: 250px;">Question</th>
             <th></th>
         </tr>
     </thead>
-    <tbody>
-    <% quiz.questions.forEach(function (question) { %>
+    <tbody class="sortable">
+    <% quiz.questions.forEach(function (question, i) { %>
         <tr data-id="<%= question.id %>">
-            <td><input type="checkbox" name="questions[]" value="<%= question.id %>"></td>
-            <td><%= question.question %></td>
+            <td style="width: 10px;"><%= i + 1 %>.</td>
+            <td style="max-width: 250px;"><%= question.question %></td>
             <td>
                 <div class="dropdown">
                     <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">

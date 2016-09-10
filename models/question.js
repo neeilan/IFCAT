@@ -75,7 +75,7 @@ QuestionSchema.methods.store = function (obj, callback) {
             break;
     }
 
-    this.save(callback);
+    return this.save(callback);
 };
 
 module.exports = mongoose.model('Question', QuestionSchema);

@@ -47,38 +47,16 @@ UserSchema.methods.hasRole = function (role) {
     return this.roles.indexOf(role) !== -1;
 };
 
-// Sort users by roles;
-// - if users have same roles, sort users by first names;
-// - otherwise, sort users by last names;
-UserSchema.statics.compareRoles = function (a, b) {
-/*
-    ['admin', 'instructor', 'teachingAssistant', 'student'].forEach(function (role) {
-        var aHasRole = a.hasRole(role), bHasRole = b.hasRole(role);
-        if (aHasRole && bHasRole) {
-            return compareFirstNames(a, b);
-        } else if (aHasRole) {
-            return 1;
-        } else if (bHasRole) {
-            return -1;
+// sort users by roles, first name, and last name
+UserSchema.statics.sortByRole = function (users) {
+    var roles = this.schema.path('roles').caster.enumValues;
+    return _.sortBy(users, function (user) {
+        var index = roles.indexOf(user.roles[0]);
+        if (index > -1) {
+            return index;
         }
-    });
-
-    function compareFirstNames (a, b) {
-        var aFirstName = _.lowerCase(a.name.first), bFirstName = _.lowerCase(b.name.first);
-        if (aFirstName === bFirstName) {
-            return compareLastNames(a, b);
-        }
-        return aFirstName > bFirstName ? 1 : -1;
-    }
-    
-    function compareLastNames (a, b) {
-        var aLastName = _.lowerCase(a.name.last), bLastName = _.lowerCase(b.name.last);
-        if (aLastName === bLastName) {
-            return 0;
-        }
-        return aLastName > bLastName ? 1 : -1;
-    }
-    */
+        return roles.length; // highest number
+    }, 'name.first', 'name.last');
 };
 
 // find instructors
