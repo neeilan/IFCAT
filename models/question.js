@@ -22,6 +22,27 @@ QuestionSchema.methods.withFiles = function () {
     });
 };
 
+// check if question is a multiple choice question
+QuestionSchema.methods.isMultipleChoice = function () {
+    return this.type === 'multiple choice';
+};
+
+// check if question is a true or false question
+QuestionSchema.methods.isTrueOrFalse = function () {
+    return this.type === 'true or false';
+};
+
+// check if question is a multiple select question
+QuestionSchema.methods.isMultipleSelect = function () {
+    return this.type === 'multiple select';
+};
+
+// check if question is a fill in the blanks question
+QuestionSchema.methods.isFillInTheBlanks = function () {
+    return this.type === 'fill in the blanks';
+};
+
+
 // check if question has file
 QuestionSchema.methods.hasFile = function (id) {
     return this.files.indexOf(id) !== -1;

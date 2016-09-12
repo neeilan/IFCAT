@@ -7,4 +7,12 @@ var FileSchema = new mongoose.Schema({
     timestamps: true
 });
 
+FileSchema.methods.isAudio = function () {
+    return this.type.indexOf('audio') !== -1;
+};
+
+FileSchema.methods.isImage = function () {
+    return this.type.indexOf('image') !== -1;
+};
+
 module.exports = mongoose.model('File', FileSchema);
