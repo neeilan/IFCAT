@@ -64,11 +64,35 @@ CourseSchema.statics.findCourses = function () {
     }]);
 };
 
+CourseSchema.methods.addStudent = function (user) {
+    if (this.students.indexOf(user) === -1) {
+        this.students.push(user);
+    }
+};
+
+// find courses taught by instructor
+CourseSchema.statics.findCoursesByInstructor = function (userId) {
+    return this.find({
+        'instructors': { 
+            $in: [userId] 
+        } 
+    }).sort('code');
+};
+
+// find courses taught by teaching assistant
+CourseSchema.statics.findCoursesByTeachingAssistant = function (userId) {
+    return this.find({
+        'teachingAssistants': { 
+            $in: [userId] 
+        } 
+    }).sort('code');
+};
+
 // find courses enrolled by student
-CourseSchema.statics.findCoursesByStudent = function (id) {
+CourseSchema.statics.findCoursesByStudent = function (userId) {
     return this.find({ 
         'students': { 
-            $in: [id] 
+            $in: [userId] 
         } 
     }).sort('code');
 };

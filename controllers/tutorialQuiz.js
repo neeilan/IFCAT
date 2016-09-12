@@ -30,6 +30,8 @@ exports.getQuizListForAdmin = function (req, res) {
 
 // Retrieve quizzes within course
 exports.getQuizListForStudent = function (req, res) { 
+
+
     models.Course.populate(req.course, {
         // find the tutorial that student is in
         path: 'tutorials',

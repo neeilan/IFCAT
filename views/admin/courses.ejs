@@ -4,9 +4,7 @@
 
 <h4 class="todo">@TODO: ability to delete courses</h4>
 
-<% if (user.hasRole('admin')) { %>
-    <a class="btn btn-default btn-sm" href="/admin/courses/new">Add New Course</a>
-<% } %>
+<a class="btn btn-default btn-sm" href="/admin/courses/new">Add New Course</a>
 
 <table class="table table-striped">
     <thead>
@@ -54,7 +52,6 @@
                         <li><a href="/admin/courses/<%= course.id %>/students">Manage Students</a></li>
                         <li class="divider"></li>
                         <li><a href="/admin/courses/<%= course.id %>">Delete Course</a></li>
-                    
                     </ul>
                 </div>
             </td>

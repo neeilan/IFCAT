@@ -42,6 +42,13 @@ UserSchema.methods.isValidPassword = function (password) {
     return bcrypt.compareSync(password, this.local.password);
 };
 
+// generate salt
+UserSchema.methods.addRole = function (role) {
+    if (this.hasRole(role) === false) {
+        this.roles.push(role);
+    }
+};
+
 // check user's role
 UserSchema.methods.hasRole = function (role) {
     return this.roles.indexOf(role) !== -1;
@@ -81,6 +88,11 @@ UserSchema.statics.findTeachingAssistants = function () {
         'name.first': 1,
         'name.last': 1
     });
+};
+
+// find user by email address
+UserSchema.statics.findUserByEmail = function (email, callback) {
+    return this.findOne({ 'local.email': email }, callback);
 };
 
 module.exports = mongoose.model('User', UserSchema);

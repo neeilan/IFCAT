@@ -83,7 +83,7 @@ router.use(function (req, res, next) {
 // @TODO: model validation
 router.get('/logout', controllers.User.logout);
 
-router.get('/courses', controllers.Course.getCourseListForAdmin);
+router.get('/courses', controllers.Course.getCourseList);
 router.get('/courses/new', controllers.Course.getCourseForm);
 router.get('/courses/:course/edit', controllers.Course.getCourseForm);
 router.post('/courses', controllers.Course.addCourse);
@@ -140,6 +140,7 @@ router.get('/users/:us3r/edit', controllers.User.getUserForm);
 router.post('/users', controllers.User.addUser);
 router.put('/users/:us3r', controllers.User.editUser);
 //router.delete('/users/:user', controllers.User.deleteUser);
-router.post('/users/import', csvUpload.single('file'), controllers.User.importStudents);
+
+router.post('/courses/:course/students/import', csvUpload.single('file'), controllers.User.importStudents);
 
 module.exports = router;

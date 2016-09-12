@@ -5,9 +5,7 @@
 
 <h4 class="todo">@TODO: ability to delete quizzes at course level</h4>
 
-<% if (user.hasRole('admin', 'instructor')) { %>
-    <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/quizzes/new">Add New Quiz</a>
-<% } %>
+<a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/quizzes/new">Add New Quiz</a>
 
 <table class="table table-striped sortable">
     <thead>
@@ -30,14 +28,10 @@
                         Actions<span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                    <% if (user.hasRole('admin', 'instructor')) { %>
                         <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/edit">Edit Quiz</a></li>
-                    <% } %>
                         <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions">Manage Questions</a></li>
-                    <% if (user.hasRole('admin', 'instructor')) { %>
                         <li class="divider"></li>
                         <li><a href="#">Delete Quiz</a></li>
-                    <% } %>
                     </ul>
                 </div>
             </td>

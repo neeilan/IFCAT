@@ -19,27 +19,30 @@ exports.getCourse = function (req, res, next, course) {
 };
 
 // Retrieve many courses
-exports.getCourseListForAdmin = function (req, res) {
+exports.getCourseList = function (req, res) {
     if (req.user.hasRole('admin')) {
         models.Course.findCourses().exec(function (err, courses) { 
             res.render('admin/courses', { courses: courses });
         });
     } else {
-        models.Course.find({
-            $or: [
-                { 'instructors': { $in: [req.user.id] } }, 
-                { 'teachingAssistants': { $in: [req.user.id] } }
-            ], 
-            $sort: { 
-                code: 1 
-            } 
-        }, function (err, courses) { 
-            res.render('admin/courses', { courses: courses });
+        async.series([
+            function (done) {
+                models.Course.findCoursesByInstructor(req.user.id).exec(done);
+            },
+            function (done) {
+                models.Course.findCoursesByTeachingAssistant(req.user.id).exec(done);
+            }
+        ], function (err, results) {
+            res.render('admin/courses', { 
+                'instructor.courses': results[0],
+                'teachingAssistant.courses': results[1] 
+            });
         });
     }
 };
 
-exports.getCourseListForStudent = function (req, res) {
+// Retrieve courses enrolled for student
+exports.getEnrolledCourseList = function (req, res) {
     models.Course.findCoursesByStudent(req.user.id).exec(function (err, courses) { 
         res.render('student/courses', { courses: courses });
     });

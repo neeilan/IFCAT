@@ -36,8 +36,8 @@ router.use(function (req, res, next) {
 // authenticated routes
 router.get('/logout', controllers.User.logout);
 
-router.get('/courses', controllers.Course.getCourseListForStudent);
-router.get('/courses/:course/quizzes', controllers.TutorialQuiz.getQuizListForStudent);
+router.get('/courses', controllers.Course.getEnrolledCourseList);
+//router.get('/courses/:course/quizzes', controllers.TutorialQuiz.getQuizzesForStudent);
 router.get('/courses/:course/quizzes/:tutorialQuiz/start', controllers.TutorialQuiz.startQuiz);
 router.get('/courses/:course/quizzes/:tutorialQuiz/questions/:question', controllers.TutorialQuiz.getNextQuestion);
 router.get('/courses/:course/quizzes/:tutorialQuiz/end', controllers.TutorialQuiz.endQuiz);

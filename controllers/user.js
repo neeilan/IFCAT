@@ -73,17 +73,37 @@ exports.importStudents = function (req, res) {
         delimiter: ',',
         skip_empty_lines: true
     }, function (err, rows) {
-        // create students
-        async.mapSeries(rows, function (row, done) {
-            var user = new models.User();
-                user.name.first = row.first;
-                user.name.last = row.last;
-                user.roles = _.map(row.roles.split(','), _.trim);
-                user.local.email = row.email;
-                user.local.password = user.generateHash(row.password);
-                user.save(done);
-        }, function (err, newStudents) {
-            res.redirect('/admin/users');
+        async.eachSeries(rows, function (row, done) {
+            async.waterfall([
+                // add student if they do not already exist
+                function (done) {
+                    // check if user exist already with email address
+                    models.User.findUserByEmail(row.email, function (err, user) {
+                        // if user does not already exist, create them
+                        if (!user) {
+                            user = new models.User();
+                            user.name.first = row.first;
+                            user.name.last = row.last;
+                            user.local.email = row.email;
+                            user.local.password = user.generateHash(row.password);
+                        }
+                        // mark them as student
+                        user.addRole('student');
+                        user.save(function (err) {
+                            done(err, user);
+                        });
+                    });
+                },
+                // add student into course
+                function (user, done) {
+                    req.course.addStudent(user);
+                    req.course.save(function (err) {
+                        done(err, user);
+                    });
+                }
+            ], done);
+        }, function (err) {
+            res.redirect('/admin/courses/' + req.course.id + '/students');
         });
     });
 };
