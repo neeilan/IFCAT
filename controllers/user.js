@@ -79,6 +79,9 @@ exports.importStudents = function (req, res) {
                 function (done) {
                     // check if user exist already with email address
                     models.User.findUserByEmail(row.email, function (err, user) {
+                        if (err) {
+                            console.log(err);
+                        }
                         // if user does not already exist, create them
                         if (!user) {
                             user = new models.User();
@@ -103,6 +106,9 @@ exports.importStudents = function (req, res) {
                 }
             ], done);
         }, function (err) {
+            if (err) {
+                console.log(err);
+            }
             res.redirect('/admin/courses/' + req.course.id + '/students');
         });
     });

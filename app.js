@@ -13,9 +13,12 @@ var bodyParser = require('body-parser'),
 var config = require('./config/common'),
     routes = require('./routes');
 
-var app = express();
+var app = express(),
+    server = require('http').Server(app),
+    io = require('socket.io')(server);
 
 // locals
+app.locals.io = io; // io global
 app.locals._ = require('lodash');
 app.locals.moment = require('moment');
 app.locals.dateFormat = 'MMMM Do YYYY @ h:mm a';
@@ -33,6 +36,7 @@ app.use('/', express.static(__dirname + '/public'));
 app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist'));
 app.use('/lodash', express.static(__dirname + '/node_modules/lodash'));
+app.use('/socketioclient', express.static(__dirname + '/node_modules/socket.io-client'));
 
 app.use(morgan('dev'));
 
