@@ -1,5 +1,4 @@
 $(function () {
-
     var $selectQuestion = $('#select-question'),
         $prevQuestion = $('#prev-question'),
         $checkAnswer = $('#check-answer'),

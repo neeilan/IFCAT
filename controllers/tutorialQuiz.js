@@ -50,9 +50,9 @@ exports.getQuizListForStudent = function (req, res) {
             }
         }
     }, function (err) {
-        /*if (err) {
+        if (err) {
             return res.status(500).send("Unable to retrieve any quizzes at this time (" + err.message + ").");
-        }*/
+        }
         var tutorial = req.course.tutorials[0];
         if (tutorial) {
             res.render('student/tutorial-quizzes', { course: req.course, tutorial: tutorial });

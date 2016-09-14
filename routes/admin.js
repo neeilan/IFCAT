@@ -99,9 +99,9 @@ router.post('/courses/:course/tutorials', controllers.Tutorial.addTutorial);
 router.put('/courses/:course/tutorials/:tutorial', controllers.Tutorial.editTutorial);
 // router.delete('/courses/:course/tutorials/:tutorial', controllers.Tutorial.deleteTutorial);
 
-// // /*router.get('/courses/:course/tutorials/:tutorial/students', controllers.User.getStudentsByTutorial);
-// // router.post('/courses/:course/tutorials/:tutorial/students/:student', controllers.User.addStudentInTutorial);
-// // router.delete('/courses/:course/tutorials/:tutorial/students/:student', controllers.User.deleteStudentInTutorial);*/
+router.get('/courses/:course/tutorials/:tutorial/students', controllers.Student.getStudentsByTutorial);
+// router.post('/courses/:course/tutorials/:tutorial/students/:student', controllers.User.addStudentInTutorial);
+// router.delete('/courses/:course/tutorials/:tutorial/students/:student', controllers.User.deleteStudentInTutorial);
 
 router.get('/courses/:course/quizzes', controllers.Quiz.getQuizList);
 router.get('/courses/:course/quizzes/new', controllers.Quiz.getQuizForm);
