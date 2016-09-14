@@ -1,3 +1,8 @@
+//
+$('#driverSelect').hide();
+$('#activeQuiz').hide();
+//
+
 var socket = io();
 
 var quizId = $('#quizId').html(), // get from url in full app
@@ -6,16 +11,35 @@ var quizId = $('#quizId').html(), // get from url in full app
 socket.emit('requestQuiz', quizId);
 
 socket.on('quizData', function(quiz){
-    quizData = quiz;
-    console.log(quizData);
-            renderQuestion(quizData.quiz, 0);
-
+  quizData = quiz;
+  $('#driverSelect').show()
+  
+  $('#selectDriverBtn').click(function(){
+    socket.emit('selectedAsDriver');
+  })
 })
 
 socket.on('startQuiz', function(){
+  $('#driverSelect').hide();
+  $('#activeQuiz').show();
     if (quizData)
         renderQuestion(quizData.quiz, 0);
 })
+
+socket.on('renderQuestion', function(n){
+  renderQuestion(quizData.quiz, n);
+})
+
+socket.on('updateScores', function(scores){
+    $('#score').html(scores.score);
+    $('#currentAttempts').html(scores.attemptNumber);
+
+})
+
+function showQuestionToGroup(n){
+  socket.emit('showQuestionToGroup', n); //  experimenting with wrappers
+  
+}
 
 
 // var quiz = {
@@ -34,12 +58,16 @@ socket.on('startQuiz', function(){
 
  
 var score = 0,
-    currentQuizId = quiz._id;
-// renderQuestion(quiz, 0);
+    currentQuizId = null;
 
 // console.log(sessionStorage.getItem('currentQuiz'));
   
 function renderQuestion(quiz, n){
+  
+  if (n >= quiz.questions.length){
+    quizCompleted();
+    return;
+  }
     
     var attemptNumber = 1;
     
@@ -87,7 +115,8 @@ function renderQuestion(quiz, n){
     
         if (quiz.questions.length-1 > n){
           // Got it right - move on to next question
-          renderQuestion(quiz, ++n);
+          // renderQuestion(quiz, ++n);
+          showQuestionToGroup(++n);
         }
         else {
           // Quiz is done - you got the question right
@@ -101,7 +130,7 @@ function renderQuestion(quiz, n){
       }
       
       // update score
-      $('#score').html(score);
+      socket.emit('propagateScoresToGroup', { score : score , attemptNumber : attemptNumber } )
 
       })
 }
@@ -111,6 +140,10 @@ function mark(questionNumber, answer){
   var index = quizData.quiz.questions[questionNumber].choices.indexOf(answer);
   console.log(index)
   return (quizData.quiz.questions[questionNumber].answers.indexOf(index) > -1)
+ }
+ 
+ function quizCompleted (){
+  $('#activeQuiz').html('The quiz has been completed.')  
  }
  
  // Socket.io handlers
