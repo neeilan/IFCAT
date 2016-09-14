@@ -6,10 +6,10 @@
 
     <p>Morbi finibus lacus ac quam iaculis mollis. Sed mi ex, posuere luctus nulla efficitur, varius vehicula orci. Donec nibh velit, mollis eget mi quis, convallis maximus ex. Sed bibendum dolor lacus, lacinia elementum lorem facilisis sed. Quisque placerat, dolor sed pulvinar sagittis, elit odio tincidunt metus, id sodales augue dui ultricies magna. Vestibulum eu quam dolor. Aenean hendrerit vitae arcu et mollis. Vestibulum dapibus nibh ut eleifend ullamcorper.</p>
 
-    <%= quiz.toString() %>
+    TutorialQuiz <span id="quizId"><%= quiz._id %></span>
     
    <hr/>
-   
+  <span>Score: <span id="score"></span></span>
   <span>Attempt: <span id="currentAttempts"></span></span>
   <div id = "activeQuiz">
     <div id = "text"></div>
@@ -21,6 +21,5 @@
 </div>
 
 <script src="/socketioclient/socket.io.js"></script>
-
 <%- include ./footer -%>
 <script src="/js/start-quiz.js"></script>

@@ -91,15 +91,7 @@ io.use(passportSocketIo.authorize({
 
 app.get('/quiz', function (req, res){
     require('./models').TutorialQuiz.findOne({})
-    // .populate({
-    //     path : 'quiz',
-    //     model : 'Quiz',
-    //     populate : {
-    //         path : 'questions',
-    //         model : 'Question'
-    //     }
-    // })
-    // .exec()
+    .exec()
     .then(function(tutQuiz){
         res.render('student/start-quiz.ejs', { quiz : tutQuiz } )
     })
@@ -110,10 +102,26 @@ io.on('connection', function(socket){
      if (socket.request.user && socket.request.user.logged_in) {
       console.log(socket.request.user);
       socket.join('user:' + socket.request.user._id); // Since a user can connect from multiple devices/ports, use socket.io rooms instead of hashmap
-    }
+     }
     else{
         console.log('socket unauthenticated');
     }
+    
+    socket.on('requestQuiz', function(id){
+        require('./models').TutorialQuiz.findById(id)
+        .populate({
+            path : 'quiz',
+            model : 'Quiz',
+            populate : {
+                path : 'questions',
+                model : 'Question'
+            }
+        })
+        .exec()
+        .then(function(tutQuiz){
+            socket.emit('quizData', tutQuiz )
+        })
+    })
 })
 //////////////// -------------
 

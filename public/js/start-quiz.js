@@ -1,29 +1,55 @@
 var socket = io();
 
-var quiz = {
-  name : 'Quiz 1',
-  questions: [ { text: 'Favourite color?', correctAnswers : ['red'],
-                choices: ['blue', 'red', 'green', 'purple', 'orange'] },
-              { text: 'Favourite answer', correctAnswers : ['correct'],
-                choices: ['wrong', 'correct'] },
-              ],
-  randomizeChoices: false,
-  scoreByAttempt : [5,4,3,2,1]
-}
+var quizId = $('#quizId').html(), // get from url in full app
+    quizData = null;
+    
+socket.emit('requestQuiz', quizId);
+
+socket.on('quizData', function(quiz){
+    quizData = quiz;
+    console.log(quizData);
+            renderQuestion(quizData.quiz, 0);
+
+})
+
+socket.on('startQuiz', function(){
+    if (quizData)
+        renderQuestion(quizData.quiz, 0);
+})
+
+
+// var quiz = {
+//   _id: 'hihihi',
+//   name : 'Quiz 1',
+//   questions: [ { question: 'Favourite color?', correctAnswers : ['red'],
+//                 choices: ['blue', 'red', 'green', 'purple', 'orange'] },
+//               { question: 'Favourite answer', correctAnswers : ['correct'],
+//                 choices: ['wrong', 'correct'] },
+//               ],
+//   randomizeChoices: false,
+//   scoreByAttempt : [5,4,3,2,1]
+// }
+
+
 
  
-var score = 0;
-renderQuestion(quiz, 0);
+var score = 0,
+    currentQuizId = quiz._id;
+// renderQuestion(quiz, 0);
+
+// console.log(sessionStorage.getItem('currentQuiz'));
   
 function renderQuestion(quiz, n){
     
     var attemptNumber = 1;
     
+    // update score
+    
     // reset attempt number
     $('#currentAttempts').html(attemptNumber);
     
     // renders nth question (0 indexed) in quiz
-    $("#text").html(quiz.questions[n].text);
+    $("#text").html(quiz.questions[n].question);
     $("#choices").html("");
     
     // shuffle choices if need be
@@ -47,6 +73,7 @@ function renderQuestion(quiz, n){
       }
       console.log(chosenAnswer);
       var isCorrect = mark(n, chosenAnswer);
+      console.log(isCorrect);
       $('.currentlyChosen').removeClass('currentlyChosen');
       
       if (isCorrect){
@@ -54,7 +81,8 @@ function renderQuestion(quiz, n){
           // Increment score if they did it withinn 5 attempts
           // can push actual response and # attempts to an array here
           // to build a response/groupResponse document
-          score += quiz.scoreByAttempt[attemptNumber-1];
+           score +=  1;
+        //or   quiz.scoreByAttempt ? quiz.scoreByAttempt[attemptNumber-1] ||
         }
     
         if (quiz.questions.length-1 > n){
@@ -72,11 +100,24 @@ function renderQuestion(quiz, n){
         $('#currentAttempts').html(++attemptNumber);
       }
       
+      // update score
+      $('#score').html(score);
+
       })
 }
 
 function mark(questionNumber, answer){
 // returns true iff answer is a correct answer to question (questionNumber + 1)
-  return (quiz.questions[questionNumber].correctAnswers.indexOf(answer) > -1)
+  var index = quizData.quiz.questions[questionNumber].choices.indexOf(answer);
+  console.log(index)
+  return (quizData.quiz.questions[questionNumber].answers.indexOf(index) > -1)
  }
+ 
+ // Socket.io handlers
+ 
+ socket.on('goToQuestion', function(data){
+     if (data.quizId === currentQuizId) {
+         renderQuestion(quiz, data.questionNumber)
+     }
+ })
     
