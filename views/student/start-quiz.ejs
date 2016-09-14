@@ -9,7 +9,16 @@
     TutorialQuiz <span id="quizId"><%= quiz._id %></span>
     
    <hr/>
+   
+  <div id = "driverSelect">
+    This quiz requires one member of your group to serve as the driver,
+    who will select the answers. Discuss within your group and press the button below if you are the chosen driver.
+    <hr/>
+    <button id = "selectDriverBtn" > I will be the driver </button>
+  </div>
+  
   <span>Score: <span id="score"></span></span>
+  <br/>
   <span>Attempt: <span id="currentAttempts"></span></span>
   <div id = "activeQuiz">
     <div id = "text"></div>
