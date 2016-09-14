@@ -1,14 +1,26 @@
 <%- include ./header -%>
-
+<link rel = "stylesheet" href = "/css/quiz.css" type="text/css" />
 <h1>Instructions</h1>
 
 <div class="center-block">
 
     <p>Morbi finibus lacus ac quam iaculis mollis. Sed mi ex, posuere luctus nulla efficitur, varius vehicula orci. Donec nibh velit, mollis eget mi quis, convallis maximus ex. Sed bibendum dolor lacus, lacinia elementum lorem facilisis sed. Quisque placerat, dolor sed pulvinar sagittis, elit odio tincidunt metus, id sodales augue dui ultricies magna. Vestibulum eu quam dolor. Aenean hendrerit vitae arcu et mollis. Vestibulum dapibus nibh ut eleifend ullamcorper.</p>
 
-    <a href="/student/courses/<%= course.id %>/quizzes/<%= tutorialQuiz.id %>/questions/<%= quiz.questions[0] %>" class="btn btn-primary btn-lg" role="button">Start quiz</a>
+    <%= quiz.toString() %>
+    
+   <hr/>
+   
+  <span>Attempt: <span id="currentAttempts"></span></span>
+  <div id = "activeQuiz">
+    <div id = "text"></div>
+    <div id = "attachment"></div>
+    <div id = "choices"></div>
+    <button id = "next">Submit</button>
+  </div>
 
 </div>
+
 <script src="/socketioclient/socket.io.js"></script>
 
 <%- include ./footer -%>
+<script src="/js/start-quiz.js"></script>

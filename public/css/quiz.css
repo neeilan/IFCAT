@@ -1,0 +1,20 @@
+.choice {
+  border: solid 2px grey;
+  padding: 5px;
+  margin: 5px;
+  text-align: center;
+  color: grey;
+  background: white;
+}
+
+.currentlyChosen {
+  background: blue;
+  border-color: blue;
+  color: white;
+}
+
+.previouslyChosen {
+  color: blue;
+  border-color: blue;
+  
+}

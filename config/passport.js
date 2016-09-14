@@ -6,11 +6,14 @@ passport.serializeUser(function (user, done) {
     done(null, user.id);
 });
 
+
+
 passport.deserializeUser(function (id, done) {
     User.findById(id, '-password', function (err, user) { 
         done(null, user);
     });
 });
+
 
 passport.use('local-signup', new LocalStrategy({
     usernameField: 'email',
