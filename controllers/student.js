@@ -37,6 +37,6 @@ exports.getStudentsByTutorial = function (req, res) {
             sort: { 'name.first': 1, 'name.last': 1 }
         }
     }, function (err) {
-        res.render('admin/students', { course: req.course, tutorial: req.tutorial });
+        res.render('admin/tutorial-students', { course: req.course, tutorial: req.tutorial });
     }); 
 };
