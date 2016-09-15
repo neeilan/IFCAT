@@ -81,6 +81,8 @@ app.use(function (err, req, res, next) {
 
 
 /////////////////// realtime quiz testing endpoint ------------------
+var models = require('./models');
+
 io.use(passportSocketIo.authorize({
   key: 'connect.sid',
   secret: config.session.secret,
@@ -98,30 +100,98 @@ app.get('/quiz', function (req, res){
 })
 
 io.on('connection', function(socket){
-    console.log('connection');
+    
      if (socket.request.user && socket.request.user.logged_in) {
-      console.log(socket.request.user);
+    //   console.log(socket.request.user);
+      console.log('authenticated socket');
       socket.join('user:' + socket.request.user._id); // Since a user can connect from multiple devices/ports, use socket.io rooms instead of hashmap
      }
     else{
-        console.log('socket unauthenticated');
+        console.log('unauthenticated socket');
     }
     
-    socket.on('requestQuiz', function(id){
-        require('./models').TutorialQuiz.findById(id)
-        .populate({
+    socket.on('requestQuiz', function(tutQuizId){
+        
+        models.TutorialQuiz.findById(tutQuizId)
+        .populate([{
             path : 'quiz',
             model : 'Quiz',
             populate : {
                 path : 'questions',
                 model : 'Question'
             }
-        })
+        },
+        {
+            path : 'groups',
+            model : 'Group'
+        }])
         .exec()
         .then(function(tutQuiz){
+            // console.log(tutQuiz);
+            var studentHasAGroup = false;
+            // if student already in a group, add them to approriate socket.io room
+            tutQuiz.groups.forEach(function(group){
+                // console.log(group);
+                if (group.members.indexOf(socket.request.user._id) > -1) {
+                    socket.join('group:'+group._id);
+                    console.log('Joined enrolled group');
+                    studentHasAGroup = true;
+                }
+            })
+            if (!studentHasAGroup) {
+                // student doesn't have a group - add them to one
+                var groupsWithRoom = tutQuiz.groups.filter(function(group){
+                    if (!tutQuiz.max || !tutQuiz.max.membersPerGroup){
+                        tutQuiz.max = { membersPerGroup : 2 }                     // MAKE THIS DEFAULT BEHAVIOR IN SCHEMA
+                    }
+                    return (group.members.length < tutQuiz.max.membersPerGroup);
+                })
+                
+                if (groupsWithRoom.length > 0) {
+                    // there is a group with room, let's add the student to it
+                    models.Group.findByIdAndUpdate(groupsWithRoom[0]._id, { $push : { members : socket.request.user._id } }, { new : true }, function (err,doc){
+                        if (err)
+                            console.log(err);
+                    });
+                    console.log('Joining existing group '+ groupsWithRoom[0]._id);
+                    socket.join('group:' + groupsWithRoom[0]._id);
+                }
+                else {
+                    // there are no groups with room - let's make a new group
+                    var group = new models.Group();
+                    group.name = (tutQuiz.groups.length + 1).toString();
+                    group.members = [ socket.request.user._id ];
+                    group.save( function(err, group){
+                     if (!err) {
+                         // we also need to add the group to this tutorialQuiz
+                         models.TutorialQuiz.update({ _id : tutQuiz._id }, { $push : { groups :  group._id } }, { new : true }, function(err, doc){
+                            if (err) 
+                                console.log(err);
+                         })
+                         console.log('Created and joined a new group ', group._id);
+                         socket.join('group:'+group._id)
+                     }
+                    });
+                }
+                
+            }
             socket.emit('quizData', tutQuiz )
         })
     })
+    
+    
+    socket.on('selectedAsDriver', function(data){
+        io.emit('startQuiz');
+    })
+    
+    socket.on('showQuestionToGroup', function(n){
+        io.emit('renderQuestion', n);
+    })
+    
+    socket.on('propagateScoresToGroup', function(score){
+        io.emit('updateScores', score)
+    })
+    
 })
 //////////////// -------------
 

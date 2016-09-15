@@ -27,6 +27,7 @@ socket.on('startQuiz', function(){
 })
 
 socket.on('renderQuestion', function(n){
+  console.log('renderQuestion: ', n);
   renderQuestion(quizData.quiz, n);
 })
 
@@ -112,17 +113,9 @@ function renderQuestion(quiz, n){
            score +=  1;
         //or   quiz.scoreByAttempt ? quiz.scoreByAttempt[attemptNumber-1] ||
         }
-    
-        if (quiz.questions.length-1 > n){
-          // Got it right - move on to next question
-          // renderQuestion(quiz, ++n);
-          showQuestionToGroup(++n);
-        }
-        else {
-          // Quiz is done - you got the question right
-          $("#activeQuiz").html('Quiz complete! Your score: '+score);
-        }
-    
+        
+        // Move onto next question
+        showQuestionToGroup(++n);
       }
       else {
         // just got the question wrong
