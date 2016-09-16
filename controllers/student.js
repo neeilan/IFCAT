@@ -17,6 +17,8 @@ exports.getStudentListBySearchQuery = function (req, res) {
     });
 };
 
+
+
 // Retrieve list of students for tutorial
 exports.getStudentsByTutorial = function (req, res) { 
     models.Tutorial.populate(req.tutorial, { 
@@ -34,6 +36,18 @@ exports.getStudentsByTutorial = function (req, res) {
         res.json({ status: true });
     });
 };
+
+// Add student to course
+exports.addStudent = function (req, res) {
+
+    console.log(req.course.students, req.us3r.id);
+    req.course.addStudent(req.us3r.id);
+    console.log(req.course.students, req.us3r.id);
+    req.course.save(function (err) {
+        res.json({ status: true });
+    });
+};
+
 // Update student in tutorials
 exports.editStudent = function (req, res) {
      req.course.withTutorials().execPopulate().then(function () {
