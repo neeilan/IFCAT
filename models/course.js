@@ -41,7 +41,7 @@ CourseSchema.methods.withStudents = function () {
     });
 };
 // populate tutorials
-CourseSchema.methods.withTutorials = function (deep = false) {
+CourseSchema.methods.withTutorials = function (deep) {
     var obj = {
         path: 'tutorials',
         options: {
