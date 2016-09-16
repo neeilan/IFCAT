@@ -83,12 +83,4 @@ TutorialQuizSchema.statics.findQuizzesByTutorial = function (tutorial) {
     return this.find({ tutorial: tutorial }).populate('tutorial quiz');
 };
 
-// find quizzes within tutorial
-TutorialQuizSchema.statics.findQuizzesByCourseStudent = function (course, user) {
-    var model = this;
-    models.Course.findCourseByStudent(course.id, user.id).exec(function (err, course) {
-        return model.find({ tutorial: course.tutorials[0] }).populate('tutorial quiz');
-    });
-};
-
 module.exports = mongoose.model('TutorialQuiz', TutorialQuizSchema);
