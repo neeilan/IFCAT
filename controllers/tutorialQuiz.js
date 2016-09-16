@@ -28,40 +28,6 @@ exports.getQuizListForAdmin = function (req, res) {
     });
 };
 
-// Retrieve quizzes within course
-exports.getQuizListForStudent = function (req, res) { 
-
-
-    models.Course.populate(req.course, {
-        // find the tutorial that student is in
-        path: 'tutorials',
-        model: models.Tutorial,
-        match: {
-            students: { $in: [req.user.id] }
-        },
-        // find the quizzes within the tutorial
-        populate: {
-            path: 'quizzes',
-            model: models.TutorialQuiz,
-            match: { published: true },
-            populate: {
-                path: 'quiz',
-                model: models.Quiz
-            }
-        }
-    }, function (err) {
-        /*if (err) {
-            return res.status(500).send("Unable to retrieve any quizzes at this time (" + err.message + ").");
-        }*/
-        var tutorial = req.course.tutorials[0];
-        if (tutorial) {
-            res.render('student/tutorial-quizzes', { course: req.course, tutorial: tutorial });
-        } else {
-            res.redirect('/student/courses');
-        }
-    });
-};
-
 // Retrieve quiz form
 exports.getQuizForm = function (req, res) {
     res.render('admin/tutorial-quiz', { course: req.course, tutorialQuiz: req.tutorialQuiz });

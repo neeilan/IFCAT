@@ -14,7 +14,6 @@ exports.getFile = function (req, res, next, fil3) {
         next();
     });
 };
-
 // Retrieve all files in the course
 exports.getFileList = function (req, res) {
     req.course.withFiles().execPopulate().then(function (err) {
@@ -24,12 +23,10 @@ exports.getFileList = function (req, res) {
         res.render('admin/course-files', { course: req.course });
     });
 };
-
 // Retrieve specific file
 exports.getFileForm = function (req, res) { 
     res.render('admin/course-file', { course: req.course, fil3: req.fil3 || new models.File() });
 };
-
 // Add new file
 exports.addFile = function (req, res) {
     models.File.create({ 
@@ -45,7 +42,6 @@ exports.addFile = function (req, res) {
         }); 
     });
 };
-
 // Update specific file for course
 exports.editFile = function (req, res) {
     req.fil3.name = req.file.filename;
@@ -54,6 +50,5 @@ exports.editFile = function (req, res) {
         res.redirect('/admin/courses/' + req.course.id + '/files/' + req.fil3.id + '/edit');
     });
 };
-
 // Delete specific file for course
 exports.deleteFile = function (req, res) {};

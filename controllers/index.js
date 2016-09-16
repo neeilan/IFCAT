@@ -1,5 +1,7 @@
 exports.User = require('./user');
 exports.Student = require('./student');
+exports.TeachingAssistant = require('./teachingAssistant');
+exports.Instructor = require('./instructor');
 exports.Course = require('./course');
 exports.Tutorial = require('./tutorial');
 exports.Quiz = require('./quiz');

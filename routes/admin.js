@@ -61,14 +61,18 @@ router.use(function (req, res, next) {
 // e.g. Courses / Tutorials ----> Courses / CSCC09H3 / Tutorials
 router.use(function (req, res, next) {
     if (req.method === 'GET') {
-        var keywords = ['courses', 'tutorials', 'quizzes', 'questions', 'files', 'students', 'groups', 'users'];
+        var keywords = [
+            'users', 'students', 'teaching-assistants', 'instructors',
+            'courses', 'tutorials', 'quizzes', 'questions', 'files', 
+            'groups'
+        ];
         var fragments = req.url.split('/');
-        // look for keywords
         res.locals.breadcrumbs = [];
         fragments.forEach(function (fragment, f) {
+            // check if fragment is one of the keywords
             if (keywords.indexOf(fragment) !== -1) {
                 res.locals.breadcrumbs.push({
-                    text: _.upperFirst(fragment),
+                    text: _.upperFirst(_.startCase(fragment)),
                     href: _.take(fragments, f + 1).join('/') 
                 });
             }
@@ -89,8 +93,6 @@ router.get('/courses/:course/edit', controllers.Course.getCourseForm);
 router.post('/courses', controllers.Course.addCourse);
 router.put('/courses/:course', controllers.Course.editCourse);
 //router.delete('/courses/:course', controllers.Course.deleteCourse);
-
-router.get('/courses/:course/students', controllers.Student.getStudentsByCourse);
 
 router.get('/courses/:course/tutorials', controllers.Tutorial.getTutorialList);
 router.get('/courses/:course/tutorials/new', controllers.Tutorial.getTutorialForm);
@@ -125,7 +127,7 @@ router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups', controllers
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroups);
 //router.post('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/save', controllers.Group.saveGroups);
 //router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/view', controllers.Group.viewGroupForm);
-//router.delete('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group', controllers.Group.deleteGroupFromTutorial);*/
+//router.delete('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group', controllers.Group.deleteGroupFromTutorial);
 
 router.get('/courses/:course/files', controllers.File.getFileList);
 router.get('/courses/:course/files/new', controllers.File.getFileForm);
@@ -141,6 +143,22 @@ router.post('/users', controllers.User.addUser);
 router.put('/users/:us3r', controllers.User.editUser);
 //router.delete('/users/:user', controllers.User.deleteUser);
 
+router.get('/courses/:course/instructors', controllers.Instructor.getInstructorListByCourse);
+router.get('/courses/:course/instructors/search', controllers.Instructor.getInstructorListBySearchQuery);
+router.post('/courses/:course/instructors/:us3r', controllers.Instructor.addInstructor);
+router.delete('/courses/:course/instructors/:us3r', controllers.Instructor.deleteInstructor);
+
+router.get('/courses/:course/teaching-assistants', controllers.TeachingAssistant.getTeachingAssistantListByCourse);
+router.get('/courses/:course/teaching-assistants/search', controllers.TeachingAssistant.getTeachingAssistantListBySearchQuery);
+router.post('/courses/:course/teaching-assistants/:us3r', controllers.TeachingAssistant.addTeachingAssistant);
+router.put('/courses/:course/teaching-assistants/:us3r', controllers.TeachingAssistant.editTeachingAssistant);
+router.delete('/courses/:course/teaching-assistants/:us3r', controllers.TeachingAssistant.deleteTeachingAssistant);
+
+router.get('/courses/:course/students', controllers.Student.getStudentListByCourse);
+router.get('/courses/:course/students/search', controllers.Student.getStudentListBySearchQuery);
 router.post('/courses/:course/students/import', csvUpload.single('file'), controllers.User.importStudents);
+router.post('/courses/:course/students/:us3r', controllers.Student.addStudent);
+router.put('/courses/:course/students/:us3r', controllers.Student.editStudent);
+router.delete('/courses/:course/students/:us3r', controllers.Student.deleteStudent);
 
 module.exports = router;

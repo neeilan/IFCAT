@@ -1,6 +1,6 @@
 $(function () {
 
-    var $selectQuestion = $('#select-question'),
+    var $selectQuestion = $('.select-question'),
         $prevQuestion = $('#prev-question'),
         $checkAnswer = $('#check-answer'),
         $nextQuestion = $('#next-question');
@@ -14,8 +14,8 @@ $(function () {
 
     var templates = {
         'multiple choice': _.template($('#multiple-choice-template').text()),
-        'true or false': _.template($('#true-or-false').text()),
-        'multiple select': _.template($('#multiple-select').text())
+        'true or false': _.template($('#true-or-false-template').text()),
+        'multiple select': _.template($('#multiple-select-template').text())
     };
 
     // templates[res.question.type]

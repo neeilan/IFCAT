@@ -1,4 +1,5 @@
-var mongoose = require('mongoose');
+var _ = require('lodash'),
+    mongoose = require('mongoose');
 
 var CourseSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -12,17 +13,51 @@ var CourseSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-
-// populate tutorials
-CourseSchema.methods.withTutorials = function () {
+// populate instructors
+CourseSchema.methods.withInstructors = function () {
     return this.populate({
+        path: 'instructors',
+        options: {
+            sort: { 'name.first': 1, 'name.last': 1 }
+        }
+    });
+};
+// populate teaching assistants
+CourseSchema.methods.withTeachingAssistants = function () {
+    return this.populate({
+        path: 'teachingAssistants',
+        options: {
+            sort: { 'name.first': 1, 'name.last': 1 }
+        }
+    });
+};
+// populate students
+CourseSchema.methods.withStudents = function () {
+    return this.populate({ 
+        path: 'students', 
+        options: { 
+            sort: { 'name.first': 1, 'name.last': 1 }
+        }
+    });
+};
+// populate tutorials
+CourseSchema.methods.withTutorials = function (deep = false) {
+    var obj = {
         path: 'tutorials',
         options: {
             sort: { number: 1 }
         }
-    });
+    };
+    if (deep) {
+        obj.populate = {
+            path: 'teachingAssistants', 
+            options: { 
+                sort: { 'name.first': 1, 'name.last': 1 }
+            }
+        };
+    }
+    return this.populate(obj);
 };
-
 // populate quizzes
 CourseSchema.methods.withQuizzes = function () {
     return this.populate({
@@ -32,7 +67,6 @@ CourseSchema.methods.withQuizzes = function () {
         }
     });
 };
-
 // populate files
 CourseSchema.methods.withFiles = function () {
     return this.populate({ 
@@ -42,10 +76,48 @@ CourseSchema.methods.withFiles = function () {
         }
     });
 };
-
+// add instructor
+CourseSchema.methods.addInstructor = function (user) {
+    if (this.instructors.indexOf(user) === -1) {
+        this.instructors.push(user);
+    }
+};
+// add teaching assistant
+CourseSchema.methods.addTeachingAssistant = function (user) {
+    if (this.teachingAssistants.indexOf(user) === -1) {
+        this.teachingAssistants.push(user);
+    }
+};
+// add student
+CourseSchema.methods.addStudent = function (user) {
+    if (this.students.indexOf(user) === -1) {
+        this.students.push(user);
+    }
+};
+// delete isntructor
+CourseSchema.methods.deleteInstructor = function (user) {
+    var index = this.instructors.indexOf(user);
+    if (index !== -1) {
+        this.instructors.splice(index, 1);
+    }
+};
+// delete teaching assistant
+CourseSchema.methods.deleteTeachingAssistant = function (user) {
+    var index = this.teachingAssistants.indexOf(user);
+    if (index !== -1) {
+        this.teachingAssistants.splice(index, 1);
+    }
+};
+// delete student
+CourseSchema.methods.deleteStudent = function (user) {
+    var index = this.students.indexOf(user);
+    if (index !== -1) {
+        this.students.splice(index, 1);
+    }
+};
 // find courses
 CourseSchema.statics.findCourses = function () {
-    return this.find({}).sort('code').populate([{
+    return this.find().sort('code').populate([{
         path: 'instructors',
         options: {
             sort: { 'name.first': 1, 'name.last': 1 }
@@ -63,38 +135,48 @@ CourseSchema.statics.findCourses = function () {
         }
     }]);
 };
-
-CourseSchema.methods.addStudent = function (user) {
-    if (this.students.indexOf(user) === -1) {
-        this.students.push(user);
-    }
-};
-
 // find courses taught by instructor
-CourseSchema.statics.findCoursesByInstructor = function (userId) {
+CourseSchema.statics.findCoursesByInstructor = function (user) {
     return this.find({
         'instructors': { 
-            $in: [userId] 
+            $in: [user] 
         } 
     }).sort('code');
 };
-
 // find courses taught by teaching assistant
-CourseSchema.statics.findCoursesByTeachingAssistant = function (userId) {
+CourseSchema.statics.findCoursesByTeachingAssistant = function (user) {
     return this.find({
         'teachingAssistants': { 
-            $in: [userId] 
+            $in: [user] 
         } 
     }).sort('code');
 };
-
 // find courses enrolled by student
-CourseSchema.statics.findCoursesByStudent = function (userId) {
+CourseSchema.statics.findCoursesByStudent = function (user) {
     return this.find({ 
         'students': { 
-            $in: [userId] 
+            $in: [user] 
         } 
     }).sort('code');
+};
+// find course by ID enrolled by student
+CourseSchema.statics.findCourseByStudent = function (course, user) {
+    return this.findOne({
+        $and: [{
+            students: { 
+                $in: [user] 
+            }
+        }, {
+            _id: course,
+        }]
+    }).populate({
+        path: 'tutorials',
+        match: {
+            students: { 
+                $in: [user] 
+            }
+        }
+    });
 };
 
 module.exports = mongoose.model('Course', CourseSchema);
