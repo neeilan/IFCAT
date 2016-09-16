@@ -17,7 +17,6 @@ exports.getCourse = function (req, res, next, course) {
         next();
     });
 };
-
 // Retrieve many courses
 exports.getCourseList = function (req, res) {
     if (req.user.hasRole('admin')) {
@@ -40,33 +39,15 @@ exports.getCourseList = function (req, res) {
         });
     }
 };
-
-// Retrieve courses enrolled for student
-exports.getEnrolledCourseList = function (req, res) {
-    models.Course.findCoursesByStudent(req.user.id).exec(function (err, courses) { 
-        res.render('student/courses', { courses: courses });
-    });
-};
-
-//
+// Get form for course
 exports.getCourseForm = function (req, res) {
-    async.series([
-        function (done) {
-            models.User.findInstructors().exec(done);        
-        },
-        function (done) {
-            models.User.findTeachingAssistants().exec(done);        
-        }
-    ], function (err, results) {
-        res.render('admin/course', { 
-            course: req.course || new models.Course(), 
-            instructors: results[0],
-            teachingAssistants: results[1] 
-        });
+    res.render('admin/course', { 
+        course: req.course || new models.Course(), 
+        instructors: results[0],
+        teachingAssistants: results[1] 
     });
 };
-
-// Add course model
+// Add course
 exports.addCourse = function (req, res) {
     models.Course.create(req.body, function (err, course) {
         /*if (err) {
@@ -75,7 +56,6 @@ exports.addCourse = function (req, res) {
         res.redirect('/admin/courses');
     });
 };
-
 // Update course
 exports.editCourse = function (req, res) {
     _.extend(req.course, req.body).save(function (err) {  
@@ -85,6 +65,5 @@ exports.editCourse = function (req, res) {
         res.redirect('/admin/courses/' + req.course.id + '/edit');
     });
 };
-
 // Delete course
 exports.deleteCourse = function (req, res) {}; 

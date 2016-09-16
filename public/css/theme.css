@@ -24,3 +24,23 @@ body > .navbar {
 .ui-sortable-helper {
     display: table !important;
 }
+
+
+#col-unassigned-students .sortable {
+    background: #f9f9f9;
+    min-height: 300px;
+}
+#col-groups .panel-heading {
+    overflow: hidden;
+}
+#col-groups .panel-heading .panel-title {
+    float: left;
+}
+#col-groups .panel-heading .glyphicon-remove {
+    cursor: pointer;
+    float: right;    
+}
+
+.ui-sortable-handle {
+    margin-bottom: 5px;
+}

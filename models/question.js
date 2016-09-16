@@ -5,8 +5,7 @@ var QuestionSchema = new mongoose.Schema({
     question: { type: String, required: true },
     type: { type: String, enum: ['multiple choice', 'true or false', 'multiple select'/*, 'fill in the blanks'*/] },
     choices: [String],
-    // indices of choices e.g. [1,2] => second and third choices are the answers
-    answers: [Number],
+    answers: [String],
     files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }]
 }, { 
     timestamps: true 
@@ -49,8 +48,8 @@ QuestionSchema.methods.hasFile = function (id) {
 };
 
 // check if question has nth-choice as an answer
-QuestionSchema.methods.hasAnswer = function (n) {
-    return this.answers.indexOf(n) !== -1;
+QuestionSchema.methods.isAnswer = function (choice) {
+    return this.answers.indexOf(choice) !== -1;
 };
 
 // save question
@@ -74,7 +73,7 @@ QuestionSchema.methods.store = function (obj, callback) {
                 if (value) {
                     this.choices.push(value);
                     if (d === selected) {
-                        this.answers = [this.choices.length - 1];
+                        this.answers = [value];
                     }
                 }
             }
@@ -87,7 +86,7 @@ QuestionSchema.methods.store = function (obj, callback) {
                 if (value) {
                     this.choices.push(value);
                     if (selected.indexOf(d) !== -1) {
-                        this.answers.push(this.choices.length - 1);
+                        this.answers.push(value);
                     }
                 }
             }

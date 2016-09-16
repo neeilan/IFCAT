@@ -45,7 +45,7 @@
 
         <!-- for multiple choice -->
 
-        <% if (question.isNew || question.type !== 'multiple choice') { %>
+        <% if (question.isNew || !question.isMultipleChoice()) { %>
             <div class="col-sm-10 multiple-choice" style="display: none;">
                 <% for (var i = 0, len = 3; i < 3; i++) { %>    
                     <div class="form-group">
@@ -75,7 +75,7 @@
                         </div>
                         <div class="col-xs-4 radio">
                             <label><input type="radio" name="answer[multiple-choice]" 
-                                value="<%= i %>"<%= question.hasAnswer(i) ? ' checked' : '' %>></label>
+                                value="<%= i %>"<%= question.isAnswer(choice) ? ' checked' : '' %>></label>
                         </div>
                     </div>
                 <% }) %>
@@ -91,7 +91,7 @@
 
         <!-- for true or false -->
         
-        <% if (question.isNew || question.type !== 'true or false') { %>
+        <% if (question.isNew || !question.isTrueOrFalse()) { %>
             <div class="col-sm-10 true-or-false" style="display: none;">
                 <% ['True', 'False'].forEach(function (choice, i) { %>    
                     <div class="form-group">
@@ -114,7 +114,7 @@
                         </div>
                         <div class="col-xs-4 radio">
                             <label><input type="radio" name="answer[true-or-false]" value="<%= i %>"<%= 
-                                question.hasAnswer(i) ? ' checked' : '' %>></label>
+                                question.isAnswer(choice) ? ' checked' : '' %>></label>
                         </div>
                     </div>
                 <% }) %>
@@ -123,7 +123,7 @@
 
         <!-- for multiple select -->
 
-        <% if (question.isNew || question.type !== 'multiple select') { %>
+        <% if (question.isNew || !question.isMultipleSelect()) { %>
             <div class="col-sm-10 multiple-select" style="display: none;">
                 <% for (var i = 0, len = 3; i < 3; i++) { %>    
                     <div class="form-group">
@@ -152,7 +152,7 @@
                         </div>
                         <div class="col-xs-4 checkbox">
                             <label><input type="checkbox" name="answers[multiple-select][]" value="<%= i %>"<%= 
-                                question.hasAnswer(i) ? ' checked' : '' %>></label>
+                                question.isAnswer(choice) ? ' checked' : '' %>></label>
                         </div>
                     </div>
                 <% }) %>

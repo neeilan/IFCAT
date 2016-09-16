@@ -9,6 +9,7 @@ var models = require('../models');
 exports.getUser = function (req, res, next, us3r) {
     models.User.findById(us3r, function (err, us3r) {
         if (err) {
+            console.log(err);
             return next(err);
         }
         if (!us3r) {

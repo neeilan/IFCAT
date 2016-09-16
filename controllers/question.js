@@ -16,14 +16,12 @@ exports.getQuestion = function (req, res, next, question) {
         next();
     });
 };
-
 // Retrieve list of questions for quiz
 exports.getQuestionList = function (req, res) { 
     req.quiz.withQuestions().execPopulate().then(function (err) {
         res.render('admin/quiz-questions', { course: req.course, quiz: req.quiz });
     });
 };
-
 // Retrieve specific question for quiz
 exports.getQuestionForm = function (req, res) {
     if (!req.question) {
@@ -37,7 +35,6 @@ exports.getQuestionForm = function (req, res) {
         });
     });
 };
-
 // Add new question for quiz
 exports.addQuestion = function (req, res, next) {
     var question = new models.Question();
@@ -52,7 +49,6 @@ exports.addQuestion = function (req, res, next) {
         });
     });
 };
-
 // Update specific question for quiz
 exports.editQuestion = function (req, res, next) { 
     req.question.store(req.body, function (err) {
@@ -64,6 +60,5 @@ exports.editQuestion = function (req, res, next) {
         );
     });      
 };
-
 // Delete specific question for quiz
 exports.deleteQuestion = function (req, res) { };

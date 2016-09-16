@@ -1,12 +1,63 @@
 $(function () {
-
+    // turn off caching
+    $.ajaxSetup({ cache: false });
+    // checked/unchecked all table-body checkboxes when table-header checkbox is checked/unchecked
     $('th > :checkbox').change(function () {
         $(this).closest('table').find('td > :checkbox').prop('checked', this.checked);
     });
-
+    // 
     $('.btn [type=file]').change(function () {
         $(this).parent().next('.label-info').html(this.value);
     });
+
+    // users handlers
+
+    // search users when form is submitted
+    $('#search-user-form').submit(function (e) {
+        e.preventDefault();
+        $('#search-user-results').load(this.action, $(this).serialize());
+    });
+    // update user in tutorials when button is clicked
+    $('.btn-update-user').click(function () {
+        var $tr = $(this).closest('tr');
+        // send request
+        $.ajax($(this).data('url'), {
+            type: 'put',
+            data: $tr.find(':input').serialize(),
+            success: function (res) {
+                if (res.status) {
+                    window.location.reload(true);
+                }
+            },
+            dataType: 'json'
+        });
+    });
+    // delete user from course when button is clicked
+    $('.btn-delete-user').click(function () {
+        var $tr = $(this).closest('tr');
+        // send request
+        $.ajax($(this).data('url'), {
+            type: 'delete',
+            success: function (res) {
+                if (res.status) {
+                    window.location.reload(true);
+                }
+            },
+            dataType: 'json'
+        });
+    });
+    // add user to course when button is clicked
+    $('#search-user-results').on('click', '.btn-add-user', function () { console.log($(this).data('url'));
+        var $tr = $(this).closest('tr');
+        // send request
+        $.post($(this).data('url'), function (res) {
+            if (res.status) {
+                window.location.reload(true);
+            }
+        }, 'json');
+    });
+
+    // question handlers
 
     $('#question-form [name=type]').change(function () {
         var type = _.kebabCase(this.value);
@@ -54,8 +105,9 @@ $(function () {
     // setup group handlers
 
     var options = { 
-        cancel: false, 
-        connectWith: '.sortable' 
+        cancel: false,
+        
+        connectWith: '.sortable'
     };
     
     $('.sortable').sortable(options);
@@ -93,6 +145,12 @@ $(function () {
             });
             
         });
+    });
+
+    $('.btn-remove-group').click(function () {
+        var $panel = $(this).closest('.panel');
+            $panel.find('.sortable > .btn').appendTo($('#col-unassigned-students > .panel'));
+            $panel.remove();
     });
 
     $('#btn-save-groups').click(function () {

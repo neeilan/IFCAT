@@ -1,0 +1,23 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>First</th>
+            <th>Last</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% users.forEach(function (user) { %> 
+        <tr>
+            <td><%= user.name.first %></td>
+            <td><%= user.name.last %></td>
+            <td><%= user.local.email %></td>
+            <td>
+                <button type="button" class="btn btn-default btn-sm btn-add-user"
+                    data-url="/admin/courses/<%= course.id %>/teaching-assistants/<%= user.id %>">Add</button>
+            </td>
+        </tr>
+    <% }) %>
+    </tbody>
+</table>
