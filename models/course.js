@@ -159,24 +159,5 @@ CourseSchema.statics.findCoursesByStudent = function (user) {
         } 
     }).sort('code');
 };
-// find course by ID enrolled by student
-CourseSchema.statics.findCourseByStudent = function (course, user) {
-    return this.findOne({
-        $and: [{
-            students: { 
-                $in: [user] 
-            }
-        }, {
-            _id: course,
-        }]
-    }).populate({
-        path: 'tutorials',
-        match: {
-            students: { 
-                $in: [user] 
-            }
-        }
-    });
-};
 
 module.exports = mongoose.model('Course', CourseSchema);

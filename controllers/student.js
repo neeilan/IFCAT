@@ -76,7 +76,7 @@ exports.deleteStudent = function (req, res) {
             req.course.deleteStudent(req.us3r.id);
             req.course.save(function (err) {
                 res.json({ status: true });
-            })
+            });
         });
     });  
 };
@@ -89,13 +89,24 @@ exports.getCourseList = function (req, res) {
         res.render('student/courses', { courses: courses });
     });
 };
-
 // Retrieve quizzes within course
 exports.getQuizList = function (req, res) {
-    models.TutorialQuiz.findQuizzesByCourseStudent(req.course.id, req.user.id).then(function (err, tutorialQuizzes) {
-        res.render('student/tutorial-quizzes', { 
-            course: req.course,
-            tutorialQuizzes: tutorialQuizzes 
+    req.course.withTutorials().execPopulate().then(function () {
+        // find tutorials that student is in
+        var tutorials = req.course.tutorials.filter(function (tutorial) {
+            return tutorial.students.indexOf(req.user.id);
         });
+        // find tutorial quizzes
+        if (tutorials) {
+            models.TutorialQuiz.find({ tutorial: tutorials[0].id, published: true }).populate('quiz').exec(function (err, tutorialQuizzes) {
+                console.log('tutorial', tutorials[0]);
+                console.log('tutorialQuizzes', tutorialQuizzes);
+                res.render('student/tutorial-quizzes', { 
+                    course: req.course,
+                    tutorial: tutorials[0],
+                    tutorialQuizzes: tutorialQuizzes 
+                });
+            });
+        }
     });
 };

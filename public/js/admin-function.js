@@ -47,7 +47,7 @@ $(function () {
         });
     });
     // add user to course when button is clicked
-    $('#search-user-results').on('click', '.btn-add-user', function () { console.log($(this).data('url'));
+    $('#search-user-results').on('click', '.btn-add-user', function () {
         var $tr = $(this).closest('tr');
         // send request
         $.post($(this).data('url'), function (res) {
