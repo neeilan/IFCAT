@@ -87,6 +87,7 @@ TutorialQuizSchema.statics.findQuizzesByTutorial = function (tutorial) {
 TutorialQuizSchema.statics.findQuizzesByCourseStudent = function (course, user) {
     var model = this;
     models.Course.findCourseByStudent(course.id, user.id).exec(function (err, course) {
+        console.log(course);
         return model.find({ tutorial: course.tutorials[0] }).populate('tutorial quiz');
     });
 };

@@ -1,9 +1,9 @@
 <%- include ./header -%>
 
-<h1><%- course.name + ' - ' + tutorial.getTUT() %></h2>
+<h1><%- course.name + ' - TUT ' + tutorial.number %></h2>
 
 <div class="list-group">
-<% tutorial.quizzes.forEach(function (tutorialQuiz) { %>
+<% tutorialQuizzes.forEach(function (tutorialQuiz) { %>
     <a href="/student/courses/<%= course.id %>/quizzes/<%= tutorialQuiz.id %>/start" class="list-group-item"><%= tutorialQuiz.quiz.name %></a>
 <% }) %>
 </div>
