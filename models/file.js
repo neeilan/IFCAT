@@ -6,11 +6,11 @@ var FileSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-
+// Check if file is an audio
 FileSchema.methods.isAudio = function () {
     return this.type.indexOf('audio') !== -1;
 };
-
+// Check if file is an image
 FileSchema.methods.isImage = function () {
     return this.type.indexOf('image') !== -1;
 };

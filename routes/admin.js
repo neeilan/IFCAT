@@ -50,7 +50,6 @@ router.param('group', controllers.Group.getGroup);
 // check if user is authenticated
 router.use(function (req, res, next) {
     if (req.isAuthenticated()) {
-        console.log('authenticated');
         return next();
     }
     res.redirect('/login');
@@ -60,7 +59,7 @@ router.use(function (req, res, next) {
 // @TODO: find a way to add slugs in between keywords 
 // e.g. Courses / Tutorials ----> Courses / CSCC09H3 / Tutorials
 router.use(function (req, res, next) {
-    if (req.method === 'GET') {
+    if (!req.xhr && req.method === 'GET') {
         var keywords = [
             'users', 'students', 'teaching-assistants', 'instructors',
             'courses', 'tutorials', 'quizzes', 'questions', 'files', 
@@ -85,6 +84,7 @@ router.use(function (req, res, next) {
 // @TODO: handle delete routes e.g. deleting course = deleting every related to the course
 // @TODO: handle unexpected errors
 // @TODO: model validation
+
 router.get('/logout', controllers.User.logout);
 
 router.get('/courses', controllers.Course.getCourseList);
@@ -113,6 +113,7 @@ router.put('/courses/:course/quizzes/:quiz', controllers.Quiz.editQuiz);
 // //router.delete('/courses/:course/quizzes/:quiz', controllers.Quiz.deleteQuiz);
 
 router.get('/courses/:course/quizzes/:quiz/questions', controllers.Question.getQuestionList);
+router.put('/courses/:course/quizzes/:quiz/questions/sort', controllers.Question.sortQuestionList);
 router.get('/courses/:course/quizzes/:quiz/questions/new', controllers.Question.getQuestionForm);
 router.get('/courses/:course/quizzes/:quiz/questions/:question/edit', controllers.Question.getQuestionForm);
 router.post('/courses/:course/quizzes/:quiz/questions', controllers.Question.addQuestion);

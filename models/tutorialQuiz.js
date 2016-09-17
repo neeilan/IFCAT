@@ -29,17 +29,15 @@ var TutorialQuizSchema = new mongoose.Schema({
 }, {
     timestamps: true 
 });
-
+// Set index
 TutorialQuizSchema.index({ tutorial: 1, quiz: 1 }, { unique: true });
-
-// get students not within groups
+// Get students not within groups
 TutorialQuizSchema.virtual('unassignedStudents').get(function () {
     return _.reduce(this.groups, function (students, group) {
         return _.differenceWith(students, group.members, function (a, b) { return a.id === b.id; });
     }, this.tutorial.students);
 });
-
-// populate students
+// Populate students
 TutorialQuizSchema.methods.withStudents = function () {
     return this.populate({
         path: 'tutorial.students',
@@ -49,8 +47,7 @@ TutorialQuizSchema.methods.withStudents = function () {
         }
     });
 };
-
-// populate groups
+// Populate groups
 TutorialQuizSchema.methods.withGroups = function () {
     return this.populate({
         path: 'groups',
@@ -66,8 +63,21 @@ TutorialQuizSchema.methods.withGroups = function () {
         }]
     });
 };
-
-// save tutorial-quiz
+// Populate responses
+TutorialQuizSchema.methods.withResponses = function () {
+    return this.populate({
+        path: 'responses',
+        model: models.Response,
+        populate: [{
+            path: 'group',
+            model: models.Group
+        }, {
+            path: 'question',
+            models: models.Question
+        }]
+    });
+};
+// Save tutorial-quiz
 TutorialQuizSchema.methods.store = function (obj, callback) {
     this.allocateMembers = obj.allocateMembers;
     this.max = {};
@@ -77,8 +87,7 @@ TutorialQuizSchema.methods.store = function (obj, callback) {
     this.active = obj.active;
     return this.save(callback);
 };
-
-// find quizzes within tutorial
+// Find quizzes within tutorial
 TutorialQuizSchema.statics.findQuizzesByTutorial = function (tutorial) {
     return this.find({ tutorial: tutorial }).populate('tutorial quiz');
 };

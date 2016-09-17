@@ -1,23 +1,25 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>First</th>
-            <th>Last</th>
+            <th>Name</th>
             <th>Email</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-    <% users.forEach(function (user) { %> 
-        <tr>
-            <td><%= user.name.first %></td>
-            <td><%= user.name.last %></td>
-            <td><%= user.local.email %></td>
-            <td>
-                <button type="button" class="btn btn-default btn-sm btn-add-user"
-                    data-url="/admin/courses/<%= course.id %>/instructors/<%= user.id %>">Add</button>
-            </td>
-        </tr>
-    <% }) %>
+    <% if (users && users.length) { %>
+        <% for (var i = 0, len = users.length; i < len; i++) { %>
+            <tr>
+                <td><%= users[i].name.full %></td>
+                <td><%= users[i].local.email %></td>
+                <td>
+                    <button type="button" class="btn btn-default btn-sm btn-add-user"
+                        data-url="/admin/courses/<%= course.id %>/instructors/<%= users[i].id %>">Add</button>
+                </td>
+            </tr>
+        <% } %>
+    <% } else { %>
+        <tr><td colspan="3">No results were found matching query.</td></tr>
+    <% } %>
     </tbody>
 </table>

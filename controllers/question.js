@@ -1,10 +1,11 @@
-var _ = require('lodash');
+var _ = require('lodash'),
+    mongoose = require('mongoose');
 
 var models = require('../models');
 
 // Retrieve course
 exports.getQuestion = function (req, res, next, question) {
-    models.Question.findById(question).exec(function (err, question) {
+    models.Question.findById(question, function (err, question) {
         if (err) {
             return next(err);
         }
@@ -20,6 +21,20 @@ exports.getQuestion = function (req, res, next, question) {
 exports.getQuestionList = function (req, res) { 
     req.quiz.withQuestions().execPopulate().then(function (err) {
         res.render('admin/quiz-questions', { course: req.course, quiz: req.quiz });
+    });
+};
+// Sort list of questions
+exports.sortQuestionList = function (req, res) {
+    // ensure that same IDs are given
+    if (_.isArray(req.body.questions) && 
+        _.isEqual(req.quiz.questions.slice().sort().toString(), req.body.questions.slice().sort().toString())) {
+        // set new order of questions
+        req.quiz.questions = req.body.questions.map(function (str) { 
+            return new mongoose.Types.ObjectId(str); 
+        });
+    }
+    req.quiz.save(function (err) {
+        res.json({ status: true });       
     });
 };
 // Retrieve specific question for quiz

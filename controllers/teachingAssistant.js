@@ -50,7 +50,7 @@ exports.deleteTeachingAssistant = function (req, res) {
             req.course.deleteTeachingAssistant(req.us3r.id);
             req.course.save(function (err) {
                 res.json({ status: true });
-            })
+            });
         });
     });  
 };

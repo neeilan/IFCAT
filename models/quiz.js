@@ -6,9 +6,11 @@ var models = require('.');
 
 var QuizSchema = new mongoose.Schema({
     name: String,
+    // questions are sorted in the order that they are placed 
+    // i.e. [0] => 1st question, [1] => 2nd question, etc
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref : 'Question' }],
     // number of points given per attempt
-    // e.g. [4,2,1]  => 3 attempts possible: 
+    // e.g. [4,2,1] => 3 attempts possible: 
     // 4 points if answered correctly on 1st attempt, 2 points if answered on 2nd attempt, 
     // 1 point if answered correctly on 3rd attempt, no point otherwise 
     gradingScheme: [Number],
@@ -20,15 +22,9 @@ var QuizSchema = new mongoose.Schema({
 
 // populate questions
 QuizSchema.methods.withQuestions = function () {
-    return this.populate({
-        path: 'questions', 
-        options: { 
-            sort: { name: 1 } 
-        }
-    });
+    return this.populate('questions');
 };
-
-// load quiz' tutorials
+// Load quiz' tutorials
 QuizSchema.methods.loadTutorials = function () {
     var quiz = this;
     return models.TutorialQuiz.find({ quiz: quiz }, 'tutorial').populate('tutorial').exec(function (err, tutorialQuizzes) {
@@ -37,8 +33,7 @@ QuizSchema.methods.loadTutorials = function () {
         });
     });
 };
-
-// save quiz
+// Save quiz
 QuizSchema.methods.store = function (obj, callback) {
     var quiz = this;
         quiz.name = obj.name;

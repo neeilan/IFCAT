@@ -21,7 +21,7 @@ exports.getCourse = function (req, res, next, course) {
 exports.getCourseList = function (req, res) {
     if (req.user.hasRole('admin')) {
         models.Course.findCourses().exec(function (err, courses) { 
-            res.render('admin/courses', { courses: courses });
+            res.render('admin/courses', { title: 'Courses', courses: courses });
         });
     } else {
         async.series([
@@ -41,11 +41,8 @@ exports.getCourseList = function (req, res) {
 };
 // Get form for course
 exports.getCourseForm = function (req, res) {
-    res.render('admin/course', { 
-        course: req.course || new models.Course(), 
-        instructors: results[0],
-        teachingAssistants: results[1] 
-    });
+    var course = req.course || new models.Course();
+    res.render('admin/course', { title: course.isNew ? 'Add course' : 'Edit course', course: course });
 };
 // Add course
 exports.addCourse = function (req, res) {
