@@ -38,7 +38,7 @@ app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist'));
 app.use('/lodash', express.static(__dirname + '/node_modules/lodash'));
 app.use('/socketioclient', express.static(__dirname + '/node_modules/socket.io-client'));
-app.use('/', express.static(__dirname + '/public'));
+app.use(express.static('public'));
 
 app.use(morgan('dev'));
 
@@ -118,13 +118,18 @@ io.on('connection', function(socket){
             model : 'Quiz',
             populate : {
                 path : 'questions',
-                model : 'Question'
+                model : 'Question',
+                populate : {
+                    path : 'files',
+                    model : 'File'
+                }
             }
         },
         {
             path : 'groups',
             model : 'Group'
-        }])
+        }
+        ])
         .exec()
         .then(function(tutQuiz){
             

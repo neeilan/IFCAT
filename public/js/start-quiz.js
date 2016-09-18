@@ -73,16 +73,23 @@ function renderQuestion(quiz, n){
   $('#submitQuestion').off('click');
     
   currentQuestionId = quiz.questions[n]._id;
-  var attemptNumber = 0;
-  
-  // update score
   
   // reset attempt number
-  $('#currentAttempts').html(attemptNumber);
+  $('#currentAttempts').html('0');
   
   // renders nth question (0 indexed) in quiz
   $("#text").html(quiz.questions[n].question);
   $("#choices").html("");
+  
+  if (quiz.questions[n].files){
+    var file = quiz.questions[n].files[0];
+    if (file && file.type.includes('image')){
+      var courseId = url.slice(url.indexOf('/courses/') + 9, url.indexOf('/quizzes'));
+      var fileUrl = '/upl/' + courseId + '/' + file.name;
+      $('#text').append('<br/><img class="attachedImg" src="' + fileUrl + '"/> <br/>')
+
+    }
+  }
   
   // shuffle choices if need be
   // var choices = quiz.randomizeChoices ? _.shuffle(quiz.questions[n].choices) : quiz.questions[n].choices
@@ -95,7 +102,7 @@ function renderQuestion(quiz, n){
   
   $(".choice").click(function(e){
     $('.currentlyChosen').removeClass('currentlyChosen');
-    $(e.target).addClass('currentlyChosen')
+    $(e.target).addClass('currentlyChosen');
    })
   
     $("#submitQuestion").click(function(e){

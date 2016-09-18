@@ -1,4 +1,8 @@
-
+.attachedImg{
+  width: 90%;
+  max-width: 500px;
+  margin: auto;
+}
 
 .choice {
   border: solid 2px grey;
