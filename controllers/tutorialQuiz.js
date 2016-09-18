@@ -16,7 +16,6 @@ exports.getQuiz = function (req, res, next, tutorialQuiz) {
         next();
     });
 };
-
 // Retrieve quizzes within tutorial
 exports.getQuizListForAdmin = function (req, res) {
     models.TutorialQuiz.findQuizzesByTutorial(req.tutorial).then(function (tutorialQuizzes) {
@@ -27,11 +26,8 @@ exports.getQuizListForAdmin = function (req, res) {
         });
     });
 };
-
 // Retrieve quizzes within course
 exports.getQuizListForStudent = function (req, res) { 
-
-
     models.Course.populate(req.course, {
         // find the tutorial that student is in
         path: 'tutorials',
@@ -61,12 +57,10 @@ exports.getQuizListForStudent = function (req, res) {
         }
     });
 };
-
 // Retrieve quiz form
 exports.getQuizForm = function (req, res) {
     res.render('admin/tutorial-quiz', { course: req.course, tutorialQuiz: req.tutorialQuiz });
 };
-
 // Edit quiz for tutorial
 exports.editQuiz = function (req, res) {
     req.tutorialQuiz.store(req.body, function (err) {
@@ -75,6 +69,30 @@ exports.editQuiz = function (req, res) {
             '/tutorial-quizzes/' + req.tutorialQuiz.id +
             '/edit'
         );
+    });
+};
+// Publish quiz for tutorial
+exports.publishQuiz = function (req, res) {
+    req.tutorialQuiz.published = req.body.published;
+    req.tutorialQuiz.save(function (err) {
+        // @TODO: emit event
+        res.json({ status: true });
+    });
+};
+// Unlock quiz for tutorial
+exports.unlockQuiz = function (req, res) {
+    req.tutorialQuiz.unlocked = req.body.unlocked;
+    req.tutorialQuiz.save(function (err) {
+        // @TODO: emit event
+        res.json({ status: true });
+    });
+};
+// Activate quiz for tutorial
+exports.activateQuiz = function (req, res) {
+    req.tutorialQuiz.active = req.body.active;
+    req.tutorialQuiz.save(function (err) {
+        // @TODO: emit event
+        res.json({ status: true });
     });
 };
 

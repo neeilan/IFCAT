@@ -132,7 +132,37 @@ $(function () {
     
     $('#col-unassigned-students .sortable, #col-groups .sortable').sortable(options);
 
-    $('#btn-add-group').click(function () {
+    $('#form-tutorial-quiz-group [name=published]').on('change', function (e) {
+        $.ajax($('#publish-tutorial-quiz-url').val(), {
+            type: 'put',
+            data: { published: this.value }, 
+            success: function (res) {
+                console.log(res.status);
+            }
+        });
+    });
+
+    $('#form-tutorial-quiz-group [name=unlocked]').on('change', function (e) {
+        $.ajax($('#unlock-tutorial-quiz-url').val(), {
+            type: 'put',
+            data: { unlocked: this.value }, 
+            success: function (res) {
+                console.log(res.status);
+            }
+        });
+    });
+
+    $('#form-tutorial-quiz-group [name=active]').on('change', function (e) {
+        $.ajax($('#activate-tutorial-quiz-url').val(), {
+            type: 'put',
+            data: { active: this.value }, 
+            success: function (res) {
+                console.log(res.status);
+            }
+        });
+    });
+
+    /*$('#btn-add-group').click(function () {
         var $tpl = $(_.template($('#panel-group-template').text())({ id: parseInt(_.uniqueId(), 10) + 999 }));
             $tpl.find('.sortable').sortable(options);
             $tpl.prependTo($('#panel-groups'));
@@ -165,7 +195,7 @@ $(function () {
             });
             
         });
-    });
+    });*/
 
     $('.btn-remove-group').click(function () {
         var $panel = $(this).closest('.panel');

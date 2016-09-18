@@ -123,6 +123,9 @@ router.put('/courses/:course/quizzes/:quiz/questions/:question', controllers.Que
 router.get('/courses/:course/tutorials/:tutorial/quizzes', controllers.TutorialQuiz.getQuizListForAdmin);
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/edit', controllers.TutorialQuiz.getQuizForm);
 router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz', controllers.TutorialQuiz.editQuiz);
+router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/publish', controllers.TutorialQuiz.publishQuiz);
+router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/unlock', controllers.TutorialQuiz.unlockQuiz);
+router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/activate', controllers.TutorialQuiz.activateQuiz);
 
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups', controllers.Group.getGroupList);
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroups);

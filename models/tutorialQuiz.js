@@ -82,9 +82,9 @@ TutorialQuizSchema.methods.store = function (obj, callback) {
     this.allocateMembers = obj.allocateMembers;
     this.max = {};
     this.max[obj.max.key] = obj.max.value;
-    this.published = obj.published;
+    /*this.published = obj.published;
     this.unlocked = obj.unlocked;
-    this.active = obj.active;
+    this.active = obj.active;*/
     return this.save(callback);
 };
 // Find quizzes within tutorial
