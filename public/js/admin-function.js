@@ -120,7 +120,8 @@ $(function () {
 
     // setup group handlers
 
-    var options = { 
+    var options = {
+        axis: 'y', 
         cancel: false,
         connectWith: '.sortable'
     };

@@ -4,14 +4,14 @@
 
 <h4 class="todo">@TODO: ability to delete users</h4>
 
-<a class="btn btn-default btn-sm" href="/admin/users/new">Add new user</a>
+<a href="/admin/users/new" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add new user</a>
 
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
+            <th>Name</th>
             <th>Email</th>
+            <th>UTORid</th>
             <th class="text-center">Admin</th>
             <th class="text-center">Instructor</th>
             <th class="text-center">Teaching Assistant</th>
@@ -20,32 +20,36 @@
         </tr>
     </thead>
     <tbody>
-    <% users.forEach(function (user) { %>
-        <tr>
-            <td><%= user.name.first %></td>
-            <td><%= user.name.last %></td>
-            <td><%= user.local.email %></td>
-            <% ['admin', 'instructor', 'teachingAssistant', 'student'].forEach(function (role) { %>
-                <td class="text-center">
-                <% if (user.hasRole(role)) { %>
-                    <span class="glyphicon glyphicon-ok"></span>
-                <% } %>
+    <% if (users && users.length) { %>
+        <% for (var i = 0, len = users.length; i < len; i++) { %>
+            <tr>
+                <td><%= users[i].name.full %></td>
+                <td><%= users[i].local.email %></td>
+                <td><%= users[i].UTORid %></td>
+                <% ['admin', 'instructor', 'teachingAssistant', 'student'].forEach(function (role) { %>
+                    <td class="text-center">
+                    <% if (users[i].hasRole(role)) { %>
+                        <span class="glyphicon glyphicon-ok"></span>
+                    <% } %>
+                    </td>
+                <% }) %>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                            Actions<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="/admin/users/<%= users[i].id %>/edit">Edit user</a></li>
+                            <li class="divider">
+                            <li><a href="#"><span class="glyphicon glyphicon-remove"></span> Delete user</a></li>
+                        </ul>
+                    </div>
                 </td>
-            <% }) %>
-            <td>
-                <div class="dropdown">
-                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                        Actions<span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="/admin/users/<%= user.id %>/edit">Edit user</a></li>
-                        <li class="divider">
-                        <li><a href="#">Delete user</a></li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
-    <% }) %>
+            </tr>
+        <% } %>
+    <% } else { %>
+        <tr><td colspan="8">No users have been added yet.</td></tr>
+    <% } %>
     </tbody>
 </table>
 

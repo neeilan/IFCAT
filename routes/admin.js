@@ -157,7 +157,7 @@ router.delete('/courses/:course/teaching-assistants/:us3r', controllers.Teaching
 
 router.get('/courses/:course/students', controllers.Student.getStudentListByCourse);
 router.get('/courses/:course/students/search', controllers.Student.getStudentListBySearchQuery);
-router.post('/courses/:course/students/import', csvUpload.single('file'), controllers.User.importStudents);
+router.post('/courses/:course/students/import', csvUpload.single('file'), controllers.Student.importStudents);
 router.post('/courses/:course/students/:us3r', controllers.Student.addStudent);
 router.put('/courses/:course/students/:us3r', controllers.Student.editStudent);
 router.delete('/courses/:course/students/:us3r', controllers.Student.deleteStudent);

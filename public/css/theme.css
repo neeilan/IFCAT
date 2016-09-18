@@ -23,6 +23,7 @@ body > .navbar {
     float: right;    
 }
 .ui-sortable-helper {
+    cursor: pointer;
     display: table !important;
 }
 .ui-sortable-handle {

@@ -4,14 +4,16 @@
 <h4 class="todo">@TODO: maybe render latex</h4>
 
 <a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/sort" 
-    class="btn btn-default btn-sm" id="btn-sort-questions">Sort Questions</a>
+    class="btn btn-default btn-sm" id="btn-sort-questions"><span 
+    class="glyphicon glyphicon-ok"></span> Sort Questions</a>
 
 <a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/new"
-    class="btn btn-default btn-sm">Add New Question</a>
+    class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add New Question</a>
 
 <table class="table table-striped" id="table-questions">
     <thead>
         <tr>
+            <th></th>
             <th style="width: 10px;">No.</th>
             <th style="max-width: 250px;">Question</th>
             <th></th>
@@ -20,6 +22,7 @@
     <tbody class="sortable">
     <% for (var i = 0, len = quiz.questions.length; i < len; i++) { %>
         <tr data-id="<%= quiz.questions[i].id %>">
+            <td style="width: 10px;"><span class="glyphicon glyphicon-option-vertical"></span></td>
             <td style="width: 10px;"><%= quiz.questions[i].number %>.</td>
             <td style="max-width: 250px;"><%= quiz.questions[i].question %></td>
             <td>
@@ -29,9 +32,9 @@
                     </button>
                     <ul class="dropdown-menu">
                         <!--li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= quiz.questions[i].id %>/view">View Question</a></li-->
-                        <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= quiz.questions[i].id %>/edit">Edit Question</a></li>
+                        <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= quiz.questions[i].id %>/edit"><span class="glyphicon glyphicon-pencil"></span> Edit Question</a></li>
                         <li class="divider"></li>
-                        <li><a href="#">Delete Question</a></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-remove"></span> Delete Question</a></li>
                     </ul>
                 </div>
             </td>
