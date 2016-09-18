@@ -83,7 +83,6 @@ TutorialQuizSchema.statics.findQuizzesByTutorial = function (tutorial) {
     return this.find({ tutorial: tutorial }).populate('tutorial quiz');
 };
 
-<<<<<<< HEAD
 // find quizzes within tutorial
 TutorialQuizSchema.statics.findQuizzesByCourseStudent = function (course, user) {
     var model = this;
@@ -93,6 +92,4 @@ TutorialQuizSchema.statics.findQuizzesByCourseStudent = function (course, user) 
     });
 };
 
-=======
->>>>>>> e472d1e0b05f4063581434d483002f70c6cd70a8
 module.exports = mongoose.model('TutorialQuiz', TutorialQuizSchema);

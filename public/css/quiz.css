@@ -1,3 +1,5 @@
+
+
 .choice {
   border: solid 2px grey;
   padding: 5px;
@@ -5,16 +7,34 @@
   text-align: center;
   color: grey;
   background: white;
+  padding: 15px;
+
 }
 
 .currentlyChosen {
-  background: blue;
-  border-color: blue;
+  background: #FF9933;
+  border-color: #FF9933;
   color: white;
 }
 
 .previouslyChosen {
-  color: blue;
-  border-color: blue;
+  color: #FF9933;
+  border-color: #FF9933;
   
+}
+
+#activeQuiz{
+  text-align: center;
+}
+
+#submitQuestion {
+  margin: auto;
+  margin-bottom: 15px;
+  width: 100%;
+  padding: 15px;
+}
+
+#submitQuestion:disabled {
+  background: grey;
+  border-color: grey;
 }
