@@ -32,7 +32,7 @@ function (req, email, password, done) {
             user = new User();
             user.local.email = email;
             user.local.password = user.generateHash(password);
-            user.roles = ['student'];
+            user.roles = ['admin'];
             user.save(function (err) {
                 if (err) {
                     throw err;
