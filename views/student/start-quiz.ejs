@@ -17,23 +17,23 @@
     <div id = "driverSelect" style="display : none">
       This quiz requires a member of your group to serve as the driver, who will submit answers.
       <br/>
-      <button class = "btn btn-primary" id = "selectDriverBtn" > I will be driver </button>
-      <button class = "btn btn-danger" id = "deferDriverBtn" > I not be the driver </button>
+      <button class = "btn btn-primary col-md-4 col-sm-10 col-xs-10 col-md-offset-4 col-sm-offset-1 col-xs-offset-1" id = "selectDriverBtn" > I will be driver </button>
+      <br/>
+      <button class = "btn btn-danger col-md-4 col-sm-10 col-xs-10 col-md-offset-4 col-sm-offset-1 col-xs-offset-1" id = "deferDriverBtn" > I not be the driver </button>
     </div>
     
   </div>
   
-  <!--<span>Score: <span id="score">0</span></span>-->
   <br/>
-  <span style = "display: none" >Attempts: <span id="currentAttempts">0</span></span>
   
   <div class= "row" id = "activeQuiz" style="display: none">
-      
       <div class = "col-md-2 col-sm-12 col-xs-12">
         <div id = "questionSelect"></div>
       </div>
 
-      <div class = "col-md-9 col-md-offset-1 col-sm-12 col-xs-12">  
+      <div class = "col-md-9 col-md-offset-1 col-sm-12 col-xs-12"> 
+        <span><span id="currentAttempts"></span></span>
+        <br/>
         <h3><div id = "text"></div></h3>
         <hr/>
         <div id = "attachment"></div>
@@ -49,3 +49,4 @@
 <script src="/socketioclient/socket.io.js"></script>
 <%- include ./footer -%>
 <script src="/js/start-quiz.js"></script>
+

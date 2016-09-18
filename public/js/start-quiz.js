@@ -27,6 +27,15 @@ $(document).on('click', '#deferDriverBtn', function(){
   }
 })
 
+function renderStars(empty, full){
+    var fullStars = "<i class = 'fa fa-star' />".repeat( full ),
+      emptyStars = "<i class = 'fa fa-star-o' />".repeat(  empty );
+    var html = emptyStars + fullStars;
+    $('#currentAttempts').html(html).show();
+}
+
+
+
 // socket.on('quizUnlocked', function(tutQuiz){ // unlocked = can select groups
 //   if (tutQuiz.unlocked){
 //     $('#driverSelect').show();
@@ -75,12 +84,15 @@ socket.on('assignedAsDriver', function(){
 })
 
 socket.on('renderQuestion', function(data){
+  console.log(quizData)
   renderQuestion(quizData.quiz, data.questionNumber);
   
 })
 
 socket.on('updateAttempts', function(data){
-    $('#currentAttempts').html(data.attempts);
+  if (quizData.quiz.questions.length - data.attempts >= 0)
+    renderStars(data.attempts, quizData.quiz.questions.length - data.attempts)
+
 })
 
 function emit(eventName, data) {
@@ -103,6 +115,7 @@ function renderQuestion(quiz, n){
   $('#driverSelect').hide();
   $('#assignGroup').hide();
   $('#activeQuiz').show();
+  $('#currentAttempts').hide();
   
   if (n >= quiz.questions.length){
     quizCompleted();
@@ -114,8 +127,6 @@ function renderQuestion(quiz, n){
     
   currentQuestionId = quiz.questions[n]._id;
   
-  // reset attempt number
-  $('#currentAttempts').html('0');
   
   // renders nth question (0 indexed) in quiz
   $("#text").html(quiz.questions[n].question);
@@ -165,7 +176,7 @@ function renderQuestion(quiz, n){
       emit('attemptAnswer', {
         questionId : currentQuestionId,
         correct: isCorrect,
-        next: n+1
+        next: parseInt(n) + 1
       })      
       
     })
