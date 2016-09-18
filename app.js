@@ -217,9 +217,6 @@ io.on('connection', function(socket){
     
     socket.on('attemptAnswer', function(data){
         
-        console.log('attemptingAnswer');
-        console.log( data )
-        
         models.Response.findOne({ group : data.groupId, question: data.questionId })
         .exec()
         .then(function(response){
