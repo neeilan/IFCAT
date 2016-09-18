@@ -61,4 +61,8 @@ exports.editUser = function (req, res) {
     });
 };
 // Delete specific user
-exports.deleteUser = function (req, res) {};
+exports.deleteUser = function (req, res) {
+    req.us3r.remove(function (err) {
+        res.json({ status: true });
+    });
+};

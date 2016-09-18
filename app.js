@@ -36,6 +36,7 @@ app.set('views', __dirname + '/views');
 
 app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist'));
+app.use('/bootbox', express.static(__dirname + '/node_modules/bootbox'));
 app.use('/lodash', express.static(__dirname + '/node_modules/lodash'));
 app.use('/socketioclient', express.static(__dirname + '/node_modules/socket.io-client'));
 app.use(express.static('public'));
@@ -68,8 +69,6 @@ app.use(function (req, res, next) {
     res.locals.user = req.user;
     next();
 });
-
-
 
 app.use('/', routes.guest);
 app.use('/student', routes.student);

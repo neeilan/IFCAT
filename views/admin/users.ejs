@@ -14,13 +14,13 @@
             <th>UTORid</th>
             <th class="text-center">Admin</th>
             <th class="text-center">Instructor</th>
-            <th class="text-center">Teaching Assistant</th>
+            <th class="text-center">TA</th>
             <th class="text-center">Student</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-    <% if (users && users.length) { %>
+    <% if (!_.isEmpty(users)) { %>
         <% for (var i = 0, len = users.length; i < len; i++) { %>
             <tr>
                 <td><%= users[i].name.full %></td>
@@ -41,7 +41,7 @@
                         <ul class="dropdown-menu">
                             <li><a href="/admin/users/<%= users[i].id %>/edit">Edit user</a></li>
                             <li class="divider">
-                            <li><a href="#"><span class="glyphicon glyphicon-remove"></span> Delete user</a></li>
+                            <li><a href="/admin/users/<%= users[i].id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete user</a></li>
                         </ul>
                     </div>
                 </td>
@@ -52,5 +52,10 @@
     <% } %>
     </tbody>
 </table>
+
+<script type="text/template" id="btn-delete-message-template">
+    <p>You are about to delete user and all of its associated information.</p>
+    <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>
+</script>
 
 <%- include ./footer -%>

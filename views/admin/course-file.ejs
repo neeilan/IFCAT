@@ -1,6 +1,7 @@
 <%- include ./header -%>
 
-<h1><%= fil3.isNew ? 'Add new file' : 'Edit file' %></h1>
+<h1><%= course.code + ' - ' + course.name %><br>
+<small><%= fil3.isNew ? 'Add new file' : 'Edit file' %></small></h1>
 
 <form action="/admin/courses/<%= course.id %>/files/<%= fil3.isNew ? '' : fil3.id + '?_method=put' %>" 
     method="post" enctype="multipart/form-data" class="form-horizontal">

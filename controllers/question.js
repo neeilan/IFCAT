@@ -76,4 +76,8 @@ exports.editQuestion = function (req, res, next) {
     });      
 };
 // Delete specific question for quiz
-exports.deleteQuestion = function (req, res) { };
+exports.deleteQuestion = function (req, res) {
+    req.question.remove(function (err) {
+        res.json({ status: true });
+    })
+};

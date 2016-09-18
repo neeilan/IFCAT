@@ -63,4 +63,8 @@ exports.editCourse = function (req, res) {
     });
 };
 // Delete course
-exports.deleteCourse = function (req, res) {}; 
+exports.deleteCourse = function (req, res) {
+    req.course.remove(function (err) {
+        res.json({ status: true });
+    });
+}; 

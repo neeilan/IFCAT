@@ -1,11 +1,13 @@
 <%- include ./header -%>
 
-<h1>Media</h1>
-
-<h4 class="todo">@TODO: ability to delete files</h4>
+<h1><%= course.code + ' - ' + course.name %><br><small>Files</small></h1>
 
 <a href="/admin/courses/<%= course.id %>/files/new" class="btn btn-default btn-sm"><span 
     class="glyphicon glyphicon-plus"></span> Add New File</a>
+
+<a href="#" class="btn btn-default" id="btn-delete-files"><span class="glyphicon glyphicon-remove"></span> Delete Files</a>
+
+<br><br>
 
 <table class="table table-striped">
     <tdead>
@@ -18,27 +20,28 @@
         </tr>
     </tdead>
     <tbody>
-    <% course.files.forEach(function (file) { %>
-        <tr>
-            <td><input type="checkbox" name="files[]" value="<%= file.id %>"></td>
-            <td><%= file.name %></td>
-            <td><%= file.type %></td>
-            <td><%= moment(file.updatedAt).format(dateFormat) %></td>
-            <td>
-                <div class="dropdown">
-                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                        Actions<span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="/admin/courses/<%= course.id %>/files/<%= file.id %>/edit">Edit File</a></li>
-                        <li class="divider">
-                        <li><a href="#"><span class="glyphicon glyphicon-remove"></span> Delete File</a></li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
-    <% }) %>
+    <% if (!_.isEmpty(course.files)) { %>
+        <% for (var i = 0, len = course.files.length; i < len; i++) { %>
+            <tr>
+                <td><input type="checkbox" name="files[]" value="<%= course.files[i].id %>"></td>
+                <td><%= course.files[i].name %></td>
+                <td><%= course.files[i].type %></td>
+                <td><%= moment(course.files[i].updatedAt).format(dateFormat) %></td>
+                <td>
+                    <a href="/admin/courses/<%= course.id %>/files/<%= course.files[i].id %>/edit" class="btn btn-default">
+                        <span class="glyphicon glyphicon-pencil"></span> Edit File</a></li>
+                </td>
+            </tr>
+        <% } %>
+    <% } else { %>
+        <tr><td colspan="5">No files have been added yet.</td></tr>
+    <% } %>
     </tbody>
 </table>
+
+<script type="text/template" id="btn-delete-message-template">
+    <p>You are about to delete files and all of their associations.</p>
+    <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>  
+</script>
 
 <%- include ./footer -%>

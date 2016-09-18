@@ -1,14 +1,18 @@
 $(function () {
+
     // turn off caching
     $.ajaxSetup({ cache: false });
+
     // checked/unchecked all table-body checkboxes when table-header checkbox is checked/unchecked
     $('th > :checkbox').change(function () {
         $(this).closest('table').find('td > :checkbox').prop('checked', this.checked);
     });
+
     // 
     $('.btn [type=file]').change(function () {
         $(this).parent().next('.label-info').html(this.value);
     });
+
 
     // users handlers
 
@@ -221,4 +225,43 @@ $(function () {
             window.location.reload(true);
         });
     });
+
+    //
+
+    $('.btn-delete').click(function (e) {
+        e.preventDefault();
+        var url = this.href;
+        // open confirmation dialog before performing deletion
+        bootbox.dialog({
+            title: 'Confirm deletion',
+            message: $('#btn-delete-message-template').text(),
+            buttons: {
+                cancel: {
+                    label: 'Cancel'
+                },
+                danger: {
+                    label: 'Delete',
+                    className: 'btn-danger',
+                    callback: function (res) {
+                        if (res) {
+                            // perform deletion
+                            $.ajax(url, {
+                                type: 'delete',
+                                success: function (res) {
+                                    if (res.status) {
+                                        window.location.reload(true);
+                                    }     
+                                }
+                            });
+                        }
+                    }
+                }
+            },
+            onEscape: true,
+            size: 'small'
+        });
+    });
+
+
+
 });

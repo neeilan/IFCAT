@@ -47,4 +47,8 @@ exports.editTutorial = function (req, res) {
     });
 };
 // Delete specific tutorial for course
-exports.deleteTutorial = function (req, res) {};
+exports.deleteTutorial = function (req, res) {
+    req.tutorial.remove(function (err) {
+        res.json({ status: true });
+    });
+};

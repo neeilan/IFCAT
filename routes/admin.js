@@ -92,25 +92,23 @@ router.get('/courses/new', controllers.Course.getCourseForm);
 router.get('/courses/:course/edit', controllers.Course.getCourseForm);
 router.post('/courses', controllers.Course.addCourse);
 router.put('/courses/:course', controllers.Course.editCourse);
-//router.delete('/courses/:course', controllers.Course.deleteCourse);
+router.delete('/courses/:course', controllers.Course.deleteCourse);
 
 router.get('/courses/:course/tutorials', controllers.Tutorial.getTutorialList);
 router.get('/courses/:course/tutorials/new', controllers.Tutorial.getTutorialForm);
 router.get('/courses/:course/tutorials/:tutorial/edit', controllers.Tutorial.getTutorialForm);
 router.post('/courses/:course/tutorials', controllers.Tutorial.addTutorial);
 router.put('/courses/:course/tutorials/:tutorial', controllers.Tutorial.editTutorial);
-// router.delete('/courses/:course/tutorials/:tutorial', controllers.Tutorial.deleteTutorial);
+router.delete('/courses/:course/tutorials/:tutorial', controllers.Tutorial.deleteTutorial);
 
 router.get('/courses/:course/tutorials/:tutorial/students', controllers.Student.getStudentsByTutorial);
-// router.post('/courses/:course/tutorials/:tutorial/students/:student', controllers.User.addStudentInTutorial);
-// router.delete('/courses/:course/tutorials/:tutorial/students/:student', controllers.User.deleteStudentInTutorial);
 
 router.get('/courses/:course/quizzes', controllers.Quiz.getQuizList);
 router.get('/courses/:course/quizzes/new', controllers.Quiz.getQuizForm);
 router.get('/courses/:course/quizzes/:quiz/edit', controllers.Quiz.getQuizForm);
 router.post('/courses/:course/quizzes', controllers.Quiz.addQuiz);
 router.put('/courses/:course/quizzes/:quiz', controllers.Quiz.editQuiz);
-// //router.delete('/courses/:course/quizzes/:quiz', controllers.Quiz.deleteQuiz);
+router.delete('/courses/:course/quizzes/:quiz', controllers.Quiz.deleteQuiz);
 
 router.get('/courses/:course/quizzes/:quiz/questions', controllers.Question.getQuestionList);
 router.put('/courses/:course/quizzes/:quiz/questions/sort', controllers.Question.sortQuestionList);
@@ -118,7 +116,7 @@ router.get('/courses/:course/quizzes/:quiz/questions/new', controllers.Question.
 router.get('/courses/:course/quizzes/:quiz/questions/:question/edit', controllers.Question.getQuestionForm);
 router.post('/courses/:course/quizzes/:quiz/questions', controllers.Question.addQuestion);
 router.put('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.editQuestion);
-//router.delete('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.deleteQuestion);
+router.delete('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.deleteQuestion);
 
 router.get('/courses/:course/tutorials/:tutorial/quizzes', controllers.TutorialQuiz.getQuizListForAdmin);
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/edit', controllers.TutorialQuiz.getQuizForm);
@@ -140,14 +138,14 @@ router.get('/courses/:course/files/new', controllers.File.getFileForm);
 router.get('/courses/:course/files/:fil3/edit', controllers.File.getFileForm);
 router.post('/courses/:course/files', anyUpload.single('file'), controllers.File.addFile);
 router.put('/courses/:course/files/:fil3', anyUpload.single('file'), controllers.File.editFile);
-//router.delete('/courses/:course/files/:fil3', controllers.File.deleteFile);
+router.delete('/courses/:course/files/:fil3', controllers.File.deleteFile);
 
 router.get('/users', controllers.User.getUserList);
 router.get('/users/new', controllers.User.getUserForm);
 router.get('/users/:us3r/edit', controllers.User.getUserForm);
 router.post('/users', controllers.User.addUser);
 router.put('/users/:us3r', controllers.User.editUser);
-//router.delete('/users/:us3r', controllers.User.deleteUser);
+router.delete('/users/:us3r', controllers.User.deleteUser);
 
 router.get('/courses/:course/instructors', controllers.Instructor.getInstructorListByCourse);
 router.get('/courses/:course/instructors/search', controllers.Instructor.getInstructorListBySearchQuery);

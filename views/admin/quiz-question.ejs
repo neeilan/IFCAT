@@ -1,6 +1,7 @@
 <%- include ./header -%>
 
-<h1><%= question.isNew ? 'Add new question' : 'Edit question' %></h1>
+<h1><%= course.code + ' - ' + course.name %><br>
+<small>Quiz <%= quiz.number %> - <%= question.isNew ? 'Add new question' : 'Edit question' %></small></h1>
 
 <form id="form-question" action="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= 
     question.isNew ? '' : question.id + '?_method=put' %>" method="post" class="form-horizontal">
