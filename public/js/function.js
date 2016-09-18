@@ -6,53 +6,25 @@ $(function () {
 
     var urls = {
         selectQuestion: $('#select-question-url').val(),
-        prevQuestion: $('#prev-question-url').val(),
+        prevQuestion: $().val(),
         checkAnswer: $('#check-answer-url').val(),
         nextQuestion: $('#next-question-url').val()
     };
 
-    var templates = {
-        'multiple choice': _.template($('#multiple-choice-template').text()),
-        'true or false': _.template($('#true-or-false-template').text()),
-        'multiple select': _.template($('#multiple-select-template').text())
-    };
-
     // templates[res.question.type]
 
-    var loadQuestion = function (res) {
-        // update question 
-
-        $('').text(res.question.question);
-        // update files
-        $('').html(
-            res.question.files.map(function (file) {
-                return templates[res.question.file.type]({
-
-                });
-            }).join('')
-        );
-        // update answers
-        $('').html(
-            res.question.answers.map(function (answer) {
-                return templates[res.question.type]({
-
-                });
-            }).join('')
-        );
-
-    };
-
-    $selectQuestion.click(function (e) {
+    $(document).on('click', '.btn-select-question', function (e) {
         e.preventDefault();
         $.post(urls.selectQuestion, { id: $(this).data('id') }, loadQuestion);
     });
 
-    $prevQuestion.click(function (e) {
+    $(document).on('click', '#btn-prev-question', function (e) {
         e.preventDefault();
-        $.post(urls.prevQuestion, loadQuestion);
+        // emit socket event
+        // load view
     });
 
-    $checkAnswer.click(function (e) {
+    $(document).on('click', '#btn-next-question', function (e) {
         e.preventDefault();
         $.post(urls.checkAnswer, $(this).closest('form').serialize(), function (res) {
             // update # of attempts
@@ -68,8 +40,9 @@ $(function () {
         });
     });
 
-    $nextQuestion.click(function (e) {
+    $(document).on('click', '#btn-next-question', function (e) {
         e.preventDefault();
-        $.post(urls.nextQuestion, loadQuestion);
+        // emit socket event
+        // load view
     });
 });

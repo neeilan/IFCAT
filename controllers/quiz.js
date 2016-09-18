@@ -54,4 +54,8 @@ exports.editQuiz = function (req, res) {
     });
 };
 // Delete quiz
-exports.deleteQuiz = function (req, res) {};
+exports.deleteQuiz = function (req, res) {
+    req.quiz.remove(function (err) {
+        res.json({ status: true });
+    });
+};

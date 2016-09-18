@@ -51,4 +51,8 @@ exports.editFile = function (req, res) {
     });
 };
 // Delete specific file for course
-exports.deleteFile = function (req, res) {};
+exports.deleteFile = function (req, res) {
+    req.fil3.remove(function (err) {
+        res.json({ status: true });
+    })
+};

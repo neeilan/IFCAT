@@ -1,6 +1,6 @@
 <%- include ./header -%>
 
-<h1>Teaching assistants</h1>
+<h1><%= course.code + ' - ' + course.name %><br><small>Teaching assistants</small></h1>
 
 <!-- Show current TAs -->
 
@@ -40,7 +40,7 @@
 
 <!-- Search TAs -->
 
-<h1>Find teaching assistants</h1>
+<h1><small>Find teaching assistants</small></h1>
 
 <form id="form-search-user" action="/admin/courses/<%= course.id %>/teaching-assistants/search" method="get">
     <div class="form-group">

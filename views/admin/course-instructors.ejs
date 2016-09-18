@@ -1,6 +1,6 @@
 <%- include ./header -%>
 
-<h1>Instructors</h1>
+<h1><%= course.code + ' - ' + course.name %><br><small>Instructors</small></h1>
 
 <!-- Show current instructors -->
 
@@ -28,7 +28,7 @@
 
 <!-- Search instructors -->
 
-<h1>Find instructors</h1>
+<h1><small>Find instructors</small></h1>
 
 <form id="form-search-user" action="/admin/courses/<%= course.id %>/instructors/search" method="get">
     <div class="form-group">

@@ -1,7 +1,6 @@
 <%- include ./header -%>
 
-<h1>Tutorials</h1>
-<h4 class="todo">@TODO: ability to delete tutorials</h4>
+<h1><%= course.code + ' - ' + course.name %><br><small>Tutorials</small></h1>
 
 <a href="/admin/courses/<%= course.id %>/tutorials/new" class="btn btn-default btn-sm"><span 
     class="glyphicon glyphicon-plus"></span> Add New Tutorial</a>
@@ -10,35 +9,44 @@
     <thead>
         <tr>
             <th>Tutorial</th>
-            <th>Teaching assistants</th>
+            <th>TA</th>
             <th class="text-center"># of students</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-    <% course.tutorials.forEach(function (tutorial) { %>
-        <tr>
-            <td>TUT <%= tutorial.number %></td>
-            <td><%- tutorial.teachingAssistants.map(function (ta) { return ta.name.full; }).join('<br>') %></td>
-            <td class="text-center"><%= tutorial.students.length %></td>
-            <td>
-                <div class="dropdown">
-                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                        Actions<span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/edit"><span 
-                            class="glyphicon glyphicon-pencil"></span> Edit Tutorial</a></li>
-                        <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/students">Manage Students</a></li>
-                        <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes">Manage Quizzes</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#"><span class="glyphicon glyphicon-remove"></span> Delete Tutorial</a></li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
-    <% }) %>
+    <% if (!_.isEmpty(course.tutorials)) { %>
+        <% for (var i = 0, len = course.tutorials.length; i < len; i++) { %>
+            <tr>
+                <td>TUT <%= course.tutorials[i].number %></td>
+                <td><%- course.tutorials[i].teachingAssistants.map(function (ta) { return ta.name.full; }).join('<br>') %></td>
+                <td class="text-center"><%= course.tutorials[i].students.length %></td>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                            Actions<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= course.tutorials[i].id %>/edit"><span 
+                                class="glyphicon glyphicon-pencil"></span> Edit Tutorial</a></li>
+                            <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= course.tutorials[i].id %>/students">Manage Students</a></li>
+                            <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= course.tutorials[i].id %>/quizzes">Manage Quizzes</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= course.tutorials[i].id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete Tutorial</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        <% } %>
+    <% } else { %>
+        <tr><td colspan="4">No tutorials have been added yet.</td></tr>        
+    <% } %>
     </tbody>
 </table>
+
+<script type="text/template" id="btn-delete-message-template">
+    <p>You are about to delete tutorial and all of its associated information.</p>
+    <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>
+</script>
 
 <%- include ./footer -%>

@@ -1,7 +1,7 @@
 <%- include ./header -%>
 
 
-<h1>Students</h1>
+<h1><%= course.code + ' - ' + course.name %><br><small>Students</small></h1>
 
 <!-- Show current students -->
 
@@ -52,7 +52,7 @@
 
 <!-- Search students -->
 
-<h1>Find students</h1>
+<h1><small>Find students</small></h1>
 
 <form id="form-search-user" action="/admin/courses/<%= course.id %>/students/search" method="get">
     <div class="form-group">
@@ -74,7 +74,7 @@
 
 <!-- Import students -->
 
-<h1>Import students</h1>
+<h1><small>Import students</small></h1>
 
 <form action="/admin/courses/<%= course.id %>/students/import" method="post" enctype="multipart/form-data" class="form-inline">
     <div class="form-group">
