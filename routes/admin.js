@@ -87,7 +87,7 @@ router.use(function (req, res, next) {
 
 router.get('/logout', controllers.User.logout);
 
-router.get('/courses/generate', controllers.Course.generateData); // for testing
+router.get('/courses/generate', controllers.Course.generateData);
 
 router.get('/courses', controllers.Course.getCourseList);
 router.get('/courses/new', controllers.Course.getCourseForm);

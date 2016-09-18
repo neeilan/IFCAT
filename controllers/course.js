@@ -76,9 +76,6 @@ exports.deleteCourse = function (req, res) {
 
 
 
-
-
-
 // FOR TEST PURPOSES ONLY
 
 exports.generateData = function (req, res) {
