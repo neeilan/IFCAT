@@ -38,6 +38,7 @@ app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist'));
 app.use('/lodash', express.static(__dirname + '/node_modules/lodash'));
 app.use('/socketioclient', express.static(__dirname + '/node_modules/socket.io-client'));
+app.use('/font-awesome', express.static(__dirname + 'node_modules/font-awesome'));
 app.use(express.static('public'));
 
 app.use(morgan('dev'));
