@@ -124,10 +124,8 @@ function renderQuestion(quiz, n){
 }
 
 function mark(questionNumber, answer){
-// returns true iff answer is a correct answer to question (questionNumber + 1)
-  var index = quizData.quiz.questions[questionNumber].choices.indexOf(answer);
-  console.log(quizData.quiz.questions[questionNumber].answers)
-  return (quizData.quiz.questions[questionNumber].answers.indexOf(index.toString()) > -1)
+  // returns true iff answer is a correct answer to question (questionNumber + 1)
+  return (quizData.quiz.questions[questionNumber].answers.indexOf(answer) > -1)
  }
  
  function quizCompleted (){
