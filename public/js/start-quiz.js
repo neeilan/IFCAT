@@ -1,62 +1,62 @@
 //
 $('#driverSelect').hide();
 $('#activeQuiz').hide();
+$('.quizBtn').attr('disabled', true); // Disable quiz buttons (enable if assigned as driver)
 //
-
+var url = window.location.href;
+var quizId = url.slice(url.indexOf('/quizzes/') + 9, url.indexOf('/start'));
 var socket = io();
-
-var quizId = $('#quizId').html(), // get from url in full app
-    quizData = null;
+var quizData, groupId, currentQuestionId;
     
 socket.emit('requestQuiz', quizId);
 
-socket.on('quizData', function(quiz){
-  quizData = quiz;
-  $('#driverSelect').show()
-  
+socket.on('quizData', function(data){
+  quizData = data.quiz;
+  groupId = data.groupId;
+  $('#groupName').html(data.groupName);
+})
+
+socket.on('quizActivated', function(data){
+  console.log('quiz activated')
+  $('#driverSelect').show();
   $('#selectDriverBtn').click(function(){
-    socket.emit('selectedAsDriver');
+    emit('nominateSelfAsDriver');
   })
 })
 
-socket.on('startQuiz', function(){
+socket.on('startQuiz', function(data){
   $('#driverSelect').hide();
   $('#activeQuiz').show();
     if (quizData)
         renderQuestion(quizData.quiz, 0);
 })
 
-socket.on('renderQuestion', function(n){
-  console.log('renderQuestion: ', n);
-  renderQuestion(quizData.quiz, n);
+socket.on('assignedAsDriver', function(){
+  /*
+  Emitted to the user assigned as a driver.
+  Todo: When previous driver disconnects, assign next driver automatically
+  */
+  // enable choices and submit buttons (disabled by default)
+  $('.quizBtn').attr('disabled', false);
 })
 
-socket.on('updateScores', function(scores){
-    $('#score').html(scores.score);
-    $('#currentAttempts').html(scores.attemptNumber);
-
+socket.on('renderQuestion', function(data){
+  renderQuestion(quizData.quiz, data.questionNumber);
 })
 
-function showQuestionToGroup(n){
-  socket.emit('showQuestionToGroup', n); //  experimenting with wrappers
-  
+socket.on('updateAttempts', function(data){
+    $('#currentAttempts').html(data.attempts);
+})
+
+function emit(eventName, data) {
+  /* Acts as wrapper for emitting events, attaching
+   useful "header" properties */
+   if (!data) {
+     var data = {}
+   }
+  data.groupId = groupId;
+  socket.emit(eventName, data);
 }
-
-
-// var quiz = {
-//   _id: 'hihihi',
-//   name : 'Quiz 1',
-//   questions: [ { question: 'Favourite color?', correctAnswers : ['red'],
-//                 choices: ['blue', 'red', 'green', 'purple', 'orange'] },
-//               { question: 'Favourite answer', correctAnswers : ['correct'],
-//                 choices: ['wrong', 'correct'] },
-//               ],
-//   randomizeChoices: false,
-//   scoreByAttempt : [5,4,3,2,1]
-// }
-
-
-
  
 var score = 0,
     currentQuizId = null;
@@ -69,70 +69,65 @@ function renderQuestion(quiz, n){
     quizCompleted();
     return;
   }
+  
+  $('#submitQuestion').off('click');
     
-    var attemptNumber = 1;
-    
-    // update score
-    
-    // reset attempt number
-    $('#currentAttempts').html(attemptNumber);
-    
-    // renders nth question (0 indexed) in quiz
-    $("#text").html(quiz.questions[n].question);
-    $("#choices").html("");
-    
-    // shuffle choices if need be
-    // var choices = quiz.randomizeChoices ? _.shuffle(quiz.questions[n].choices) : quiz.questions[n].choices
-    var choices = quiz.questions[n].choices
+  currentQuestionId = quiz.questions[n]._id;
+  var attemptNumber = 0;
+  
+  // update score
+  
+  // reset attempt number
+  $('#currentAttempts').html(attemptNumber);
+  
+  // renders nth question (0 indexed) in quiz
+  $("#text").html(quiz.questions[n].question);
+  $("#choices").html("");
+  
+  // shuffle choices if need be
+  // var choices = quiz.randomizeChoices ? _.shuffle(quiz.questions[n].choices) : quiz.questions[n].choices
+  var choices = quiz.questions[n].choices
 
-    // render choices
-    $.each(choices, function(i, choice){
-      $("#choices").append("<div class = 'choice'>"+ choice +"</div>")
-    })
-    
-    $(".choice").click(function(e){
-      $('.currentlyChosen').removeClass('currentlyChosen');
-      $(e.target).addClass('currentlyChosen')
-     })
-    
-    $("#next").click(function(e){
+  // render choices
+  $.each(choices, function(i, choice){
+    $("#choices").append("<div class = 'quizBtn choice'>"+ choice +"</div>")
+  })
+  
+  $(".choice").click(function(e){
+    $('.currentlyChosen').removeClass('currentlyChosen');
+    $(e.target).addClass('currentlyChosen')
+   })
+  
+    $("#submitQuestion").click(function(e){
+      
       var currentlyChosen = $('.currentlyChosen');
-      if (currentlyChosen.length){
-        var chosenAnswer = currentlyChosen[0].textContent;
+      
+      if (currentlyChosen.length === 0){
+        return;
       }
+
+      var chosenAnswer = currentlyChosen[0].textContent;
+      
       console.log(chosenAnswer);
+      
       var isCorrect = mark(n, chosenAnswer);
-      console.log(isCorrect);
+      
       $('.currentlyChosen').removeClass('currentlyChosen');
       
-      if (isCorrect){
-        if (attemptNumber < 5){
-          // Increment score if they did it withinn 5 attempts
-          // can push actual response and # attempts to an array here
-          // to build a response/groupResponse document
-           score +=  1;
-        //or   quiz.scoreByAttempt ? quiz.scoreByAttempt[attemptNumber-1] ||
-        }
-        
-        // Move onto next question
-        showQuestionToGroup(++n);
-      }
-      else {
-        // just got the question wrong
-        $('#currentAttempts').html(++attemptNumber);
-      }
+      emit('attemptAnswer', {
+        questionId : currentQuestionId,
+        correct: isCorrect,
+        next: n+1
+      })      
       
-      // update score
-      socket.emit('propagateScoresToGroup', { score : score , attemptNumber : attemptNumber } )
-
-      })
+    })
 }
 
 function mark(questionNumber, answer){
 // returns true iff answer is a correct answer to question (questionNumber + 1)
   var index = quizData.quiz.questions[questionNumber].choices.indexOf(answer);
-  console.log(index)
-  return (quizData.quiz.questions[questionNumber].answers.indexOf(index) > -1)
+  console.log(quizData.quiz.questions[questionNumber].answers)
+  return (quizData.quiz.questions[questionNumber].answers.indexOf(index.toString()) > -1)
  }
  
  function quizCompleted (){
@@ -143,7 +138,7 @@ function mark(questionNumber, answer){
  
  socket.on('goToQuestion', function(data){
      if (data.quizId === currentQuizId) {
-         renderQuestion(quiz, data.questionNumber)
+         renderQuestion(quizData.quiz, data.questionNumber)
      }
  })
     

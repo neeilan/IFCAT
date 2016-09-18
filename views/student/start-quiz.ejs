@@ -4,12 +4,16 @@
 
 <div class="center-block">
 
-    <p>Morbi finibus lacus ac quam iaculis mollis. Sed mi ex, posuere luctus nulla efficitur, varius vehicula orci. Donec nibh velit, mollis eget mi quis, convallis maximus ex. Sed bibendum dolor lacus, lacinia elementum lorem facilisis sed. Quisque placerat, dolor sed pulvinar sagittis, elit odio tincidunt metus, id sodales augue dui ultricies magna. Vestibulum eu quam dolor. Aenean hendrerit vitae arcu et mollis. Vestibulum dapibus nibh ut eleifend ullamcorper.</p>
-
-    TutorialQuiz <span id="quizId"><%= quiz._id %></span>
-    
+    <p>Morbi nibh velit, mollis eget mi quis, convallis maximus ex.
+    Sed bibendum dolor lacus, lacinia elementum lorem facilisis sed.
+    Quisque placerat, dolor sed pulvinar sagittis, elit odio tincidunt metus.
+    Aenean hendrerit vitae arcu et mollis.</p>
    <hr/>
-   
+  <div id = "assignGroup">
+    You are in group : <br/><h1 id = "groupName">(Unassigned)</h1>
+    <br/>
+    Please find the other members of your group. When your TA activates the quiz, you will be able to select a driver and collaborate on your questions.
+  </div>
   <div id = "driverSelect">
     This quiz requires one member of your group to serve as the driver,
     who will select the answers. Discuss within your group and press the button below if you are the chosen driver.
@@ -19,12 +23,14 @@
   
   <span>Score: <span id="score">0</span></span>
   <br/>
-  <span>Attempt: <span id="currentAttempts">0</span></span>
+  <span>Attempts: <span id="currentAttempts">0</span></span>
   <div id = "activeQuiz">
     <div id = "text"></div>
     <div id = "attachment"></div>
     <div id = "choices"></div>
-    <button id = "next">Submit</button>
+    <hr/>
+    <button class = "btn btn-success quizBtn" disabled="true" id = "submitQuestion">Submit</button>
+    <br/>
   </div>
 
 </div>
