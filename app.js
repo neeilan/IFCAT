@@ -22,7 +22,7 @@ var app = express(),
 // locals
 app.locals.io = io; // io global
 app.locals._ = require('lodash');
-app.locals.moment = require('moment');
+app.locals.moment = require('moment');  
 app.locals.dateFormat = 'MMMM Do YYYY @ h:mm a';
 
 mongoose.connect(config.db.url);
@@ -101,13 +101,13 @@ app.get('/quiz', function (req, res){
 
 io.on('connection', function(socket){
     
-     if (socket.request.user && socket.request.user.logged_in) {
-    //   console.log(socket.request.user);
-      console.log('authenticated socket');
-      socket.join('user:' + socket.request.user._id); // Since a user can connect from multiple devices/ports, use socket.io rooms instead of hashmap
-     }
+    if (socket.request.user && socket.request.user.logged_in) {
+       /* We can push user-specific messages / notifications if need be. Only group-specific rooms used in version 1.
+       socket.join('user:' + socket.request.user._id); // Since a user can connect from multiple devices/ports, use socket.io rooms instead of hashmap
+        */
+    }
     else{
-        console.log('unauthenticated socket');
+        socket.disconnect();
     }
     
     socket.on('requestQuiz', function(tutQuizId){
@@ -127,69 +127,128 @@ io.on('connection', function(socket){
         }])
         .exec()
         .then(function(tutQuiz){
-            // console.log(tutQuiz);
-            var studentHasAGroup = false;
+            
+            var studentsGroup = null;
+            
             // if student already in a group, add them to approriate socket.io room
             tutQuiz.groups.forEach(function(group){
-                // console.log(group);
                 if (group.members.indexOf(socket.request.user._id) > -1) {
                     socket.join('group:'+group._id);
-                    console.log('Joined enrolled group');
-                    studentHasAGroup = true;
+                    console.log('Joined enrolled group ', group.name);
+                    studentsGroup = group.name;
+                    socket.emit('quizData', { quiz : tutQuiz, groupName : studentsGroup, groupId: group._id} );
+                            
+                    // Automatic activation in 5 seconds
+                    setTimeout(function(){io.in('group:'+group._id).emit('quizActivated')}, 5000);
+
+                    
                 }
             })
-            if (!studentHasAGroup) {
-                // student doesn't have a group - add them to one
-                var groupsWithRoom = tutQuiz.groups.filter(function(group){
-                    if (!tutQuiz.max || !tutQuiz.max.membersPerGroup){
-                        tutQuiz.max = { membersPerGroup : 2 }                     // MAKE THIS DEFAULT BEHAVIOR IN SCHEMA
-                    }
-                    return (group.members.length < tutQuiz.max.membersPerGroup);
-                })
-                
-                if (groupsWithRoom.length > 0) {
-                    // there is a group with room, let's add the student to it
-                    models.Group.findByIdAndUpdate(groupsWithRoom[0]._id, { $push : { members : socket.request.user._id } }, { new : true }, function (err,doc){
-                        if (err)
-                            console.log(err);
-                    });
-                    console.log('Joining existing group '+ groupsWithRoom[0]._id);
+            
+            
+            if (studentsGroup) return;
+            
+            // student doesn't already have a group - need to add them to one
+            
+            var groupsWithRoom = tutQuiz.groups.filter(function(group){
+                if (!tutQuiz.max || !tutQuiz.max.membersPerGroup){
+                    tutQuiz.max = { membersPerGroup : 2 }                     // MAKE THIS DEFAULT BEHAVIOR IN SCHEMA
+                }
+                return (group.members.length < tutQuiz.max.membersPerGroup);
+            })
+            
+            // if there's already a group with room, we can put the student there
+            if (groupsWithRoom.length > 0) {
+                // there is a group with room, let's add the student to it
+                models.Group.findByIdAndUpdate(groupsWithRoom[0]._id, { $push : { members : socket.request.user._id } }, { new : true }, function (err,doc){
+                    if (err) throw err;
+                    console.log('Joining existing group ', groupsWithRoom[0]._id);
+                    studentsGroup = groupsWithRoom[0].name;
                     socket.join('group:' + groupsWithRoom[0]._id);
-                }
-                else {
-                    // there are no groups with room - let's make a new group
-                    var group = new models.Group();
-                    group.name = (tutQuiz.groups.length + 1).toString();
-                    group.members = [ socket.request.user._id ];
-                    group.save( function(err, group){
-                     if (!err) {
-                         // we also need to add the group to this tutorialQuiz
-                         models.TutorialQuiz.update({ _id : tutQuiz._id }, { $push : { groups :  group._id } }, { new : true }, function(err, doc){
-                            if (err) 
-                                console.log(err);
-                         })
-                         console.log('Created and joined a new group ', group._id);
-                         socket.join('group:'+group._id)
-                     }
-                    });
-                }
+                    socket.emit('quizData', { quiz : tutQuiz, groupName : studentsGroup, groupId: groupsWithRoom[0]._id} );
+                });
                 
             }
-            socket.emit('quizData', tutQuiz )
+            
+            // if all existing groups are full, make a new group for the student
+            else {
+                // there are no groups with room - let's make a new group
+                var group = new models.Group();
+                group.name = (tutQuiz.groups.length + 1).toString();
+                group.members = [ socket.request.user._id ];
+                group.save( function(err, group){
+                    studentsGroup = group.name
+                    if (!err) {
+                         // we also need to add the group to this tutorialQuiz
+                         models.TutorialQuiz.update({ _id : tutQuiz._id }, { $push : { groups :  group._id } }, { new : true }, function(err, doc){
+                            if (err) throw err;
+                         console.log('Created and joined a new group ', group.name);
+                         socket.join('group:'+group._id);
+                         socket.emit('quizData', { quiz : tutQuiz, groupName : studentsGroup, groupId: group._id } );
+                         })
+                     }
+                });
+            }
         })
     })
     
     
-    socket.on('selectedAsDriver', function(data){
-        io.emit('startQuiz');
+    socket.on('nominateSelfAsDriver', function(data){
+        models.Group.findById(data.groupId)
+        .exec()
+        .then(function(group){
+            if (!group.driver || group.driver == socket.request.user)
+                return models.Group.findByIdAndUpdate(data.groupId, { driver : socket.request.user })
+                .exec()
+        })
+        .then(function(){
+            socket.emit('assignedAsDriver', { groupId : data.groupId } );
+            io.in('group:' + data.groupId).emit('startQuiz');
+        })
     })
     
-    socket.on('showQuestionToGroup', function(n){
-        io.emit('renderQuestion', n);
+    socket.on('showQuestionToGroup', function(data){
+        io.in('group:' + data.groupId).emit('renderQuestion', data.questionNumber);
     })
     
-    socket.on('propagateScoresToGroup', function(score){
-        io.emit('updateScores', score)
+    socket.on('propagateScoresToGroup', function(data){
+        io.in('group:' + data.groupId).emit('updateScores', data.score)
+    })
+    
+    socket.on('attemptAnswer', function(data){
+        
+        console.log('attemptingAnswer');
+        console.log( data )
+        
+        models.Response.findOne({ group : data.groupId, question: data.questionId })
+        .exec()
+        .then(function(response){
+            if (!response){
+                var res = new models.Response();
+                res.group = data.groupId;
+                res.question = data.questionId;
+                res.attempts = 1;
+                res.correct = data.correct;
+                return res.save();
+            }
+            else{
+                return models.Response.findByIdAndUpdate(response._id,
+                { correct: data.correct , $inc : { attempts : 1 } },
+                { new: true } )
+                .exec()
+            }
+        })
+        .then(function(response){
+            if (response.correct){
+                io.in('group:' + data.groupId).emit('renderQuestion', 
+                { groupId: data.groupId, questionNumber: data.next });
+            }
+            else {
+                io.in('group:' + data.groupId).emit('updateAttempts', 
+                { groupId: data.groupId, attempts : response.attempts });
+            }
+
+        })
     })
     
 })
