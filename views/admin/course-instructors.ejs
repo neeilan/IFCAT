@@ -7,8 +7,7 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
+            <th>Name</th>
             <th>Email</th>
             <th></th>
         </tr>
@@ -16,8 +15,7 @@
     <tbody>
     <% course.instructors.forEach(function (instructor) { %>
         <tr>
-            <td><%= instructor.name.first %></td>
-            <td><%= instructor.name.last %></td>
+            <td><%= instructor.name.full %></td>
             <td><%= instructor.local.email %></td>
             <td>
                 <button type="button" class="btn btn-danger btn-sm btn-delete-user"
@@ -32,7 +30,7 @@
 
 <h1>Find instructors</h1>
 
-<form id="search-user-form" action="/admin/courses/<%= course.id %>/instructors/search" method="get">
+<form id="form-search-user" action="/admin/courses/<%= course.id %>/instructors/search" method="get">
     <div class="form-group">
         <label class="col-md-3 control-label">Enter name (or leave blank)</label>
         <div class="col-md-4">

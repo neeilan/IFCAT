@@ -13,7 +13,7 @@ var CourseSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-// populate instructors
+// Populate instructors
 CourseSchema.methods.withInstructors = function () {
     return this.populate({
         path: 'instructors',
@@ -22,7 +22,7 @@ CourseSchema.methods.withInstructors = function () {
         }
     });
 };
-// populate teaching assistants
+// Populate teaching assistants
 CourseSchema.methods.withTeachingAssistants = function () {
     return this.populate({
         path: 'teachingAssistants',
@@ -31,7 +31,7 @@ CourseSchema.methods.withTeachingAssistants = function () {
         }
     });
 };
-// populate students
+// Populate students
 CourseSchema.methods.withStudents = function () {
     return this.populate({ 
         path: 'students', 
@@ -40,7 +40,7 @@ CourseSchema.methods.withStudents = function () {
         }
     });
 };
-// populate tutorials
+// Populate tutorials
 CourseSchema.methods.withTutorials = function (deep) {
     var obj = {
         path: 'tutorials',
@@ -58,7 +58,7 @@ CourseSchema.methods.withTutorials = function (deep) {
     }
     return this.populate(obj);
 };
-// populate quizzes
+// Populate quizzes
 CourseSchema.methods.withQuizzes = function () {
     return this.populate({
         path: 'quizzes', 
@@ -67,7 +67,7 @@ CourseSchema.methods.withQuizzes = function () {
         }
     });
 };
-// populate files
+// Populate files
 CourseSchema.methods.withFiles = function () {
     return this.populate({ 
         path: 'files', 
@@ -76,46 +76,46 @@ CourseSchema.methods.withFiles = function () {
         }
     });
 };
-// add instructor
+// Add instructor
 CourseSchema.methods.addInstructor = function (user) {
     if (this.instructors.indexOf(user) === -1) {
         this.instructors.push(user);
     }
 };
-// add teaching assistant
+// Add teaching assistant
 CourseSchema.methods.addTeachingAssistant = function (user) {
     if (this.teachingAssistants.indexOf(user) === -1) {
         this.teachingAssistants.push(user);
     }
 };
-// add student
+// Add student
 CourseSchema.methods.addStudent = function (user) {
     if (this.students.indexOf(user) === -1) {
         this.students.push(user);
     }
 };
-// delete isntructor
+// Delete isntructor
 CourseSchema.methods.deleteInstructor = function (user) {
     var index = this.instructors.indexOf(user);
     if (index !== -1) {
         this.instructors.splice(index, 1);
     }
 };
-// delete teaching assistant
+// Delete teaching assistant
 CourseSchema.methods.deleteTeachingAssistant = function (user) {
     var index = this.teachingAssistants.indexOf(user);
     if (index !== -1) {
         this.teachingAssistants.splice(index, 1);
     }
 };
-// delete student
+// Delete student
 CourseSchema.methods.deleteStudent = function (user) {
     var index = this.students.indexOf(user);
     if (index !== -1) {
         this.students.splice(index, 1);
     }
 };
-// find courses
+// Find courses
 CourseSchema.statics.findCourses = function () {
     return this.find().sort('code').populate([{
         path: 'instructors',
@@ -135,7 +135,7 @@ CourseSchema.statics.findCourses = function () {
         }
     }]);
 };
-// find courses taught by instructor
+// Find courses taught by instructor
 CourseSchema.statics.findCoursesByInstructor = function (user) {
     return this.find({
         'instructors': { 
@@ -143,7 +143,7 @@ CourseSchema.statics.findCoursesByInstructor = function (user) {
         } 
     }).sort('code');
 };
-// find courses taught by teaching assistant
+// Find courses taught by teaching assistant
 CourseSchema.statics.findCoursesByTeachingAssistant = function (user) {
     return this.find({
         'teachingAssistants': { 
@@ -151,7 +151,7 @@ CourseSchema.statics.findCoursesByTeachingAssistant = function (user) {
         } 
     }).sort('code');
 };
-// find courses enrolled by student
+// Find courses enrolled by student
 CourseSchema.statics.findCoursesByStudent = function (user) {
     return this.find({ 
         'students': { 

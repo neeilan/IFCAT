@@ -72,7 +72,9 @@ UserSchema.statics.findUsersByRole = function (role) {
 };
 // find teaching assistants by search query
 UserSchema.statics.findUsersBySearchQuery = function (query, role) {
-    var regexp = new RegExp(query, 'i');
+    // build regular expression e.g. 'first last' => /(first|last)/i
+    var regexp = new RegExp('(' + query.replace(/\s/, '|') + ')', 'i');
+    // query based on UTORid, name, or email
     return this.find().and([
         {
             roles: {
@@ -81,6 +83,7 @@ UserSchema.statics.findUsersBySearchQuery = function (query, role) {
         }, 
         {
             $or: [
+                { 'UTORid': regexp },
                 { 'name.first': regexp },
                 { 'last.first': regexp },
                 { 'local.email': regexp }
@@ -91,9 +94,13 @@ UserSchema.statics.findUsersBySearchQuery = function (query, role) {
         'name.last': 1
     });
 };
+// find user by UTORid
+UserSchema.statics.findUserByUTOR = function (UTORid) {
+    return this.findOne({ UTORid: UTORid });
+};
 // find user by email address
-UserSchema.statics.findUserByEmail = function (email, callback) {
-    return this.findOne({ 'local.email': email }, callback);
+UserSchema.statics.findUserByEmail = function (email) {
+    return this.findOne({ 'local.email': email });
 };
 
 module.exports = mongoose.model('User', UserSchema);

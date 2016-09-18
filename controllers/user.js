@@ -41,14 +41,12 @@ exports.getUserList = function (req, res) {
 exports.getUserForm = function (req, res) {
     res.render('admin/user', { us3r: req.us3r || new models.User() });
 };
-
 // Add new user
 exports.addUser = function (req, res) {
     models.User.create(req.body, function (err, user) {
         res.redirect('/admin/users');
     });
 };
-
 // Update specific user
 exports.editUser = function (req, res) {
     req.us3r.name.first = req.body.name.first;
@@ -62,55 +60,5 @@ exports.editUser = function (req, res) {
         res.redirect('/admin/users/' + req.us3r.id + '/edit');
     });
 };
-
 // Delete specific user
 exports.deleteUser = function (req, res) {};
-
-// Import list of users
-exports.importStudents = function (req, res) {
-    // read spreadsheet
-    csv.parse(req.file.buffer.toString(), {
-        columns: true,
-        delimiter: ',',
-        skip_empty_lines: true
-    }, function (err, rows) {
-        async.eachSeries(rows, function (row, done) {
-            async.waterfall([
-                // add student if they do not already exist
-                function (done) {
-                    // check if user exist already with email address
-                    models.User.findUserByEmail(row.email, function (err, user) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        // if user does not already exist, create them
-                        if (!user) {
-                            user = new models.User();
-                            user.name.first = row.first;
-                            user.name.last = row.last;
-                            user.local.email = row.email;
-                            user.local.password = user.generateHash(row.password);
-                        }
-                        // mark them as student
-                        user.addRole('student');
-                        user.save(function (err) {
-                            done(err, user);
-                        });
-                    });
-                },
-                // add student into course
-                function (user, done) {
-                    req.course.addStudent(user);
-                    req.course.save(function (err) {
-                        done(err, user);
-                    });
-                }
-            ], done);
-        }, function (err) {
-            if (err) {
-                console.log(err);
-            }
-            res.redirect('/admin/courses/' + req.course.id + '/students');
-        });
-    });
-};

@@ -4,7 +4,8 @@
 
 <h4 class="todo">@TODO: ability to delete courses</h4>
 
-<a class="btn btn-default btn-sm" href="/admin/courses/new">Add New Course</a>
+<a href="/admin/courses/new" class="btn btn-default btn-sm"><span 
+    class="glyphicon glyphicon-plus"></span> Add New Course</a>
 
 <table class="table table-striped">
     <thead>
@@ -12,7 +13,7 @@
             <th>Code</th>
             <th>Name</th>
             <th>Instructors</th>
-            <th>Tutorials/TAs</th>
+            <th>Tutorials/T.A.'s</th>
             <th></th>
         </tr>
     </thead>
@@ -45,15 +46,18 @@
                         Actions<span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a href="/admin/courses/<%= course.id %>/edit">Edit Course</a></li>
+                        <li><a href="/admin/courses/<%= course.id %>/edit"><span 
+                            class="glyphicon glyphicon-pencil"></span> Edit Course</a></li>
                         <li><a href="/admin/courses/<%= course.id %>/tutorials">Manage Tutorials</a></li>
                         <li><a href="/admin/courses/<%= course.id %>/quizzes">Manage Quizzes</a></li>
-                        <li><a href="/admin/courses/<%= course.id %>/files">Manage Files</a></li>
+                        <li><a href="/admin/courses/<%= course.id %>/files"><span 
+                            class="glyphicon glyphicon-file"></span> Manage Files</a></li>
                         <li><a href="/admin/courses/<%= course.id %>/instructors">Manage Instructors</a></li>
                         <li><a href="/admin/courses/<%= course.id %>/teaching-assistants">Manage Teaching Assistants</a></li>
                         <li><a href="/admin/courses/<%= course.id %>/students">Manage Students</a></li>
                         <li class="divider"></li>
-                        <li><a href="/admin/courses/<%= course.id %>">Delete Course</a></li>
+                        <li><a href="/admin/courses/<%= course.id %>"><span 
+                            class="glyphicon glyphicon-remove"></span> Delete Course</a></li>
                     </ul>
                 </div>
             </td>

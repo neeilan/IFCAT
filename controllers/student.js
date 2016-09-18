@@ -16,42 +16,23 @@ exports.getStudentListBySearchQuery = function (req, res) {
         res.render('admin/course-students-search-results', { course: req.course, users: users });
     });
 };
-
-
-
 // Retrieve list of students for tutorial
 exports.getStudentsByTutorial = function (req, res) { 
-    models.Tutorial.populate(req.tutorial, { 
-        path: 'students',
-        options: {
-            sort: { 'name.first': 1, 'name.last': 1 }
-        }
-    }, function (err) {
+    req.tutorial.withStudents().execPopulate().then(function () {
         res.render('admin/tutorial-students', { course: req.course, tutorial: req.tutorial });
-    }); 
-    console.log(req.course.students, req.us3r.id);
-    req.course.addStudent(req.us3r.id);
-    console.log(req.course.students, req.us3r.id);
-    req.course.save(function (err) {
-        res.json({ status: true });
     });
 };
-
 // Add student to course
 exports.addStudent = function (req, res) {
-
-    console.log(req.course.students, req.us3r.id);
     req.course.addStudent(req.us3r.id);
-    console.log(req.course.students, req.us3r.id);
     req.course.save(function (err) {
         res.json({ status: true });
     });
 };
-
-// Update student in tutorials
+// Update student in tutorial
 exports.editStudent = function (req, res) {
-     req.course.withTutorials().execPopulate().then(function () {
-        // update student in tutorial
+    req.course.withTutorials().execPopulate().then(function () {
+        // ugly: move student in tutorial
         async.eachSeries(req.course.tutorials, function (tutorial, done) {
             if (!req.body.tutorial[req.us3r.id] || req.body.tutorial[req.us3r.id] !== tutorial.id) {
                 tutorial.deleteStudent(req.us3r.id);
@@ -79,6 +60,67 @@ exports.deleteStudent = function (req, res) {
             });
         });
     });  
+};
+// Import list of students
+exports.importStudents = function (req, res) {
+    // read spreadsheet
+    csv.parse(req.file.buffer.toString(), {
+        columns: true,
+        delimiter: ',',
+        skip_empty_lines: true
+    }, function (err, rows) {
+        async.eachSeries(rows, function (row, done) {
+            async.waterfall([
+                // add student if they do not already exist
+                function (done) {
+                    // check if user exist already with UTORid
+                    models.User.findUserByUTOR(row.UTORid).then(function (user) {
+                        // if user does not already exist, create them
+                        if (!user) {
+                            user = new models.User();
+                            user.UTORid = row.UTORid;
+                            user.local.email = row.email;
+                            user.name.first = row.first;
+                            user.name.last = row.last;
+                            user.local.password = user.generateHash(row.password);
+                        }
+                        // mark them as student
+                        user.addRole('student');
+                        user.save(function (err) {
+                            done(err, user);
+                        });
+                    });
+                },
+                // add student into course if they are not already
+                function (user, done) {
+                    req.course.withTutorials().execPopulate().then(function () {
+                        req.course.addStudent(user);
+                        req.course.save(function (err) {
+                            done(err, user);
+                        });
+                    });
+                },
+                // ugly: move student into tutorial if they are not already
+                function (user, done) {
+                    async.eachSeries(req.course.tutorials, function (tutorial, done) {
+                        if (_.toInteger(tutorial.number) !== _.toInteger(row.tutorial)) {
+                            tutorial.deleteStudent(user.id);
+                        } else {
+                            tutorial.addStudent(user.id);
+                        }
+                        tutorial.save(done);
+                    }, function (err) {
+                        done(err, user);
+                    });
+                }
+            ], done);
+        }, function (err) {
+            if (err) {
+                console.log(err);
+            }
+            res.redirect('/admin/courses/' + req.course.id + '/students');
+        });
+    });
 };
 
 // TO-FIX!

@@ -7,8 +7,7 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th rowspan="2">First Name</th>
-            <th rowspan="2">Last Name</th>
+            <th rowspan="2">Name</th>
             <th rowspan="2">Email</th>
             <th colspan="<%= course.tutorials.length %>" class="text-center">Tutorials</th>
             <th rowspan="2"></th>
@@ -22,8 +21,7 @@
     <tbody>
     <% course.teachingAssistants.forEach(function (teachingAssistant) { %>
         <tr>
-            <td><%= teachingAssistant.name.first %></td>
-            <td><%= teachingAssistant.name.last %></td>
+            <td><%= teachingAssistant.name.full %></td>
             <td><%= teachingAssistant.local.email %></td>
             <% course.tutorials.forEach(function (tutorial) { %>
                 <td class="text-center"><input type="checkbox" name="tutorials[]" value="<%= tutorial.id %>"<%= 
@@ -44,7 +42,7 @@
 
 <h1>Find teaching assistants</h1>
 
-<form id="search-user-form" action="/admin/courses/<%= course.id %>/teaching-assistants/search" method="get">
+<form id="form-search-user" action="/admin/courses/<%= course.id %>/teaching-assistants/search" method="get">
     <div class="form-group">
         <label class="col-md-3 control-label">Enter name (or leave blank)</label>
         <div class="col-md-4">

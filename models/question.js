@@ -2,6 +2,7 @@ var _ = require('lodash'),
     mongoose = require('mongoose');
 
 var QuestionSchema = new mongoose.Schema({
+    number: String,
     question: { type: String, required: true },
     type: { type: String, enum: ['multiple choice', 'true or false', 'multiple select'/*, 'fill in the blanks'*/] },
     choices: [String],
@@ -10,8 +11,7 @@ var QuestionSchema = new mongoose.Schema({
 }, { 
     timestamps: true 
 });
-
-// populate files
+// Populate files
 QuestionSchema.methods.withFiles = function () {
     return this.populate({ 
         path: 'files',
@@ -20,81 +20,69 @@ QuestionSchema.methods.withFiles = function () {
         }
     });
 };
-
-// check if question is a multiple choice question
+// Check if question is a multiple choice question
 QuestionSchema.methods.isMultipleChoice = function () {
     return this.type === 'multiple choice';
 };
-
-// check if question is a true or false question
+// Check if question is a true or false question
 QuestionSchema.methods.isTrueOrFalse = function () {
     return this.type === 'true or false';
 };
-
-// check if question is a multiple select question
+// Check if question is a multiple select question
 QuestionSchema.methods.isMultipleSelect = function () {
     return this.type === 'multiple select';
 };
-
-// check if question is a fill in the blanks question
+// Check if question is a fill in the blanks question
 QuestionSchema.methods.isFillInTheBlanks = function () {
     return this.type === 'fill in the blanks';
 };
-
-
-// check if question has file
+// Check if question has file with given ID
 QuestionSchema.methods.hasFile = function (id) {
     return this.files.indexOf(id) !== -1;
 };
-
-// check if question has nth-choice as an answer
+// Check if given choice is one of the answers
 QuestionSchema.methods.isAnswer = function (choice) {
     return this.answers.indexOf(choice) !== -1;
 };
-
-// save question
+// Save question
 QuestionSchema.methods.store = function (obj, callback) {
+    this.number = obj.number;
     this.question = obj.question;
     this.type = obj.type;
     this.files = obj.files;
-    this.choices = []; // clear previous choices
-    this.answers = []; // clear previous answers
+    // clear previous choices and answers
+    this.choices = []; 
+    this.answers = [];
 
     var selected, key, matches, value, d;
 
-    switch (this.type) {
-        case 'multiple choice':
-        case 'true or false':
-        //case 'fill in the blanks':
-            selected = obj.answer[_.kebabCase(this.type)];
-            // add choices + answer
-            for (d in obj.choices) {
-                value = _.trim(obj.choices[d]);
-                if (value) {
-                    this.choices.push(value);
-                    if (d === selected) {
-                        this.answers = [value];
-                    }
+    if (this.isMultipleChoice() || this.isTrueOrFalse()) {
+        selected = _.isObject(obj.answer) ? obj.answer[_.kebabCase(this.type)] : false;
+        // add choices and selected answer
+        for (d in obj.choices) {
+            value = _.trim(obj.choices[d]);
+            if (value) {
+                this.choices.push(value);
+                // mark as the answer if selected
+                if (d === selected) {
+                    this.answers = [value];
                 }
             }
-            break;
-        case 'multiple select':
-            selected = obj.answers[_.kebabCase(this.type)] || [];
-            // add choices + answers
-            for (d in obj.choices) {
-                value = _.trim(obj.choices[d]);
-                if (value) {
-                    this.choices.push(value);
-                    if (selected.indexOf(d) !== -1) {
-                        this.answers.push(value);
-                    }
+        }
+    } else {
+        selected = _.isObject(obj.answers) ? obj.answers[_.kebabCase(this.type)] : [];
+        // add choices + selected answers
+        for (d in obj.choices) {
+            value = _.trim(obj.choices[d]);
+            if (value) {
+                this.choices.push(value);
+                // mark as one of answers if selected
+                if (selected.indexOf(d) !== -1) {
+                    this.answers.push(value);
                 }
             }
-            break;
-        default:
-            break;
+        }
     }
-
     return this.save(callback);
 };
 

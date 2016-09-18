@@ -13,7 +13,7 @@ $(function () {
     // users handlers
 
     // search users when form is submitted
-    $('#search-user-form').submit(function (e) {
+    $('#form-search-user').submit(function (e) {
         e.preventDefault();
         $('#search-user-results').load(this.action, $(this).serialize());
     });
@@ -59,7 +59,23 @@ $(function () {
 
     // question handlers
 
-    $('#question-form [name=type]').change(function () {
+    $('#btn-sort-questions').click(function (e) {
+        e.preventDefault();
+        $.ajax(this.href, {
+            type: 'put',
+            data: $('#table-questions tr[data-id]').map(function () {
+                return { name: 'questions[]', value: $(this).data('id') };
+            }), 
+            success: function (res) {
+                if (res.status) {
+                    window.location.reload(true);
+                }
+            },
+            dataType: 'json'
+        });
+    });
+
+    $('#form-question [name=type]').change(function () {
         var type = _.kebabCase(this.value);
         // show related items for type
         $('.multiple-choice, .true-or-false, .multiple-select').each(function () {
@@ -104,9 +120,9 @@ $(function () {
 
     // setup group handlers
 
-    var options = { 
+    var options = {
+        axis: 'y', 
         cancel: false,
-        
         connectWith: '.sortable'
     };
     

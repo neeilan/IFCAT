@@ -1,14 +1,10 @@
 <%- include ./header -%>
 
 <h1>Tutorials</h1>
-
-
 <h4 class="todo">@TODO: ability to delete tutorials</h4>
-<h4 class="todo">@TODO: ability to manage TAs</h4>
 
-<% if (user.hasRole('admin', 'instructor')) { %>
-    <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/tutorials/new">Add New Tutorial</a>
-<% } %>
+<a href="/admin/courses/<%= course.id %>/tutorials/new" class="btn btn-default btn-sm"><span 
+    class="glyphicon glyphicon-plus"></span> Add New Tutorial</a>
 
 <table class="table table-striped">
     <thead>
@@ -31,11 +27,12 @@
                         Actions<span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/edit">Edit Tutorial</a></li>
+                        <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/edit"><span 
+                            class="glyphicon glyphicon-pencil"></span> Edit Tutorial</a></li>
                         <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/students">Manage Students</a></li>
                         <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes">Manage Quizzes</a></li>
                         <li class="divider"></li>
-                        <li><a href="#">Delete Tutorial</a></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-remove"></span> Delete Tutorial</a></li>
                     </ul>
                 </div>
             </td>

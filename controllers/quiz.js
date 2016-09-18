@@ -5,7 +5,7 @@ var models = require('../models');
 
 // Retrieve course
 exports.getQuiz = function (req, res, next, quiz) {
-    models.Quiz.findById(quiz).exec(function (err, quiz) {
+    models.Quiz.findById(quiz, function (err, quiz) {
         if (err) {
             return next(err);
         }
@@ -17,14 +17,12 @@ exports.getQuiz = function (req, res, next, quiz) {
         next();
     });
 };
-
 // Retrieve quizzes within course
 exports.getQuizList = function (req, res) {
     req.course.withQuizzes().execPopulate().then(function() {
         res.render('admin/course-quizzes', { course: req.course });
     });
 };
-
 // Retrieve quiz form
 exports.getQuizForm = function (req, res) {
     if (!req.quiz) {
@@ -36,7 +34,6 @@ exports.getQuizForm = function (req, res) {
         });
     });
 };
-
 // Add quiz to course
 exports.addQuiz = function (req, res) {
     var quiz = new models.Quiz();
@@ -47,7 +44,6 @@ exports.addQuiz = function (req, res) {
         });
     });
 };
-
 // Update quiz
 exports.editQuiz = function (req, res) {
     req.quiz.store(req.body, function (err) { 
@@ -57,6 +53,5 @@ exports.editQuiz = function (req, res) {
         res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/edit');
     });
 };
-
 // Delete quiz
 exports.deleteQuiz = function (req, res) {};
