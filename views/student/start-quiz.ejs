@@ -1,37 +1,41 @@
 <%- include ./header -%>
 <link rel = "stylesheet" href = "/css/quiz.css" type="text/css" />
-<h1>Instructions</h1>
-
 <div class="center-block">
 
-    <p>Morbi nibh velit, mollis eget mi quis, convallis maximus ex.
-    Sed bibendum dolor lacus, lacinia elementum lorem facilisis sed.
-    Quisque placerat, dolor sed pulvinar sagittis, elit odio tincidunt metus.
-    Aenean hendrerit vitae arcu et mollis.</p>
    <hr/>
-  <div id = "assignGroup">
-    You are in group : <br/><h1 id = "groupName">(Unassigned)</h1>
-    <br/>
-    Please find the other members of your group. When your TA activates the quiz, you will be able to select a driver and collaborate on your questions.
-  </div>
-  <div id = "driverSelect">
-    This quiz requires one member of your group to serve as the driver,
-    who will select the answers. Discuss within your group and press the button below if you are the chosen driver.
-    <hr/>
-    <button id = "selectDriverBtn" > I will be the driver </button>
+   <div class = "centerText">
+    <div id = "assignGroup">
+        You are in group : <br/><h1 id = "groupName" class = "extraLarge"></h1>
+      <br/>
+      <p>
+      Please find the other members of your group. When your TA activates the quiz, you will be able to select a driver and collaborate on your questions.
+      </p>
+      <hr/>
+    </div>
+  
+    <div id = "driverSelect" style="display : none">
+      This quiz requires a member of your group to serve as the driver, who will submit answers.
+      <br/>
+      <button class = "btn btn-primary" id = "selectDriverBtn" > I will be driver </button>
+      <button class = "btn btn-danger" id = "deferDriverBtn" > I not be the driver </button>
+    </div>
+    
   </div>
   
-  <span>Score: <span id="score">0</span></span>
+  <!--<span>Score: <span id="score">0</span></span>-->
   <br/>
-  <span>Attempts: <span id="currentAttempts">0</span></span>
-  <div id = "activeQuiz">
+  <span style = "display: none" >Attempts: <span id="currentAttempts">0</span></span>
+  
+  <div id = "activeQuiz" style="display: none">
     <div id = "text"></div>
     <div id = "attachment"></div>
     <div id = "choices"></div>
     <hr/>
     <button class = "btn btn-success quizBtn" disabled="true" id = "submitQuestion">Submit</button>
     <br/>
+    <div id = "questionSelect"/>
   </div>
+  <hr/>
 
 </div>
 

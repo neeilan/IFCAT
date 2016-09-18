@@ -83,7 +83,8 @@ exports.publishQuiz = function (req, res) {
 exports.unlockQuiz = function (req, res) {
     req.tutorialQuiz.unlocked = req.body.unlocked;
     req.tutorialQuiz.save(function (err) {
-        // @TODO: emit event
+        req.app.locals.io.in('tutorialQuiz:' + req.tutorialQuiz.id)
+        .emit('quizUnlocked' , req.tutorialQuiz)
         res.json({ status: true });
     });
 };
@@ -91,7 +92,8 @@ exports.unlockQuiz = function (req, res) {
 exports.activateQuiz = function (req, res) {
     req.tutorialQuiz.active = req.body.active;
     req.tutorialQuiz.save(function (err) {
-        // @TODO: emit event
+        req.app.locals.io.in('tutorialQuiz:' + req.tutorialQuiz.id)
+        .emit('quizActivated', req.tutorialQuiz)
         res.json({ status: true });
     });
 };

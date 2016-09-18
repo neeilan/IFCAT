@@ -105,6 +105,8 @@ io.on('connection', function(socket){
        /* We can push user-specific messages / notifications if need be. Only group-specific rooms used in version 1.
        socket.join('user:' + socket.request.user._id); // Since a user can connect from multiple devices/ports, use socket.io rooms instead of hashmap
         */
+        var referringUrl = socket.request.headers.referrer;
+        
     }
     else{
         socket.disconnect();
@@ -135,6 +137,9 @@ io.on('connection', function(socket){
             
             var studentsGroup = null;
             
+            // Socket room for all students in this tutorial taking this quiz
+            socket.join('tutorialQuiz:' + tutQuiz._id);
+            
             // if student already in a group, add them to approriate socket.io room
             tutQuiz.groups.forEach(function(group){
                 if (group.members.indexOf(socket.request.user._id) > -1) {
@@ -142,16 +147,11 @@ io.on('connection', function(socket){
                     console.log('Joined enrolled group ', group.name);
                     studentsGroup = group.name;
                     socket.emit('quizData', { quiz : tutQuiz, groupName : studentsGroup, groupId: group._id} );
-                            
-                    // Automatic activation in 5 seconds
-                    setTimeout(function(){io.in('group:'+group._id).emit('quizActivated')}, 5000);
-
-                    
                 }
             })
             
             
-            if (studentsGroup) return;
+            if (studentsGroup || tutQuiz.active) return; // don't allow new group joining if a quiz is active
             
             // student doesn't already have a group - need to add them to one
             
@@ -212,14 +212,6 @@ io.on('connection', function(socket){
         })
     })
     
-    socket.on('showQuestionToGroup', function(data){
-        io.in('group:' + data.groupId).emit('renderQuestion', data.questionNumber);
-    })
-    
-    socket.on('propagateScoresToGroup', function(data){
-        io.in('group:' + data.groupId).emit('updateScores', data.score)
-    })
-    
     socket.on('attemptAnswer', function(data){
         
         models.Response.findOne({ group : data.groupId, question: data.questionId })
@@ -252,6 +244,8 @@ io.on('connection', function(socket){
 
         })
     })
+
+    
     
 })
 //////////////// -------------

@@ -1,6 +1,3 @@
-//
-$('#driverSelect').hide();
-$('#activeQuiz').hide();
 $('.quizBtn').attr('disabled', true); // Disable quiz buttons (enable if assigned as driver)
 //
 var url = window.location.href;
@@ -10,26 +7,68 @@ var quizData, groupId, currentQuestionId;
     
 socket.emit('requestQuiz', quizId);
 
-socket.on('quizData', function(data){
-  quizData = data.quiz;
-  groupId = data.groupId;
-  $('#groupName').html(data.groupName);
+socket.on('quizData', function(tutorialQuiz){
+  quizData = tutorialQuiz.quiz;
+  groupId = tutorialQuiz.groupId;
+  $('#groupName').html(tutorialQuiz.groupName);
+  
+  if (quizData.active){
+    $('#driverSelect').show();  
+  }
 })
 
-socket.on('quizActivated', function(data){
-  console.log('quiz activated')
-  $('#driverSelect').show();
-  $('#selectDriverBtn').click(function(){
-    emit('nominateSelfAsDriver');
-  })
+
+$(document).on('click', '#selectDriverBtn', function(){
+  emit('nominateSelfAsDriver');
+})
+$(document).on('click', '#deferDriverBtn', function(){
+  if (quizData.active){
+    $('#driverSelect').hide();
+    $('#activeQuiz').show();
+    renderQuestion(quizData.quiz, 0);
+  }
+})
+
+// socket.on('quizUnlocked', function(tutQuiz){ // unlocked = can select groups
+//   if (tutQuiz.unlocked){
+//     $('#driverSelect').show();
+//     $('#selectDriverBtn').click(function(){
+//       if (tutQuiz.unlocked && tutQuiz.active)
+//         emit('nominateSelfAsDriver');
+//       else {
+//         alert('Please wait until your TA activates this quiz before you start answering questions')
+//       }
+//     })
+//     $('#deferDriverBtn').click(function(){
+//       // if (tutQuiz.active)
+//       //   renderQuestion(quizData.quiz, 0);
+//     })    
+//   }
+//   else{
+//     $('#activateQuiz').html('The quiz is locked.');
+//   }
+// })
+
+
+socket.on('quizActivated', function(tutQuiz){ // active = start questions
+  quizData.active = tutQuiz.active;
+  if (tutQuiz.active){
+    alert('The quiz is now active. Select a driver and proceed!')
+    $('#driverSelect').show();
+  }
+  else{
+    $('#activeQuiz').html('The quiz is no longer active. Your responses have been saved.');
+  }
 })
 
 socket.on('startQuiz', function(data){
   $('#driverSelect').hide();
+  $('#assignGroup').hide();
   $('#activeQuiz').show();
-    if (quizData)
+    if (quizData.active)
         renderQuestion(quizData.quiz, 0);
 })
+
 
 socket.on('assignedAsDriver', function(){
   /*
@@ -42,6 +81,7 @@ socket.on('assignedAsDriver', function(){
 
 socket.on('renderQuestion', function(data){
   renderQuestion(quizData.quiz, data.questionNumber);
+  
 })
 
 socket.on('updateAttempts', function(data){
@@ -69,6 +109,7 @@ function renderQuestion(quiz, n){
     quizCompleted();
     return;
   }
+
   
   $('#submitQuestion').off('click');
     
@@ -128,6 +169,17 @@ function renderQuestion(quiz, n){
       })      
       
     })
+    
+  // questions list
+  $('#questionSelect').html('');
+  quiz.questions.forEach(function(question, i){
+    var className = (i == n) ? 'btn-primary' : 'btn-default';
+    $('#questionSelect').append('<button id = "'+ i + '" class = "goToQuestion btn '+ className +'">'+ (i+1) +'</button>');
+    $(document).on('click', '.goToQuestion', function(e){
+      renderQuestion(quiz, e.target.id )
+    })
+  })
+  
 }
 
 function mark(questionNumber, answer){

@@ -15,6 +15,15 @@
 
 }
 
+.centerText {
+  text-align: center;
+}
+
+.extraLarge {
+  font-weight: bold;
+  font-size: 72px;
+}
+
 .currentlyChosen {
   background: #FF9933;
   border-color: #FF9933;
