@@ -82,32 +82,37 @@ exports.editQuiz = function (req, res) {
 
 //
 exports.startQuiz = function (req, res) {
-    models.TutorialQuiz.populate(req.tutorialQuiz, {
-        // get group with user as a member
-        path: 'groups',
-        model: models.Group,
-        match: {
-            members: { $in: [req.user.id] }
-        },
-        // get driver of the group
-        populate: {
-            path: 'driver'
-        }
-    }, function (err) {
-        var group = req.tutorialQuiz.groups[0];
-        // check if user belongs to a group
-        if (!group) {
-            return res.redirect('/admin/courses');
-        }
+    // models.TutorialQuiz.populate(req.tutorialQuiz, {
+    //     // get group with user as a member
+    //     path: 'groups',
+    //     model: models.Group,
+    //     match: {
+    //         members: { $in: [req.user.id] }
+    //     },
+    //     // get driver of the group
+    //     populate: {
+    //         path: 'driver'
+    //     }
+    // }, function (err) {
+    //     var group = req.tutorialQuiz.groups[0];
+    //     // check if user belongs to a group
+    //     if (!group) {
+    //         return res.redirect('/admin/courses');
+    //     }
 
-        //console.log(req.tutorialQuiz);
+    //     //console.log(req.tutorialQuiz);
 
-        res.render('student/start-quiz', {
+    //     res.render('student/start-quiz.ejs', {
+    //         course: req.course,
+    //         tutorialQuiz: req.tutorialQuiz,
+    //         quiz: req.tutorialQuiz.quiz
+    //     });
+    // });
+     res.render('student/start-quiz.ejs', {
             course: req.course,
             tutorialQuiz: req.tutorialQuiz,
             quiz: req.tutorialQuiz.quiz
         });
-    });
 };
 
 exports.getNextQuestion = function (req, res) {
