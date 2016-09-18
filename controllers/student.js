@@ -94,13 +94,13 @@ exports.getQuizList = function (req, res) {
     req.course.withTutorials().execPopulate().then(function () {
         // find tutorials that student is in
         var tutorials = req.course.tutorials.filter(function (tutorial) {
-            return tutorial.students.indexOf(req.user.id);
+            return (tutorial.students.indexOf(req.user.id) > -1);
         });
         // find tutorial quizzes
         if (tutorials) {
             models.TutorialQuiz.find({ tutorial: tutorials[0].id, published: true }).populate('quiz').exec(function (err, tutorialQuizzes) {
-                console.log('tutorial', tutorials[0]);
-                console.log('tutorialQuizzes', tutorialQuizzes);
+                // console.log('tutorial', tutorials[0]);
+                // console.log('tutorialQuizzes', tutorialQuizzes);
                 res.render('student/tutorial-quizzes', { 
                     course: req.course,
                     tutorial: tutorials[0],
