@@ -152,3 +152,7 @@ exports.getQuizList = function (req, res) {
         }
     });
 };
+// 
+exports.getMarks = function (req, res) {
+    
+};

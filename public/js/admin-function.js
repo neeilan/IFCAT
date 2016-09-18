@@ -59,11 +59,16 @@ $(function () {
 
     // question handlers
 
+    $('#table-quiz-questions .sortable').sortable({
+        axis: 'y', 
+        cancel: false
+    });
+
     $('#btn-sort-questions').click(function (e) {
         e.preventDefault();
         $.ajax(this.href, {
             type: 'put',
-            data: $('#table-questions tr[data-id]').map(function () {
+            data: $('#table-quiz-questions tr[data-id]').map(function () {
                 return { name: 'questions[]', value: $(this).data('id') };
             }), 
             success: function (res) {
@@ -121,12 +126,11 @@ $(function () {
     // setup group handlers
 
     var options = {
-        axis: 'y', 
         cancel: false,
         connectWith: '.sortable'
     };
     
-    $('.sortable').sortable(options);
+    $('#col-unassigned-students .sortable, #col-groups .sortable').sortable(options);
 
     $('#btn-add-group').click(function () {
         var $tpl = $(_.template($('#panel-group-template').text())({ id: parseInt(_.uniqueId(), 10) + 999 }));

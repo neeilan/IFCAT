@@ -17,7 +17,6 @@ exports.getGroup = function (req, res, next, group) {
         next();
     });
 };
-
 // Retrieve list of groups for tutorial
 exports.getGroupList = function (req, res) { 
     req.tutorialQuiz.withStudents().withGroups().execPopulate().then(function (err) {
@@ -27,7 +26,6 @@ exports.getGroupList = function (req, res) {
         });
     });
 };
-
 // Temporarily generate groups
 exports.generateGroups = function (req, res) {
     // get students within tutorial

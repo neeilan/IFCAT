@@ -130,6 +130,8 @@ router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/generate', co
 //router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/view', controllers.Group.viewGroupForm);
 //router.delete('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group', controllers.Group.deleteGroupFromTutorial);
 
+router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/responses', controllers.Response.getResponseList);
+
 router.get('/courses/:course/files', controllers.File.getFileList);
 router.get('/courses/:course/files/new', controllers.File.getFileForm);
 router.get('/courses/:course/files/:fil3/edit', controllers.File.getFileForm);
@@ -142,7 +144,7 @@ router.get('/users/new', controllers.User.getUserForm);
 router.get('/users/:us3r/edit', controllers.User.getUserForm);
 router.post('/users', controllers.User.addUser);
 router.put('/users/:us3r', controllers.User.editUser);
-//router.delete('/users/:user', controllers.User.deleteUser);
+//router.delete('/users/:us3r', controllers.User.deleteUser);
 
 router.get('/courses/:course/instructors', controllers.Instructor.getInstructorListByCourse);
 router.get('/courses/:course/instructors/search', controllers.Instructor.getInstructorListBySearchQuery);
@@ -161,5 +163,6 @@ router.post('/courses/:course/students/import', csvUpload.single('file'), contro
 router.post('/courses/:course/students/:us3r', controllers.Student.addStudent);
 router.put('/courses/:course/students/:us3r', controllers.Student.editStudent);
 router.delete('/courses/:course/students/:us3r', controllers.Student.deleteStudent);
+router.get('/courses/:course/students/:us3r/marks', controllers.Student.getMarks);
 
 module.exports = router;

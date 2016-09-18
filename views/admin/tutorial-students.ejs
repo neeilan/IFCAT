@@ -4,40 +4,34 @@
 
 <h4 class="todo">@TODO: ability to delete students</h4>
 
-<form action="#" method="post">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th><input type="checkbox" value="1"></th>
-                <!--th>UTORid</th-->
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        <% tutorial.students.forEach(function (student) { %>
-            <tr>
-                <td><input type="checkbox" value="<%= student.id %>"></td>
-                <!--td><%= student.UTORid %></td-->
-                <td><%= student.name.first %></td>
-                <td><%= student.name.last %></td>
-                <td><%= student.local.email %></td>
-                <th>
-                    <div class="dropdown">
-                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                            Actions<span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">View </a></li>
-                        </ul>
-                    </div>
-                </th>
-            </tr>
-        <% }) %>
-        </tbody>
-    </table>
-</form>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>UTORid</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% for (var i = 0, len = tutorial.students.length; i < len; i++) { %>
+        <tr>
+            <td><%= tutorial.students[i].UTORid %></td>
+            <td><%= tutorial.students[i].name.full %></td>
+            <td><%= tutorial.students[i].local.email %></td>
+            <th>
+                <div class="dropdown">
+                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                        Actions<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="/admin/courses/<%= course.id %>/students/<%= tutorial.students[i].id %>/marks">View Marks</a></li>
+                    </ul>
+                </div>
+            </th>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
 
 <%- include ./footer -%>

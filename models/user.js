@@ -73,7 +73,7 @@ UserSchema.statics.findUsersByRole = function (role) {
 // find teaching assistants by search query
 UserSchema.statics.findUsersBySearchQuery = function (query, role) {
     // build regular expression e.g. 'first last' => /(first|last)/i
-    var regexp = new RegExp('(' + query.replace(/\s/, '|') + ')', 'i');
+    var regexp = new RegExp('(' + query.replace(/\s/, '|').trim() + ')', 'i');
     // query based on UTORid, name, or email
     return this.find().and([
         {

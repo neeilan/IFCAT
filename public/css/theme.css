@@ -12,15 +12,20 @@ body > .navbar {
     background: #f9f9f9;
     min-height: 300px;
 }
+#col-groups .panel {
+    position: relative;;
+}
+#col-groups .panel > .dropdown {
+    top: 8px;
+    position: absolute;
+    right: 20px;
+    z-index: 1000;
+}
 #col-groups .panel-heading {
-    overflow: hidden;
+    height: 45px;
 }
 #col-groups .panel-heading .panel-title {
-    float: left;
-}
-#col-groups .panel-heading .glyphicon-remove {
-    cursor: pointer;
-    float: right;    
+    padding-top: 5px;
 }
 .ui-sortable-helper {
     cursor: pointer;
