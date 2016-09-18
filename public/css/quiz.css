@@ -6,7 +6,6 @@
 
 .choice {
   border: solid 2px grey;
-  padding: 5px;
   margin: 5px;
   text-align: center;
   color: grey;
@@ -21,7 +20,7 @@
 
 .extraLarge {
   font-weight: bold;
-  font-size: 72px;
+  font-size: 96px;
 }
 
 .currentlyChosen {
@@ -54,4 +53,9 @@
 
 .goToQuestion {
   margin: 5px;
+}
+
+#driverSelect button {
+  padding: 15px 10px 15px 10px;
+  margin-top: 15px;
 }

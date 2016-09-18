@@ -39,7 +39,7 @@ app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist')
 app.use('/bootbox', express.static(__dirname + '/node_modules/bootbox'));
 app.use('/lodash', express.static(__dirname + '/node_modules/lodash'));
 app.use('/socketioclient', express.static(__dirname + '/node_modules/socket.io-client'));
-app.use('/font-awesome', express.static(__dirname + 'node_modules/font-awesome'));
+app.use('/font-awesome', express.static(__dirname + '/node_modules/font-awesome'));
 app.use(express.static('public'));
 
 app.use(morgan('dev'));
@@ -90,14 +90,6 @@ io.use(passportSocketIo.authorize({
   passport: passport,
   cookieParser: cookieParser
 }));
-
-app.get('/quiz', function (req, res){
-    require('./models').TutorialQuiz.findOne({})
-    .exec()
-    .then(function(tutQuiz){
-        res.render('student/start-quiz.ejs', { quiz : tutQuiz } )
-    })
-})
 
 io.on('connection', function(socket){
     
