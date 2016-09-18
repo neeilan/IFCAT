@@ -2,8 +2,9 @@
 <link rel = "stylesheet" href = "/css/quiz.css" type="text/css" />
 <div class="center-block">
 
-   <hr/>
+   
    <div class = "centerText">
+       
     <div id = "assignGroup">
         You are in group : <br/><h1 id = "groupName" class = "extraLarge"></h1>
       <br/>
@@ -26,16 +27,22 @@
   <br/>
   <span style = "display: none" >Attempts: <span id="currentAttempts">0</span></span>
   
-  <div id = "activeQuiz" style="display: none">
-    <div id = "text"></div>
-    <div id = "attachment"></div>
-    <div id = "choices"></div>
-    <hr/>
-    <button class = "btn btn-success quizBtn" disabled="true" id = "submitQuestion">Submit</button>
-    <br/>
-    <div id = "questionSelect"/>
+  <div class= "row" id = "activeQuiz" style="display: none">
+      
+      <div class = "col-md-2 col-sm-12 col-xs-12">
+        <div id = "questionSelect"></div>
+      </div>
+
+      <div class = "col-md-9 col-md-offset-1 col-sm-12 col-xs-12">  
+        <h3><div id = "text"></div></h3>
+        <hr/>
+        <div id = "attachment"></div>
+        <div id = "choices"></div>
+        <hr/>
+        <button class = "btn btn-success quizBtn" disabled="true" id = "submitQuestion">Submit</button>
+        <br/>
+      </div>
   </div>
-  <hr/>
 
 </div>
 

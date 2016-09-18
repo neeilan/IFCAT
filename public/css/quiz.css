@@ -1,7 +1,7 @@
 .attachedImg{
   width: 90%;
   max-width: 500px;
-  margin: auto;
+  margin: 10px auto 10px auto;
 }
 
 .choice {
@@ -50,4 +50,8 @@
 #submitQuestion:disabled {
   background: grey;
   border-color: grey;
+}
+
+.goToQuestion {
+  margin: 5px;
 }

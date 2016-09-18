@@ -23,8 +23,6 @@ $(document).on('click', '#selectDriverBtn', function(){
 })
 $(document).on('click', '#deferDriverBtn', function(){
   if (quizData.active){
-    $('#driverSelect').hide();
-    $('#activeQuiz').show();
     renderQuestion(quizData.quiz, 0);
   }
 })
@@ -62,9 +60,6 @@ socket.on('quizActivated', function(tutQuiz){ // active = start questions
 })
 
 socket.on('startQuiz', function(data){
-  $('#driverSelect').hide();
-  $('#assignGroup').hide();
-  $('#activeQuiz').show();
     if (quizData.active)
         renderQuestion(quizData.quiz, 0);
 })
@@ -105,6 +100,10 @@ var score = 0,
   
 function renderQuestion(quiz, n){
   
+  $('#driverSelect').hide();
+  $('#assignGroup').hide();
+  $('#activeQuiz').show();
+  
   if (n >= quiz.questions.length){
     quizCompleted();
     return;
@@ -122,12 +121,13 @@ function renderQuestion(quiz, n){
   $("#text").html(quiz.questions[n].question);
   $("#choices").html("");
   
+  $('#attachment').html('');
   if (quiz.questions[n].files){
     var file = quiz.questions[n].files[0];
     if (file && file.type.includes('image')){
       var courseId = url.slice(url.indexOf('/courses/') + 9, url.indexOf('/quizzes'));
       var fileUrl = '/upl/' + courseId + '/' + file.name;
-      $('#text').append('<br/><img class="attachedImg" src="' + fileUrl + '"/> <br/>')
+      $('#attachment').html('<img class="attachedImg" src="' + fileUrl + '"/> <br/><hr/>')
 
     }
   }
@@ -174,7 +174,7 @@ function renderQuestion(quiz, n){
   $('#questionSelect').html('');
   quiz.questions.forEach(function(question, i){
     var className = (i == n) ? 'btn-primary' : 'btn-default';
-    $('#questionSelect').append('<button id = "'+ i + '" class = "goToQuestion btn '+ className +'">'+ (i+1) +'</button>');
+    $('#questionSelect').append('<button id = "'+ i + '" class = "goToQuestion col-md-11 col-xs-2 col-sm-2 btn '+ className +'">'+ (i+1) +'</button>');
     $(document).on('click', '.goToQuestion', function(e){
       renderQuestion(quiz, e.target.id )
     })
