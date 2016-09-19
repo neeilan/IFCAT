@@ -126,9 +126,9 @@ exports.generateData = function (req, res) {
                 var n = _.sampleSize('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6).join(''),
                     m = _.sampleSize('01234', 1).join('');
                 arr.push({
-                    'UTORid': n + m,
-                    'name.first': n,
-                    'name.last': n,
+                    'UTORid': _.lowerCase(n + m),
+                    'name.first': _.startCase(n),
+                    'name.last': _.startCase(n),
                     'local.email': n + m + '@mail.utoronto.ca',
                     'local.password': '',
                     'roles': ['student']

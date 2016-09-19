@@ -38,9 +38,6 @@ exports.addFile = function (req, res) {
     }, function (err, file) { 
         req.course.files.push(file);
         req.course.save(function (err) {
-            if (err) {
-                console.log(err);
-            }
             res.redirect('/admin/courses/' + req.course.id + '/files');
         }); 
     });

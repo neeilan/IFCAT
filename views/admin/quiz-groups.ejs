@@ -2,7 +2,7 @@
 
 <h1>Groups</h1>
 
-<h4 class="todo">@TODO: ability to delete groups</h4>
+<!--h4 class="todo">@TODO: ability to delete groups</h4-->
 
 <!--button type="button" class="btn btn-default btn-sm" id="btn-add-group"><span 
     class="glyphicon glyphicon-plus"></span> Add group</button-->
@@ -64,7 +64,7 @@
         <div class="panel-group" id="panel-groups">
         <% for (var i = 0, len = tutorialQuiz.groups.length; i < len; i++) { %>
             <div class="panel panel-default" data-group-id="<%= tutorialQuiz.groups[i].id %>">
-                <div class="dropdown">
+                <div class="dropdown" style="z-index: <%= i + 1000 %>">
                     <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
                         Actions<span class="caret"></span>
                     </button>

@@ -134,6 +134,7 @@ router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/generate', co
 //router.delete('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group', controllers.Group.deleteGroupFromTutorial);
 
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/responses', controllers.Response.getResponseList);
+router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/responses/export', controllers.Response.exportResponseList);
 
 router.get('/courses/:course/files', controllers.File.getFileList);
 router.get('/courses/:course/files/new', controllers.File.getFileForm);

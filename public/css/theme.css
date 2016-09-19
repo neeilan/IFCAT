@@ -19,7 +19,6 @@ body > .navbar {
     top: 8px;
     position: absolute;
     right: 20px;
-    z-index: 1000;
 }
 #col-groups .panel-heading {
     height: 45px;
