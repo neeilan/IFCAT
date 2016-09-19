@@ -216,7 +216,15 @@ io.on('connection', function(socket){
                 res.attempts = 1;
                 res.correct = data.correct;
                 res.points = data.correct ? 5 : 0;
-                return res.save();
+                return res.save()
+                .then(function(res){
+                    models.TutorialQuiz.findByIdAndUpdate(data.quizId, {
+                        $push : { responses : res._id }
+                    }).exec()
+                    .then(function(){
+                        return res;
+                    })
+                })
             }
             else{
                 // Some logic to prevent students from being dumb and reanswering correct questions and losing points
@@ -236,6 +244,7 @@ io.on('connection', function(socket){
             }
         })
         .then(function(response){
+            console.log(response);
             if (response.correct){
                 io.in('group:' + data.groupId).emit('renderQuestion', 
                 { groupId: data.groupId, questionNumber: data.next });
@@ -244,6 +253,8 @@ io.on('connection', function(socket){
                 io.in('group:' + data.groupId).emit('updateAttempts', 
                 { groupId: data.groupId, attempts : response.attempts });
             }
+            
+            
 
         })
     })
@@ -267,7 +278,7 @@ io.on('connection', function(socket){
     
     socket.on('awardPoint', function(data){
     
-        console.log('Awarding point to user');
+        console.log('Awarding point');
         // models.User.findByIdAndUpdate(data.userId, { $inc : { teachingPoints : 1 }},
         // {new : true }, function (user){
         //     console.log('Teaching points for user '+data.userId+' now '+user.teachingPoints);

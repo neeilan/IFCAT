@@ -8,6 +8,8 @@ var models = require('../models');
 exports.getResponseList = function (req, res) {
     req.tutorialQuiz.withResponses().execPopulate().then(function () {
         // ugly: filter out group responses
+        console.log('reponses' , req.tutorialQuiz)
+        console.log(req.group.id)
         var responses = _.filter(req.tutorialQuiz.responses, function (response) {
             return response.group.id === req.group.id;
         });
