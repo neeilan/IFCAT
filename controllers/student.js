@@ -23,7 +23,7 @@ exports.getStudentsByTutorial = function (req, res) {
     });
 };
 // Add student to course
-exports.addStudent = function (req, res) {
+exports.addStudent = function (req, res) { console.log(req.us3r.id);
     req.course.addStudent(req.us3r.id);
     req.course.save(function (err) {
         res.json({ status: true });
@@ -154,5 +154,55 @@ exports.getQuizList = function (req, res) {
 };
 // 
 exports.getMarks = function (req, res) {
-    
+    req.course.withTutorials().execPopulate().then(function () {
+        // find tutorials that student is in
+        var tutorial = _.find(req.course.tutorials, function (tutorial) {
+            return tutorial.students.indexOf(req.us3r.id) !== -1;
+        });
+        // find tutorial quizzes
+        if (tutorial) {
+            models.TutorialQuiz.find({ tutorial: tutorial.id }).populate([{
+                path: 'quiz',
+                model: models.Quiz
+            }, {
+                path: 'groups',
+                model: models.Group
+            }, {
+                path: 'responses',
+                model: models.Response,
+                populate: {
+                    path: 'group',
+                    model: models.Group
+                }
+            }]).exec(function (err, tutorialQuizzes) {
+                // ugly: find marks by student
+                var marks = _.map(tutorialQuizzes, function (tutorialQuiz) {
+                    return {
+                        tutorialQuiz: tutorialQuiz,
+                        group: _.find(tutorialQuiz.groups, function (group) {
+                            return group.members.indexOf(req.us3r.id) !== -1;
+                        }),
+                        points: _.reduce(tutorialQuiz.responses, function (sum, response) {
+                            if (response.group.members.indexOf(req.us3r.id) !== -1) {
+                                return sum + response.points;
+                            }
+                            return sum;
+                        }, 0)
+                    };
+                });
+                // tally the points
+                var totalPoints = _.reduce(marks, function (sum, mark) {
+                    return sum + mark.points;
+                }, 0);
+
+                res.render('admin/student-marks', {
+                    student: req.us3r,
+                    course: req.course,
+                    tutorial: tutorial,
+                    marks: marks,
+                    totalPoints: totalPoints
+                });
+            });
+        }
+    });
 };

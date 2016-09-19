@@ -1,0 +1,39 @@
+<%- include ./header -%>
+
+<h1><%= course.code + ' - ' + course.name %><br>
+<small><%= student.name.full %> - Marks</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Quiz</th>
+            <th>Group</th>
+            <th class="text-center">Points awarded</th>
+        </tr>
+    </thead>
+    <% if (!_.isEmpty(marks)) { %>
+        <tfoot>
+            <tr class="total-points">
+                <th colspan="2" style="text-align: right">Total Points</th>
+                <th class="text-center"><%= totalPoints %></th>
+            </tr>
+        </tfoot>
+        <tbody>
+        <% for (var i = 0, len = marks.length; i < len; i++) { %>
+            <tr>
+                <td><%= marks[i].tutorialQuiz.quiz.name %>.</td>
+                <td>
+                    <a href="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= marks[i].tutorialQuiz.id %>/groups/<%= marks[i].group.id %>/responses">Group <%= marks[i].group.name %></a>       
+                </td>
+                <td class="text-center"><%= marks[i].points %></td>
+            </tr>
+        <% } %>
+        </tbody>
+    <% } else { %>
+        <tbody>
+            <tr><td colspan="3">No marks have been given yet.</td></tr>
+        </tbody>
+    <% } %>
+</table>
+
+<%- include ./footer -%>

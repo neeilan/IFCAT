@@ -5,14 +5,13 @@ var models = require('../models');
 
 // Retrieve responses
 exports.getResponseList = function (req, res) {
-    req.tutorialQuiz.withResponses(req.group.id).execPopulate().then(function () {
+    req.tutorialQuiz.withResponses().execPopulate().then(function () {
         // ugly: filter out group responses
         var responses = _.filter(req.tutorialQuiz.responses, function (response) {
             return response.group.id === req.group.id;
         });
         // tally the points
         var totalPoints = _.reduce(responses, function (sum, response) {
-            console.log(sum, response.points);
             return sum + response.points;
         }, 0);
 

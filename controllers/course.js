@@ -86,7 +86,7 @@ exports.generateData = function (req, res) {
 
     var quizSize = 10,
         tutorialSize = 10,
-        groupSize = Math.floor(Math.random() * tutorialSize / 2) + 1;
+        groupSize = Math.floor(Math.random() * tutorialSize - 2) + 1;
 
     async.series([
         // create course

@@ -3,7 +3,7 @@
 
 <h1><%= course.code + ' - ' + course.name %><br><small>Students</small></h1>
 
-<!-- Show current students -->
+<!-- Show current course.students[i]. -->
 
 <table class="table table-striped">
     <thead>
@@ -11,7 +11,9 @@
             <th rowspan="2">UTORid</th>
             <th rowspan="2">Name</th>
             <th rowspan="2">Email</th>
-            <th colspan="<%= course.tutorials.length %>" class="text-center">Tutorials</th>
+            <% if (!_.isEmpty(course.tutorials)) { %>
+                <th colspan="<%= course.tutorials.length %>" class="text-center">Tutorials</th>
+            <% } %>
             <th rowspan="2"></th>
         </tr>
         <tr>
@@ -21,36 +23,42 @@
         </tr>
     </thead>
     <tbody>
-    <% course.students.forEach(function (student) { %>
-        <tr>
-            <td><%= student.UTORid %></td>
-            <td><%= student.name.full %></td>
-            <td><%= student.local.email %></td>
-            <% course.tutorials.forEach(function (tutorial) { %>
-                <td class="text-center"><input type="radio" name="tutorial[<%= student.id %>]" value="<%= tutorial.id %>"<%= 
-                    tutorial.students.indexOf(student.id) !== -1 ? ' checked' : '' %>></td>
-            <% }) %>
-            <td>
-                <div class="dropdown">
-                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                        Actions<span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="#" class="btn-update-user"
-                    data-url="/admin/courses/<%= course.id %>/students/<%= student.id %>">Update tutorial</a></li>
-                        <li class="divider">
-                        <li><a href="#" class="btn-delete-user"
-                    data-url="/admin/courses/<%= course.id %>/students/<%= student.id %>">Remove from course</a></li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
-    <% }) %>
+    <% if (!_.isEmpty(course.students)) { %>
+        <% for (var i = 0, len = course.students.length; i < len; i++) { %>
+            <tr>
+                <td><%= course.students[i].UTORid %></td>
+                <td><%= course.students[i].name.full %></td>
+                <td><%= course.students[i].local.email %></td>
+                <% course.tutorials.forEach(function (tutorial) { %>
+                    <td class="text-center"><input type="radio" name="tutorial[<%= course.students[i].id %>]" 
+                        value="<%= tutorial.id %>"<%= tutorial.students.indexOf(course.students[i].id) !== -1 ? ' checked' : '' %>></td>
+                <% }) %>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                            Actions<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                        <% if (!_.isEmpty(course.tutorials)) { %>
+                            <li><a href="#" class="btn-update-user"
+                        data-url="/admin/courses/<%= course.id %>/students/<%= course.students[i].id %>">Update tutorial</a></li>
+                            <li class="divider">
+                        <% } %>
+                            <li><a href="#" class="btn-delete-user"
+                        data-url="/admin/courses/<%= course.id %>/students/<%= course.students[i].id %>">Remove from course</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        <% } %>
+    <% } else { %>
+        <tr><td colspan="<%= 4 + course.tutorials.length %>">No students have been added to the course yet.</td></tr>
+    <% } %>
     </tbody>
 </table>
 
 
-<!-- Search students -->
+<!-- Search course.students[i]. -->
 
 <h1><small>Find students</small></h1>
 
@@ -72,7 +80,7 @@
 
 <div id="search-user-results" class="clearfix"></div>
 
-<!-- Import students -->
+<!-- Import course.students[i]. -->
 
 <h1><small>Import students</small></h1>
 
@@ -85,7 +93,6 @@
             </label>
             <span class="label label-info"></span>
             <input type="submit" value="Go" class="btn btn-primary btn-sm">
-     
     </div>
 </form>
 

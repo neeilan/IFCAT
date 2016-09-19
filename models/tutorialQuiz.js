@@ -90,16 +90,12 @@ TutorialQuizSchema.methods.store = function (obj, callback) {
 };
 // Find quizzes within tutorial
 TutorialQuizSchema.statics.findQuizzesByTutorial = function (tutorial) {
-    return this.find({ tutorial: tutorial }).populate('tutorial quiz');
+    return this.find({ tutorial: tutorial }).populate('tutorial quiz groups responses');
 };
 
 // find quizzes within tutorial
-TutorialQuizSchema.statics.findQuizzesByCourseStudent = function (course, user) {
-    var model = this;
-    models.Course.findCourseByStudent(course.id, user.id).exec(function (err, course) {
-        console.log(course);
-        return model.find({ tutorial: course.tutorials[0] }).populate('tutorial quiz');
-    });
+TutorialQuizSchema.statics.findQuizzesByStudent = function (tutorial, user) {
+    
 };
 
 module.exports = mongoose.model('TutorialQuiz', TutorialQuizSchema);
