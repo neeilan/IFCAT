@@ -16,6 +16,10 @@ var UserSchema = new mongoose.Schema({
         token: String,
     },
     UTORid: String, // not sure if we are using it
+    teachingPoints: {
+        type: Number,
+        default: 0
+    },
     name: {
         first: String,
         last: String

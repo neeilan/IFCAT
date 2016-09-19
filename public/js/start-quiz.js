@@ -35,28 +35,6 @@ function renderStars(empty, full){
 }
 
 
-
-// socket.on('quizUnlocked', function(tutQuiz){ // unlocked = can select groups
-//   if (tutQuiz.unlocked){
-//     $('#driverSelect').show();
-//     $('#selectDriverBtn').click(function(){
-//       if (tutQuiz.unlocked && tutQuiz.active)
-//         emit('nominateSelfAsDriver');
-//       else {
-//         alert('Please wait until your TA activates this quiz before you start answering questions')
-//       }
-//     })
-//     $('#deferDriverBtn').click(function(){
-//       // if (tutQuiz.active)
-//       //   renderQuestion(quizData.quiz, 0);
-//     })    
-//   }
-//   else{
-//     $('#activateQuiz').html('The quiz is locked.');
-//   }
-// })
-
-
 socket.on('quizActivated', function(tutQuiz){ // active = start questions
   quizData.active = tutQuiz.active;
   if (tutQuiz.active){
@@ -64,7 +42,7 @@ socket.on('quizActivated', function(tutQuiz){ // active = start questions
     $('#driverSelect').show();
   }
   else{
-    $('#activeQuiz').html('The quiz is no longer active. Your responses have been saved.');
+    quizCompleted();
   }
 })
 
@@ -199,7 +177,14 @@ function mark(questionNumber, answer){
  }
  
  function quizCompleted (){
-  $('#activeQuiz').html('The quiz has been completed.')  
+   if (quizData.active){
+    $('#activeQuiz').html('Your responses have been submitted.\
+    You can change answers (penalties may apply) until your TA inactivates this quiz.');
+   }
+   else{
+     $('#postQuiz').show();
+     socket.emit('quizComplete', { groupId: groupId, quizId: quizData._id })
+   }
  }
  
  // Socket.io handlers
@@ -210,3 +195,20 @@ function mark(questionNumber, answer){
      }
  })
     
+socket.on('postQuiz', function(data){
+  $('#activeQuiz').hide();
+  $("#postQuiz").show();
+  $('#score').html(data.score);
+  var html = "";
+  data.members.forEach(function(member){
+    html+="<br/><button class='teachingPt btn btn-default col-md-6 col-xs-8 col-sm-8 col-md-offset-3 col-sm-offset-2 col-xs-offset-2 ' id='"+ member._id +"'>" + (member.name.first+' '
+    +member.name.last) +"</button><br/>"
+  })
+  $("#teachingPointsPicker").html(html);
+  $(document).on('click','.teachingPt', function(e){
+    socket.emit('awardPoint', { userId: e.target.id });
+    $('#postQuiz').html('Quiz complete');
+  })
+  
+  
+})

@@ -215,13 +215,24 @@ io.on('connection', function(socket){
                 res.question = data.questionId;
                 res.attempts = 1;
                 res.correct = data.correct;
+                res.points = data.correct ? 5 : 0;
                 return res.save();
             }
             else{
+                // Some logic to prevent students from being dumb and reanswering correct questions and losing points
+                // Basically, if they get it right once, they can't worsen their score
+                
+
+                var attemptsInc = response.correct ? 0 : 1;
+                var newScore = (response.correct) ? response.points : (data.correct) ? (5 - response.attempts) : 0;;
+                // If they got it correct before, don't increment
+                
                 return models.Response.findByIdAndUpdate(response._id,
-                { correct: data.correct , $inc : { attempts : 1 } },
+                { correct: (response.correct || data.correct) , $inc : { attempts : attemptsInc },
+                points : (newScore > 0) ? newScore : 0 },
                 { new: true } )
                 .exec()
+        
             }
         })
         .then(function(response){
@@ -237,6 +248,31 @@ io.on('connection', function(socket){
         })
     })
 
+    socket.on('quizComplete', function(data){
+        models.Group.findById(data.groupId).populate('members').exec()
+        .then(function(group){
+            models.Response.find({ group : data.groupId }).exec()
+            .then(function(groups){
+                return groups.reduce((pre, curr)=> pre.points + curr.points)
+            })
+            .then(function(score){
+                io.in('group:'+data.groupId).emit('postQuiz',{
+                    members : group.members,
+                    score : score
+                })
+            })
+        })
+        
+    })
+    
+    socket.on('awardPoint', function(data){
+    
+        console.log('Awarding point to user');
+        // models.User.findByIdAndUpdate(data.userId, { $inc : { teachingPoints : 1 }},
+        // {new : true }, function (user){
+        //     console.log('Teaching points for user '+data.userId+' now '+user.teachingPoints);
+        // })
+    })
     
     
 })
