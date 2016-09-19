@@ -140,7 +140,7 @@ router.get('/courses/:course/files/new', controllers.File.getFileForm);
 router.get('/courses/:course/files/:fil3/edit', controllers.File.getFileForm);
 router.post('/courses/:course/files', anyUpload.single('file'), controllers.File.addFile);
 router.put('/courses/:course/files/:fil3', anyUpload.single('file'), controllers.File.editFile);
-router.delete('/courses/:course/files/:fil3', controllers.File.deleteFile);
+router.delete('/courses/:course/files', controllers.File.deleteFiles);
 
 router.get('/users', controllers.User.getUserList);
 router.get('/users/new', controllers.User.getUserForm);

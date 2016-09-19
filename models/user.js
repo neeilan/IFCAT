@@ -52,6 +52,18 @@ UserSchema.methods.addRole = function (role) {
 UserSchema.methods.hasRole = function (role) {
     return this.roles.indexOf(role) !== -1;
 };
+// Save user
+UserSchema.methods.store = function (obj, callback) {
+    this.name.first = obj.name.first;
+    this.name.last = obj.name.last;
+    this.roles = obj.roles;
+    this.UTORid = obj.UTORid;
+    this.local.email = obj.local.email;
+    if (obj.local.password) {
+        this.local.password = this.generateHash(obj.local.password);
+    }
+    return this.save(callback);
+};
 // sort users by roles, first name, and last name
 UserSchema.statics.sortByRole = function (users) {
     var roles = this.schema.path('roles').caster.enumValues;

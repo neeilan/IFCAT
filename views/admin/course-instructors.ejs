@@ -13,16 +13,20 @@
         </tr>
     </thead>
     <tbody>
-    <% course.instructors.forEach(function (instructor) { %>
-        <tr>
-            <td><%= instructor.name.full %></td>
-            <td><%= instructor.local.email %></td>
-            <td>
-                <button type="button" class="btn btn-danger btn-sm btn-delete-user"
-                    data-url="/admin/courses/<%= course.id %>/instructors/<%= instructor.id %>">Delete</button>
-            </td>
-        </tr>
-    <% }) %>
+    <% if (!_.isEmpty(course.instructors)) { %>
+        <% for (var i = 0, len = course.instructors.length; i < len; i++) { %>
+            <tr>
+                <td><%= course.instructors[i].name.full %></td>
+                <td><%= course.instructors[i].local.email %></td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm btn-delete-user"
+                        data-url="/admin/courses/<%= course.id %>/instructors/<%= course.instructors[i].id %>">Delete</button>
+                </td>
+            </tr>
+        <% } %>
+    <% } else { %>
+        <tr><td colspan="3">No instructors have been added to the course yet.</td></tr>
+    <% } %>
     </tbody>
 </table>
 

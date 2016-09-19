@@ -23,40 +23,35 @@ exports.getUser = function (req, res, next, us3r) {
 
 // route handlers
 
+// Login user
 exports.login = function (req, res) {
     res.render('login', { message: req.flash('message') }); 
 };
-
+// Logout user
 exports.logout = function (req, res) {
     req.logout();
     res.redirect('/login');
 };
-
+// Retrieve list of users
 exports.getUserList = function (req, res) {
     models.User.find({}).exec(function (err, users) {
         res.render('admin/users', { users: models.User.sortByRole(users) });
     }); 
 };
-
+// Retrieve user form
 exports.getUserForm = function (req, res) {
     res.render('admin/user', { us3r: req.us3r || new models.User() });
 };
 // Add new user
 exports.addUser = function (req, res) {
-    models.User.create(req.body, function (err, user) {
+    var user = new models.User();
+    user.store(req.body, function (err) {
         res.redirect('/admin/users');
     });
 };
 // Update specific user
 exports.editUser = function (req, res) {
-    req.us3r.name.first = req.body.name.first;
-    req.us3r.name.last = req.body.name.last;
-    req.us3r.roles = req.body.roles;
-    req.us3r.local.email = req.body.local.email;
-    if (req.body.local.password) {
-        req.us3r.local.password = req.us3r.generateHash(req.body.local.password);
-    }
-    req.us3r.save(function (err) {
+    req.us3r.store(req.body, function (err) {
         res.redirect('/admin/users/' + req.us3r.id + '/edit');
     });
 };

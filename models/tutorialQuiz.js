@@ -90,7 +90,7 @@ TutorialQuizSchema.methods.store = function (obj, callback) {
 };
 // Find quizzes within tutorial
 TutorialQuizSchema.statics.findQuizzesByTutorial = function (tutorial) {
-    return this.find({ tutorial: tutorial }).populate('tutorial quiz groups responses');
+    return this.find({ tutorial: tutorial }).populate('tutorial quiz');
 };
 
 // find quizzes within tutorial

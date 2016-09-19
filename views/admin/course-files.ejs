@@ -5,11 +5,11 @@
 <a href="/admin/courses/<%= course.id %>/files/new" class="btn btn-default btn-sm"><span 
     class="glyphicon glyphicon-plus"></span> Add New File</a>
 
-<a href="#" class="btn btn-default" id="btn-delete-files"><span class="glyphicon glyphicon-remove"></span> Delete Files</a>
+<a href="/admin/courses/<%= course.id %>/files" class="btn btn-default btn-delete" id="btn-delete-files"><span class="glyphicon glyphicon-remove"></span> Delete Files</a>
 
 <br><br>
 
-<table class="table table-striped">
+<table class="table table-striped" id="table-files">
     <tdead>
         <tr>
             <th><input type="checkbox" value="1" class="select-all"></th>

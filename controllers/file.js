@@ -1,3 +1,6 @@
+var _ = require('lodash'),
+    async = require('async');
+
 var models = require('../models');
 
 // Retrieve file
@@ -51,8 +54,10 @@ exports.editFile = function (req, res) {
     });
 };
 // Delete specific file for course
-exports.deleteFile = function (req, res) {
-    req.fil3.remove(function (err) {
+exports.deleteFiles = function (req, res) {
+    async.eachSeries(req.body.files, function (id, done) {
+        models.File.findByIdAndRemove(id, done);
+    }, function (err) {
         res.json({ status: true });
     })
 };

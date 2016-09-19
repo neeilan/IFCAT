@@ -2,8 +2,6 @@
 
 <h1>Users</h1>
 
-<h4 class="todo">@TODO: ability to delete users</h4>
-
 <a href="/admin/users/new" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add new user</a>
 
 <table class="table table-striped">
@@ -39,7 +37,7 @@
                             Actions<span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="/admin/users/<%= users[i].id %>/edit">Edit user</a></li>
+                            <li><a href="/admin/users/<%= users[i].id %>/edit"><span class="glyphicon glyphicon-pencil"></span> Edit user</a></li>
                             <li class="divider">
                             <li><a href="/admin/users/<%= users[i].id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete user</a></li>
                         </ul>

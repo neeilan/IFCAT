@@ -93,20 +93,6 @@ $(function () {
                 $col.find(':input').prop('disabled', !$col.hasClass(type));
         });
     }).change();
-
-    /*$('#file-modal .add-files').click(function (e) {
-        var html = $('#file-modal .list-group-item.active').map(function () {
-            return '<div>' +
-                '<span>' + $(this).text() + '</span>' +
-                '<input type="hidden" name="files[]" value="' + $(this).data('id') + '"">' +
-            '</div>';
-        }).get().join('');
-
-        var $a = $('#question-form .add-files');
-            $a.prevAll().remove();
-            $a.before(html);
-    });*/
-
     
     $('.multiple-choice, .multiple-select').on('click', '.btn-remove-choice', function (e) {
         e.preventDefault();
@@ -230,7 +216,10 @@ $(function () {
 
     $('.btn-delete').click(function (e) {
         e.preventDefault();
-        var url = this.href;
+        var url = this.href, data = null;
+        if (this.id === 'btn-delete-files') {
+            data = $('#table-files :checkbox:checked').serialize();
+        }
         // open confirmation dialog before performing deletion
         bootbox.dialog({
             title: 'Confirm deletion',
@@ -247,6 +236,7 @@ $(function () {
                             // perform deletion
                             $.ajax(url, {
                                 type: 'delete',
+                                data: data,
                                 success: function (res) {
                                     if (res.status) {
                                         window.location.reload(true);
