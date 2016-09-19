@@ -86,7 +86,7 @@ exports.generateData = function (req, res) {
 
     var quizSize = 10,
         tutorialSize = 10,
-        groupSize = Math.floor(Math.random() * tutorialSize) + 1;
+        groupSize = Math.floor(Math.random() * tutorialSize / 2) + 1;
 
     async.series([
         // create course
@@ -198,8 +198,8 @@ exports.generateData = function (req, res) {
                 async.eachSeries(quiz.questions, function (question, done) {
                     var apc = _.shuffle([[0, 4, true], [1, 2, true], [2, 1, true], [3, 0, false]])[0];
                     models.Response.create({
-                        group: group.id,
-                        question: question.id,
+                        group: group,
+                        question: question,
                         attempts: apc[0],
                         points: apc[1],
                         correct: apc[2]

@@ -64,8 +64,8 @@ TutorialQuizSchema.methods.withGroups = function () {
     });
 };
 // Populate responses
-TutorialQuizSchema.methods.withResponses = function () {
-    return this.populate({
+TutorialQuizSchema.methods.withResponses = function (group) {
+    var obj = {
         path: 'responses',
         model: models.Response,
         populate: [{
@@ -75,7 +75,8 @@ TutorialQuizSchema.methods.withResponses = function () {
             path: 'question',
             models: models.Question
         }]
-    });
+    };
+    return this.populate(obj);
 };
 // Save tutorial-quiz
 TutorialQuizSchema.methods.store = function (obj, callback) {

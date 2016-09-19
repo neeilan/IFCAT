@@ -29,8 +29,10 @@
                         <ul class="dropdown-menu">
                             <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= course.tutorials[i].id %>/edit"><span 
                                 class="glyphicon glyphicon-pencil"></span> Edit Tutorial</a></li>
-                            <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= course.tutorials[i].id %>/students">Manage Students</a></li>
-                            <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= course.tutorials[i].id %>/quizzes">Manage Quizzes</a></li>
+                            <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= course.tutorials[i].id %>/quizzes"><span 
+                                class="glyphicon glyphicon-list-alt"></span> Manage Quizzes</a></li>
+                            <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= course.tutorials[i].id %>/students"><span 
+                                class="glyphicon glyphicon-user"></span> Manage Students</a></li>
                             <li class="divider"></li>
                             <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= course.tutorials[i].id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete Tutorial</a></li>
                         </ul>

@@ -1,6 +1,7 @@
 <%- include ./header -%>
 
-<h1>Responses</h1>
+<h1><%= course.code + ' - ' + course.name %><br>
+<small>Tutorial <%= tutorialQuiz.tutorial.number %> - <%= tutorialQuiz.quiz.name %> - Group <%= group.name %> - Responses</h1>
 
 <table class="table table-striped">
     <thead>
@@ -11,23 +12,29 @@
             <th class="text-center">Points awarded</th>
         </tr>
     </thead>
-    <tfoot>
-        <tr class="total-points">
-            <th colspan="3">Total Points</th>
-            <th></th>
-        </tr>
-    </tfoot>
-    <tbody>
-    <% for (var i = 0, len = responses.length; i < len; i++) { %>
-        <tr>
-            <td style="width: 10px;"><%= responses[i].question.number %>.</td>
-            <td style="max-width: 250px;"><%= responses[i].question.question %></td>
-            <td class="text-center"><%= responses[i].attempts %></td>
-            <td class="text-center"><%= responses[i].points %></td>
-            <td class="text-center"></td>
-        </tr>
+    <% if (!_.isEmpty(responses)) { %>
+        <tfoot>
+            <tr class="total-points">
+                <th colspan="3" style="text-align: right">Total Points</th>
+                <th class="text-center"><%= totalPoints %></th>
+            </tr>
+        </tfoot>
+        <tbody>
+        <% for (var i = 0, len = responses.length; i < len; i++) { %>
+            <tr>
+                <td style="width: 10px;"><%= responses[i].question.number %>.</td>
+                <td style="max-width: 250px;"><%= responses[i].question.question %></td>
+                <td class="text-center"><%= responses[i].attempts %></td>
+                <td class="text-center"><%= responses[i].points %></td>
+                <td class="text-center"></td>
+            </tr>
+        <% } %>
+        </tbody>
+    <% } else { %>
+        <tbody>
+            <tr><td colspan="4">No responses have been given yet.</td></tr>
+        </tbody>
     <% } %>
-    </tbody>
 </table>
 
 <%- include ./footer -%>
