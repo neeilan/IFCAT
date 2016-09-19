@@ -28,7 +28,11 @@ exports.getResponseList = function (req, res) {
 // Export responses
 exports.exportResponseList = function (req, res) {
     var data = [];
-    var filename = 'tut' + req.tutorialQuiz.tutorial.number + '-group' + req.group.name + '.csv';
+    var filename =
+        req.course.code + 
+        '-tut' + req.tutorialQuiz.tutorial.number +
+        '-group' + req.group.name + 
+        '.csv';
 
     req.tutorialQuiz.withResponses().execPopulate().then(function () {
         // ugly: filter out group responses
@@ -40,6 +44,7 @@ exports.exportResponseList = function (req, res) {
             return sum + response.points;
         }, 0);
         // build information
+        data.push(['Course', req.course.code, req.course.name]);
         data.push(['Tutorial', req.tutorialQuiz.tutorial.number]);
         data.push(['Quiz', req.tutorialQuiz.quiz.name]);
         data.push(['Group', req.group.name]);
@@ -60,6 +65,6 @@ exports.exportResponseList = function (req, res) {
         // send CSV
         res.setHeader('Content-disposition', 'attachment; filename=' + filename); 
         res.set('Content-Type', 'text/csv'); 
-        res.status(200).send(data.map(function (row) { return row.join(); }).join("\n"));
+        res.status(200).send(_.map(data, function (row) { return row.join(); }).join("\n"));
     });
 };
