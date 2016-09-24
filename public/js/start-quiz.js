@@ -3,18 +3,41 @@ $('.quizBtn').attr('disabled', true); // Disable quiz buttons (enable if assigne
 var url = window.location.href;
 var quizId = url.slice(url.indexOf('/quizzes/') + 9, url.indexOf('/start'));
 var socket = io();
-var quizData, groupId, currentQuestionId;
+var quizData, groupId,isDriver,  responses = {}, currentQuestionId, score = 0;
     
 socket.emit('requestQuiz', quizId);
 
 socket.on('quizData', function(tutorialQuiz){
+  console.log(tutorialQuiz)
   quizData = tutorialQuiz.quiz;
   groupId = tutorialQuiz.groupId;
+  
   $('#groupName').html(tutorialQuiz.groupName);
   
   if (quizData.active){
     $('#driverSelect').show();  
   }
+  
+})
+
+// When a question is answered by leader, a 'groupAttempt' event is emitted
+socket.on('groupAttempt', function(data){
+  console.log(data)
+  responses[data.response.question] = data.response;
+  if (data.response.group != groupId) return;
+  if (data.response.correct) {
+    swal("Good job!", "Question "+ data.questionNumber +" was answered correctly!.\
+     Received " + data.response.points + " points ", "success");
+     score += parseInt(data.response.points);
+     $('#'+(data.questionNumber-1)).addClass('btn-success');
+     renderStars(data.questionNumber-1, data.response.attempts - 1, 6 - data.response.attempts);
+      $('#currentScore').html(score);
+  }
+  else {
+    swal("Yikes!", "Question "+ data.questionNumber +" was answered incorrectly!", "error");
+    renderStars(data.questionNumber-1, data.response.attempts, 5 - data.response.attempts);
+  }
+  
 })
 
 
@@ -27,17 +50,18 @@ $(document).on('click', '#deferDriverBtn', function(){
   }
 })
 
-function renderStars(empty, full){
-    var fullStars = "<i class = 'fa fa-star' />".repeat( full ),
-      emptyStars = "<i class = 'fa fa-star-o' />".repeat(  empty );
+function renderStars(question, empty, full){
+    var fullStars = "<i class = 'fa fa-star' />&nbsp;".repeat(full),
+      emptyStars = "<i class = 'fa fa-star-o' />&nbsp;".repeat(empty);
     var html = emptyStars + fullStars;
-    $('#currentAttempts').html(html).show();
+    $('#points-'+question).html(html);
 }
 
 
 socket.on('quizActivated', function(tutQuiz){ // active = start questions
   quizData.active = tutQuiz.active;
   if (tutQuiz.active){
+    $('#postQuiz').hide();
     alert('The quiz is now active. Select a driver and proceed!')
     $('#driverSelect').show();
   }
@@ -51,6 +75,16 @@ socket.on('startQuiz', function(data){
         renderQuestion(quizData.quiz, 0);
 })
 
+socket.on('updateScores', function(data){
+  data.responses.forEach(function(response, i){
+    responses[response.question] = response;
+  })
+  if (data.responses.length){
+  score = data.responses.reduce(function(prev, curr){
+    return prev.points + curr.points;
+  })
+  }
+})
 
 socket.on('assignedAsDriver', function(){
   /*
@@ -58,6 +92,7 @@ socket.on('assignedAsDriver', function(){
   Todo: When previous driver disconnects, assign next driver automatically
   */
   // enable choices and submit buttons (disabled by default)
+  isDriver = true;
   $('.quizBtn').attr('disabled', false);
 })
 
@@ -67,11 +102,6 @@ socket.on('renderQuestion', function(data){
   
 })
 
-socket.on('updateAttempts', function(data){
-  if (quizData.quiz.questions.length - data.attempts >= 0)
-    renderStars(data.attempts, quizData.quiz.questions.length - data.attempts)
-
-})
 
 function emit(eventName, data) {
   /* Acts as wrapper for emitting events, attaching
@@ -80,6 +110,7 @@ function emit(eventName, data) {
      var data = {}
    }
   data.groupId = groupId;
+  data.quizId = quizData._id;
   socket.emit(eventName, data);
 }
  
@@ -89,11 +120,14 @@ var score = 0,
 // console.log(sessionStorage.getItem('currentQuiz'));
   
 function renderQuestion(quiz, n){
-  
+  $('.quizBtn').attr('disabled', !isDriver);
   $('#driverSelect').hide();
   $('#assignGroup').hide();
   $('#activeQuiz').show();
-  $('#currentAttempts').hide();
+  $('#currentScore').html(score || 0);
+  
+
+  
   
   if (n >= quiz.questions.length){
     quizCompleted();
@@ -147,34 +181,56 @@ function renderQuestion(quiz, n){
       
       console.log(chosenAnswer);
       
-      var isCorrect = mark(n, chosenAnswer);
       
       $('.currentlyChosen').removeClass('currentlyChosen');
       
       emit('attemptAnswer', {
-        questionId : currentQuestionId,
-        correct: isCorrect,
-        next: parseInt(n) + 1
+        questionId : quiz.questions[n]._id,
+        answer : chosenAnswer,
+        questionNumber : parseInt(n)+1
       })      
       
     })
     
   // questions list
-  $('#questionSelect').html('');
-  quiz.questions.forEach(function(question, i){
-    var className = (i == n) ? 'btn-primary' : 'btn-default';
-    $('#questionSelect').append('<button id = "'+ i + '" class = "goToQuestion col-md-11 col-xs-2 col-sm-2 btn '+ className +'">'+ (i+1) +'</button>');
-    $(document).on('click', '.goToQuestion', function(e){
-      renderQuestion(quiz, e.target.id )
+  
+  if($('#questionSelect').html().length == 0){ // at start or after refresh
+    quiz.questions.forEach(function(question, i){
+      var className = (i == n) ? 'btn-warning' : '';
+      $('#questionSelect').append('<button id = "'+ i + '" class = "goToQuestion col-md-11 col-xs-2 col-sm-2 btn '+ className +'">'
+      + (i+1)
+      + '<br/><div class = "questionPoints" id = "points-'+ i +'">'
+      +'</div>'
+      + '</button>');
+      $(document).on('click', '.goToQuestion', function(e){
+        renderQuestion(quiz, e.target.id )
+      })
+      if (question._id in responses){
+        if(responses[question._id].correct){
+         renderStars(i, responses[question._id].attempts - 1, 6 - responses[question._id].attempts);
+         $('#'+i).addClass('btn-success');
+        }
+        else{
+         renderStars(i, responses[question._id].attempts, 5 - responses[question._id].attempts);
+        }
+      }
+      else{
+        renderStars(i, 0, 5);
+      }
     })
-  })
+  } else {
+    $('.goToQuestion').removeClass('btn-warning');
+    $('#'+n).addClass('btn-warning');
+
+  }
+  
+  // Check for previously answered questions
+  if (quiz.questions[n]._id in responses && responses[quiz.questions[n]._id].correct){
+    $('.quizBtn').attr('disabled', true);
+    $('#choices').append('<br/><div class = "alert alert-success"> You have correctly answered this question already.</div>')
+  }
   
 }
-
-function mark(questionNumber, answer){
-  // returns true iff answer is a correct answer to question (questionNumber + 1)
-  return (quizData.quiz.questions[questionNumber].answers.indexOf(answer) > -1)
- }
  
  function quizCompleted (){
    if (quizData.active){
@@ -209,6 +265,4 @@ socket.on('postQuiz', function(data){
     socket.emit('awardPoint', { userId: e.target.id });
     $('#postQuiz').html('Quiz complete');
   })
-  
-  
 })

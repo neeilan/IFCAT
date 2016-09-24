@@ -128,7 +128,7 @@ io.on('connection', function(socket){
         ])
         .exec()
         .then(function(tutQuiz){
-            var studentsGroup = null;
+            var studentsGroup, studentsGroupId = null;
             
             // Socket room for all students in this tutorial taking this quiz
             socket.join('tutorialQuiz:' + tutQuiz._id);
@@ -139,12 +139,13 @@ io.on('connection', function(socket){
                     socket.join('group:'+group._id);
                     console.log('Joined enrolled group ', group.name);
                     studentsGroup = group.name;
+                    studentsGroupId = group._id;
                     socket.emit('quizData', { quiz : tutQuiz, groupName : studentsGroup, groupId: group._id} );
                 }
             })
             
-            
-            if (studentsGroup || tutQuiz.active) return; // don't allow new group joining if a quiz is active
+            if (studentsGroup) return studentsGroupId;
+            else if (tutQuiz.active) return; // don't allow new group joining if a quiz is active
             
             // student doesn't already have a group - need to add them to one
             
@@ -161,9 +162,10 @@ io.on('connection', function(socket){
                 models.Group.findByIdAndUpdate(groupsWithRoom[0]._id, { $push : { members : socket.request.user._id } }, { new : true }, function (err,doc){
                     if (err) throw err;
                     console.log('Joining existing group ', groupsWithRoom[0]._id);
-                    studentsGroup = groupsWithRoom[0].name;
+                 
                     socket.join('group:' + groupsWithRoom[0]._id);
-                    socket.emit('quizData', { quiz : tutQuiz, groupName : studentsGroup, groupId: groupsWithRoom[0]._id} );
+                    socket.emit('quizData', { quiz : tutQuiz, groupName : groupsWithRoom[0].name, groupId: groupsWithRoom[0]._id} );
+                    return;
                 });
                 
             }
@@ -175,18 +177,33 @@ io.on('connection', function(socket){
                 group.name = (tutQuiz.groups.length + 1).toString();
                 group.members = [ socket.request.user._id ];
                 group.save( function(err, group){
-                    studentsGroup = group.name
+                    
                     if (!err) {
                          // we also need to add the group to this tutorialQuiz
                          models.TutorialQuiz.update({ _id : tutQuiz._id }, { $push : { groups :  group._id } }, { new : true }, function(err, doc){
                             if (err) throw err;
                          console.log('Created and joined a new group ', group.name);
                          socket.join('group:'+group._id);
-                         socket.emit('quizData', { quiz : tutQuiz, groupName : studentsGroup, groupId: group._id } );
+                         socket.emit('quizData', { quiz : tutQuiz, groupName : group.name, groupId: group._id } );
+                         return;
                          })
                      }
                 });
             }
+        })
+        .then(function(groupId){
+            console.log(groupId)
+            if (!groupId) return;
+            console.log('then func')
+            models.Response.find({ group : groupId })
+            .exec()
+            .then(function(responses){
+                console.log(responses)
+                io.in('group:'+groupId).emit('updateScores', {
+                    quizId: tutQuizId,
+                    responses: responses
+                })
+            })
         })
     })
     
@@ -234,13 +251,13 @@ io.on('connection', function(socket){
                     // Basically, if they get it right once, they can't worsen their score
                     
                     var attemptsInc = response.correct ? 0 : 1;
-                    var newScore = (response.correct) ? response.points : (data.correct) ? (5 - response.attempts) : 0;
+                    var newScore = (response.correct) ? response.points : (answerIsCorrect) ? (5 - response.attempts) : 0;
                     // If they got it correct before, don't increment
                     
                     return models.Response.findByIdAndUpdate(response._id,
                     { correct: (response.correct || answerIsCorrect) , $inc : { attempts : attemptsInc },
                     points : (newScore > 0) ? newScore : 0 },
-                    { new: true } )
+                    { new : true } )
                     .exec()
                 }
             })
