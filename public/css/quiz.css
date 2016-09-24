@@ -14,6 +14,10 @@
 
 }
 
+.bold {
+  font-weight: bold;
+}
+
 .centerText {
   text-align: center;
 }

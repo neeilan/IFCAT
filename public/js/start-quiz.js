@@ -3,7 +3,7 @@ $('.quizBtn').attr('disabled', true); // Disable quiz buttons (enable if assigne
 var url = window.location.href;
 var quizId = url.slice(url.indexOf('/quizzes/') + 9, url.indexOf('/start'));
 var socket = io();
-var quizData, groupId,isDriver,  responses = {}, currentQuestionId, score = 0;
+var quizData, groupId, isDriver,  responses = {}, currentQuestionId, score = 0;
     
 socket.emit('requestQuiz', quizId);
 
@@ -13,6 +13,7 @@ socket.on('quizData', function(tutorialQuiz){
   groupId = tutorialQuiz.groupId;
   
   $('#groupName').html(tutorialQuiz.groupName);
+  $('#currentGroup').html(tutorialQuiz.groupName);
   
   if (quizData.active){
     $('#driverSelect').show();  
@@ -22,7 +23,6 @@ socket.on('quizData', function(tutorialQuiz){
 
 // When a question is answered by leader, a 'groupAttempt' event is emitted
 socket.on('groupAttempt', function(data){
-  console.log(data)
   responses[data.response.question] = data.response;
   if (data.response.group != groupId) return;
   if (data.response.correct) {
@@ -31,12 +31,12 @@ socket.on('groupAttempt', function(data){
      score += parseInt(data.response.points);
      $('#'+(data.questionNumber-1)).addClass('btn-success');
      renderStars(data.questionNumber-1, data.response.attempts - 1, 6 - data.response.attempts);
-      $('#currentScore').html(score);
   }
   else {
     swal("Yikes!", "Question "+ data.questionNumber +" was answered incorrectly!", "error");
     renderStars(data.questionNumber-1, data.response.attempts, 5 - data.response.attempts);
   }
+  $('#currentScore').html(score);
   
 })
 
@@ -54,6 +54,9 @@ function renderStars(question, empty, full){
     var fullStars = "<i class = 'fa fa-star' />&nbsp;".repeat(full),
       emptyStars = "<i class = 'fa fa-star-o' />&nbsp;".repeat(empty);
     var html = emptyStars + fullStars;
+    if (parseInt(empty) + parseInt(full) > 7){
+      html = (full)+"/"+(empty+full);
+    }
     $('#points-'+question).html(html);
 }
 
@@ -79,9 +82,13 @@ socket.on('updateScores', function(data){
   data.responses.forEach(function(response, i){
     responses[response.question] = response;
   })
+  console.log(responses);
   if (data.responses.length){
   score = data.responses.reduce(function(prev, curr){
-    return prev.points + curr.points;
+    if (isNaN(prev)){
+      return prev.points + curr.points;
+    }
+    return prev + curr.points;
   })
   }
 })
@@ -156,8 +163,8 @@ function renderQuestion(quiz, n){
   }
   
   // shuffle choices if need be
-  // var choices = quiz.randomizeChoices ? _.shuffle(quiz.questions[n].choices) : quiz.questions[n].choices
-  var choices = quiz.questions[n].choices
+  var choices = (quiz.randomizeChoices || quiz.shuffleChoices) ? _.shuffle(quiz.questions[n].choices) : quiz.questions[n].choices
+  // var choices = quiz.questions[n].choices
 
   // render choices
   $.each(choices, function(i, choice){
@@ -197,7 +204,7 @@ function renderQuestion(quiz, n){
   if($('#questionSelect').html().length == 0){ // at start or after refresh
     quiz.questions.forEach(function(question, i){
       var className = (i == n) ? 'btn-warning' : '';
-      $('#questionSelect').append('<button id = "'+ i + '" class = "goToQuestion col-md-11 col-xs-2 col-sm-2 btn '+ className +'">'
+      $('#questionSelect').append('<button id = "'+ i + '" class = "goToQuestion col-md-12 col-xs-2 col-sm-3 btn '+ className +'">'
       + (i+1)
       + '<br/><div class = "questionPoints" id = "points-'+ i +'">'
       +'</div>'
@@ -207,11 +214,12 @@ function renderQuestion(quiz, n){
       })
       if (question._id in responses){
         if(responses[question._id].correct){
-         renderStars(i, responses[question._id].attempts - 1, 6 - responses[question._id].attempts);
+        renderStars(i, responses[question._id].attempts - 1, 6 - responses[question._id].attempts);
+        // renderStars(i, 3, 5);
          $('#'+i).addClass('btn-success');
         }
         else{
-         renderStars(i, responses[question._id].attempts, 5 - responses[question._id].attempts);
+        renderStars(i, responses[question._id].attempts, 5 - responses[question._id].attempts);
         }
       }
       else{

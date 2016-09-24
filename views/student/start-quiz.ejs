@@ -28,11 +28,12 @@
   
   <div class= "row" id = "activeQuiz" style="display: none">
       <div class = "col-md-2 col-sm-12 col-xs-12">
+        <span>Group <span class = "bold" id="currentGroup"><br/></span> &nbsp; Score <span class="bold" id="currentScore"></span>
+        <hr/>
         <div id = "questionSelect"></div>
       </div>
-
+      <br/>
       <div class = "col-md-9 col-md-offset-1 col-sm-12 col-xs-12"> 
-        <span>Score - <span id="currentScore"></span>
         <br/>
         <h3><div id = "text"></div></h3>
         <hr/>
@@ -63,5 +64,6 @@
 <script src="/sweetalert/dist/sweetalert.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/sweetalert/dist/sweetalert.css">
 <%- include ./footer -%>
+<script src="/lodash/lodash.min.js"></script>
 <script src="/js/start-quiz.js"></script>
 
