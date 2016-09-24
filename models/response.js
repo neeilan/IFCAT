@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var ResponseSchema = new mongoose.Schema({
     group: { type: mongoose.Schema.Types.ObjectId, ref : 'Group' },
     question: { type: mongoose.Schema.Types.ObjectId, ref : 'Question' },
-    attempts: Number,
+    attempts: { type : Number , default: 1 },
     correct: Boolean,
     points: Number
 }, {

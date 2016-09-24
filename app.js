@@ -40,6 +40,7 @@ app.use('/bootbox', express.static(__dirname + '/node_modules/bootbox'));
 app.use('/lodash', express.static(__dirname + '/node_modules/lodash'));
 app.use('/socketioclient', express.static(__dirname + '/node_modules/socket.io-client'));
 app.use('/font-awesome', express.static(__dirname + '/node_modules/font-awesome'));
+app.use('/sweetalert', express.static(__dirname + '/node_modules/sweetalert'))
 app.use(express.static('public'));
 
 app.use(morgan('dev'));
@@ -113,6 +114,7 @@ io.on('connection', function(socket){
             populate : {
                 path : 'questions',
                 model : 'Question',
+                select : '-answers',
                 populate : {
                     path : 'files',
                     model : 'File'
@@ -126,7 +128,6 @@ io.on('connection', function(socket){
         ])
         .exec()
         .then(function(tutQuiz){
-            
             var studentsGroup = null;
             
             // Socket room for all students in this tutorial taking this quiz
@@ -205,58 +206,54 @@ io.on('connection', function(socket){
     })
     
     socket.on('attemptAnswer', function(data){
-        
-        models.Response.findOne({ group : data.groupId, question: data.questionId })
+        models.Question.findById(data.questionId)
         .exec()
-        .then(function(response){
-            if (!response){
-                var res = new models.Response();
-                res.group = data.groupId;
-                res.question = data.questionId;
-                res.attempts = 1;
-                res.correct = data.correct;
-                res.points = data.correct ? 5 : 0;
-                return res.save()
-                .then(function(res){
-                    models.TutorialQuiz.findByIdAndUpdate(data.quizId, {
+        .then(function(question){
+            var answerIsCorrect = (question.answers.indexOf(data.answer) != -1); // mark
+            
+            models.Response.findOne({ group : data.groupId, question: data.questionId })
+            .exec()
+            .then(function(response){
+                if (!response){
+                    
+                    var res = new models.Response();
+                    res.group = data.groupId;
+                    res.question = data.questionId;
+                    res.correct = answerIsCorrect;
+                    res.points = answerIsCorrect ? 5 : 0;
+                    return models.TutorialQuiz.findByIdAndUpdate(data.quizId, {
                         $push : { responses : res._id }
-                    }).exec()
-                    .then(function(){
-                        return res;
                     })
-                })
-            }
-            else{
-                // Some logic to prevent students from being dumb and reanswering correct questions and losing points
-                // Basically, if they get it right once, they can't worsen their score
+                    .exec()
+                    .then(function(){
+                        return res.save()
+                    })
+                }
+                else{
+                    // Some logic to prevent students from being dumb and reanswering correct questions and losing points
+                    // Basically, if they get it right once, they can't worsen their score
+                    
+                    var attemptsInc = response.correct ? 0 : 1;
+                    var newScore = (response.correct) ? response.points : (data.correct) ? (5 - response.attempts) : 0;
+                    // If they got it correct before, don't increment
+                    
+                    return models.Response.findByIdAndUpdate(response._id,
+                    { correct: (response.correct || answerIsCorrect) , $inc : { attempts : attemptsInc },
+                    points : (newScore > 0) ? newScore : 0 },
+                    { new: true } )
+                    .exec()
+                }
+            })
+            .then(function(response){
                 
-
-                var attemptsInc = response.correct ? 0 : 1;
-                var newScore = (response.correct) ? response.points : (data.correct) ? (5 - response.attempts) : 0;;
-                // If they got it correct before, don't increment
-                
-                return models.Response.findByIdAndUpdate(response._id,
-                { correct: (response.correct || data.correct) , $inc : { attempts : attemptsInc },
-                points : (newScore > 0) ? newScore : 0 },
-                { new: true } )
-                .exec()
-        
-            }
-        })
-        .then(function(response){
-            console.log(response);
-            if (response.correct){
-                io.in('group:' + data.groupId).emit('renderQuestion', 
-                { groupId: data.groupId, questionNumber: data.next });
-            }
-            else {
-                io.in('group:' + data.groupId).emit('updateAttempts', 
-                { groupId: data.groupId, attempts : response.attempts });
-            }
+                io.in('group:' + data.groupId).emit('groupAttempt', {
+                    response: response,
+                    questionNumber: data.questionNumber
+                } )
+            })           
             
-            
-
         })
+  
     })
 
     socket.on('quizComplete', function(data){

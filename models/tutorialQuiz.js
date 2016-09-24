@@ -78,6 +78,7 @@ TutorialQuizSchema.methods.withResponses = function (group) {
     };
     return this.populate(obj);
 };
+
 // Save tutorial-quiz
 TutorialQuizSchema.methods.store = function (obj, callback) {
     this.allocateMembers = obj.allocateMembers;
