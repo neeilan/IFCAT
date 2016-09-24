@@ -192,13 +192,10 @@ io.on('connection', function(socket){
             }
         })
         .then(function(groupId){
-            console.log(groupId)
             if (!groupId) return;
-            console.log('then func')
             models.Response.find({ group : groupId })
             .exec()
             .then(function(responses){
-                console.log(responses)
                 io.in('group:'+groupId).emit('updateScores', {
                     quizId: tutQuizId,
                     responses: responses
