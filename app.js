@@ -20,7 +20,7 @@ var app = express(),
     io = require('socket.io')(http);
 
 // locals
-app.locals.io = io; // io global
+app.locals.io = io;
 app.locals._ = require('lodash');
 app.locals.moment = require('moment');  
 app.locals.dateFormat = 'MMMM Do YYYY @ h:mm a';
@@ -37,10 +37,11 @@ app.set('views', __dirname + '/views');
 app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'));
 app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist'));
 app.use('/bootbox', express.static(__dirname + '/node_modules/bootbox'));
+app.use('/bootstrap-switch', express.static(__dirname + '/node_modules/bootstrap-switch/dist'));
+app.use('/font-awesome', express.static(__dirname + '/node_modules/font-awesome'));
 app.use('/lodash', express.static(__dirname + '/node_modules/lodash'));
 app.use('/socketioclient', express.static(__dirname + '/node_modules/socket.io-client'));
-app.use('/font-awesome', express.static(__dirname + '/node_modules/font-awesome'));
-app.use('/sweetalert', express.static(__dirname + '/node_modules/sweetalert'))
+app.use('/sweetalert', express.static(__dirname + '/node_modules/sweetalert'));
 app.use(express.static('public'));
 
 app.use(morgan('dev'));

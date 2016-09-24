@@ -9,13 +9,11 @@ var QuizSchema = new mongoose.Schema({
     // questions are sorted in the order that they are placed 
     // i.e. [0] => 1st question, [1] => 2nd question, etc
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref : 'Question' }],
-    // number of points given per attempt
-    // e.g. [4,2,1] => 3 attempts possible: 
-    // 4 points if answered correctly on 1st attempt, 2 points if answered on 2nd attempt, 
-    // 1 point if answered correctly on 3rd attempt, no point otherwise 
-    gradingScheme: [Number],
-    randomizeChoices: Boolean,
-    useLaTeX: Boolean
+    shuffleChoices: Boolean,
+    useLaTeX: Boolean,
+    points: Number,
+    firstTryBonus: Number,
+    penalty: Number
 }, { 
     timestamps: true
 });
@@ -35,11 +33,15 @@ QuizSchema.methods.loadTutorials = function () {
 };
 // Save quiz
 QuizSchema.methods.store = function (obj, callback) {
+    this.name = obj.name;
+    this.gradingScheme = obj.gradingScheme;
+    this.shuffleChoices = !!obj.shuffleChoices;
+    this.useLaTeX = !!obj.useLaTeX;
+    this.points = obj.points;
+    this.firstTryBonus = obj.firstTryBonus;
+    this.penalty = obj.penalty;
+
     var quiz = this;
-        quiz.name = obj.name;
-        quiz.gradingScheme = obj.gradingScheme;
-        quiz.randomizeChoices = obj.randomizeChoices;
-        quiz.useLaTeX = obj.useLaTeX;
 
     async.series([
         // save quiz

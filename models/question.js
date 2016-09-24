@@ -7,7 +7,12 @@ var QuestionSchema = new mongoose.Schema({
     type: { type: String, enum: ['multiple choice', 'true or false', 'multiple select'/*, 'fill in the blanks'*/] },
     choices: [String],
     answers: [String],
-    files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }]
+    files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
+    shuffleChoices: Boolean,
+    useLaTeX: Boolean,
+    points: Number,
+    firstTryBonus: Number,
+    penalty: Number
 }, { 
     timestamps: true 
 });
@@ -50,6 +55,11 @@ QuestionSchema.methods.store = function (obj, callback) {
     this.question = obj.question;
     this.type = obj.type;
     this.files = obj.files;
+    this.shuffleChoices = !!obj.shuffleChoices;
+    this.useLaTeX = !!obj.useLaTeX;
+    this.points = obj.points;
+    this.firstTryBonus = obj.firstTryBonus;
+    this.penalty = obj.penalty;
     // clear previous choices and answers
     this.choices = []; 
     this.answers = [];

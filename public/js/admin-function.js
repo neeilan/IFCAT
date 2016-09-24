@@ -85,7 +85,7 @@ $(function () {
     });
 
     $('#form-question [name=type]').change(function () {
-        var type = _.kebabCase(this.value);
+        var type = _.kebabCase(this.value); console.log(type);
         // show related items for type
         $('.multiple-choice, .true-or-false, .multiple-select').each(function () {
             var $col = $(this);
@@ -252,6 +252,7 @@ $(function () {
         });
     });
 
-
+    //
+    $(".bootstrap-switch").bootstrapSwitch();
 
 });

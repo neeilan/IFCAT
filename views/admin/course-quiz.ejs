@@ -15,46 +15,42 @@
         </div>
     </div>
 
-    <!--div class="form-group">
-        <label class="col-sm-2 control-label">Grading Scheme</label>
-        <div class="col-sm-6">
-            <% for (var i = 0, len = Math.max(quiz.gradingScheme.length, 4); i < len; i++) { %>    
-                <div class="form-group">
-                    <div class="col-xs-4"> 
-                        <input name="gradingScheme[]" value="<%= quiz.gradingScheme[i] !== 'undefined' ?
-                            quiz.gradingScheme[i] : '' %>" class="form-control" maxlength="2">
-                    </div>
-                </div>
-            <% } %>
-            <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-10">
-                    <a href="#" id="add-attempt">Add another attempt</a>
-                </div>
-            </div>
-        </div> 
-    </div-->
+    <!-- default question options -->
 
     <div class="form-group">
-        <label for="question" class="col-sm-2 control-label">Randomize choices?</label>
+        <label for="question" class="col-sm-2 control-label">Shuffle choices?</label>
         <div class="col-sm-10">
-        <% ['No', 'Yes'].forEach(function (text, b) { %>
-            <label class="radio-inline">
-                <input type="radio" name="randomizeChoices" value="<%= b %>"<%= 
-                    quiz.randomizeChoices == b ? ' checked' : '' %>><%= text %>
-            </label>
-        <% }) %>
+            <input type="checkbox" name="shuffleChoices" value="1" class="bootstrap-switch"<%= 
+                quiz.shuffleChoices ? ' checked' : '' %>>
         </div>
     </div>
 
     <div class="form-group">
         <label for="question" class="col-sm-2 control-label">Format questions using LaTeX?</label>
         <div class="col-sm-10">
-        <% ['No', 'Yes'].forEach(function (text, b) { %>
-            <label class="radio-inline">
-                <input type="radio" name="useLaTeX" value="<%= b %>"<%= 
-                    quiz.useLaTeX == b ? ' checked' : '' %>><%= text %>
-            </label>
-        <% }) %>
+            <input type="checkbox" name="useLaTeX" value="1" class="bootstrap-switch"<%= 
+                quiz.useLaTeX ? ' checked' : '' %>>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="question" class="col-sm-2 control-label">Points possible</label>
+        <div class="col-sm-6">
+            <input type="number" name="points" value="<%= quiz.points %>" min="0" max="7" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="question" class="col-sm-2 control-label">First-try bonus</label>
+        <div class="col-sm-6">
+            <input type="number" name="firstTryBonus" value="<%= quiz.firstTryBonus %>" min="0" max="7" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="question" class="col-sm-2 control-label">Penalty per attempt</label>
+        <div class="col-sm-6">
+            <input type="number" name="penalty" value="<%= quiz.penalty %>" min="0" max="7" class="form-control">
         </div>
     </div>
 
@@ -62,7 +58,7 @@
         <label class="col-sm-2 control-label">Available to</label>
         <div class="col-sm-10">
             <select name="tutorials[]" multiple class="form-control">
-            <% course.tutorials.forEach(function (tutorial) { %>
+            <% _.each(course.tutorials, function (tutorial) { %>
                 <option value="<%= tutorial.id %>"<%= quiz.isNew || quiz.tutorials.indexOf(tutorial.id) !== -1 ? 
                     ' selected' : '' %>>TUT <%= tutorial.number %></option> 
             <% }) %>
@@ -77,15 +73,6 @@
         </div>
     </div>
 </form>
-
-<script type="text/template" id="grading-scheme-item">
-    <div class="form-group">
-        <label class="col-xs-4 control-label">Attempt #${ i }</label>
-        <div class="col-xs-4"> 
-            <input name="gradingScheme[]" value="" class="form-control" maxlength="2">
-        </div>
-    </div>
-</script>
 
 
 <%- include ./footer -%>
