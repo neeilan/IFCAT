@@ -11,9 +11,9 @@ var QuizSchema = new mongoose.Schema({
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref : 'Question' }],
     shuffleChoices: Boolean,
     useLaTeX: Boolean,
-    points: Number,
-    firstTryBonus: Number,
-    penalty: Number
+    points: { type: Number, default : 4 },
+    firstTryBonus: { type : Number, default : 1 },
+    penalty: { type : Number, default : 1 }
 }, { 
     timestamps: true
 });

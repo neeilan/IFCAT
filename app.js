@@ -235,7 +235,7 @@ io.on('connection', function(socket){
                     res.group = data.groupId;
                     res.question = data.questionId;
                     res.correct = answerIsCorrect;
-                    res.points = answerIsCorrect ? 5 : 0;
+                    res.points = answerIsCorrect ? question.points + question.firstTryBonus : 0;
                     return models.TutorialQuiz.findByIdAndUpdate(data.quizId, {
                         $push : { responses : res._id }
                     })
@@ -249,7 +249,7 @@ io.on('connection', function(socket){
                     // Basically, if they get it right once, they can't worsen their score
                     
                     var attemptsInc = response.correct ? 0 : 1;
-                    var newScore = (response.correct) ? response.points : (answerIsCorrect) ? (5 - response.attempts) : 0;
+                    var newScore = (response.correct) ? response.points : (answerIsCorrect) ? (question.points + question.firstTryBonus - response.attempts * question.penalty) : 0;
                     // If they got it correct before, don't increment
                     
                     return models.Response.findByIdAndUpdate(response._id,
@@ -260,7 +260,6 @@ io.on('connection', function(socket){
                 }
             })
             .then(function(response){
-                
                 io.in('group:' + data.groupId).emit('groupAttempt', {
                     response: response,
                     questionNumber: data.questionNumber

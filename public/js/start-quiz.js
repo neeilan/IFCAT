@@ -25,16 +25,23 @@ socket.on('quizData', function(tutorialQuiz){
 socket.on('groupAttempt', function(data){
   responses[data.response.question] = data.response;
   if (data.response.group != groupId) return;
+  var question = quizData.quiz.questions[data.questionNumber-1];
+  var maxScore = question.firstTryBonus + question.points;
   if (data.response.correct) {
     swal("Good job!", "Question "+ data.questionNumber +" was answered correctly!.\
      Received " + data.response.points + " points ", "success");
      score += parseInt(data.response.points);
      $('#'+(data.questionNumber-1)).addClass('btn-success');
-     renderStars(data.questionNumber-1, data.response.attempts - 1, 6 - data.response.attempts);
+     
+      var emptyStars = (responses[question._id].attempts-1) * question.penalty > maxScore ? maxScore : (responses[question._id].attempts-1) * question.penalty;
+      var fullStars = maxScore - emptyStars > 0 ? (maxScore - emptyStars) : 0;
+      renderStars(data.questionNumber-1, emptyStars, fullStars);
   }
   else {
     swal("Yikes!", "Question "+ data.questionNumber +" was answered incorrectly!", "error");
-    renderStars(data.questionNumber-1, data.response.attempts, 5 - data.response.attempts);
+    var emptyStars = (responses[question._id].attempts) * question.penalty > maxScore ? maxScore : (responses[question._id].attempts) * question.penalty;
+    var fullStars = maxScore - emptyStars > 0 ? (maxScore - emptyStars) : 0;
+    renderStars(data.questionNumber-1, emptyStars, fullStars);
   }
   $('#currentScore').html(score);
   
@@ -212,18 +219,20 @@ function renderQuestion(quiz, n){
       $(document).on('click', '.goToQuestion', function(e){
         renderQuestion(quiz, e.target.id )
       })
+      var maxScore = question.points + question.firstTryBonus;
       if (question._id in responses){
         if(responses[question._id].correct){
-        renderStars(i, responses[question._id].attempts - 1, 6 - responses[question._id].attempts);
-        // renderStars(i, 3, 5);
+          var emptyStars = (responses[question._id].attempts-1) * question.penalty > maxScore ? maxScore : (responses[question._id].attempts-1) * question.penalty;
+          var fullStars = maxScore - emptyStars > 0 ? (maxScore - emptyStars) : 0;
+        renderStars(i, emptyStars, fullStars);
          $('#'+i).addClass('btn-success');
         }
         else{
-        renderStars(i, responses[question._id].attempts, 5 - responses[question._id].attempts);
+        renderStars(i, responses[question._id].attempts * question.penalty, maxScore - responses[question._id].attempts * question.penalty);
         }
       }
       else{
-        renderStars(i, 0, 5);
+        renderStars(i, 0, maxScore);
       }
     })
   } else {
