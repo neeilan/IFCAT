@@ -16,6 +16,10 @@ router.post('/login', passport.authenticate('local-login', {
     failureFlash: true
 }));
 
+router.post('/uteach-login', passport.authenticate('auth0',{}), function(req,res){
+    res.redirect('/student/courses');
+})
+
 // lifesaver: query single objects
 router.param('course', controllers.Course.getCourse);
 router.param('tutorial', controllers.Tutorial.getTutorial);
