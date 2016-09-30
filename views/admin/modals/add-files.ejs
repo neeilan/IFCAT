@@ -1,0 +1,36 @@
+<!-- modal -->
+<div class="modal fade" id="modal-add-files" tabindex="-1" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <h4 class="modal-title">Select files</h4>
+            </div>
+            <div class="modal-body">
+                <div class="col-xs-8 col-preview"></div>
+                <div class="col-xs-4 col-files">
+                    <ul class="list-group">
+                    <% _.each(course.files, function (file) { %>
+                        <li class="list-group-item<%=
+                                question.files.indexOf(file.id) !== -1  ? ' active' : '' %>">
+                            <input type="checkbox" name="files[]" value="<%= file.id %>"<%=
+                                question.files.indexOf(file.id) !== -1  ? 'checked' : '' %>> 
+                            <a href="/upl/<%= course.id %>/<%= file.name %>" target="_preview"><%= file.name %></a>
+                        <% if (file.isImage()) { %>
+                            <img src="/upl/<%= course.id %>/<%= file.name %>" class="img-responsive preview" style="display: none">
+                        <% } else if (file.isAudio()) { %>
+                            <audio controls class="preview" style="display: none">
+                                <source src="/upl/<%= course.id %>/<%= file.name %>" type="<%= file.type %>">
+                            </audio>
+                        <% } %>
+                        </li>
+                    <% }) %>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <!--button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button-->
+            </div>
+        </div>
+    </div>
+</div>

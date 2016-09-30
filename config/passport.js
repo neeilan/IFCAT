@@ -7,16 +7,13 @@ passport.serializeUser(function (user, done) {
     done(null, user.id);
 });
 
-
-
 passport.deserializeUser(function (id, done) {
     User.findById(id, '-password', function (err, user) { 
         done(null, user);
     });
 });
 
-
-passport.use('local-signup', new LocalStrategy({
+/*passport.use('local-signup', new LocalStrategy({
     usernameField: 'email',
     passReqToCallback : true
 }, 
@@ -33,7 +30,7 @@ function (req, email, password, done) {
             user = new User();
             user.local.email = email;
             user.local.password = user.generateHash(password);
-            user.roles = ['admin'];
+            user.roles = ['student'];
             user.save(function (err) {
                 if (err) {
                     throw err;
@@ -42,7 +39,7 @@ function (req, email, password, done) {
             });
         });
     });
-}));
+}));*/
 
 passport.use('local-login', new LocalStrategy({
     usernameField: 'email',
@@ -56,6 +53,7 @@ function (req, email, password, done) {
         if (!user) {
             return done(null, false, req.flash('message', 'Invalid email. Please try again.'));
         }
+        // @TODO use async version
         if (!user.isValidPassword(password)) {
             return done(null, false, req.flash('message', 'Invalid password. Please try again.'));    
         }
@@ -63,6 +61,6 @@ function (req, email, password, done) {
     });
 }));
 
-// TODO: add another strategy
+// @TODO add auth0 strategy here
 
 module.exports = passport;

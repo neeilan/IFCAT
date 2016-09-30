@@ -1,4 +1,5 @@
-var fs = require('fs');
+var fs = require('fs'),
+    path = require('path');
 
 var _ = require('lodash'),
     multer = require('multer'),
@@ -11,19 +12,31 @@ var controllers = require('../controllers');
 var anyUpload = multer({ 
     storage: multer.diskStorage({
         destination: function (req, file, cb) {
-            var dest = __dirname + '/../public/upl/' + req.params.course;
+            var destination = __dirname + '/../public/upl/' + req.params.course;
             // create course directory if it does not already exist
-            fs.mkdir(dest, function (e) {
+            fs.mkdir(destination, function (e) {
                 if (e && e.code !== 'EEXIST') {
                     console.log(e);
                 } else {
-                    cb(null, dest);  
+                    cb(null, destination);  
                 }
             });
         },
         filename: function (req, file, cb) {
-            // @TODO: handle duplicates e.g. 2nd file with name.ext should be renamed to name_2.ext
-            cb(null, file.originalname);
+            var destination = __dirname + '/../public/upl/' + req.params.course,
+                extname = path.extname(file.originalname),
+                basename = path.basename(file.originalname, extname),
+                i = 1;
+            // create unique filename within folder
+            fs.readdir(destination, function (err, filenames) {
+                for (;;) {
+                    var newname = [basename, i > 1 ? ' (' + i + ')' : '', extname].join('');
+                    if (filenames.indexOf(newname) === -1) {
+                        return cb(null, newname);
+                    }
+                    i++;
+                }
+            });
         }
     })
 });
@@ -137,10 +150,9 @@ router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/respon
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/responses/export', controllers.Response.exportResponseList);
 
 router.get('/courses/:course/files', controllers.File.getFileList);
-router.get('/courses/:course/files/new', controllers.File.getFileForm);
+router.post('/courses/:course/files', anyUpload.array('files'), controllers.File.addFiles);
 router.get('/courses/:course/files/:fil3/edit', controllers.File.getFileForm);
-router.post('/courses/:course/files', anyUpload.single('file'), controllers.File.addFile);
-router.put('/courses/:course/files/:fil3', anyUpload.single('file'), controllers.File.editFile);
+router.put('/courses/:course/files/:fil3', controllers.File.editFile);
 router.delete('/courses/:course/files', controllers.File.deleteFiles);
 
 router.get('/users', controllers.User.getUserList);

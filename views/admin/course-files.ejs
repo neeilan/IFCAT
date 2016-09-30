@@ -2,42 +2,54 @@
 
 <h1><%= course.code + ' - ' + course.name %><br><small>Files</small></h1>
 
-<a href="/admin/courses/<%= course.id %>/files/new" class="btn btn-default btn-sm"><span 
-    class="glyphicon glyphicon-plus"></span> Add New File</a>
+<a href="/admin/courses/<%= course.id %>/files" class="btn btn-default btn-sm" 
+    id="btn-upload-files"><span class="glyphicon glyphicon-plus"></span> Upload Files</button>
 
-<a href="/admin/courses/<%= course.id %>/files" class="btn btn-default btn-delete" id="btn-delete-files"><span class="glyphicon glyphicon-remove"></span> Delete Files</a>
+<a href="/admin/courses/<%= course.id %>/files" class="btn btn-danger btn-sm pull-right btn-delete<%= 
+    course.files.length ? '' : ' disabled' %>" id="btn-delete-files"><span class="glyphicon glyphicon-remove"></span> Delete Files</a>
 
 <br><br>
 
+
 <table class="table table-striped" id="table-files">
-    <tdead>
+    <thead>
         <tr>
-            <th><input type="checkbox" value="1" class="select-all"></th>
+            <th style="width: 10px;"><input type="checkbox" value="1"></th>
             <th>Name</th>
             <th>Type</th>
-            <th>Last modified</th>
-            <th></th>
+            <th>Created on</th>
         </tr>
-    </tdead>
+    </thead>
     <tbody>
     <% if (!_.isEmpty(course.files)) { %>
-        <% for (var i = 0, len = course.files.length; i < len; i++) { %>
+        <% _.each(course.files, function (file) { %>
             <tr>
-                <td><input type="checkbox" name="files[]" value="<%= course.files[i].id %>"></td>
-                <td><%= course.files[i].name %></td>
-                <td><%= course.files[i].type %></td>
-                <td><%= moment(course.files[i].updatedAt).format(dateFormat) %></td>
+                <td><input type="checkbox" name="files[]" value="<%= file.id %>"></td>
                 <td>
-                    <a href="/admin/courses/<%= course.id %>/files/<%= course.files[i].id %>/edit" class="btn btn-default">
-                        <span class="glyphicon glyphicon-pencil"></span> Edit File</a></li>
+                    <a href="/upl/<%= course.id %>/<%= file.name %>" target="_preview"><%= file.name %></a>
+                <% if (file.isImage()) { %>
+                    <img src="/upl/<%= course.id %>/<%= file.name %>" class="preview" style="display: none">
+                <% } else if (file.isAudio()) { %>
+                    <audio controls class="preview" style="display: none">
+                        <source src="/upl/<%= course.id %>/<%= file.name %>" type="<%= file.type %>">
+                    </audio>
+                <% } %>
                 </td>
+                <td><%= file.type %></td>
+                <td><%= moment(file.createdAt).format(dateFormat) %></td>
             </tr>
-        <% } %>
+        <% }) %>
     <% } else { %>
-        <tr><td colspan="5">No files have been added yet.</td></tr>
+        <tr><td colspan="4">No files have been added yet.</td></tr>
     <% } %>
     </tbody>
 </table>
+
+<script type="text/template" id="btn-upload-message-template">
+    <button class="btn btn-default btn-block" id="btn-select-files">Select Files</button>
+    <input type="file" name="files" multiple id="files" style="display: none">
+    <ul class="list-group"></ul>
+</script>
 
 <script type="text/template" id="btn-delete-message-template">
     <p>You are about to delete files and all of their associations.</p>

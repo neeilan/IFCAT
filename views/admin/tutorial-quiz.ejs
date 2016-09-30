@@ -12,9 +12,9 @@
         <div class="col-sm-7">
             <select name="allocateMembers" class="form-control">
             <% [
-                { value: 'unaided', text: 'allowing users to assign themselves to groups as they sign in' },
+                //{ value: 'unaided', text: 'allowing users to assign themselves to groups as they sign in' },
                 { value: 'automatically', text: 'automatically assigning users to groups as they sign in' },
-                { value: 'manually', text: 'manually assigning users to groups' }
+                //{ value: 'manually', text: 'manually assigning users to groups' }
             ].forEach(function (option) { %>
                 <option value="<%= option.value %>"<%= tutorialQuiz.allocateMembers === option.value ? 
                     ' selected' : '' %>><%= option.text %></option>
@@ -29,8 +29,8 @@
             <div class="form-group">
                 <div class="col-xs-5">
                     <select name="max[key]" class="form-control">
-                        <option value="groups"<%= tutorialQuiz.max.groups ? 
-                            ' selected' : '' %>>groups</option>
+                        <!--option value="groups"<%= tutorialQuiz.max.groups ? 
+                            ' selected' : '' %>>groups</option-->
                         <option value="membersPerGroup"<%= tutorialQuiz.max.membersPerGroup ? 
                             ' selected' : '' %>>members per group</option>
                     </select>

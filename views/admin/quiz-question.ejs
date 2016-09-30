@@ -9,7 +9,7 @@
     <div class="form-group">
         <label for="question" class="col-sm-2 control-label">Number</label>
         <div class="col-sm-2">
-            <input name="number" value="<%= question.number %>" maxlength="6" class="form-control">
+            <input name="number" value="<%= question.number %>" maxlength="6" class="form-control" placeholder="e.g. 1, A or 1a">
         </div>
     </div>
 
@@ -37,20 +37,13 @@
     <div class="form-group">
         <label for="type" class="col-sm-2 control-label">Files</label>
         <div class="col-sm-10">
-            <div class="form-group"<%- course.files.length ? '' : ' style="display: none"' %>>
-                <div class="col-sm-10">
-                <% _.each(course.files, function (file) { %>
-                    <a href="/public/upl/<%= course.id %>/<%= file.name %>" target="_blank"><%= file.name %></a>
-                <% }) %>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-sm-10">
-                    <button type="button" class="btn btn-default btn-sm" id="btn-add-files">
-                        <span class="glyphicon glyphicon-plus"></span> Add files
-                    </button>
-                </div>
-            </div>
+            <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-add-files">
+                <span class="glyphicon glyphicon-plus"></span> Add files
+            </button>
+            &nbsp;&nbsp;
+            <a href="#" id="file-counter" data-toggle="modal" data-target="#modal-add-files"><%= 
+                question.files.length !== 1 ? question.files.length + ' files selected' : '1 file selected' %></a>
+            <%- include ./modals/add-files %>
         </div>
     </div>
 
@@ -256,6 +249,5 @@
         </div>
     </div>
 </script>
-
 
 <%- include ./footer -%>

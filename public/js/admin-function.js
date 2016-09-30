@@ -93,6 +93,28 @@ $(function () {
                 $col.find(':input').prop('disabled', !$col.hasClass(type));
         });
     }).change();
+
+    $('#modal-add-files .list-group-item :checkbox').click(function (e) {
+        var $listGroup = $(this).closest('.list-group'),
+            $listGroupItem = $(this).closest('.list-group-item'),
+            $fileCounter = $('#file-counter');
+        // toggle active state based on checkbox' state
+        $listGroupItem.toggleClass('active', this.checked);
+        // indicate # of files were selected
+        var count = $listGroup.find(':checked').length;
+        if (count) {
+            $fileCounter.text(count > 1 ? count + ' files selected' : '1 file selected');    
+        } else {
+            $fileCounter.empty();
+        }
+    });
+
+    $('#modal-add-files .list-group-item:has(.preview) a').click(function (e) {
+        e.preventDefault();
+        $(this).closest('.modal-body').find('.col-preview').html(
+            $(this).next('.preview').clone().css('display', '')
+        );
+    });
     
     $('.multiple-choice, .multiple-select').on('click', '.btn-remove-choice', function (e) {
         e.preventDefault();
@@ -121,31 +143,23 @@ $(function () {
     };
     
     $('#col-unassigned-students .sortable, #col-groups .sortable').sortable(options);
+    
+    $('#col-groups .dropdown-menu a').on('click', function (e) { e.stopPropagation(); });
 
-    $('#form-tutorial-quiz-group [name=published]').on('change', function (e) {
+    $('#publish-tutorial-quiz').on('switchChange.bootstrapSwitch', function (e, state) {
         $.ajax($('#publish-tutorial-quiz-url').val(), {
             type: 'put',
-            data: { published: this.value }, 
+            data: { published: state }, 
             success: function (res) {
                 console.log(res.status);
             }
         });
     });
 
-    $('#form-tutorial-quiz-group [name=unlocked]').on('change', function (e) {
-        $.ajax($('#unlock-tutorial-quiz-url').val(), {
-            type: 'put',
-            data: { unlocked: this.value }, 
-            success: function (res) {
-                console.log(res.status);
-            }
-        });
-    });
-
-    $('#form-tutorial-quiz-group [name=active]').on('change', function (e) {
+    $('#activate-tutorial-quiz').on('switchChange.bootstrapSwitch', function (e, state) {
         $.ajax($('#activate-tutorial-quiz-url').val(), {
             type: 'put',
-            data: { active: this.value }, 
+            data: { active: state }, 
             success: function (res) {
                 console.log(res.status);
             }
@@ -222,11 +236,14 @@ $(function () {
         }
         // open confirmation dialog before performing deletion
         bootbox.dialog({
+            onEscape: true,
+            size: 'small',
             title: 'Confirm deletion',
             message: $('#btn-delete-message-template').text(),
             buttons: {
                 cancel: {
-                    label: 'Cancel'
+                    label: 'Cancel',
+                    className: 'btn-sm'
                 },
                 danger: {
                     label: 'Delete',
@@ -246,13 +263,85 @@ $(function () {
                         }
                     }
                 }
-            },
+            } // end of buttons
+        }); // end of bootbox
+    });
+
+    $('#btn-upload-files').click(function (e) {
+        e.preventDefault();
+        var url = this.href, data = new FormData();
+        // open dialog
+        bootbox.dialog({
             onEscape: true,
-            size: 'small'
+            className: 'modal-upload-files',
+            title: 'Select files',
+            message: $('#btn-upload-message-template').text(),
+            buttons: {
+                cancel: {
+                    label: 'Cancel',
+                    className: 'btn-sm'
+                },
+                upload: {
+                    label: 'Upload files',
+                    className: 'btn-default btn-sm',
+                    callback: function () {
+                        var files = $('#files')[0].files;
+                        if (files.length) {
+                            // add files
+                            for (var i in files) {
+                                data.append('files', files[i]);
+                            }
+                            // send request
+                            $.ajax(url, {
+                                type: 'post',
+                                processData: false,
+                                contentType: false,
+                                data: data,
+                                success: function(res) {
+                                    if (res.status) {
+                                        window.location.reload(true);
+                                    }
+                                }
+                            });
+                        }
+                        return false;
+                    }
+                }
+            } // end of buttons
+        }); // end of bootbox
+    });
+
+    // open file input
+    $(document).on('click','#btn-select-files', function (e) {
+        $(this).next(':file').click();
+    });
+
+    // list files selected by file input
+    $(document).on('change', '#files', function (e) {
+        var files = this.files;
+        $(this).next('.list-group').html(function () {
+            return _.map(files, function (file) {
+                return '<li class="list-group-item">' + file.name + '</li>';
+            });
         });
     });
 
-    //
-    $(".bootstrap-switch").bootstrapSwitch();
+    // preview image and audio files
+    $('#table-files tbody tr:has(.preview) a').on('click', function (e) {
+        e.preventDefault();
+        bootbox.dialog({
+            onEscape: true,
+            className: 'modal-preview-file',
+            message: $(this).next('.preview').clone().css('display', '')
+        });
+    });
+
+    // style checkboxes with switch control
+    $(":checkbox.bootstrap-switch").bootstrapSwitch({  
+        inverse: true,
+        offText: 'No',
+        onText: 'Yes',
+        size: 'small',
+    });
 
 });

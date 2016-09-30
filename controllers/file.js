@@ -30,23 +30,21 @@ exports.getFileList = function (req, res) {
 exports.getFileForm = function (req, res) { 
     res.render('admin/course-file', { course: req.course, fil3: req.fil3 || new models.File() });
 };
-// Add new file
-exports.addFile = function (req, res) {
-    models.File.create({ 
-        name: req.file.filename, 
-        type: req.file.mimetype 
-    }, function (err, file) { 
-        req.course.files.push(file);
-        req.course.save(function (err) {
-            res.redirect('/admin/courses/' + req.course.id + '/files');
-        }); 
+// Add new files
+exports.addFiles = function (req, res) {
+    async.eachSeries(req.files, function (obj, done) {
+        var fil3 = new models.File();
+        fil3.store(obj, function (err) {
+            req.course.files.push(fil3);
+            req.course.save(done); 
+        });
+    }, function (err) {
+        res.json({ status: true });
     });
 };
 // Update specific file for course
 exports.editFile = function (req, res) {
-    req.fil3.name = req.file.filename;
-    req.fil3.type = req.file.mimetype;
-    req.fil3.save(function (err) {
+    req.fil3.store(req, function (err) {
         res.redirect('/admin/courses/' + req.course.id + '/files/' + req.fil3.id + '/edit');
     });
 };
@@ -56,5 +54,5 @@ exports.deleteFiles = function (req, res) {
         models.File.findByIdAndRemove(id, done);
     }, function (err) {
         res.json({ status: true });
-    })
+    });
 };

@@ -7,9 +7,6 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th class="text-center">Published</th>
-            <th class="text-center">Unlocked</th>
-            <th class="text-center">Active</th>
             <th></th>
         </tr>
     </thead>
@@ -17,21 +14,6 @@
     <% tutorialQuizzes.forEach(function (tutorialQuiz) { %>
         <tr>
             <td><%= tutorialQuiz.quiz.name %></td>
-            <td class="text-center">
-            <% if (tutorialQuiz.published) { %>
-                <span class="glyphicon glyphicon-ok"></span>
-            <% } %>
-            </td>
-            <td class="text-center">
-            <% if (tutorialQuiz.unlocked) { %>
-                <span class="glyphicon glyphicon-ok"></span>
-            <% } %>
-            </td>
-            <td class="text-center">
-            <% if (tutorialQuiz.active) { %>
-                <span class="glyphicon glyphicon-ok"></span>
-            <% } %>
-            </td>
             <td>
                 <div class="dropdown">
                     <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
