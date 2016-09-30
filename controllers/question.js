@@ -65,7 +65,7 @@ exports.addQuestion = function (req, res, next) {
     });
 };
 // Update specific question for quiz
-exports.editQuestion = function (req, res, next) { 
+exports.editQuestion = function (req, res, next) {
     req.question.store(req.body, function (err) {
         res.redirect(
             '/admin/courses/' + req.course.id + 
@@ -79,5 +79,5 @@ exports.editQuestion = function (req, res, next) {
 exports.deleteQuestion = function (req, res) {
     req.question.remove(function (err) {
         res.json({ status: true });
-    })
+    });
 };

@@ -20,16 +20,85 @@ body > .navbar {
     position: absolute;
     right: 20px;
 }
-#col-groups .panel-heading {
-    height: 45px;
-}
-#col-groups .panel-heading .panel-title {
-    padding-top: 5px;
-}
 .ui-sortable-helper {
     cursor: pointer;
     display: table !important;
 }
 .ui-sortable-handle {
     margin-bottom: 5px;
+}
+
+
+.modal-upload-files .modal-body {
+    padding: 0;
+}
+.modal-upload-files .modal-body .btn {
+    margin: 15px auto;
+    width: 95%;
+}
+.modal-upload-files .modal-body .list-group {
+    margin: 0;
+}
+.modal-upload-files .modal-body .list-group-item {
+    border-radius: 0;
+    border-top: 1px solid #ddd;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+}
+.modal-upload-files .modal-body .btn-remove-file {
+    padding: 8px 20px 0 0;
+    position: absolute;
+    right: 0px;
+    top: 0;
+}
+.modal-preview-file .bootbox-body > * {
+    display: block;
+    margin: 0 auto;
+}
+
+
+
+#modal-add-files .modal-body {
+    max-height: 500px;
+    padding: 0;
+    overflow-y: scroll;
+}
+#modal-add-files .col-preview {
+    border-right: 1px solid #ddd;
+    padding: 15px;
+    position: relative;
+    right: -1px;
+}
+#modal-add-files .col-preview > * {
+    display: block;
+    margin: 0 auto;
+}
+#modal-add-files .col-files {
+    border-left: 1px solid #ddd;
+    padding: 0;
+}
+#modal-add-files .col-files .list-group {
+    margin: 0; 
+    padding: 0;
+}
+#modal-add-files .col-files .list-group-item {
+    border-radius: 0;
+    border-left: 0;
+    overflow: hidden;
+    width: 100%;
+}
+#modal-add-files .col-files .list-group-item:first-child {
+    border-top: 0;
+}
+#modal-add-files .col-files .list-group-item.active a {
+    color: #fff;
+    text-decoration: underline;
+}
+#modal-add-files .col-files [type=checkbox] {
+    margin-right: 10px;
+}
+#modal-add-files .modal-footer {
+    position: relative;
+    top: -1px;
 }

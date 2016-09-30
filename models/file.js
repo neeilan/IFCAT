@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 var FileSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    type: { type: String }
+    type: String
 }, {
     timestamps: true
 });
@@ -13,6 +13,12 @@ FileSchema.methods.isAudio = function () {
 // Check if file is an image
 FileSchema.methods.isImage = function () {
     return this.type.indexOf('image') !== -1;
+};
+//
+FileSchema.methods.store = function (obj, callback) {
+    this.name = obj.filename;
+    this.type = obj.mimetype;
+    return this.save(callback);
 };
 
 module.exports = mongoose.model('File', FileSchema);
