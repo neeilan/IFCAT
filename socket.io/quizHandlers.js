@@ -161,7 +161,8 @@ module.exports = function(io){
                     // Basically, if they get it right once, they can't worsen their score
                     
                     var attemptsInc = response.correct ? 0 : 1;
-                    var newScore = (response.correct) ? response.points : (answerIsCorrect) ? (question.points + question.firstTryBonus - response.attempts * question.penalty) : 0;
+                    var bonus = (response.attempts == 0) ? question.firstTryBonus : 0;
+                    var newScore = (response.correct) ? response.points : (answerIsCorrect) ? (question.points + bonus - response.attempts * question.penalty) : 0;
                     // If they got it correct before, don't increment
                     
                     return models.Response.findByIdAndUpdate(response._id,
