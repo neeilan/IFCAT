@@ -179,43 +179,54 @@ $(function () {
     });
 
     $('#btn-add-group').click(function () {
-        var $table = $('#form-quiz-groups'),
-            $tableHead = $table.find('.row-head > table'),
-            $tableBody = $table.find('.row-body > table');
+        var $table = $(this).closest('form').find('table'),
+            $thead = $table.find('thead'),
+            $tfoot = $table.find('tfoot'),
+            $tbody = $table.find('tbody');
+        // get next group #
+        var numbers = [];
+        $thead.find('tr:eq(1) th').each(function () {
+            if (!isNaN(this.innerText)) {
+                numbers.push(parseInt(this.innerText, 10));
+            }
+        });
+        var value = _.toInteger(_.max(numbers)) + 1;
         // increment colspan
-        $tableHead.find('tr:eq(0) th:eq(1)').attr('colspan', function (i, attr) { return parseInt(attr, 10) + 1; });
+        $thead.find('tr:eq(0) th:eq(1)').attr('colspan', function (i, attr) { 
+            return parseInt(attr, 10) + 1; 
+        });
+        $tfoot.find('tr:eq(1) th:eq(0)').attr('colspan', function (i, attr) { 
+            return parseInt(attr, 10) + 1; 
+        });
         // add header column
-        $tableHead.find('tr:eq(1)').append('<th class="g">Z</th>');
+        $thead.find('tr:eq(1)').append('<th class="g">' + value + '</th>');
+        $tfoot.find('tr:eq(0)').append('<th class="g">' + value + '</th>');
         // add body column
-        $tableBody.find('tr').each(function () { 
+        $tbody.find('tr').each(function () { 
             var $tr = $(this);
             var name = $tr.find(':radio:eq(0)').attr('name');
-            $tr.append('<th class="g"><input type="radio" name="' + name + '" value="Z"></th>');
+            $tr.append('<th class="g"><input type="radio" name="' + name + '" value="' + value + '"></th>');
         });
     });
 
-    $('.btn-remove-group').click(function () {
+    $('#btn-remove-group').click(function () {
         var $panel = $(this).closest('.panel');
             $panel.find('.sortable > .btn').appendTo($('#col-unassigned-students > .panel'));
             $panel.remove();
     });
 
-    $('#btn-save-groups').click(function () {
-        var url = $('#save-groups-url').val(),
-            data = [];
-        // build data
-        $('[data-group-id]').each(function () {
-            var group = $(this).data('group-id');
-            $('[data-member-id]', this).each(function () {
-                data.push({
-                    name: 'groups[' + group + ']',
-                    value: $(this).data('member-id')
-                });
-            }); 
-        });
+    $('#form-quiz-groups').submit(function (e) {
+        e.preventDefault();
+        var $form = $(this);
         // send request
-        $.post(url, data, function () { 
-            window.location.reload(true);
+        $.ajax(this.action, {
+            type: 'put',
+            data: $form.serialize(), 
+            success: function (res) {
+                if (res.status) {
+                    window.location.reload(true);
+                }
+            }
         });
     });
 

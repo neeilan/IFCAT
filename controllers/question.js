@@ -26,8 +26,10 @@ exports.getQuestionList = function (req, res) {
 // Sort list of questions
 exports.sortQuestionList = function (req, res) {
     // ensure that same IDs are given
-    if (_.isArray(req.body.questions) && 
-        _.isEqual(req.quiz.questions.slice().sort().toString(), req.body.questions.slice().sort().toString())) {
+    if (_.isArray(req.body.questions) && _.isEqual(
+            req.quiz.questions.slice().sort().toString(), 
+            req.body.questions.slice().sort().toString()
+        )) {
         // set new order of questions
         req.quiz.questions = req.body.questions.map(function (str) { 
             return new mongoose.Types.ObjectId(str); 

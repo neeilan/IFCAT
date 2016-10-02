@@ -114,28 +114,17 @@ textarea.form-control {
 }
 
 #form-quiz-groups {
-    overflow: hidden;
+    display: inline-block;
 }
-#form-quiz-groups .row-head, #form-quiz-groups .row-body {
-    clear: left;
-    float: left;
-    overflow-x: auto;
-}
-#form-quiz-groups .row-body {
-    overflow-y: auto;
-    max-height: 500px;
-}
-#form-quiz-groups .row-head table {
+#form-quiz-groups table {
     border-top: 1px solid #ddd;
     border-left: 1px solid #ddd;
     margin-top: 10px;
 }
-#form-quiz-groups .row-body table {
-    border-left: 1px solid #ddd;
-}
 #form-quiz-groups th, #form-quiz-groups td {
     border-bottom: 1px solid #ddd;
     border-right: 1px solid #ddd;
+    height: 30px;
     overflow: hidden;
     text-align: center;
     text-overflow: ellipsis;
@@ -154,9 +143,6 @@ textarea.form-control {
 #form-quiz-groups tr td:first-child {
     text-align: left;
 }
-#form-quiz-groups .row-head th, #form-quiz-groups .row-body td {
-    height: 30px;
-}
-#form-quiz-groups .row-body td {
+#form-quiz-groups tbody td {
     padding: 0 5px;
 }
