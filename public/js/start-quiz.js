@@ -171,25 +171,27 @@ function renderQuestion(quiz, n){
   
   $('#attachment').html('');
   if (quiz.questions[n].files){
-    var file = quiz.questions[n].files[0];
-    if (file){
+    
+    quiz.questions[n].files.forEach(function(file){
       var courseId = url.slice(url.indexOf('/courses/') + 9, url.indexOf('/quizzes'));
       var fileUrl = '/upl/' + courseId + '/' + file.name;
       if (file.type.includes('image')){
-        $('#attachment').html('<img class="attachedImg" src="' + fileUrl + '"/> <br/>\
-        <a target = "_blank" href="'+fileUrl+'"> Direct link</a><hr/>')
+        $('#attachment').append('<img class="attachedImg" src="' + fileUrl + '"/> <br/>\
+        <a target = "_blank" href="'+fileUrl+'"> Direct link</a><br/>')
       }
       else if (file.type.includes('audio')){
-        $('#attachment').html('<audio controls>\
+        $('#attachment').append('<audio controls>\
           <source src="'+ fileUrl +'" type="'+ file.type +'">\
           Your browser does not support the audio element.\
           </audio><br/>\
           <a target = "_blank" href="'+fileUrl+'"> Direct link</a><br/>')
       }
       else {
-        $('#attachment').html('<a target = "_blank" href = "'+ fileUrl +'">'+ file.name + '</a><br/>')
+        $('#attachment').append('<a target = "_blank" href = "'+ fileUrl +'">'+ file.name + '</a><br/>')
       }
-    }
+      $('#attachment').append('<hr/>');
+  
+    })
   }
   
   // shuffle choices if need be
