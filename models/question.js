@@ -4,10 +4,11 @@ var _ = require('lodash'),
 var QuestionSchema = new mongoose.Schema({
     number: String,
     question: { type: String, required: true },
-    type: { type: String, enum: ['multiple choice', 'true or false', 'multiple select'/*, 'fill in the blanks'*/] },
+    type: { type: String, enum: ['multiple choice', 'multiple select'/*, 'fill in the blanks'*/] },
     choices: [String],
     answers: [String],
     files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
+    links: [String],
     shuffleChoices: Boolean,
     useLaTeX: Boolean,
     points: Number,
@@ -28,10 +29,6 @@ QuestionSchema.methods.withFiles = function () {
 // Check if question is a multiple choice question
 QuestionSchema.methods.isMultipleChoice = function () {
     return this.type === 'multiple choice';
-};
-// Check if question is a true or false question
-QuestionSchema.methods.isTrueOrFalse = function () {
-    return this.type === 'true or false';
 };
 // Check if question is a multiple select question
 QuestionSchema.methods.isMultipleSelect = function () {
@@ -55,6 +52,7 @@ QuestionSchema.methods.store = function (obj, callback) {
     this.question = obj.question;
     this.type = obj.type;
     this.files = obj.files;
+    this.links = _.filter(obj.links, Boolean);
     this.shuffleChoices = !!obj.shuffleChoices;
     this.useLaTeX = !!obj.useLaTeX;
     this.points = obj.points;
@@ -66,7 +64,7 @@ QuestionSchema.methods.store = function (obj, callback) {
 
     var selected, key, matches, value, d;
 
-    if (this.isMultipleChoice() || this.isTrueOrFalse()) {
+    if (this.isMultipleChoice()) {
         selected = _.isObject(obj.answer) ? obj.answer[_.kebabCase(this.type)] : false;
         // add choices and selected answer
         for (d in obj.choices) {

@@ -1,0 +1,33 @@
+<a href="#" class="counter" id="link-counter" data-toggle="modal" data-target="#modal-add-links"><%= 
+    question.links.length !== 1 ? question.links.length + ' links' : '1 link' %></a>
+
+<!-- add links modal -->
+<div class="modal fade" id="modal-add-links" tabindex="-1" style="display: none;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <h4 class="modal-title">Enter links</h4>
+            </div>
+            <div class="modal-body">
+                <% if (!_.isEmpty(question.links)) { %>
+                    <% _.each(question.links, function (link) { %>    
+                        <div class="form-group">
+                            <input type="text" name="links[]" value="<%= link %>" class="form-control" placeholder="http://www.example.com">
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="form-group">
+                        <input type="text" name="links[]" value="" class="form-control" placeholder="http://www.example.com">
+                    </div>
+                <% } %>
+                <button type="button" class="btn btn-default btn-sm" id="btn-add-link">
+                    <span class="glyphicon glyphicon-plus"></span> Add another link
+                </button>
+            </div>
+            <div class="modal-footer">
+                <!--button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button-->
+            </div>
+        </div>
+    </div>
+</div>
