@@ -80,7 +80,7 @@ socket.on('quizActivated', function(tutQuiz){ // active = start questions
   quizData.active = tutQuiz.active;
   if (tutQuiz.active){
     $('#postQuiz').hide();
-    alert('The quiz is now active. Select a driver and proceed!')
+    swal('','The quiz is now active. Select a driver and proceed','info')
     $('#driverSelect').show();
   }
   else{
@@ -296,9 +296,10 @@ function renderQuestion(quiz, n){
  })
     
 socket.on('postQuiz', function(data){
+  $(".preQuiz").hide();
   $('#activeQuiz').hide();
   $("#postQuiz").show();
-  $('#score').html(data.score);
+  $('#score').html(score);
   var html = "";
   data.members.forEach(function(member){
     html+="<br/><button class='teachingPt btn btn-default col-md-6 col-xs-8 col-sm-8 col-md-offset-3 col-sm-offset-2 col-xs-offset-2 ' id='"+ member._id +"'>" + (member.name.first+' '
@@ -306,7 +307,11 @@ socket.on('postQuiz', function(data){
   })
   $("#teachingPointsPicker").html(html);
   $(document).on('click','.teachingPt', function(e){
-    socket.emit('awardPoint', { userId: e.target.id });
+    emit('awardPoint', { receiverId : e.target.id });
     $('#postQuiz').html('Quiz complete');
   })
+})
+
+socket.on('info', function(data){
+  swal('', data.message, 'info');
 })

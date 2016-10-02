@@ -23,7 +23,7 @@ var TutorialQuizSchema = new mongoose.Schema({
     // make quiz visible to students
     published: Boolean,
     // allow students to enter pre-phase of the quiz
-    unlocked: Boolean,
+    unlocked: Boolean, // deprecated
     // allow students to do quiz
     active: Boolean
 }, {

@@ -57,7 +57,10 @@ module.exports = function(io){
             })
             
             if (studentsGroup) return studentsGroupId;
-            else if (tutQuiz.active) return; // don't allow new group joining if a quiz is active
+            else if (tutQuiz.active) {
+                socket.emit('info', { message : 'You cannot join a group while the quiz is active. Please talk to your TA.' });
+                return; // don't allow new group joining if a quiz is active
+            }
 
             // student doesn't already have a group - need to add them to one
             
@@ -84,23 +87,21 @@ module.exports = function(io){
             
             // if all existing groups are full, make a new group for the student
             else {
-                console.log('elseeeeeeeeeeeeeeeee')
                 // there are no groups with room - let's make a new group
                 var group = new models.Group();
                 group.name = (tutQuiz.groups.length + 1).toString();
                 group.members = [ socket.request.user._id ];
                 group.save( function(err, group){
-                    
-                    if (!err) {
-                         // we also need to add the group to this tutorialQuiz
-                         models.TutorialQuiz.update({ _id : tutQuiz._id }, { $push : { groups :  group._id } }, { new : true }, function(err, doc){
-                            if (err) throw err;
-                         console.log('Created and joined a new group ', group.name);
-                         socket.join('group:'+ group._id);
-                         socket.emit('quizData', { quiz : tutQuiz, groupName : group.name, groupId: group._id } );
-                         return;
-                         })
-                     }
+                    if (err) console.log (err);
+                     // we also need to add the group to this tutorialQuiz
+                     models.TutorialQuiz.update({ _id : tutQuiz._id }, { $push : { groups :  group._id } }, { new : true }, function(err, doc){
+                        if (err) throw err;
+                     console.log('Created and joined a new group ', group.name);
+                     socket.join('group:'+ group._id);
+                     socket.emit('quizData', { quiz : tutQuiz, groupName : group.name, groupId: group._id } );
+                     return;
+                     })
+                     
                 });
             }
         })
@@ -137,13 +138,22 @@ module.exports = function(io){
         models.Question.findById(data.questionId)
         .exec()
         .then(function(question){
+            
+            
             var answerIsCorrect = (question.answers.indexOf(data.answer) != -1); // mark
+            
+            // if (question.type == 'multiple select'){
+            //     var answerIsCorrect = false;
+            //     if (data.answer.length == question.answers.length){
+            //          answerIsCorrect = true;
+            //         data.answer.forEach((ans)=>{ if (question.answers.indexOf(ans)==-1) answerIsCorrect = false; })
+            //     }
+            // }
             
             models.Response.findOne({ group : data.groupId, question: data.questionId })
             .exec()
             .then(function(response){
                 if (!response){
-                    console.log(data);
                     var res = new models.Response();
                     res.group = data.groupId;
                     res.question = data.questionId;
@@ -202,12 +212,11 @@ module.exports = function(io){
     })
     
     socket.on('awardPoint', function(data){
-    
-        console.log('Awarding point');
-        // models.User.findByIdAndUpdate(data.userId, { $inc : { teachingPoints : 1 }},
-        // {new : true }, function (user){
-        //     console.log('Teaching points for user '+data.userId+' now '+user.teachingPoints);
-        // })
+        models.Group.findByIdAndUpdate(data.groupId,
+        { $push : { teachingPoints : data.receiverId } },{new:true}, function(err, group){
+            if (err) throw err;
+            socket.emit('info', {message : 'Teaching points successfully awarded'});
+        })
     })
     
     }
