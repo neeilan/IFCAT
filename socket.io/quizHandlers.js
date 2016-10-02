@@ -127,6 +127,7 @@ module.exports = function(io){
                 .exec()
         })
         .then(function(){
+            emitters.emitToGroup(data.groupId, 'resetDriver', {});
             socket.emit('assignedAsDriver', { groupId : data.groupId } );
             emitters.emitToGroup(data.groupId, 'startQuiz', {});
         })
@@ -147,6 +148,7 @@ module.exports = function(io){
                     res.group = data.groupId;
                     res.question = data.questionId;
                     res.correct = answerIsCorrect;
+                    res.attempts = answerIsCorrect ? 0 : 1;
                     res.points = answerIsCorrect ? (question.points + question.firstTryBonus) : 0;
                     return models.TutorialQuiz.findByIdAndUpdate(data.quizId, {
                         $push : { responses : res._id }
@@ -160,9 +162,8 @@ module.exports = function(io){
                     // Some logic to prevent students from being dumb and reanswering correct questions and losing points
                     // Basically, if they get it right once, they can't worsen their score
                     
-                    var attemptsInc = response.correct ? 0 : 1;
-                    var bonus = (response.attempts == 0) ? question.firstTryBonus : 0;
-                    var newScore = (response.correct) ? response.points : (answerIsCorrect) ? (question.points + bonus - response.attempts * question.penalty) : 0;
+                    var attemptsInc = (response.correct) ? 0 : (answerIsCorrect) ? 0 : 1 ;
+                    var newScore = (response.correct) ? response.points : (answerIsCorrect) ? (question.points - (response.attempts * question.penalty)) : 0;
                     // If they got it correct before, don't increment
                     
                     return models.Response.findByIdAndUpdate(response._id,

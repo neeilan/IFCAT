@@ -3,7 +3,7 @@ $('.quizBtn').attr('disabled', true); // Disable quiz buttons (enable if assigne
 var url = window.location.href;
 var quizId = url.slice(url.indexOf('/quizzes/') + 9, url.indexOf('/start'));
 var socket = io();
-var quizData, groupId, isDriver,  responses = {}, currentQuestionId, score = 0;
+var quizData, groupId, isDriver,  responses = {}, currentQuestionId, currentQuestionIndex, score = 0;
     
 socket.emit('requestQuiz', quizId);
 
@@ -27,22 +27,30 @@ socket.on('groupAttempt', function(data){
   if (data.response.group != groupId) return;
   var question = quizData.quiz.questions[data.questionNumber-1];
   var maxScore = question.firstTryBonus + question.points;
+  
   if (data.response.correct) {
-    swal("Good job!", "Question "+ data.questionNumber +" was answered correctly!.\
+    swal("Good job!", "Question "+ data.questionNumber + " was answered correctly!.\
      Received " + data.response.points + " points ", "success");
      score += parseInt(data.response.points);
      $('#'+(data.questionNumber-1)).addClass('btn-success');
-     
-      var emptyStars = (responses[question._id].attempts-1) * question.penalty > maxScore ? maxScore : (responses[question._id].attempts-1) * question.penalty;
-      var fullStars = maxScore - emptyStars > 0 ? (maxScore - emptyStars) : 0;
-      renderStars(data.questionNumber-1, emptyStars, fullStars);
   }
   else {
     swal("Yikes!", "Question "+ data.questionNumber +" was answered incorrectly!", "error");
-    var emptyStars = (responses[question._id].attempts) * question.penalty > maxScore ? maxScore : (responses[question._id].attempts) * question.penalty;
+    var emptyStars = (responses[question._id].attempts == 0) ? 0 : responses[question._id].attempts * question.penalty + question.firstTryBonus;
+    emptyStars = emptyStars > maxScore ? maxScore : emptyStars;
     var fullStars = maxScore - emptyStars > 0 ? (maxScore - emptyStars) : 0;
     renderStars(data.questionNumber-1, emptyStars, fullStars);
   }
+  
+
+socket.on('resetDriver', function(){
+  $('.quizBtn').attr('disabled', true);
+  isDriver = false;
+  renderQuestion(currentQuestionIndex);
+})
+      
+  
+  renderQuestion(quizData.quiz, currentQuestionIndex);
   $('#currentScore').html(score);
   
 })
@@ -81,8 +89,10 @@ socket.on('quizActivated', function(tutQuiz){ // active = start questions
 })
 
 socket.on('startQuiz', function(data){
-    if (quizData.active)
-        renderQuestion(quizData.quiz, 0);
+    if (quizData.active){
+      swal('Your group now has a driver!', 'Note that any previous driver no longer has answering privileges', 'info');
+      renderQuestion(quizData.quiz, 0);
+    }
 })
 
 socket.on('updateScores', function(data){
@@ -152,6 +162,7 @@ function renderQuestion(quiz, n){
   $('#submitQuestion').off('click');
     
   currentQuestionId = quiz.questions[n]._id;
+  currentQuestionIndex = n;
   
   
   // renders nth question (0 indexed) in quiz
@@ -231,16 +242,19 @@ function renderQuestion(quiz, n){
         renderQuestion(quiz, e.target.id )
       })
       var maxScore = question.points + question.firstTryBonus;
+      
+      
+      
       if (question._id in responses){
         if(responses[question._id].correct){
-          var emptyStars = (responses[question._id].attempts-1) * question.penalty > maxScore ? maxScore : (responses[question._id].attempts-1) * question.penalty;
-          var fullStars = maxScore - emptyStars > 0 ? (maxScore - emptyStars) : 0;
-        renderStars(i, emptyStars, fullStars);
          $('#'+i).addClass('btn-success');
         }
-        else{
-        renderStars(i, responses[question._id].attempts * question.penalty, maxScore - responses[question._id].attempts * question.penalty);
-        }
+        var emptyStars = (responses[question._id].attempts == 0) ? 0 : responses[question._id].attempts * question.penalty + question.firstTryBonus;
+        emptyStars = emptyStars > maxScore ? maxScore : emptyStars;
+        
+        var fullStars = maxScore - emptyStars > 0 ? (maxScore - emptyStars) : 0;
+        renderStars(i, emptyStars, fullStars);        
+
       }
       else{
         renderStars(i, 0, maxScore);
