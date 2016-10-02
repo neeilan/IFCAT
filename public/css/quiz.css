@@ -64,6 +64,9 @@
   margin-top: 15px;
 }
 
+#questionScore{display:none;}
+
 @media all and (max-width: 650px) {
     .questionPoints{display:none;}
+    #questionScore{display:block;}
 }

@@ -29,17 +29,19 @@ socket.on('groupAttempt', function(data){
   var maxScore = question.firstTryBonus + question.points;
   
   if (data.response.correct) {
-    swal("Good job!", "Question "+ data.questionNumber + " was answered correctly!.\
-     Received " + data.response.points + " points ", "success");
+    swal("Good job!", "Question "+ data.questionNumber + " was answered correctly!\
+     Received " + data.response.points + " of " + maxScore + " points ", "success");
      score += parseInt(data.response.points);
      $('#'+(data.questionNumber-1)).addClass('btn-success');
   }
   else {
     swal("Yikes!", "Question "+ data.questionNumber +" was answered incorrectly!", "error");
-    var emptyStars = (responses[question._id].attempts == 0) ? 0 : responses[question._id].attempts * question.penalty + question.firstTryBonus;
-    emptyStars = emptyStars > maxScore ? maxScore : emptyStars;
-    var fullStars = maxScore - emptyStars > 0 ? (maxScore - emptyStars) : 0;
-    renderStars(data.questionNumber-1, emptyStars, fullStars);
+    
+    var scoreData = calculateStars(question);
+    if (scoreData.correct) { $('#'+i).addClass('btn-success'); }
+    renderStars(data.questionNumber - 1, scoreData.emptyStars, scoreData.fullStars);
+    renderQuestionScoreMobile(data.questionNumber-1);
+
   }
   
 
@@ -50,12 +52,13 @@ socket.on('resetDriver', function(){
 })
       
   
-  renderQuestion(quizData.quiz, currentQuestionIndex);
+renderQuestion(quizData.quiz, currentQuestionIndex);
   $('#currentScore').html(score);
   
 })
 
 
+// Driver controls
 $(document).on('click', '#selectDriverBtn', function(){
   emit('nominateSelfAsDriver');
 })
@@ -65,13 +68,15 @@ $(document).on('click', '#deferDriverBtn', function(){
   }
 })
 
-function renderStars(question, empty, full){
+function renderStars(question, empty, full, returnHTML){
     var fullStars = "<i class = 'fa fa-star' />&nbsp;".repeat(full),
       emptyStars = "<i class = 'fa fa-star-o' />&nbsp;".repeat(empty);
     var html = emptyStars + fullStars;
-    if (parseInt(empty) + parseInt(full) > 7){
-      html = (full)+"/"+(empty+full);
+    
+    if (parseInt(empty) + parseInt(full) > 6){
+      html = "Score: "+(full)+"/" + (empty+full);
     }
+    if (returnHTML) return html;
     $('#points-'+question).html(html);
 }
 
@@ -99,7 +104,6 @@ socket.on('updateScores', function(data){
   data.responses.forEach(function(response, i){
     responses[response.question] = response;
   })
-  console.log(responses);
   if (data.responses.length){
   score = data.responses.reduce(function(prev, curr){
     if (isNaN(prev)){
@@ -195,12 +199,21 @@ function renderQuestion(quiz, n){
   }
   
   // shuffle choices if need be
-  var choices = (quiz.randomizeChoices || quiz.shuffleChoices) ? _.shuffle(quiz.questions[n].choices) : quiz.questions[n].choices;
+  var choices = (quiz.questions[n].shuffleChoices) ? _.shuffle(quiz.questions[n].choices) : quiz.questions[n].choices;
 
   // render choices
   $.each(choices, function(i, choice){
     $("#choices").append("<div class = 'quizBtn choice' id='choice:" + i + "' >" + choice + "</div>")
   })
+  // LATEX logic
+  if(quiz.questions[n].useLaTeX){
+    $("#activeQuiz").addClass("tex2jax_process");
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+  }
+  else{
+    $("#activateQuiz").removeClass("tex2jax_process");
+  }
+  
   
   $(".choice").click(function(e){
     if ($(e.target).hasClass('currentlyChosen')){
@@ -240,49 +253,44 @@ function renderQuestion(quiz, n){
       
     })
     
-  // questions list
-  
+  // questions list and score display
+  renderQuestionScoreMobile(n);
   if($('#questionSelect').html().length == 0){ // at start or after refresh
     quiz.questions.forEach(function(question, i){
+      
       var className = (i == n) ? 'btn-warning' : '';
       $('#questionSelect').append('<button id = "'+ i + '" class = "goToQuestion col-md-12 col-xs-2 col-sm-3 btn '+ className +'">'
-      + (i+1)
+      + quiz.questions[i].number
       + '<br/><div class = "questionPoints" id = "points-'+ i +'">'
       +'</div>'
       + '</button>');
+      
       $(document).on('click', '.goToQuestion', function(e){
-        renderQuestion(quiz, e.target.id )
+        renderQuestion(quiz, e.target.id );
       })
-      var maxScore = question.points + question.firstTryBonus;
       
-      
-      
-      if (question._id in responses){
-        if(responses[question._id].correct){
-         $('#'+i).addClass('btn-success');
-        }
-        var emptyStars = (responses[question._id].attempts == 0) ? 0 : responses[question._id].attempts * question.penalty + question.firstTryBonus;
-        emptyStars = emptyStars > maxScore ? maxScore : emptyStars;
-        
-        var fullStars = maxScore - emptyStars > 0 ? (maxScore - emptyStars) : 0;
-        renderStars(i, emptyStars, fullStars);        
-
+      var scoreData = calculateStars(question);
+      if (scoreData.correct) { 
+        $('#'+i).addClass('btn-success');
       }
-      else{
-        renderStars(i, 0, maxScore);
-      }
+      renderStars(i, scoreData.emptyStars, scoreData.fullStars);
     })
   } else {
     $('.goToQuestion').removeClass('btn-warning');
     $('#'+n).addClass('btn-warning');
-
   }
+  
+
+
+  
   
   // Check for previously answered questions
   if (quiz.questions[n]._id in responses && responses[quiz.questions[n]._id].correct){
     $('.quizBtn').attr('disabled', true);
     $('#choices').append('<br/><div class = "alert alert-success"> You have correctly answered this question already.</div>')
   }
+  
+  
   
 }
  
@@ -297,13 +305,31 @@ function renderQuestion(quiz, n){
    }
  }
  
- // Socket.io handlers
+function renderQuestionScoreMobile(questionIndex){
+  var question = quizData.quiz.questions[questionIndex];
+  var scoreData = calculateStars(question);
+  var html = renderStars(questionIndex, scoreData.emptyStars, scoreData.fullStars, true);
+  $("#questionScore").html(html);
+ }
  
- socket.on('goToQuestion', function(data){
-     if (data.quizId === currentQuizId) {
-         renderQuestion(quizData.quiz, data.questionNumber)
-     }
- })
+function calculateStars(question){
+  var result = {};
+  
+  var maxScore = question.points + question.firstTryBonus;
+  
+  if (question._id in responses){
+    result.correct = responses[question._id].correct;
+    var emptyStars = (responses[question._id].attempts == 0) ? 0 : responses[question._id].attempts * question.penalty + question.firstTryBonus;
+    result.emptyStars = emptyStars > maxScore ? maxScore : emptyStars;
+    result.fullStars = maxScore - emptyStars > 0 ? (maxScore - emptyStars) : 0;
+  }
+  else{
+    result.emptyStars = 0;
+    result.fullStars = maxScore;
+  }
+  return result;
+}
+
     
 socket.on('postQuiz', function(data){
   $(".preQuiz").hide();
