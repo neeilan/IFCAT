@@ -11,28 +11,28 @@
             <th>Code</th>
             <th>Name</th>
             <th>Instructors</th>
-            <th>Tutorials (TA)</th>
+            <th>Tutorials (TAs)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
     <% if (!_.isEmpty(courses)) { %>
-        <% for (var i = 0, len = courses.length; i < len; i++) { %>
+        <% _.each(courses, function (course) { %>
             <tr>
-                <td><%= courses[i].code %></td>
-                <td><%= courses[i].name %></td>
+                <td><%= course.code %></td>
+                <td><%= course.name %></td>
                 <td>
-                <% courses[i].instructors.forEach(function (instructor) { %>
+                <% _.each(course.instructors, function (instructor) { %>
                     <div><%= instructor.name.full %></div>
                 <% }) %>
                 </td>
                 <td class="tutorial">
-                <% courses[i].tutorials.forEach(function (tutorial) { %>
+                <% _.each(course.tutorials, function (tutorial) { %>
                     <div>
                         <span class="number"><%= 'TUT ' + tutorial.number %></span>
                     <% if (tutorial.teachingAssistants.length) { %>
                         <span class="teaching-assistants"><%=  
-                            '(' + tutorial.teachingAssistants.map(function (teachingAssistant) { 
+                            '(' + _.map(tutorial.teachingAssistants, function (teachingAssistant) { 
                                 return teachingAssistant.name.full; 
                             }).join(', ') + ')'
                         %></span>
@@ -45,28 +45,28 @@
                             Actions<span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="/admin/courses/<%= courses[i].id %>/edit"><span 
+                            <li><a href="/admin/courses/<%= course.id %>/edit"><span 
                                 class="glyphicon glyphicon-pencil"></span> Edit Course</a></li>
-                            <li><a href="/admin/courses/<%= courses[i].id %>/tutorials"><span 
+                            <li><a href="/admin/courses/<%= course.id %>/tutorials"><span 
                                 class="glyphicon glyphicon-blackboard"></span> Manage Tutorials</a></li>
-                            <li><a href="/admin/courses/<%= courses[i].id %>/quizzes"><span 
+                            <li><a href="/admin/courses/<%= course.id %>/quizzes"><span 
                                 class="glyphicon glyphicon-list-alt"></span> Manage Quizzes</a></li>
-                            <li><a href="/admin/courses/<%= courses[i].id %>/files"><span 
+                            <li><a href="/admin/courses/<%= course.id %>/files"><span 
                                 class="glyphicon glyphicon-picture"></span> Manage Files</a></li>
-                            <li><a href="/admin/courses/<%= courses[i].id %>/instructors"><span 
+                            <li><a href="/admin/courses/<%= course.id %>/instructors"><span 
                                 class="glyphicon glyphicon-user"></span> Manage Instructors</a></li>
-                            <li><a href="/admin/courses/<%= courses[i].id %>/teaching-assistants"><span 
+                            <li><a href="/admin/courses/<%= course.id %>/teaching-assistants"><span 
                                 class="glyphicon glyphicon-user"></span> Manage Teaching Assistants</a></li>
-                            <li><a href="/admin/courses/<%= courses[i].id %>/students"><span 
+                            <li><a href="/admin/courses/<%= course.id %>/students"><span 
                                 class="glyphicon glyphicon-user"></span> Manage Students</a></li>
                             <li class="divider"></li>
-                            <li><a href="/admin/courses/<%= courses[i].id %>" class="btn-delete"><span 
+                            <li><a href="/admin/courses/<%= course.id %>" class="btn-delete"><span 
                                 class="glyphicon glyphicon-remove"></span> Delete Course</a></li>
                         </ul>
                     </div>
                 </td>
             </tr>
-        <% } %>
+        <% }) %>
     <% } else { %>
         <tr><td colspan="5"> No courses have been added yet.</td></tr>
     <% } %>

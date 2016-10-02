@@ -141,8 +141,8 @@ router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/unlock', controllers
 router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/activate', controllers.TutorialQuiz.activateQuiz);
 
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups', controllers.Group.getGroupList);
-router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroups);
-//router.post('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/save', controllers.Group.saveGroups);
+//router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroups);
+router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups', controllers.Group.saveGroupList);
 //router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/view', controllers.Group.viewGroupForm);
 //router.delete('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group', controllers.Group.deleteGroupFromTutorial);
 

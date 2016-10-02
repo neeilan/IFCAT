@@ -1,0 +1,27 @@
+<!-- import students modal -->
+<div class="modal fade" id="modal-import-students" tabindex="-1" style="display: none;">
+    <div class="modal-dialog" style="max-width: 500px">
+        <div class="modal-content">
+            <form action="/admin/courses/<%= course.id %>/students/import" method="post" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h4 class="modal-title">Import students using CSV file</h4>
+                </div>
+                <div class="modal-body">
+                    <p>This import will add new students into the course and their tutorials.</p>
+                    <p>The first row of the file must consist of the following fields (case-sensitive):<br>
+                        <b>UTORid, email, first, last, tutorial</b>.</p>
+                    <br>
+                    <label class="control-label">Select the CSV file</label>&nbsp;&nbsp;
+                    <label class="btn btn-default">
+                        <input type="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display:none;">Browse
+                    </label>
+                    <span class="label label-info"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

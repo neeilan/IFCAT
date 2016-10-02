@@ -6,34 +6,27 @@
 
 
 <div class="row">
-    <div class="col-sm-3">
-        <label class="col-xs-4 col-sm-12 control-label">Published?</label>
-        <div class="col-xs-8 col-sm-12">
-            <input type="checkbox" id="publish-tutorial-quiz" value="1" class="bootstrap-switch"<%= 
-                tutorialQuiz.published ? ' checked' : '' %>>
-        </div>
+    <label class="col-xs-3 col-sm-2 col-md-2 col-lg-1 control-label">Published?</label>
+    <div class="col-xs-3 col-sm-2 col-md-2 col-lg-1">
+        <input type="checkbox" id="publish-tutorial-quiz" value="1" class="bootstrap-switch"<%= 
+            tutorialQuiz.published ? ' checked' : '' %>>
     </div>
-    <div class="col-sm-3">
-        <label class="col-xs-4 col-sm-12 control-label">Active?</label>
-        <div class="col-xs-8 col-sm-12">
-            <input type="checkbox" id="activate-tutorial-quiz" value="1" class="bootstrap-switch"<%= 
-                tutorialQuiz.active ? ' checked' : '' %>>
-        </div>
+    <label class="col-xs-3 col-sm-2 col-md-2 col-lg-1 control-label">Active?</label>
+    <div class="col-xs-3 col-sm-2 col-md-2 col-lg-1">
+        <input type="checkbox" id="activate-tutorial-quiz" value="1" class="bootstrap-switch"<%= 
+            tutorialQuiz.active ? ' checked' : '' %>>
     </div>
-    <div class="col-sm-6"></div>
 </div>
-
-
 
 <h1>Groups</h1>
 
-<form action="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>_method=put" 
+<form action="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups?_method=put" 
     method="post" id="form-quiz-groups">
-    <div class="row-head">
-        <button type="button" class="btn btn-default btn-sm" id="btn-add-group"><span 
-        class="glyphicon glyphicon-plus"></span> Add group</button>
-        <button type="submit" class="btn btn-default btn-sm btn-primary pull-right" id="btn-save-groups">Save</button>
-        <table>
+    <button type="button" class="btn btn-default btn-sm" id="btn-add-group"><span 
+    class="glyphicon glyphicon-plus"></span> Add group</button>
+    <button type="submit" class="btn btn-default btn-sm btn-primary pull-right">Save</button>
+    <table>
+        <thead>
             <tr>
                 <th rowspan="2" class="s">&nbsp;</th>
                 <th colspan="<%= 1 + tutorialQuiz.groups.length %>">Groups</th>
@@ -44,25 +37,37 @@
                 <th class="g"><%= group.name %></th>
             <% }) %>
             </tr>
-        </table>
-    </div>
-    <div class="row-body">
-        <table>
+        </thead>
+        <tfoot>
+            <tr>
+                <th rowspan="2" class="s">&nbsp;</th>
+                <th class="u">Unassigned</th>
+                <% _.each(tutorialQuiz.groups, function (group) { %>
+                    <th class="g"><%= group.name %></th>
+                <% }) %>
+            </tr>
+            <tr>
+                <th colspan="<%= 1 + tutorialQuiz.groups.length %>">Groups</th>
+            </tr>
+        </tfoot>
+        <tbody>
         <% _.each(tutorialQuiz.tutorial.students, function (student) { %>
             <tr>
                 <td class="s"><%= student.name.full %></td>
-                <td class="u"><input type="radio" name="groups[<%= student.id %>]" value="unassigned"<%=
-                    !_.find(tutorialQuiz.groups, function (group) { 
-                        return group.members.indexOf(student.id) !== -1;
-                    }) ? ' checked' : '' %>></td>
+                <td class="u">
+                    <input type="radio" name="groups[<%= student.id %>]" value="unassigned"<%=
+                        !_.find(tutorialQuiz.groups, function (group) { 
+                            return _.find(group.members, { id: student.id });
+                        }) ? ' checked' : '' %>>
+                </td>
                 <% _.each(tutorialQuiz.groups, function (group) { %>
                     <td class="g"><input type="radio" name="groups[<%= student.id %>]" value="<%= group.id %>"<%=
-                        group.members.indexOf(student.id) !== -1 ? ' checked' : '' %>></td>
+                        _.find(group.members, { id: student.id }) ? ' checked' : '' %>></td>
                 <% }) %>
             </tr>
         <% }) %>
-        </table>
-    </div>
+        </tbody>
+    </table>
 </form>
 
 <script type="text/template" id="panel-group-template">
