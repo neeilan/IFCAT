@@ -85,28 +85,20 @@ $(function () {
     });
 
     $('#form-question [name=type]').change(function () {
-        var type = _.kebabCase(this.value); console.log(type);
+        var type = _.kebabCase(this.value);
         // show related items for type
-        $('.multiple-choice, .true-or-false, .multiple-select').each(function () {
+        $('.multiple-choice, .multiple-select').each(function () {
             var $col = $(this);
                 $col.toggle($col.hasClass(type));
                 $col.find(':input').prop('disabled', !$col.hasClass(type));
         });
     }).change();
 
-    $('#modal-add-files .list-group-item :checkbox').click(function (e) {
+    $('#modal-add-files .list-group-item :checkbox').click(function () {
         var $listGroup = $(this).closest('.list-group'),
-            $listGroupItem = $(this).closest('.list-group-item'),
-            $fileCounter = $('#file-counter');
+            $listGroupItem = $(this).closest('.list-group-item');
         // toggle active state based on checkbox' state
         $listGroupItem.toggleClass('active', this.checked);
-        // indicate # of files were selected
-        var count = $listGroup.find(':checked').length;
-        if (count) {
-            $fileCounter.text(count > 1 ? count + ' files selected' : '1 file selected');    
-        } else {
-            $fileCounter.empty();
-        }
     });
 
     $('#modal-add-files .list-group-item:has(.preview) a').click(function (e) {
@@ -115,7 +107,15 @@ $(function () {
             $(this).next('.preview').clone().css('display', '')
         );
     });
-    
+
+    $('#btn-add-link').click(function () {
+        var $formGroup = $(this).prev('.form-group');
+        // create new group
+        var $newGroup = $formGroup.clone();
+            $newGroup.find('[name^=links]').val('');
+            $formGroup.after($newGroup);
+    });
+
     $('.multiple-choice, .multiple-select').on('click', '.btn-remove-choice', function (e) {
         e.preventDefault();
         $(this).closest('.form-group').remove();
@@ -166,40 +166,21 @@ $(function () {
         });
     });
 
-    /*$('#btn-add-group').click(function () {
-        var $tpl = $(_.template($('#panel-group-template').text())({ id: parseInt(_.uniqueId(), 10) + 999 }));
-            $tpl.find('.sortable').sortable(options);
-            $tpl.prependTo($('#panel-groups'));
-    });
-
-    $('#btn-generate-groups').click(function () {
-        var url = $('#generate-groups-url').val();
-        var $tpl = $(_.template($('#panel-group-template').text())({ id: parseInt(_.uniqueId(), 10) + 999 }));
-        var $list = $('#panel-groups').empty();
-        // send request
-        $.getJSON(url, function (res) {
-            // create groups
-            res.groups.forEach(function (group) {
-                // create group
-                var $item = $tpl.clone(),
-                    $body = $item.find('.sortable').sortable(options);
-                // create members + add them to group
-                group.members.forEach(function (member) {
-                    $body.append(
-                        $('<button/>', {
-                            type: 'button',
-                            class: 'btn btn-default btn-block',
-                            dataMemberId: member.id,
-                            text: member.name.first + ' ' + member.name.last
-                        })
-                    );
-                });
-                // add group
-                $list.append($item);
-            });
-            
+    $('#btn-add-group').click(function () {
+        var $table = $('#form-quiz-groups'),
+            $tableHead = $table.find('.row-head > table'),
+            $tableBody = $table.find('.row-body > table');
+        // increment colspan
+        $tableHead.find('tr:eq(0) th:eq(1)').attr('colspan', function (i, attr) { return parseInt(attr, 10) + 1; });
+        // add header column
+        $tableHead.find('tr:eq(1)').append('<th class="g">Z</th>');
+        // add body column
+        $tableBody.find('tr').each(function () { 
+            var $tr = $(this);
+            var name = $tr.find(':radio:eq(0)').attr('name');
+            $tr.append('<th class="g"><input type="radio" name="' + name + '" value="Z"></th>');
         });
-    });*/
+    });
 
     $('.btn-remove-group').click(function () {
         var $panel = $(this).closest('.panel');
