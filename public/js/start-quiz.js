@@ -197,6 +197,11 @@ function renderQuestion(quiz, n){
   
     })
   }
+  if (quiz.questions[n].links){
+      quiz.questions[n].links.forEach(function(link){
+          $("#attachment").append('<a target = "_blank" href = "'+ link +'">'+ link + '</a><br/>');
+      })
+  }
   
   // shuffle choices if need be
   var choices = quiz.questions[n].choices;
