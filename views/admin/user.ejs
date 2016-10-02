@@ -22,14 +22,15 @@
         <label class="col-sm-2 control-label">Roles</label>
         <div class="col-sm-8">
             <select name="roles" multiple class="form-control">
-            <% [
-                { text: 'Administrator', value: 'admin' },
-                { text: 'Instructor', value: 'instructor' },
-                { text: 'Teaching assistant', value: 'teachingAssistant' },
-                { text: 'Student', value: 'student' }
-            ].forEach(function (role) { %>
+            <% _.each([
+                    { text: 'Administrator', value: 'admin' },
+                    { text: 'Instructor', value: 'instructor' },
+                    { text: 'Teaching assistant', value: 'teachingAssistant' },
+                    { text: 'Student', value: 'student' }
+                ], function (role) { %>
          
-                <option value="<%= role.value %>"<%= us3r.roles.indexOf(role.value) !== -1 ? ' selected' : '' %>><%= role.text %></option>
+                <option value="<%= role.value %>"<%= us3r.roles.indexOf(role.value) !== -1 ? 
+                    ' selected' : '' %>><%= role.text %></option>
 
             <% }) %>
             </select>

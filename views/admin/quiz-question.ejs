@@ -37,10 +37,10 @@
     <div class="form-group">
         <label for="type" class="col-sm-2 control-label">Files</label>
         <div class="col-sm-10">
-            <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-add-files">
-                <span class="glyphicon glyphicon-plus"></span> Add files
-            </button>
-            <%- include ./modals/add-files %>
+            <a href="#" class="btn btn-default btn-sm<%= course.files.length ? 
+                '' : ' disabled' %>" data-toggle="modal" data-target="#modal-show-files">
+                <span class="glyphicon glyphicon-file"></span> Show files</a>
+            <%- include ./modals/show-files %>
         </div>
     </div>
 
@@ -49,10 +49,9 @@
     <div class="form-group">
         <label for="type" class="col-sm-2 control-label">Links</label>
         <div class="col-sm-10">
-            <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-add-links">
-                <span class="glyphicon glyphicon-plus"></span> Add links
-            </button>
-            <%- include ./modals/add-links %>
+            <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-show-links">
+                <span class="glyphicon glyphicon-link"></span> Show links</a>
+            <%- include ./modals/show-links %>
         </div>
     </div>
 

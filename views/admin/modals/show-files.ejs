@@ -1,12 +1,12 @@
-<a href="#" class="counter" id="file-counter" data-toggle="modal" data-target="#modal-add-files"><%= 
-    question.files.length !== 1 ? question.files.length + ' files' : '1 file' %></a>
+<a href="#" class="counter<%= course.files.length ? '' : ' disabled' %>" id="file-counter" 
+    data-toggle="modal" data-target="#modal-show-files"><%= question.files.length !== 1 ? 
+    question.files.length + ' files selected' : '1 file selected' %></a>
 
 <!-- add files modal -->
-<div class="modal fade" id="modal-add-files" tabindex="-1" style="display: none;">
+<div class="modal fade" id="modal-show-files" tabindex="-1" style="display: none;">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                 <h4 class="modal-title">Select files</h4>
             </div>
             <div class="modal-body">
@@ -32,7 +32,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <!--button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button-->
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

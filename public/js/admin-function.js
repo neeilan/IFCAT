@@ -94,18 +94,23 @@ $(function () {
         });
     }).change();
 
-    $('#modal-add-files .list-group-item :checkbox').click(function () {
+    $('#modal-show-files .list-group-item :checkbox').click(function () {
         var $listGroup = $(this).closest('.list-group'),
             $listGroupItem = $(this).closest('.list-group-item');
         // toggle active state based on checkbox' state
         $listGroupItem.toggleClass('active', this.checked);
     });
 
-    $('#modal-add-files .list-group-item:has(.preview) a').click(function (e) {
+    $('#modal-show-files .list-group-item:has(.preview) a').click(function (e) {
         e.preventDefault();
         $(this).closest('.modal-body').find('.col-preview').html(
             $(this).next('.preview').clone().css('display', '')
         );
+    });
+
+    $('#modal-show-files').on('hidden.bs.modal', function () {
+        var count = $(this).find(':checked').length;
+        $('#file-counter').text(count !== 1 ? count + ' files selected' : '1 file selected');
     });
 
     $('#btn-add-link').click(function () {
@@ -114,6 +119,13 @@ $(function () {
         var $newGroup = $formGroup.clone();
             $newGroup.find('[name^=links]').val('');
             $formGroup.after($newGroup);
+    });
+
+    $('#modal-show-links').on('hidden.bs.modal', function () {
+        var count = $(this).find('[name^=links]').filter(function() {
+            return this.value !== '';
+        }).length;
+        $('#link-counter').text(count !== 1 ? count + ' links added' : '1 link added');
     });
 
     $('.multiple-choice, .multiple-select').on('click', '.btn-remove-choice', function (e) {

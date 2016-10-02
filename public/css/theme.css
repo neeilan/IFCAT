@@ -1,6 +1,9 @@
 .row.flush-col > [class*="col-"] {
     padding: 0px;
 }
+body {
+    margin-bottom: 100px;
+}
 body > .navbar {
     border-radius: 0px;
 }
@@ -62,50 +65,50 @@ textarea.form-control {
     margin-left: 10px;
 }
 
-#modal-add-files .modal-body {
+#modal-show-files .modal-body {
     max-height: 500px;
     padding: 0;
     overflow-y: scroll;
 }
-#modal-add-files .col-preview {
+#modal-show-files .col-preview {
     border-right: 1px solid #ddd;
     padding: 15px;
     position: relative;
     right: -1px;
 }
-#modal-add-files .col-preview > * {
+#modal-show-files .col-preview > * {
     display: block;
     margin: 0 auto;
 }
-#modal-add-files .col-files {
+#modal-show-files .col-files {
     border-left: 1px solid #ddd;
     padding: 0;
 }
-#modal-add-files .col-files .list-group {
+#modal-show-files .col-files .list-group {
     margin: 0; 
     padding: 0;
 }
-#modal-add-files .col-files .list-group-item {
+#modal-show-files .col-files .list-group-item {
     border-radius: 0;
     border-left: 0;
     overflow: hidden;
     width: 100%;
 }
-#modal-add-files .col-files .list-group-item:first-child {
+#modal-show-files .col-files .list-group-item:first-child {
     border-top: 0;
 }
-#modal-add-files .col-files .list-group-item.active a {
+#modal-show-files .col-files .list-group-item.active a {
     color: #fff;
     text-decoration: underline;
 }
-#modal-add-files .col-files [type=checkbox] {
+#modal-show-files .col-files [type=checkbox] {
     margin-right: 10px;
 }
-#modal-add-files .modal-footer {
+#modal-show-files .modal-footer {
     position: relative;
     top: -1px;
 }
-#modal-add-links .form-group {
+#modal-show-links .form-group {
     margin-left: auto;
     margin-right: auto;
 }

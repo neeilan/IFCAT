@@ -1,9 +1,15 @@
 <%- include ./header -%>
 
-
 <h1><%= course.code + ' - ' + course.name %><br><small>Students</small></h1>
 
-<!-- Show current course.students[i]. -->
+<a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-import-students">
+    <span class="glyphicon glyphicon-save"></span> Import students</a>
+<%- include ./modals/import-students %>
+
+<a href="#find" class="btn btn-default btn-sm">
+    <span class="glyphicon glyphicon-user"></span> Find students</a>
+
+<!-- Show current student. -->
 
 <table class="table table-striped">
     <thead>
@@ -24,14 +30,14 @@
     </thead>
     <tbody>
     <% if (!_.isEmpty(course.students)) { %>
-        <% for (var i = 0, len = course.students.length; i < len; i++) { %>
+        <% _.each(course.students, function (student) { %>
             <tr>
-                <td><%= course.students[i].UTORid %></td>
-                <td><%= course.students[i].name.full %></td>
-                <td><%= course.students[i].local.email %></td>
-                <% course.tutorials.forEach(function (tutorial) { %>
-                    <td class="text-center"><input type="radio" name="tutorial[<%= course.students[i].id %>]" 
-                        value="<%= tutorial.id %>"<%= tutorial.students.indexOf(course.students[i].id) !== -1 ? ' checked' : '' %>></td>
+                <td><%= student.UTORid %></td>
+                <td><%= student.name.full %></td>
+                <td><%= student.local.email %></td>
+                <% _.each(course.tutorials, function (tutorial) { %>
+                    <td class="text-center"><input type="radio" name="tutorial[<%= student.id %>]" 
+                        value="<%= tutorial.id %>"<%= tutorial.students.indexOf(student.id) !== -1 ? ' checked' : '' %>></td>
                 <% }) %>
                 <td>
                     <div class="dropdown">
@@ -41,26 +47,25 @@
                         <ul class="dropdown-menu">
                         <% if (!_.isEmpty(course.tutorials)) { %>
                             <li><a href="#" class="btn-update-user"
-                        data-url="/admin/courses/<%= course.id %>/students/<%= course.students[i].id %>">Update tutorial</a></li>
+                        data-url="/admin/courses/<%= course.id %>/students/<%= student.id %>">Update tutorial</a></li>
                             <li class="divider">
                         <% } %>
                             <li><a href="#" class="btn-delete-user"
-                        data-url="/admin/courses/<%= course.id %>/students/<%= course.students[i].id %>">Remove from course</a></li>
+                        data-url="/admin/courses/<%= course.id %>/students/<%= student.id %>">Remove from course</a></li>
                         </ul>
                     </div>
                 </td>
             </tr>
-        <% } %>
+        <% }) %>
     <% } else { %>
         <tr><td colspan="<%= 4 + course.tutorials.length %>">No students have been added to the course yet.</td></tr>
     <% } %>
     </tbody>
 </table>
 
+<!-- Search student. -->
 
-<!-- Search course.students[i]. -->
-
-<h1><small>Find students</small></h1>
+<h1 id="find"><small>Find students</small></h1>
 
 <form id="form-search-user" action="/admin/courses/<%= course.id %>/students/search" method="get">
     <div class="form-group">
@@ -78,22 +83,6 @@
     </div>
 </form>
 
-<div id="search-user-results" class="clearfix"></div>
-
-<!-- Import course.students[i]. -->
-
-<h1><small>Import students</small></h1>
-
-<form action="/admin/courses/<%= course.id %>/students/import" method="post" enctype="multipart/form-data" class="form-inline">
-    <div class="form-group">
-        <label class="control-label">Upload file</label>
-        
-            <label class="btn btn-default">
-                <input type="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display:none;">Browse
-            </label>
-            <span class="label label-info"></span>
-            <input type="submit" value="Go" class="btn btn-primary btn-sm">
-    </div>
-</form>
+<div id="search-user-results"></div>
 
 <%- include ./footer -%>

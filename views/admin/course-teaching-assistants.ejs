@@ -22,24 +22,24 @@
     </thead>
     <tbody>
     <% if (!_.isEmpty(course.teachingAssistants)) { %>
-        <% for (var i = 0, len = course.teachingAssistants.length; i < len; i++) { %>
+        <% _.each(course.teachingAssistants, function (teachingAssistant) { %>
             <tr>
-                <td><%= course.teachingAssistants[i].name.full %></td>
-                <td><%= course.teachingAssistants[i].local.email %></td>
+                <td><%= teachingAssistant.name.full %></td>
+                <td><%= teachingAssistant.local.email %></td>
                 <% course.tutorials.forEach(function (tutorial) { %>
                     <td class="text-center"><input type="checkbox" name="tutorials[]" value="<%= tutorial.id %>"<%= 
-                        tutorial.teachingAssistants.indexOf(course.teachingAssistants[i].id) !== -1 ? ' checked' : '' %>></td>
+                        tutorial.teachingAssistants.indexOf(teachingAssistant.id) !== -1 ? ' checked' : '' %>></td>
                 <% }) %>
                 <td>
                 <% if (!_.isEmpty(course.tutorials)) { %>
                     <button type="button" class="btn btn-default btn-sm btn-update-user"
-                        data-url="/admin/courses/<%= course.id %>/teaching-assistants/<%= course.teachingAssistants[i].id %>">Update</button>
+                        data-url="/admin/courses/<%= course.id %>/teaching-assistants/<%= teachingAssistant.id %>">Update</button>
                 <% } %>
                     <button type="button" class="btn btn-danger btn-sm btn-delete-user"
-                        data-url="/admin/courses/<%= course.id %>/teaching-assistants/<%= course.teachingAssistants[i].id %>">Delete</button>
+                        data-url="/admin/courses/<%= course.id %>/teaching-assistants/<%= teachingAssistant.id %>">Delete</button>
                 </td>
             </tr>
-        <% } %>
+        <% }) %>
     <% } else { %>
         <tr><td colspan="<%= 3 + course.tutorials.length %>">No teaching assistants have been added to the course yet.</td></tr>
     <% } %>

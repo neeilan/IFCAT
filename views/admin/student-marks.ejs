@@ -19,15 +19,15 @@
             </tr>
         </tfoot>
         <tbody>
-        <% for (var i = 0, len = marks.length; i < len; i++) { %>
+        <% _.each(marks, function (mark) { %>
             <tr>
-                <td><%= marks[i].tutorialQuiz.quiz.name %>.</td>
+                <td><%= mark.tutorialQuiz.quiz.name %>.</td>
                 <td>
-                    <a href="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= marks[i].tutorialQuiz.id %>/groups/<%= marks[i].group.id %>/responses">Group <%= marks[i].group.name %></a>       
+                    <a href="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= mark.tutorialQuiz.id %>/groups/<%= mark.group.id %>/responses">Group <%= mark.group.name %></a>       
                 </td>
-                <td class="text-center"><%= marks[i].points %></td>
+                <td class="text-center"><%= mark.points %></td>
             </tr>
-        <% } %>
+        <% }) %>
         </tbody>
     <% } else { %>
         <tbody>
