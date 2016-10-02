@@ -199,11 +199,13 @@ function renderQuestion(quiz, n){
   }
   
   // shuffle choices if need be
-  var choices = (quiz.questions[n].shuffleChoices) ? _.shuffle(quiz.questions[n].choices) : quiz.questions[n].choices;
+  var choices = quiz.questions[n].choices;
+  var shuffledChoices = (quiz.questions[n].shuffleChoices) ? _.shuffle(quiz.questions[n].choices) : choices;
 
   // render choices
-  $.each(choices, function(i, choice){
-    $("#choices").append("<div class = 'quizBtn choice' id='choice:" + i + "' >" + choice + "</div>")
+  $.each(shuffledChoices, function(i, choice){
+      var index = choices.indexOf(shuffledChoices[i]);
+    $("#choices").append("<div class = 'quizBtn choice' id='choice:" + index + "' >" + choice + "</div>")
   })
   // LATEX logic
   if(quiz.questions[n].useLaTeX){
