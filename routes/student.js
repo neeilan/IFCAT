@@ -46,4 +46,6 @@ router.get('/courses/:course/quizzes/:tutorialQuiz/start', controllers.TutorialQ
 router.get('/courses/:course/quizzes/:tutorialQuiz/questions/:question', controllers.TutorialQuiz.getNextQuestion);
 router.get('/courses/:course/quizzes/:tutorialQuiz/end', controllers.TutorialQuiz.endQuiz);
 
+// router.use('/courses/:course/:quizzes/:tutorialQuiz/*')
+
 module.exports = router;
