@@ -142,13 +142,13 @@ module.exports = function(io){
             
             var answerIsCorrect = (question.answers.indexOf(data.answer[0]) != -1); // mark
             
-            // if (question.type == 'multiple select'){
-            //     var answerIsCorrect = false;
-            //     if (data.answer.length == question.answers.length){
-            //          answerIsCorrect = true;
-            //         data.answer.forEach((ans)=>{ if (question.answers.indexOf(ans)==-1) answerIsCorrect = false; })
-            //     }
-            // }
+            if (question.type == 'multiple select'){
+                var answerIsCorrect = false;
+                if (data.answer.length == question.answers.length){
+                     answerIsCorrect = true;
+                    data.answer.forEach((ans)=>{ if (question.answers.indexOf(ans)==-1) answerIsCorrect = false; })
+                }
+            }
             
             models.Response.findOne({ group : data.groupId, question: data.questionId })
             .exec()

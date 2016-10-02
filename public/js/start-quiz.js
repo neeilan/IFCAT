@@ -203,7 +203,15 @@ function renderQuestion(quiz, n){
   })
   
   $(".choice").click(function(e){
-    $('.currentlyChosen').removeClass('currentlyChosen');
+    if ($(e.target).hasClass('currentlyChosen')){
+      setTimeout(function(){
+        $(e.target).removeClass('currentlyChosen'); // only works with setTimeout for some reason lol
+      }, 50);
+    }
+    if (quiz.questions[n].type != 'multiple select'){
+      $('.currentlyChosen').removeClass('currentlyChosen');
+    }
+
     $(e.target).addClass('currentlyChosen');
    })
   
@@ -215,12 +223,13 @@ function renderQuestion(quiz, n){
         return;
       }
 
-      // var chosenAnswer = currentlyChosen[0].textContent;
-      var chosenAnswerIndex = $(currentlyChosen[0]).attr('id').substring(7);
-      var chosenAnswer = [quizData.quiz.questions[n].choices[chosenAnswerIndex]];
-      console.log(chosenAnswer);
-      
-      
+    // We're sending back an array of selected choices for marking for flexibility
+    var chosenAnswer = [];
+    $.each(currentlyChosen, function(i,element){
+      var chosenAnswerIndex = $(element).attr('id').substring(7);
+      chosenAnswer.push( quizData.quiz.questions[n].choices[chosenAnswerIndex] );
+    })
+
       $('.currentlyChosen').removeClass('currentlyChosen');
       
       emit('attemptAnswer', {
