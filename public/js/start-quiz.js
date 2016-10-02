@@ -166,7 +166,7 @@ function renderQuestion(quiz, n){
   
   
   // renders nth question (0 indexed) in quiz
-  $("#text").html(quiz.questions[n].question);
+  $("#text").html(quiz.questions[n].number + ") " + quiz.questions[n].question);
   $("#choices").html("");
   
   $('#attachment').html('');
@@ -199,7 +199,7 @@ function renderQuestion(quiz, n){
 
   // render choices
   $.each(choices, function(i, choice){
-    $("#choices").append("<div class = 'quizBtn choice'>"+ choice +"</div>")
+    $("#choices").append("<div class = 'quizBtn choice' id='choice:" + i + "' >" + choice + "</div>")
   })
   
   $(".choice").click(function(e){
@@ -215,8 +215,9 @@ function renderQuestion(quiz, n){
         return;
       }
 
-      var chosenAnswer = currentlyChosen[0].textContent;
-      
+      // var chosenAnswer = currentlyChosen[0].textContent;
+      var chosenAnswerIndex = $(currentlyChosen[0]).attr('id').substring(7);
+      var chosenAnswer = [quizData.quiz.questions[n].choices[chosenAnswerIndex]];
       console.log(chosenAnswer);
       
       

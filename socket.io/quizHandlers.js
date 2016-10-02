@@ -140,7 +140,7 @@ module.exports = function(io){
         .then(function(question){
             
             
-            var answerIsCorrect = (question.answers.indexOf(data.answer) != -1); // mark
+            var answerIsCorrect = (question.answers.indexOf(data.answer[0]) != -1); // mark
             
             // if (question.type == 'multiple select'){
             //     var answerIsCorrect = false;
