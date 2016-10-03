@@ -74,7 +74,7 @@ function renderStars(question, empty, full, returnHTML){
     var html = emptyStars + fullStars;
     
     if (parseInt(empty) + parseInt(full) > 6){
-      html = "Score: "+(full)+"/" + (empty+full);
+      html = "Stars: "+(full)+"/" + (empty+full);
     }
     if (returnHTML) return html;
     $('#points-'+question).html(html);
@@ -170,11 +170,14 @@ function renderQuestion(quiz, n){
   
   
   // renders nth question (0 indexed) in quiz
-  $("#text").html(quiz.questions[n].number + ") " + quiz.questions[n].question);
+  $("#text").html(quiz.questions[n].number + ". " + quiz.questions[n].question);
   $("#choices").html("");
   
+  
+  // Attachments (files and links)
   $('#attachment').html('');
-  if (quiz.questions[n].files){
+  $('#attachmentCollapser').show();
+  if (quiz.questions[n].files.length){
     
     quiz.questions[n].files.forEach(function(file){
       var courseId = url.slice(url.indexOf('/courses/') + 9, url.indexOf('/quizzes'));
@@ -191,17 +194,19 @@ function renderQuestion(quiz, n){
           <a target = "_blank" href="'+fileUrl+'"> Direct link</a><br/>')
       }
       else {
-        $('#attachment').append('<a target = "_blank" href = "'+ fileUrl +'">'+ file.name + '</a><br/>')
+        $('#attachment').append('<br/><a target = "_blank" href = "'+ fileUrl +'">'+ file.name + '</a><br/>')
       }
-      $('#attachment').append('<hr/>');
-  
     })
   }
-  if (quiz.questions[n].links){
+  else if (quiz.questions[n].links.length){
       quiz.questions[n].links.forEach(function(link){
-          $("#attachment").append('<a target = "_blank" href = "'+ link +'">'+ link + '</a><br/>');
+          $("#attachment").append('<br/><a target = "_blank" href = "'+ link +'">'+ link + '</a><br/>');
       })
   }
+  else{
+      $('#attachmentCollapser').hide();
+  }
+  $("#attachment").append('<br/>');
   
   // shuffle choices if need be
   var choices = quiz.questions[n].choices;
@@ -266,7 +271,7 @@ function renderQuestion(quiz, n){
     quiz.questions.forEach(function(question, i){
       
       var className = (i == n) ? 'btn-warning' : '';
-      $('#questionSelect').append('<button id = "'+ i + '" class = "goToQuestion col-md-12 col-xs-2 col-sm-3 btn '+ className +'">'
+      $('#questionSelect').append('<button id = "'+ i + '" class = "goToQuestion col-md-12 col-xs-2 col-sm-2 btn '+ className +'">'
       + quiz.questions[i].number
       + '<br/><div class = "questionPoints" id = "points-'+ i +'">'
       +'</div>'
@@ -294,7 +299,7 @@ function renderQuestion(quiz, n){
   // Check for previously answered questions
   if (quiz.questions[n]._id in responses && responses[quiz.questions[n]._id].correct){
     $('.quizBtn').attr('disabled', true);
-    $('#choices').append('<br/><div class = "alert alert-success"> You have correctly answered this question already.</div>')
+    $('#choices').append('<br/><div class = "alert alert-success"> You have correctly answered this question already</div>')
   }
   
   
