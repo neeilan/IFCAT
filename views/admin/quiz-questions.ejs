@@ -2,8 +2,6 @@
 
 <h1><%= course.code + ' - ' + course.name %><br><small>Quiz <%= quiz.name %> - Questions</small></h1>
 
-<h4 class="todo">@TODO: maybe render latex</h4>
-
 <a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/sort" 
     class="btn btn-default btn-sm<%= quiz.questions.length ? '' : ' disabled' %>" id="btn-sort-questions"><span 
     class="glyphicon glyphicon-ok"></span> Sort Questions</a>
@@ -24,8 +22,11 @@
     <% if (!_.isEmpty(quiz.questions)) { %>
         <tbody class="sortable">
         <% _.each(quiz.questions, function (question, i) { %>
-            <tr data-id="<%= question.id %>">
-                <td><span class="glyphicon glyphicon-option-vertical"></span></td>
+            <tr>
+                <td>
+                    <span class="glyphicon glyphicon-option-vertical"></span>
+                    <input type="hidden" name="questions[]" value="<%= question.id %>">
+                </td>
                 <td><%= question.number %>.</td>
                 <td><%= question.question %></td>
                 <td><%= question.type %></td>

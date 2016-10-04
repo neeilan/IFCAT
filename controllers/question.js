@@ -25,11 +25,13 @@ exports.getQuestionList = function (req, res) {
 };
 // Sort list of questions
 exports.sortQuestionList = function (req, res) {
-    // ensure that same IDs are given
-    if (_.isArray(req.body.questions) && _.isEqual(
-            req.quiz.questions.slice().sort().toString(), 
-            req.body.questions.slice().sort().toString()
-        )) {
+    var a = _.filter(req.quiz.questions, Boolean).slice().sort().toString(),
+        b = [];
+    if (_.isArray(req.body.questions)) {
+        b = _.filter(req.body.questions, Boolean).slice().sort().toString();
+    }
+    // ensure that same, IDs are given
+    if (_.isEqual(a, b)) {
         // set new order of questions
         req.quiz.questions = req.body.questions.map(function (str) { 
             return new mongoose.Types.ObjectId(str); 
@@ -80,6 +82,9 @@ exports.editQuestion = function (req, res, next) {
 // Delete specific question for quiz
 exports.deleteQuestion = function (req, res) {
     req.question.remove(function (err) {
-        res.json({ status: true });
+        req.quiz.questions.pull(req.question.id);
+        req.quiz.save(function () {
+            res.json({ status: true });
+        });
     });
 };
