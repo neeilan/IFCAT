@@ -187,7 +187,7 @@ function renderQuestion(quiz, n){
         <a target = "_blank" href="'+fileUrl+'"> Direct link</a><br/>')
       }
       else if (file.type.includes('audio')){
-        $('#attachment').append('<audio controls>\
+        $('#attachment').append('<br/><audio controls>\
           <source src="'+ fileUrl +'" type="'+ file.type +'">\
           Your browser does not support the audio element.\
           </audio><br/>\

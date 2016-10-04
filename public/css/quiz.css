@@ -39,13 +39,12 @@ body {
 .currentlyChosen {
   background: #009966;
   color: #66FFCC;
+  border: none;
   /*box-shadow: 0px 0px 5px #66FFCC;*/
 }
 
-.previouslyChosen {
-  color: #FF9933;
-  border-color: #FF9933;
-  
+.MathJax_Display {
+  pointer-events: none;
 }
 
 #activeQuiz{
