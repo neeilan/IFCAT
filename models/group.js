@@ -7,12 +7,4 @@ var GroupSchema = new mongoose.Schema({
     teachingPoints: [String]
 });
 
-GroupSchema.statics.findGroupByMember = function (userId) {
-    return this.findOne({
-        'members': { 
-            $in: [userId] 
-        } 
-    });
-};
-
 module.exports = mongoose.model('Group', GroupSchema);

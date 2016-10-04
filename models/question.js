@@ -4,7 +4,7 @@ var _ = require('lodash'),
 var QuestionSchema = new mongoose.Schema({
     number: String,
     question: { type: String, required: true },
-    type: { type: String, enum: ['multiple choice', 'multiple select'/*, 'fill in the blanks'*/] },
+    type: { type: String, enum: ['multiple choice', 'multiple select', 'fill in the blanks'] },
     choices: [String],
     answers: [String],
     files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
@@ -77,7 +77,7 @@ QuestionSchema.methods.store = function (obj, callback) {
                 }
             }
         }
-    } else {
+    } else if (this.isMultipleSelect()) {
         selected = _.isObject(obj.answers) ? obj.answers[_.kebabCase(this.type)] : [];
         // add choices + selected answers
         for (d in obj.choices) {
@@ -88,6 +88,14 @@ QuestionSchema.methods.store = function (obj, callback) {
                 if (selected.indexOf(d) !== -1) {
                     this.answers.push(value);
                 }
+            }
+        }
+    } else if (this.isFillInTheBlanks()) {
+        for (d in obj.choices) {
+            value = _.trim(obj.choices[d]);
+            if (value) {
+                this.choices.push(value);
+                this.answers.push(value);
             }
         }
     }
