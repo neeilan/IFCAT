@@ -185,14 +185,6 @@
         </div>
 
         <div class="form-group">
-            <label for="question" class="col-sm-2 control-label">Shuffle choices?</label>
-            <div class="col-sm-6">
-                <input type="checkbox" name="shuffleChoices" value="1" class="bootstrap-switch"<%= 
-                    _.defaultTo(question.shuffleChoices, quiz.shuffleChoices) == 1 ? ' checked' : '' %> >
-            </div>
-        </div>
-
-        <div class="form-group">
             <label for="question" class="col-sm-2 control-label">Format using LaTeX?</label>
             <div class="col-sm-6">
                 <input type="checkbox" name="useLaTeX" value="1"  class="bootstrap-switch"<%= 

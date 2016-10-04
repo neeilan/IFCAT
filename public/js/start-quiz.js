@@ -177,28 +177,26 @@ function renderQuestion(quiz, n){
   // Attachments (files and links)
   $('#attachment').html('');
   $('#attachmentCollapser').show();
-  if (quiz.questions[n].files.length){
-    
-    quiz.questions[n].files.forEach(function(file){
-      var courseId = url.slice(url.indexOf('/courses/') + 9, url.indexOf('/quizzes'));
-      var fileUrl = '/upl/' + courseId + '/' + file.name;
-      if (file.type.includes('image')){
-        $('#attachment').append('<img class="attachedImg" src="' + fileUrl + '"/> <br/>\
-        <a target = "_blank" href="'+fileUrl+'"> Direct link</a><br/>')
-      }
-      else if (file.type.includes('audio')){
-        $('#attachment').append('<br/><audio controls>\
-          <source src="'+ fileUrl +'" type="'+ file.type +'">\
-          Your browser does not support the audio element.\
-          </audio><br/>\
-          <a target = "_blank" href="'+fileUrl+'"> Direct link</a><br/>')
-      }
-      else {
-        $('#attachment').append('<br/><a target = "_blank" href = "'+ fileUrl +'">'+ file.name + '</a><br/>')
-      }
-    })
-  }
-  else if (quiz.questions[n].links.length){
+  if (quiz.questions[n].files.length || quiz.questions[n].links.length){
+        quiz.questions[n].files.forEach(function(file){
+          var courseId = url.slice(url.indexOf('/courses/') + 9, url.indexOf('/quizzes'));
+          var fileUrl = '/upl/' + courseId + '/' + file.name;
+          if (file.type.includes('image')){
+            $('#attachment').append('<img class="attachedImg" src="' + fileUrl + '"/> <br/>\
+            <a target = "_blank" href="'+fileUrl+'"> Direct link</a><br/>')
+          }
+          else if (file.type.includes('audio')){
+            $('#attachment').append('<br/><audio controls>\
+              <source src="'+ fileUrl +'" type="'+ file.type +'">\
+              Your browser does not support the audio element.\
+              </audio><br/>\
+              <a target = "_blank" href="'+fileUrl+'"> Direct link</a><br/>')
+          }
+          else {
+            $('#attachment').append('<br/><a target = "_blank" href = "'+ fileUrl +'">'+ file.name + '</a><br/>')
+          }
+        })
+        
       quiz.questions[n].links.forEach(function(link){
           $("#attachment").append('<br/><a target = "_blank" href = "'+ link +'">'+ link + '</a><br/>');
       })
@@ -206,8 +204,6 @@ function renderQuestion(quiz, n){
   else{
       $('#attachmentCollapser').hide();
   }
-  $("#attachment").append('<br/>');
-  
   
   
   // shuffle choices if need be
