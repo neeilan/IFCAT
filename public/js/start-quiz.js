@@ -208,15 +208,35 @@ function renderQuestion(quiz, n){
   }
   $("#attachment").append('<br/>');
   
+  
+  
   // shuffle choices if need be
-  var choices = quiz.questions[n].choices;
+  var choices = quiz.questions[n].choices || [];
   var shuffledChoices = (quiz.questions[n].shuffleChoices) ? _.shuffle(quiz.questions[n].choices) : choices;
 
   // render choices
-  $.each(shuffledChoices, function(i, choice){
-      var index = choices.indexOf(shuffledChoices[i]);
-    $("#choices").append("<div class = 'quizBtn choice' id='choice:" + index + "' >" + choice + "</div>")
-  })
+  if (quiz.questions[n].type == 'short answer'){
+      $('#choices').append('<input type="text" class="form-control" placeholder="Enter your answer here" id="textInput"></input><br/>');
+  }
+  else{
+      $.each(shuffledChoices, function(i, choice){
+          var index = choices.indexOf(shuffledChoices[i]);
+        $("#choices").append("<div class = 'quizBtn choice' id='choice:" + index + "' >" + choice + "</div>")
+      })   
+      $(".choice").click(function(e){
+        if ($(e.target).hasClass('currentlyChosen')){
+          setTimeout(function(){
+            $(e.target).removeClass('currentlyChosen'); // only works with setTimeout for some reason lol
+          }, 50);
+        }
+        if (quiz.questions[n].type != 'multiple select'){
+          $('.currentlyChosen').removeClass('currentlyChosen');
+        }
+    
+        $(e.target).addClass('currentlyChosen');
+    })
+  }
+
   // LATEX logic
   if(quiz.questions[n].useLaTeX){
     $("#activeQuiz").addClass("tex2jax_process");
@@ -227,28 +247,18 @@ function renderQuestion(quiz, n){
   }
   
   
-  $(".choice").click(function(e){
-    if ($(e.target).hasClass('currentlyChosen')){
-      setTimeout(function(){
-        $(e.target).removeClass('currentlyChosen'); // only works with setTimeout for some reason lol
-      }, 50);
-    }
-    if (quiz.questions[n].type != 'multiple select'){
-      $('.currentlyChosen').removeClass('currentlyChosen');
-    }
 
-    $(e.target).addClass('currentlyChosen');
-   })
   
     $("#submitQuestion").click(function(e){
-      
       var currentlyChosen = $('.currentlyChosen');
-      
-      if (currentlyChosen.length === 0){
+      var textAnswer = $('#textInput').val();
+      if (currentlyChosen.length === 0 && textAnswer.length == 0){
+          console.log('returning')
         return;
       }
 
     // We're sending back an array of selected choices for marking for flexibility
+    
     var chosenAnswer = [];
     $.each(currentlyChosen, function(i,element){
       var chosenAnswerIndex = $(element).attr('id').substring(7);
@@ -259,7 +269,7 @@ function renderQuestion(quiz, n){
       
       emit('attemptAnswer', {
         questionId : quiz.questions[n]._id,
-        answer : chosenAnswer,
+        answer : textAnswer ? [textAnswer] : chosenAnswer,
         questionNumber : parseInt(n)+1
       })      
       

@@ -4,7 +4,7 @@ var _ = require('lodash'),
 var QuestionSchema = new mongoose.Schema({
     number: String,
     question: { type: String, required: true },
-    type: { type: String, enum: ['multiple choice', 'multiple select', 'fill in the blanks'] },
+    type: { type: String, enum: ['multiple choice', 'multiple select', 'short answer'] },
     choices: [String],
     answers: [String],
     files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
@@ -34,9 +34,9 @@ QuestionSchema.methods.isMultipleChoice = function () {
 QuestionSchema.methods.isMultipleSelect = function () {
     return this.type === 'multiple select';
 };
-// Check if question is a fill in the blanks question
-QuestionSchema.methods.isFillInTheBlanks = function () {
-    return this.type === 'fill in the blanks';
+// Check if question is a short answer question
+QuestionSchema.methods.isShortAnswer = function () {
+    return this.type === 'short answer';
 };
 // Check if question has file with given ID
 QuestionSchema.methods.hasFile = function (id) {
@@ -90,7 +90,7 @@ QuestionSchema.methods.store = function (obj, callback) {
                 }
             }
         }
-    } else if (this.isFillInTheBlanks()) {
+    } else if (this.isShortAnswer()) {
         for (d in obj.choices) {
             value = _.trim(obj.choices[d]);
             if (value) {
