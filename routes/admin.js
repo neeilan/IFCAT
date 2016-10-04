@@ -68,6 +68,12 @@ router.use(function (req, res, next) {
     res.redirect('/login');
 });
 
+router.use(function(req, res, next) {
+    res.locals.failure = req.flash('failure');
+    res.locals.success = req.flash('success');
+    next();
+});
+
 // build breadcrumbs
 // @TODO: find a way to add slugs in between keywords 
 // e.g. Courses / Tutorials ----> Courses / CSCC09H3 / Tutorials
@@ -143,7 +149,6 @@ router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/activate', controlle
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups', controllers.Group.getGroupList);
 //router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroups);
 router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups', controllers.Group.saveGroupList);
-//router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/view', controllers.Group.viewGroupForm);
 //router.delete('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group', controllers.Group.deleteGroupFromTutorial);
 
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/responses', controllers.Response.getResponseList);

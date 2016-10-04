@@ -42,23 +42,30 @@ exports.getCourseList = function (req, res) {
 // Get form for course
 exports.getCourseForm = function (req, res) {
     var course = req.course || new models.Course();
-    res.render('admin/course', { title: course.isNew ? 'Add course' : 'Edit course', course: course });
+    res.render('admin/course', { 
+        title: course.isNew ? 'Add course' : 'Edit course', 
+        course: course 
+    });
 };
 // Add course
 exports.addCourse = function (req, res) {
     models.Course.create(req.body, function (err, course) {
-        /*if (err) {
-            return res.status(500).send("Unable to save course at this time (" + err.message + ").");
-        }*/
+        if (err) {
+            req.flash('failure', 'Unable to create course at this time.');
+        } else {
+            req.flash('success', 'The course has been created successfully.');
+        }
         res.redirect('/admin/courses');
     });
 };
 // Update course
 exports.editCourse = function (req, res) {
     _.extend(req.course, req.body).save(function (err) {  
-        /*if (err) {
-            return res.status(500).send("Unable to retrieve course at this time (" + err.message + ").");
-        }*/
+        if (err) {
+            req.flash('failure', 'Unable to update course at this time.');
+        } else {
+            req.flash('success', 'The course has been updated successfully.');
+        }
         res.redirect('/admin/courses/' + req.course.id + '/edit');
     });
 };
@@ -68,7 +75,6 @@ exports.deleteCourse = function (req, res) {
         res.json({ status: true });
     });
 };
-
 
 
 
@@ -175,13 +181,13 @@ exports.generateData = function (req, res) {
             models.TutorialQuiz.create({ tutorial: tutorial.id, quiz: quiz.id }, function (err, doc) {
                 tutorialQuiz = doc;
                 done(err);
-            })
+            });
         },
         // create groups
         function (done) {
-            async.eachSeries(_.chunk(tutorial.students, groupSize), function (members, done) {
+            async.eachOfSeries(_.chunk(tutorial.students, groupSize), function (members, i, done) {
                 models.Group.create({
-                    name: _.sampleSize('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 3).join(''),
+                    name: i + 1,
                     members: members,
                     driver: members[0]
                 }, function (err, doc) {

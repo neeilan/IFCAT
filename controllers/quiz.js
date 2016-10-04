@@ -30,7 +30,11 @@ exports.getQuizForm = function (req, res) {
     }
     req.course.withTutorials().execPopulate().then(function () {
         req.quiz.loadTutorials().then(function () {
-            res.render('admin/course-quiz', { course: req.course, quiz: req.quiz });
+            res.render('admin/course-quiz', {
+                title: req.quiz.isNew ? 'Add new quiz' : 'Edit quiz',
+                course: req.course, 
+                quiz: req.quiz 
+            });
         });
     });
 };
@@ -40,6 +44,11 @@ exports.addQuiz = function (req, res) {
     quiz.store(req.body, function (err, quiz) {
         req.course.quizzes.push(quiz);
         req.course.save(function (err) {
+            if (err) {
+                req.flash('failure', 'Unable to create quiz at this time.');
+            } else {
+                req.flash('success', 'The quiz has been created successfully.');
+            }
             res.redirect('/admin/courses/' + req.course.id + '/quizzes');
         });
     });
@@ -47,9 +56,11 @@ exports.addQuiz = function (req, res) {
 // Update quiz
 exports.editQuiz = function (req, res) {
     req.quiz.store(req.body, function (err) { 
-        /*if (err) {
-            return res.status(500).send("Unable to retrieve quiz at this time (" + err.message + ").");
-        } */
+        if (err) {
+            req.flash('failure', 'Unable to update quiz at this time.');
+        } else {
+            req.flash('success', 'The quiz has been updated successfully.');
+        }
         res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/edit');
     });
 };

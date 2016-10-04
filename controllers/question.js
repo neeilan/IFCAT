@@ -25,19 +25,24 @@ exports.getQuestionList = function (req, res) {
 };
 // Sort list of questions
 exports.sortQuestionList = function (req, res) {
-    var a = _.filter(req.quiz.questions, Boolean).slice().sort().toString(),
-        b = [];
-    if (_.isArray(req.body.questions)) {
-        b = _.filter(req.body.questions, Boolean).slice().sort().toString();
-    }
+    //var a = _.filter(req.quiz.questions, Boolean).slice().sort().toString(),
+        //b = [];
+    //if (_.isArray(req.body.questions)) {
+        //b = _.filter(req.body.questions, Boolean).slice().sort().toString();
+    //}
     // ensure that same, IDs are given
-    if (_.isEqual(a, b)) {
+    //if (_.isEqual(a, b)) { 
         // set new order of questions
         req.quiz.questions = req.body.questions.map(function (str) { 
             return new mongoose.Types.ObjectId(str); 
         });
-    }
+    //}
     req.quiz.save(function (err) {
+        if (err) {
+            req.flash('failure', 'Unable to sort questions at this time.');
+        } else {
+            req.flash('success', 'The questions have been sorted successfully.');
+        }
         res.json({ status: true });       
     });
 };
@@ -47,7 +52,8 @@ exports.getQuestionForm = function (req, res) {
         req.question = new models.Question();
     }
     req.course.withFiles().execPopulate().then(function (err) {
-        res.render('admin/quiz-question', { 
+        res.render('admin/quiz-question', {
+            title: req.question.isNew ? 'Add new question' : 'Edit question',
             course: req.course, 
             quiz: req.quiz, 
             question: req.question
@@ -57,9 +63,14 @@ exports.getQuestionForm = function (req, res) {
 // Add new question for quiz
 exports.addQuestion = function (req, res, next) {
     var question = new models.Question();
-    question.store(req.body, function (err) {
+    question.store(req.body, function (err) { console.log(err);
         req.quiz.questions.push(question);
         req.quiz.save(function (err) {
+            if (err) {
+                req.flash('failure', 'Unable to create question at this time.');
+            } else {
+                req.flash('success', 'The question has been created successfully.');
+            }
             res.redirect(
                 '/admin/courses/' + req.course.id + 
                 '/quizzes/' + req.quiz.id + 
@@ -71,6 +82,11 @@ exports.addQuestion = function (req, res, next) {
 // Update specific question for quiz
 exports.editQuestion = function (req, res, next) {
     req.question.store(req.body, function (err) {
+        if (err) {
+            req.flash('failure', 'Unable to update question at this time.');
+        } else {
+            req.flash('success', 'The question has been updated successfully.');
+        }
         res.redirect(
             '/admin/courses/' + req.course.id + 
             '/quizzes/' + req.quiz.id + 

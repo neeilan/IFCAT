@@ -2,6 +2,8 @@
 
 <h1><%= course.code + ' - ' + course.name %><br><small>Tutorials</small></h1>
 
+<%- include ./messages %>
+
 <a href="/admin/courses/<%= course.id %>/tutorials/new" class="btn btn-default btn-sm"><span 
     class="glyphicon glyphicon-plus"></span> Add New Tutorial</a>
 

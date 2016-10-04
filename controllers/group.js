@@ -76,7 +76,6 @@ exports.saveGroupList = function (req, res) {
     async.eachOfSeries(groups, function (members, id, done) {
         // skip unassigned groups
         if (id === 'unassigned') {
-            console.log('UNASSIGNED');
             done();
         // create new group in tutorialQuiz
         } else if (!isNaN(id)) {
@@ -114,6 +113,11 @@ exports.saveGroupList = function (req, res) {
         }, { 
             multi: true 
         }, function (err) {
+            if (err) {
+                req.flash('failure', 'Unable to save groups at this time.');
+            } else {
+                req.flash('success', 'The groups have been updated successfully.');
+            }
             res.json({ status: true });
         });
     });

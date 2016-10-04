@@ -2,8 +2,9 @@
 
 <h1><%= us3r.isNew ? 'Add new user' : 'Edit user' %></h1>
 
-<form action="/admin/users/<%= us3r.isNew ? '' : us3r.id + '?_method=put' %>" method="post" class="form-horizontal">
+<%- include ./messages %>
 
+<form action="/admin/users/<%= us3r.isNew ? '' : us3r.id + '?_method=put' %>" method="post" class="form-horizontal">
     <div class="form-group">
         <label class="col-sm-2 control-label">Name</label>
         <div class="col-sm-8">
@@ -17,7 +18,6 @@
             </div>
         </div>
     </div>
-
     <div class="form-group">
         <label class="col-sm-2 control-label">Roles</label>
         <div class="col-sm-8">

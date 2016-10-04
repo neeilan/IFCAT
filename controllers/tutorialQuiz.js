@@ -19,7 +19,7 @@ exports.getQuiz = function (req, res, next, tutorialQuiz) {
 // Retrieve quizzes within tutorial
 exports.getQuizListForAdmin = function (req, res) {
     models.TutorialQuiz.findQuizzesByTutorial(req.tutorial).then(function (tutorialQuizzes) {
-        res.render('admin/tutorial-quizzes', { 
+        res.render('admin/tutorial-quizzes', {
             course: req.course, 
             tutorial: req.tutorial, 
             tutorialQuizzes: tutorialQuizzes 
@@ -59,11 +59,19 @@ exports.getQuizListForStudent = function (req, res) {
 };
 // Retrieve quiz form
 exports.getQuizForm = function (req, res) {
-    res.render('admin/tutorial-quiz', { course: req.course, tutorialQuiz: req.tutorialQuiz });
+    res.render('admin/tutorial-quiz', { 
+        course: req.course, 
+        tutorialQuiz: req.tutorialQuiz
+    });
 };
 // Edit quiz for tutorial
 exports.editQuiz = function (req, res) {
     req.tutorialQuiz.store(req.body, function (err) {
+        if (err) {
+            req.flash('failure', 'Unable to save quiz at this time.');
+        } else {
+            req.flash('success', 'The quiz has been updated successfully.');
+        }
         res.redirect(
             '/admin/courses/' + req.course.id + 
             '/tutorial-quizzes/' + req.tutorialQuiz.id +
@@ -75,7 +83,6 @@ exports.editQuiz = function (req, res) {
 exports.publishQuiz = function (req, res) {
     req.tutorialQuiz.published = req.body.published;
     req.tutorialQuiz.save(function (err) {
-        // @TODO: emit event
         res.json({ status: true });
     });
 };
@@ -84,7 +91,7 @@ exports.unlockQuiz = function (req, res) {
     req.tutorialQuiz.unlocked = req.body.unlocked;
     req.tutorialQuiz.save(function (err) {
         req.app.locals.io.in('tutorialQuiz:' + req.tutorialQuiz.id)
-        .emit('quizUnlocked' , req.tutorialQuiz)
+        .emit('quizUnlocked' , req.tutorialQuiz);
         res.json({ status: true });
     });
 };
@@ -93,7 +100,7 @@ exports.activateQuiz = function (req, res) {
     req.tutorialQuiz.active = req.body.active;
     req.tutorialQuiz.save(function (err) {
         req.app.locals.io.in('tutorialQuiz:' + req.tutorialQuiz.id)
-        .emit('quizActivated', req.tutorialQuiz)
+        .emit('quizActivated', req.tutorialQuiz);
         res.json({ status: true });
     });
 };
@@ -102,32 +109,7 @@ exports.activateQuiz = function (req, res) {
 
 //
 exports.startQuiz = function (req, res) {
-    // models.TutorialQuiz.populate(req.tutorialQuiz, {
-    //     // get group with user as a member
-    //     path: 'groups',
-    //     model: models.Group,
-    //     match: {
-    //         members: { $in: [req.user.id] }
-    //     },
-    //     // get driver of the group
-    //     populate: {
-    //         path: 'driver'
-    //     }
-    // }, function (err) {
-    //     var group = req.tutorialQuiz.groups[0];
-    //     // check if user belongs to a group
-    //     if (!group) {
-    //         return res.redirect('/admin/courses');
-    //     }
 
-    //     //console.log(req.tutorialQuiz);
-
-    //     res.render('student/start-quiz.ejs', {
-    //         course: req.course,
-    //         tutorialQuiz: req.tutorialQuiz,
-    //         quiz: req.tutorialQuiz.quiz
-    //     });
-    // });
      res.render('student/start-quiz.ejs', {
             course: req.course,
             tutorialQuiz: req.tutorialQuiz,
@@ -136,18 +118,6 @@ exports.startQuiz = function (req, res) {
 };
 
 exports.getNextQuestion = function (req, res) {
-    /*async.series([
-        function (cb) {
-            models.Course.findById(req.params.course, cb);
-        },
-        function (cb) {
-            models.Quiz.findById(req.params.quiz, cb);
-        },
-        function (cb) {
-            models.models.Question.findById(req.params.question).populate('files').exec(cb);
-        }
-    ], 
-    function (err, results) {*/
 
         req.question.choices = _.shuffle(req.question.choices);
 
@@ -158,21 +128,9 @@ exports.getNextQuestion = function (req, res) {
             question: req.question,
             n: req.tutorialmodels.Quiz.quiz.questions.indexOf(req.question.id)
         });
-    //});*
+
 };
 
 exports.endQuiz = function (req, res) {
-    /*async.waterfall([
-        function (next) {
-            models.Course.findById(req.params.course, next);
-        },
-        function (course, next) {
-            models.Quiz.findById(req.params.quiz, function (err, quiz) {
-                next(err, course, quiz);
-            });
-        }
-    ],
-    function (err, course, quiz, question, i) {
-        res.render('student/end', { course: course, quiz: quiz });
-    });*/
+
 };

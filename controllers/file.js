@@ -27,8 +27,15 @@ exports.getFileList = function (req, res) {
     });
 };
 // Retrieve specific file
-exports.getFileForm = function (req, res) { 
-    res.render('admin/course-file', { course: req.course, fil3: req.fil3 || new models.File() });
+exports.getFileForm = function (req, res) {
+    if (!req.fil3) {
+        req.fil3 = new models.File();
+    }
+    res.render('admin/course-file', {
+        title: req.fil3.isNew ? 'Add new file' : 'Edit file',
+        course: req.course, 
+        fil3: req.fil3
+    });
 };
 // Add new files
 exports.addFiles = function (req, res) {
@@ -39,12 +46,22 @@ exports.addFiles = function (req, res) {
             req.course.save(done); 
         });
     }, function (err) {
+        if (err) {
+            req.flash('failure', 'Unable to save files at this time.');
+        } else {
+            req.flash('success', 'The files have been saved successfully.');
+        }
         res.json({ status: true });
     });
 };
 // Update specific file for course
 exports.editFile = function (req, res) {
     req.fil3.store(req, function (err) {
+        if (err) {
+            req.flash('failure', 'Unable to update file at this time.');
+        } else {
+            req.flash('success', 'The file has been updated successfully.');
+        }
         res.redirect('/admin/courses/' + req.course.id + '/files/' + req.fil3.id + '/edit');
     });
 };

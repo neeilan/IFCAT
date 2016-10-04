@@ -20,25 +20,45 @@ exports.getTutorial = function (req, res, next, tutorial) {
 // Retrieve list of tutorials for course
 exports.getTutorialList = function (req, res) {
     req.course.withTutorials(true).execPopulate().then(function (err) {
-        res.render('admin/course-tutorials', { course: req.course });
+        res.render('admin/course-tutorials', { 
+            title: 'Tutorials',
+            course: req.course 
+        });
     });
 };
 // Retrieve specific tutorial for tutorial
 exports.getTutorialForm = function (req, res) { 
-    res.render('admin/course-tutorial', { course: req.course, tutorial: req.tutorial || new models.Tutorial() });
+    if (!req.tutorial) {
+        req.tutorial = new models.Tutorial();
+    }
+    res.render('admin/course-tutorial', {
+        title: req.tutorial.isNew ? 'Add new tutorial' : 'Edit tutorial',
+        course: req.course, 
+        tutorial: req.tutorial 
+    });
 };
 // Add new tutorial for tutorial
 exports.addTutorial = function (req, res) {
     models.Tutorial.create(req.body, function (err, tutorial) {
         req.course.tutorials.push(tutorial);
         req.course.save(function (err) {
+            if (err) {
+                req.flash('failure', 'Unable to create tutorial at this time.');
+            } else {
+                req.flash('success', 'The tutorial has been created successfully.');
+            }
             res.redirect('/admin/courses/' + req.course.id + '/tutorials');
         });
     });
 };
 // Update specific tutorial for course
 exports.editTutorial = function (req, res) {
-    _.extend(req.tutorial, req.body).save(function (err) {  
+    _.extend(req.tutorial, req.body).save(function (err) {
+        if (err) {
+            req.flash('failure', 'Unable to update tutorial at this time.');
+        } else {
+            req.flash('success', 'The tutorial has been created successfully.');
+        } 
         res.redirect(
             '/admin/courses/' + req.course.id + 
             '/tutorials/' + req.tutorial.id + 

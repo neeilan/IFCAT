@@ -13,7 +13,6 @@ $(function () {
         $(this).parent().next('.label-info').html(this.value);
     });
 
-
     // users handlers
 
     // search users when form is submitted
@@ -21,6 +20,7 @@ $(function () {
         e.preventDefault();
         $('#search-user-results').load(this.action, $(this).serialize());
     });
+
     // update user in tutorials when button is clicked
     $('.btn-update-user').click(function () {
         var $tr = $(this).closest('tr');
@@ -36,6 +36,7 @@ $(function () {
             dataType: 'json'
         });
     });
+
     // delete user from course when button is clicked
     $('.btn-delete-user').click(function () {
         var $tr = $(this).closest('tr');
@@ -50,6 +51,7 @@ $(function () {
             dataType: 'json'
         });
     });
+
     // add user to course when button is clicked
     $('#search-user-results').on('click', '.btn-add-user', function () {
         var $tr = $(this).closest('tr');
@@ -63,10 +65,7 @@ $(function () {
 
     // question handlers
 
-    $('#table-quiz-questions .sortable').sortable({
-        axis: 'y', 
-        cancel: false
-    });
+    $('#table-quiz-questions .sortable').sortable({ axis: 'y', cancel: false });
 
     $('#btn-sort-questions').click(function (e) {
         e.preventDefault();
@@ -84,7 +83,7 @@ $(function () {
 
     $('#form-question [name=type]').change(function () {
         var type = _.kebabCase(this.value);
-        // show related items for type
+        // show related items for type; hide otherwise
         $('.multiple-choice, .multiple-select, .short-answer').each(function () {
             var $col = $(this);
                 $col.toggle($col.hasClass(type));

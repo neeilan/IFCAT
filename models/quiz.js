@@ -5,7 +5,7 @@ var _ = require('lodash'),
 var models = require('.');
 
 var QuizSchema = new mongoose.Schema({
-    name: String,
+    name: { type: String, required: true },
     // questions are sorted in the order that they are placed 
     // i.e. [0] => 1st question, [1] => 2nd question, etc
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref : 'Question' }],

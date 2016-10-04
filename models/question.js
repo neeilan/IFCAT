@@ -4,7 +4,7 @@ var _ = require('lodash'),
 var models = require('.');
 
 var QuestionSchema = new mongoose.Schema({
-    number: String,
+    number: { type: String, required: true },
     question: { type: String, required: true },
     type: { type: String, enum: ['multiple choice', 'multiple select', 'short answer'] },
     choices: [String],
@@ -50,8 +50,8 @@ QuestionSchema.methods.isAnswer = function (choice) {
 };
 // Save question
 QuestionSchema.methods.store = function (obj, callback) {
-    this.number = obj.number;
-    this.question = obj.question;
+    this.number = _.trim(obj.number);
+    this.question = _.trim(obj.question);
     this.type = obj.type;
     this.files = obj.files;
     this.links = _.filter(obj.links, Boolean);

@@ -2,14 +2,16 @@
 
 <h1><%= course.code + ' - ' + course.name %><br><small>Files</small></h1>
 
+<%- include ./messages %>
+
 <a href="/admin/courses/<%= course.id %>/files" class="btn btn-default btn-sm" 
     id="btn-upload-files"><span class="glyphicon glyphicon-plus"></span> Upload Files</button>
 
-<a href="/admin/courses/<%= course.id %>/files" class="btn btn-danger btn-sm pull-right btn-delete<%= 
-    course.files.length ? '' : ' disabled' %>" id="btn-delete-files"><span class="glyphicon glyphicon-remove"></span> Delete Files</a>
+<a href="/admin/courses/<%= course.id %>/files" class="btn btn-danger btn-sm pull-right 
+    btn-delete<%= course.files.length ? '' : ' disabled' %>" id="btn-delete-files"><span class="glyphicon 
+    glyphicon-remove"></span> Delete Files</a>
 
 <br><br>
-
 
 <table class="table table-striped" id="table-files">
     <thead>

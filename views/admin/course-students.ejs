@@ -2,9 +2,10 @@
 
 <h1><%= course.code + ' - ' + course.name %><br><small>Students</small></h1>
 
+<%- include ./messages %>
+
 <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-import-students">
     <span class="glyphicon glyphicon-save"></span> Import students</a>
-<%- include ./modals/import-students %>
 
 <a href="#find" class="btn btn-default btn-sm">
     <span class="glyphicon glyphicon-user"></span> Find students</a>
@@ -84,5 +85,7 @@
 </form>
 
 <div id="search-user-results"></div>
+
+<%- include ./modals/import-students %>
 
 <%- include ./footer -%>

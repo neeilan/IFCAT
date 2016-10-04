@@ -3,23 +3,22 @@
 <h1><%= course.code + ' - ' + course.name %><br>
 <small>Quiz <%= quiz.number %> - <%= question.isNew ? 'Add new question' : 'Edit question' %></small></h1>
 
+<%- include ./messages %>
+
 <form id="form-question" action="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= 
     question.isNew ? '' : question.id + '?_method=put' %>" method="post" class="form-horizontal">
-    
     <div class="form-group">
         <label for="question" class="col-sm-2 control-label">Number</label>
         <div class="col-sm-2">
             <input name="number" value="<%= question.number %>" maxlength="6" class="form-control" placeholder="e.g. 1, A or 1a">
         </div>
     </div>
-
     <div class="form-group">
         <label for="question" class="col-sm-2 control-label">Question</label>
         <div class="col-sm-10">
             <textarea name="question" class="form-control" rows="3"><%= question.question %></textarea>
         </div>
     </div>
-
     <div class="form-group">
         <label for="type" class="col-sm-2 control-label">Type</label>
         <div class="col-sm-10">
@@ -31,9 +30,7 @@
             </select>
         </div>
     </div>
-
     <!-- files -->
-
     <div class="form-group">
         <label for="type" class="col-sm-2 control-label">Files</label>
         <div class="col-sm-10">
@@ -43,9 +40,7 @@
             <%- include ./modals/show-files %>
         </div>
     </div>
-
     <!-- links -->
-
     <div class="form-group">
         <label for="type" class="col-sm-2 control-label">Links</label>
         <div class="col-sm-10">
@@ -56,14 +51,12 @@
     </div>
 
     <!-- choices -->
-
     <div class="form-group">
-        <label for="question" class="col-sm-2 control-label">Choices/Answer</label>
-
         <!-- for multiple choice -->
-
         <% if (question.isNew || !question.isMultipleChoice()) { %>
-            <div class="col-sm-10 multiple-choice" style="display: none;">
+        <div class="multiple-choice" style="display: none;">
+            <label for="question" class="col-sm-2 control-label">Choices &amp; Answer</label>
+            <div class="col-sm-10">
             <% for (var i = 0, len = 3; i < 3; i++) { %>    
                 <div class="form-group">
                     <div class="col-xs-8"> 
@@ -76,7 +69,9 @@
                 </div>
             <% } %>
         <% } else { %>
-            <div class="col-sm-10 multiple-choice">
+        <div class="multiple-choice">
+            <label for="question" class="col-sm-2 control-label">Choices &amp; Answer</label>
+            <div class="col-sm-10">
             <% _.each(question.choices, function (choice, i) { %>    
                 <div class="form-group">
                     <div class="col-xs-8"> 
@@ -97,11 +92,12 @@
                     </div>
                 </div>
             </div>
-
+        </div>
         <!-- for multiple select -->
-
         <% if (question.isNew || !question.isMultipleSelect()) { %>
-            <div class="col-sm-10 multiple-select" style="display: none;">
+        <div class="multiple-select" style="display: none;">
+            <label for="question" class="col-sm-2 control-label">Choices &amp; Answers</label>
+            <div class="col-sm-10">
             <% for (var i = 0, len = 3; i < 3; i++) { %>    
                 <div class="form-group">
                     <div class="col-xs-8"> 
@@ -113,7 +109,9 @@
                 </div>
             <% } %>
         <% } else { %>
-            <div class="col-sm-10 multiple-select">
+        <div class="multiple-select">
+            <label for="question" class="col-sm-2 control-label">Choices &amp; Answers</label>
+            <div class="col-sm-10">
             <% _.each(question.choices, function (choice, i) { %>    
                 <div class="form-group">
                     <div class="col-xs-8"> 
@@ -134,12 +132,13 @@
                     </div>
                 </div>
             </div>
-
+        </div>
         <!-- for short answer -->
-
         <% if (question.isNew || !question.isShortAnswer()) { %>
-            <div class="col-sm-10 short-answer" style="display: none;">
-            <% for (var i = 0, len = 3; i < 3; i++) { %>    
+        <div class="short-answer" style="display: none;">
+            <label for="question" class="col-sm-2 control-label">Acceptable Answers</label>
+            <div class="col-sm-10">
+            <% for (var i = 0, len = 3; i < 3; i++) { %>
                 <div class="form-group">
                     <div class="col-xs-8"> 
                         <textarea name="choices[<%= i %>]" class="form-control" rows="1" disabled></textarea>
@@ -147,6 +146,8 @@
                 </div>
             <% } %>
         <% } else { %>
+        <div class="short-answer">
+            <label for="question" class="col-sm-2 control-label">Acceptable Answers</label>
             <div class="col-sm-10 short-answer">
             <% _.each(question.choices, function (choice, i) { %>    
                 <div class="form-group">
@@ -164,18 +165,15 @@
                     </div>
                 </div>
             </div>
+        </div>
     </div>
-
     <!-- options -->
-
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <a href="#options" data-toggle="collapse" data-target="#options">Show/hide additional options</a>
         </div>
     </div>
-
     <div id="options" class="collapse">
-
         <div class="form-group">
             <label for="question" class="col-sm-2 control-label">Shuffle choices?</label>
             <div class="col-sm-6">
@@ -183,7 +181,6 @@
                     _.defaultTo(question.shuffleChoices, quiz.shuffleChoices) == 1 ? ' checked' : '' %> >
             </div>
         </div>
-
         <div class="form-group">
             <label for="question" class="col-sm-2 control-label">Format using LaTeX?</label>
             <div class="col-sm-6">
@@ -191,7 +188,6 @@
                     _.defaultTo(question.useLaTeX, quiz.useLaTeX) == 1 ? ' checked' : '' %>>
             </div>
         </div>
-
         <div class="form-group">
             <label for="question" class="col-sm-2 control-label">Points possible</label>
             <div class="col-sm-6">
@@ -199,7 +195,6 @@
                     _.defaultTo(question.points, quiz.points) %>" min="0" max="7" class="form-control">
             </div>
         </div>
-
         <div class="form-group">
             <label for="question" class="col-sm-2 control-label">First-try bonus</label>
             <div class="col-sm-6">
@@ -207,7 +202,6 @@
                     _.defaultTo(question.firstTryBonus, quiz.firstTryBonus) %>" min="0" max="7" class="form-control">
             </div>
         </div>
-
         <div class="form-group">
             <label for="question" class="col-sm-2 control-label">Penalty per attempt</label>
             <div class="col-sm-6">
@@ -215,9 +209,7 @@
                     _.defaultTo(question.penalty, quiz.penalty) %>" min="0" max="7" class="form-control">
             </div>
         </div>
-
     </div>
-
     <div class="form-group" style="margin-top: 30px;">
         <div class="col-sm-offset-2 col-sm-10">
             <a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions" class="btn btn-default btn-sm">Cancel</a>
@@ -227,7 +219,6 @@
 </form>
 
 <!-- templates -->
-
 <script type="text/template" id="multiple-choice-template">
     <div class="form-group">
         <div class="col-xs-8"> 
@@ -238,7 +229,6 @@
         </div>
     </div>
 </script>
-
 <script type="text/template" id="multiple-select-template">
     <div class="form-group">
         <div class="col-xs-8"> 
@@ -249,7 +239,6 @@
         </div>
     </div>
 </script>
-
 <script type="text/template" id="short-answer-template">
     <div class="form-group">
         <div class="col-xs-8"> 
