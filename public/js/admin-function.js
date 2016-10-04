@@ -87,7 +87,7 @@ $(function () {
     $('#form-question [name=type]').change(function () {
         var type = _.kebabCase(this.value);
         // show related items for type
-        $('.multiple-choice, .multiple-select').each(function () {
+        $('.multiple-choice, .multiple-select, .fill-in-the-blanks').each(function () {
             var $col = $(this);
                 $col.toggle($col.hasClass(type));
                 $col.find(':input').prop('disabled', !$col.hasClass(type));
@@ -128,17 +128,19 @@ $(function () {
         $('#link-counter').text(count !== 1 ? count + ' links added' : '1 link added');
     });
 
-    $('.multiple-choice, .multiple-select').on('click', '.btn-remove-choice', function (e) {
+    $('.multiple-choice, .multiple-select, .fill-in-the-blanks').on('click', '.btn-remove-choice', function (e) {
         e.preventDefault();
         $(this).closest('.form-group').remove();
     });
 
-    $('.multiple-choice, .multiple-select').on('click', '.btn-add-choice', function (e) {
+    $('.multiple-choice, .multiple-select, .fill-in-the-blanks').on('click', '.btn-add-choice', function (e) {
         e.preventDefault();
         var $col = $(e.delegateTarget), 
             type = 'multiple-choice';
         if ($col.hasClass('multiple-select')) {
             type = 'multiple-select';
+        } else if ($col.hasClass('fill-in-the-blanks')) {
+            type = 'fill-in-the-blanks';
         }
         $(e.target).closest('.form-group').before(
             _.template($('[id=' + type + '-template]').text())({
@@ -209,12 +211,7 @@ $(function () {
         });
     });
 
-    $('#btn-remove-group').click(function () {
-        var $panel = $(this).closest('.panel');
-            $panel.find('.sortable > .btn').appendTo($('#col-unassigned-students > .panel'));
-            $panel.remove();
-    });
-
+    // save groups
     $('#form-quiz-groups').submit(function (e) {
         e.preventDefault();
         var $form = $(this);

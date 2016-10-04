@@ -105,7 +105,6 @@ exports.saveGroupList = function (req, res) {
         }
     // delete members from other groups
     }, function (err) {
-        console.log('NONDELETE', ids);
         models.Group.update({ 
             _id: {
                 $nin: ids
@@ -115,7 +114,6 @@ exports.saveGroupList = function (req, res) {
         }, { 
             multi: true 
         }, function (err) {
-            console.log(err);
             res.json({ status: true });
         });
     });

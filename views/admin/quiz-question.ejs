@@ -134,51 +134,99 @@
                     </div>
                 </div>
             </div>
+
+        <!-- for fill in the blanks -->
+
+        <% if (question.isNew || !question.isFillInTheBlanks()) { %>
+            <div class="col-sm-10 fill-in-the-blanks" style="display: none;">
+            <% for (var i = 0, len = 3; i < 3; i++) { %>    
+                <div class="form-group">
+                    <div class="col-xs-8"> 
+                        <textarea name="choices[<%= i %>]" class="form-control" rows="1" disabled></textarea>
+                    </div>
+                </div>
+            <% } %>
+        <% } else { %>
+            <div class="col-sm-10 fill-in-the-blanks">
+            <% _.each(question.choices, function (choice, i) { %>    
+                <div class="form-group">
+                    <div class="col-xs-8"> 
+                        <textarea name="choices[<%= i %>]" class="form-control" rows="1"><%= choice %></textarea>
+                    </div>
+                </div>
+            <% }) %> 
+        <% } %>
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <button type="button" class="btn btn-default btn-sm btn-add-choice">
+                            <span class="glyphicon glyphicon-plus"></span> Add another choice
+                        </button>
+                    </div>
+                </div>
+            </div>
     </div>
 
     <!-- options -->
 
     <div class="form-group">
-        <label for="question" class="col-sm-2 control-label">Shuffle choices?</label>
-        <div class="col-sm-6">
-            <input type="checkbox" name="shuffleChoices" value="1" class="bootstrap-switch"<%= 
-                _.defaultTo(question.shuffleChoices, quiz.shuffleChoices) == 1 ? ' checked' : '' %> >
+        <div class="col-sm-offset-2 col-sm-10">
+            <a href="#options" data-toggle="collapse" data-target="#options">Show/hide additional options</a>
         </div>
     </div>
 
-    <div class="form-group">
-        <label for="question" class="col-sm-2 control-label">Format using LaTeX?</label>
-        <div class="col-sm-6">
-            <input type="checkbox" name="useLaTeX" value="1"  class="bootstrap-switch"<%= 
-                _.defaultTo(question.useLaTeX, quiz.useLaTeX) == 1 ? ' checked' : '' %>>
+    <div id="options" class="collapse">
+
+        <div class="form-group">
+            <label for="question" class="col-sm-2 control-label">Shuffle choices?</label>
+            <div class="col-sm-6">
+                <input type="checkbox" name="shuffleChoices" value="1" class="bootstrap-switch"<%= 
+                    _.defaultTo(question.shuffleChoices, quiz.shuffleChoices) == 1 ? ' checked' : '' %> >
+            </div>
         </div>
+
+        <div class="form-group">
+            <label for="question" class="col-sm-2 control-label">Shuffle choices?</label>
+            <div class="col-sm-6">
+                <input type="checkbox" name="shuffleChoices" value="1" class="bootstrap-switch"<%= 
+                    _.defaultTo(question.shuffleChoices, quiz.shuffleChoices) == 1 ? ' checked' : '' %> >
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="question" class="col-sm-2 control-label">Format using LaTeX?</label>
+            <div class="col-sm-6">
+                <input type="checkbox" name="useLaTeX" value="1"  class="bootstrap-switch"<%= 
+                    _.defaultTo(question.useLaTeX, quiz.useLaTeX) == 1 ? ' checked' : '' %>>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="question" class="col-sm-2 control-label">Points possible</label>
+            <div class="col-sm-6">
+                <input type="number" name="points" value="<%= 
+                    _.defaultTo(question.points, quiz.points) %>" min="0" max="7" class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="question" class="col-sm-2 control-label">First-try bonus</label>
+            <div class="col-sm-6">
+                <input type="number" name="firstTryBonus" value="<%= 
+                    _.defaultTo(question.firstTryBonus, quiz.firstTryBonus) %>" min="0" max="7" class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="question" class="col-sm-2 control-label">Penalty per attempt</label>
+            <div class="col-sm-6">
+                <input type="number" name="penalty" value="<%= 
+                    _.defaultTo(question.penalty, quiz.penalty) %>" min="0" max="7" class="form-control">
+            </div>
+        </div>
+
     </div>
 
-    <div class="form-group">
-        <label for="question" class="col-sm-2 control-label">Points possible</label>
-        <div class="col-sm-6">
-            <input type="number" name="points" value="<%= 
-                _.defaultTo(question.points, quiz.points) %>" min="0" max="7" class="form-control">
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label for="question" class="col-sm-2 control-label">First-try bonus</label>
-        <div class="col-sm-6">
-            <input type="number" name="firstTryBonus" value="<%= 
-                _.defaultTo(question.firstTryBonus, quiz.firstTryBonus) %>" min="0" max="7" class="form-control">
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label for="question" class="col-sm-2 control-label">Penalty per attempt</label>
-        <div class="col-sm-6">
-            <input type="number" name="penalty" value="<%= 
-                _.defaultTo(question.penalty, quiz.penalty) %>" min="0" max="7" class="form-control">
-        </div>
-    </div>
-
-    <div class="form-group">
+    <div class="form-group" style="margin-top: 30px;">
         <div class="col-sm-offset-2 col-sm-10">
             <a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions" class="btn btn-default btn-sm">Cancel</a>
             <button type="submit" class="btn btn-primary btn-sm">Save</button>
@@ -206,6 +254,14 @@
         </div>
         <div class="col-xs-4 checkbox">
             <label><input type="checkbox" name="answers[multiple-select][]" value="${ id }"></label>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="fill-in-the-blanks-template">
+    <div class="form-group">
+        <div class="col-xs-8"> 
+            <textarea name="choices[${ id }]" class="form-control" rows="1"></textarea>
         </div>
     </div>
 </script>
