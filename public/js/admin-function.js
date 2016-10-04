@@ -300,6 +300,12 @@ $(function () {
         }); // end of bootbox
     });
 
+    //
+    $('#btn-refresh-groups').click(function (e) {
+        e.preventDefault();
+        window.location.reload(true);
+    });
+
     // open file input
     $(document).on('click','#btn-select-files', function (e) {
         $(this).next(':file').click();

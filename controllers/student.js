@@ -41,6 +41,11 @@ exports.editStudent = function (req, res) {
             }
             tutorial.save(done);
         }, function (err) {
+            if (err) {
+                req.flash('failure', 'An error occurred while trying to update student.');
+            } else {
+                req.flash('success', 'The student has been updated successfully.');
+            }
             res.json({ status: true });
         });
     });
