@@ -72,9 +72,7 @@ $(function () {
         e.preventDefault();
         $.ajax(this.href, {
             type: 'put',
-            data: $('#table-quiz-questions tr[data-id]').map(function () {
-                return { name: 'questions[]', value: $(this).data('id') };
-            }), 
+            data: $('#table-quiz-questions :hidden').serialize(), 
             success: function (res) {
                 if (res.status) {
                     window.location.reload(true);
@@ -150,15 +148,6 @@ $(function () {
     });
 
     // setup group handlers
-
-    var options = {
-        cancel: false,
-        connectWith: '.sortable'
-    };
-    
-    $('#col-unassigned-students .sortable, #col-groups .sortable').sortable(options);
-    
-    $('#col-groups .dropdown-menu a').on('click', function (e) { e.stopPropagation(); });
 
     $('#publish-tutorial-quiz').on('switchChange.bootstrapSwitch', function (e, state) {
         $.ajax($('#publish-tutorial-quiz-url').val(), {

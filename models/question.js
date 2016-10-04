@@ -1,6 +1,8 @@
 var _ = require('lodash'),
     mongoose = require('mongoose');
 
+var models = require('.');
+
 var QuestionSchema = new mongoose.Schema({
     number: String,
     question: { type: String, required: true },
