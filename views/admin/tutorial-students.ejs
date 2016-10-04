@@ -15,21 +15,27 @@
         </tr>
     </thead>
     <tbody>
-    <% for (var i = 0, len = tutorial.students.length; i < len; i++) { %>
+    <% if (!_.isEmpty(tutorial.students)) { %>
+        <% _.each(tutorial.students, function (student) { %>
+            <tr>
+                <td><%= student.UTORid %></td>
+                <td><%= student.name.full %></td>
+                <td><%= student.local.email %></td>
+                <th>
+                    <div class="dropdown">
+                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                            Actions<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="/admin/courses/<%= course.id %>/students/<%= student.id %>/marks">View Marks</a></li>
+                        </ul>
+                    </div>
+                </th>
+            </tr>
+        <% }) %>
+    <% } else { %>
         <tr>
-            <td><%= tutorial.students[i].UTORid %></td>
-            <td><%= tutorial.students[i].name.full %></td>
-            <td><%= tutorial.students[i].local.email %></td>
-            <th>
-                <div class="dropdown">
-                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                        Actions<span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="/admin/courses/<%= course.id %>/students/<%= tutorial.students[i].id %>/marks">View Marks</a></li>
-                    </ul>
-                </div>
-            </th>
+            <td colspan="4">No students have been added to this tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students</a> into the tutorial.</td>
         </tr>
     <% } %>
     </tbody>

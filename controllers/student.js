@@ -23,7 +23,7 @@ exports.getStudentsByTutorial = function (req, res) {
     });
 };
 // Add student to course
-exports.addStudent = function (req, res) { console.log(req.us3r.id);
+exports.addStudent = function (req, res) { //console.log(req.us3r.id);
     req.course.addStudent(req.us3r.id);
     req.course.save(function (err) {
         res.json({ status: true });
@@ -54,8 +54,14 @@ exports.deleteStudent = function (req, res) {
             tutorial.save(done);
         // remove student from course
         }, function (err) {
+            //console.log(req.course.students, req.us3r.id);
             req.course.deleteStudent(req.us3r.id);
             req.course.save(function (err) {
+                if (err) {
+                    req.flash('failure', 'An error occurred while trying to remove student.');
+                } else {
+                    req.flash('success', 'The student has been removed successfully from course.');
+                }
                 res.json({ status: true });
             });
         });
@@ -73,50 +79,59 @@ exports.importStudents = function (req, res) {
             async.waterfall([
                 // add student if they do not already exist
                 function (done) {
+                    //console.log('find')
                     // check if user exist already with UTORid
-                    models.User.findUserByUTOR(row.UTORid).then(function (user) {
+                    models.User.findUserByUTOR(row.utorid).then(function (us3r) {
                         // if user does not already exist, create them
-                        if (!user) {
-                            user = new models.User();
-                            user.UTORid = row.UTORid;
-                            user.local.email = row.email;
-                            user.name.first = row.first;
-                            user.name.last = row.last;
-                            user.local.password = user.generateHash(row.password);
+                        if (!us3r) {
+                            //console.log('new')
+                            us3r = new models.User();
+                            us3r.UTORid = row.utorid;
+                            us3r.local.email = row.email;
+                            us3r.name.first = row.first;
+                            us3r.name.last = row.last;
+                            us3r.local.password = us3r.generateHash(row.password);
                         }
+                        //console.log('add student role')
                         // mark them as student
-                        user.addRole('student');
-                        user.save(function (err) {
-                            done(err, user);
+                        us3r.addRole('student');
+                        us3r.save(function (err) {
+                            done(err, us3r);
                         });
                     });
                 },
                 // add student into course if they are not already
-                function (user, done) {
+                function (us3r, done) {
                     req.course.withTutorials().execPopulate().then(function () {
-                        req.course.addStudent(user);
+                        req.course.addStudent(us3r);
                         req.course.save(function (err) {
-                            done(err, user);
+                            //console.log('add student into course')
+                            done(err, us3r);
                         });
                     });
                 },
                 // ugly: move student into tutorial if they are not already
-                function (user, done) {
+                function (us3r, done) {
                     async.eachSeries(req.course.tutorials, function (tutorial, done) {
                         if (_.toInteger(tutorial.number) !== _.toInteger(row.tutorial)) {
-                            tutorial.deleteStudent(user.id);
+                            tutorial.deleteStudent(us3r.id);
                         } else {
-                            tutorial.addStudent(user.id);
+                            tutorial.addStudent(us3r.id);
                         }
+                        //console.log('move student into tutorial')
                         tutorial.save(done);
                     }, function (err) {
-                        done(err, user);
+                        //console.log('done')
+                        done(err, us3r);
                     });
                 }
             ], done);
         }, function (err) {
+            //console.log('done all')
             if (err) {
-                console.log(err);
+                req.flash('failure', 'An error occurred while trying to import students.');
+            } else {
+                req.flash('success', 'The students have been imported successfully.');
             }
             res.redirect('/admin/courses/' + req.course.id + '/students');
         });
@@ -141,8 +156,8 @@ exports.getQuizList = function (req, res) {
         // find tutorial quizzes
         if (tutorials) {
             models.TutorialQuiz.find({ tutorial: tutorials[0].id, published: true }).populate('quiz').exec(function (err, tutorialQuizzes) {
-                // console.log('tutorial', tutorials[0]);
-                // console.log('tutorialQuizzes', tutorialQuizzes);
+                // //console.log('tutorial', tutorials[0]);
+                // //console.log('tutorialQuizzes', tutorialQuizzes);
                 res.render('student/tutorial-quizzes', { 
                     course: req.course,
                     tutorial: tutorials[0],

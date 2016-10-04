@@ -13,22 +13,28 @@
         </tr>
     </thead>
     <tbody>
-    <% _.each(tutorialQuizzes, function (tutorialQuiz) { %>
+    <% if (!_.isEmpty(tutorialQuizzes)) { %>
+        <% _.each(tutorialQuizzes, function (tutorialQuiz) { %>
+            <tr>
+                <td><%= tutorialQuiz.quiz.name %></td>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                            Actions<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/edit">Edit quiz</a></li>
+                            <li><a href="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups">Conduct quiz</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        <% }) %>
+    <% } else { %>
         <tr>
-            <td><%= tutorialQuiz.quiz.name %></td>
-            <td>
-                <div class="dropdown">
-                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                        Actions<span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/edit">Edit quiz</a></li>
-                        <li><a href="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups">Conduct quiz</a></li>
-                    </ul>
-                </div>
-            </td>
+            <td colspan="2">No quizzes have been added for this tutorial yet. Click <a href="/admin/courses/<%= course.id %>/quizzes/">here</a> to add  quizzes</a> into the tutorial.</td>
         </tr>
-    <% }) %>
+    <% } %>
     </tbody>
 </table>
 
