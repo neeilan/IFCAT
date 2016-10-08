@@ -1,37 +1,18 @@
 <%- include ./header -%>
 
-<h4 class="todo" style="color: red">@TODO: REPLACE THIS PAGE WITH REAL AUTHENTICATION</h4>
-
-<div class="col-md-4">
-    <h4>Login as student</h4>
-    <form action="/student/login" method="post" class="form-horizontal">
-        <div class="form-group">
-            <label>Email</label>
-            <input type="text" name="email" value="simmons.terrell@mail.utoronto.ca" class="form-control">
-        </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="password" value="student" class="form-control">
-        </div>
-        <button type="submit" class="btn btn-default">Log in</button>
-    </form>
-</div>
-
-<div class="col-md-4" style="height: 40px;"><!-- spacer --></div>
-
-<div class="col-md-4">
-    <h4>Login as admin</h4>
-    <form action="/admin/login" method="post" class="form-horizontal">
-        <div class="form-group">
-            <label>Email</label>
-            <input type="text" name="email" value="admin" class="form-control">
-        </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="password" value="admin" class="form-control">
-        </div>
-        <button type="submit" class="btn btn-default">Log in</button>
-    </form>
-</div>
+<form action="/student/login" method="post" class="form-horizontal" style="margin: 0 auto; max-width: 330px">
+    <h4 class="todo" style="color: red; text-align: center; margin-bottom: 30px">@TODO: REPLACE WITH AUTH0</h4>
+    <div class="form-group">
+        <label>Email</label>
+        <input type="text" name="email" value="" class="form-control">
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" value="" class="form-control">
+    </div>
+    <div class="form-group" style="margin-top: 30px">
+        <button type="submit" class="btn btn-default btn-block">Log in</button>
+    </div>
+</form>
 
 <%- include ./footer -%>

@@ -21,7 +21,10 @@ exports.getCourse = function (req, res, next, course) {
 exports.getCourseList = function (req, res) {
     if (req.user.hasRole('admin')) {
         models.Course.findCourses().exec(function (err, courses) { 
-            res.render('admin/courses', { title: 'Courses', courses: courses });
+            res.render('admin/courses', { 
+                title: 'Courses', 
+                courses: courses 
+            });
         });
     } else {
         async.series([
@@ -75,9 +78,6 @@ exports.deleteCourse = function (req, res) {
         res.json({ status: true });
     });
 };
-
-
-
 
 
 

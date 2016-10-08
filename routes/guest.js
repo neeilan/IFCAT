@@ -1,9 +1,15 @@
-var router = require('express').Router();
+var passport = require('passport'),
+    router = require('express').Router();
 
 var controllers = require('../controllers');
 
-// routes
-router.get('/login', controllers.User.login);
-// router.post('/signup', controllers.User.signup);
+// non-authenticated routes
+router.get('/login', controllers.User.getLoginForm);
+
+router.post('/signup', passport.authenticate('local-signup', {
+    successRedirect: '/student/courses',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
 
 module.exports = router;

@@ -6,13 +6,19 @@ var models = require('../models');
 // Retrieve list of instructors for course
 exports.getInstructorListByCourse = function (req, res) {
     req.course.withInstructors().execPopulate().then(function (err) {
-        res.render('admin/course-instructors', { course: req.course });
+        res.render('admin/course-instructors', { 
+            title: 'Instructors',
+            course: req.course
+        });
     });
 };
 // Retrieve list of instructors matching search query
 exports.getInstructorListBySearchQuery = function (req, res) {
     models.User.findUsersBySearchQuery(req.query.q, 'instructor').exec(function (err, users) {
-        res.render('admin/course-instructors-search-results', { course: req.course, users: users });
+        res.render('admin/course-instructors-search-results', { 
+            course: req.course, 
+            users: users 
+        });
     });
 };
 // Add instructor to course

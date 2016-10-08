@@ -58,4 +58,77 @@
     <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>  
 </script>
 
+<%- include ./body-js -%>
+
+<script>
+$(function () {
+    // open modal for uploading files
+    $('#btn-upload-files').click(function (e) {
+        e.preventDefault();
+        var url = this.href, data = new FormData();
+        // open dialog
+        bootbox.dialog({
+            onEscape: true,
+            className: 'modal-upload-files',
+            title: 'Select files',
+            message: $('#btn-upload-message-template').text(),
+            buttons: {
+                cancel: {
+                    label: 'Cancel',
+                    className: 'btn-sm'
+                },
+                upload: {
+                    label: 'Upload files',
+                    className: 'btn-default btn-sm',
+                    callback: function () {
+                        var files = $('#files')[0].files;
+                        if (files.length) {
+                            // add files
+                            for (var i in files) {
+                                data.append('files', files[i]);
+                            }
+                            // send request
+                            $.ajax(url, {
+                                type: 'post',
+                                processData: false,
+                                contentType: false,
+                                data: data,
+                                success: function(res) {
+                                    if (res.status) {
+                                        window.location.reload(true);
+                                    }
+                                }
+                            });
+                        }
+                        return false;
+                    }
+                }
+            } // end of buttons
+        }); // end of bootbox
+    });
+    // open file input
+    $(document).on('click','#btn-select-files', function (e) {
+        $(this).next(':file').click();
+    });
+    // list files selected by file input
+    $(document).on('change', '#files', function (e) {
+        var files = this.files;
+        $(this).next('.list-group').html(function () {
+            return _.map(files, function (file) {
+                return '<li class="list-group-item">' + file.name + '</li>';
+            });
+        });
+    });
+    // preview image and audio files
+    $('#table-files tbody tr:has(.preview) a').on('click', function (e) {
+        e.preventDefault();
+        bootbox.dialog({
+            onEscape: true,
+            className: 'modal-preview-file',
+            message: $(this).next('.preview').clone().css('display', '')
+        });
+    });
+});
+</script>
+
 <%- include ./footer -%>

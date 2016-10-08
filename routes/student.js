@@ -3,23 +3,6 @@ var passport = require('passport'),
 
 var controllers = require('../controllers');
 
-// non-authenticated routes
-router.post('/signup', passport.authenticate('local-signup', {
-    successRedirect: '/student/courses',
-    failureRedirect: '/login',
-    failureFlash: true
-}));
-
-router.post('/login', passport.authenticate('local-login', {
-    successRedirect: '/student/courses',
-    failureRedirect: '/login',
-    failureFlash: true
-}));
-
-router.post('/uteach-login', passport.authenticate('auth0',{}), function(req,res){
-    res.redirect('/student/courses');
-})
-
 // lifesaver: query single objects
 router.param('course', controllers.Course.getCourse);
 router.param('tutorial', controllers.Tutorial.getTutorial);
@@ -28,6 +11,18 @@ router.param('quiz', controllers.Quiz.getQuiz);
 router.param('question', controllers.Question.getQuestion);
 router.param('fil3', controllers.File.getFile);
 router.param('tutorialQuiz', controllers.TutorialQuiz.getQuiz);
+
+router.post('/login', passport.authenticate('local-login', {
+    successRedirect: '/student/courses',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
+
+router.post('/uteach-login', passport.authenticate('auth0', {
+    
+}), function(req,res){
+    res.redirect('/student/courses');
+});
 
 // check if user is authenticated
 router.use(function (req, res, next) {
@@ -45,7 +40,5 @@ router.get('/courses/:course/quizzes', controllers.Student.getQuizList);
 router.get('/courses/:course/quizzes/:tutorialQuiz/start', controllers.TutorialQuiz.startQuiz);
 router.get('/courses/:course/quizzes/:tutorialQuiz/questions/:question', controllers.TutorialQuiz.getNextQuestion);
 router.get('/courses/:course/quizzes/:tutorialQuiz/end', controllers.TutorialQuiz.endQuiz);
-
-// router.use('/courses/:course/:quizzes/:tutorialQuiz/*')
 
 module.exports = router;

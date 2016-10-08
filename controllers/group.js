@@ -21,7 +21,8 @@ exports.getGroup = function (req, res, next, group) {
 // Retrieve list of groups for tutorial
 exports.getGroupList = function (req, res) { 
     req.tutorialQuiz.withStudents().withGroups().execPopulate().then(function (err) {
-        res.render('admin/quiz-groups', { 
+        res.render('admin/quiz-groups', {
+            title: 'Groups',
             course: req.course, 
             tutorialQuiz: req.tutorialQuiz 
         });

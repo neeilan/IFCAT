@@ -20,10 +20,10 @@ var app = express(),
     io = require('socket.io')(http);
 
 // locals
-app.locals.io = io;
 app.locals._ = require('lodash');
-app.locals.moment = require('moment');  
 app.locals.dateFormat = 'MMMM Do YYYY @ h:mm a';
+app.locals.io = io;
+app.locals.moment = require('moment');  
 
 mongoose.connect(config.db.url);
 
@@ -81,7 +81,6 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500).render('error', { error: err });
 });
 
-
 io.use(passportSocketIo.authorize({
   key: 'connect.sid',
   secret: config.session.secret,
@@ -90,11 +89,8 @@ io.use(passportSocketIo.authorize({
   cookieParser: cookieParser
 }));
 
-
 // Socket io handler for quizzes
-var quizHandler = require('./socket.io/quizHandlers.js');
-io.on('connection', quizHandler(io));
-
+io.on('connection', require('./socket.io/quizHandlers.js')(io));
 
 // start server
 http.listen(app.get('port'), function () {

@@ -11,7 +11,7 @@
 <a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/new"
     class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add New Question</a>
 
-<table class="table table-striped" id="table-quiz-questions">
+<table class="table table-striped">
     <thead>
         <tr>
             <th style="width: 10px;"></th>
@@ -58,6 +58,29 @@
 <script type="text/template" id="btn-delete-message-template">
     <p>You are about to delete question and all of its associated information.</p>
     <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>
+</script>
+
+<%- include ./body-js -%>
+
+<script>
+$(function () {
+    // enable sorting
+    $('.sortable').sortable({ axis: 'y', cancel: false });
+    // save sort order of questions
+    $('#btn-sort-questions').click(function (e) {
+        e.preventDefault();
+        $.ajax(this.href, {
+            type: 'put',
+            data: $(':hidden').serialize(), 
+            success: function (res) {
+                if (res.status) {
+                    window.location.reload(true);
+                }
+            },
+            dataType: 'json'
+        });
+    });
+});
 </script>
 
 <%- include ./footer -%>

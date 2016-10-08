@@ -2,13 +2,16 @@
 
 <h1>Your Courses</h1>
 
-<div class="list-group">
-<% courses.forEach(function (course) { %>
-    <a href="/student/courses/<%= course.id %>/quizzes" class="list-group-item">
-        <span class="code"><%= course.code %></span> -
-        <span class="name"><%= course.name %></span>
-    </a>
-<% }) %>
-</div>
+<% if (!_.isEmpty(courses)) { %>
+    <div class="list-group">
+    <% _.each(courses, function (course) { %>
+        <a href="/student/courses/<%= course.id %>/quizzes" class="list-group-item">
+            <span class="code"><%= course.code %></span> -
+            <span class="name"><%= course.name %></span>
+        </a>
+    <% }) %>
+    </div>
+<% } %>
 
+<%- include ./body-js -%>
 <%- include ./footer -%>

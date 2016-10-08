@@ -100,4 +100,82 @@
     value="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/activate">
 
 
+<%- include ./body-js -%>
+
+<script>
+$(function () {
+    // publish/unpublish quiz in tutorial
+    $('#publish-tutorial-quiz').on('switchChange.bootstrapSwitch', function (e, state) {
+        $.ajax($('#publish-tutorial-quiz-url').val(), {
+            type: 'put',
+            data: { published: state }, 
+            success: function (res) {
+                console.log(res.status);
+            }
+        });
+    });
+    // activate/deactivate quiz in tutorial
+    $('#activate-tutorial-quiz').on('switchChange.bootstrapSwitch', function (e, state) {
+        $.ajax($('#activate-tutorial-quiz-url').val(), {
+            type: 'put',
+            data: { active: state }, 
+            success: function (res) {
+                console.log(res.status);
+            }
+        });
+    });
+    // add new group to table
+    $('#btn-add-group').click(function () {
+        var $table = $(this).closest('form').find('table'),
+            $thead = $table.find('thead'),
+            $tfoot = $table.find('tfoot'),
+            $tbody = $table.find('tbody');
+        // get next group #
+        var numbers = [];
+        $thead.find('tr:eq(1) th').each(function () {
+            if (!isNaN(this.innerText)) {
+                numbers.push(parseInt(this.innerText, 10));
+            }
+        });
+        var value = _.toInteger(_.max(numbers)) + 1;
+        // increment colspan
+        $thead.find('tr:eq(0) th:eq(1)').attr('colspan', function (i, attr) { 
+            return parseInt(attr, 10) + 1; 
+        });
+        $tfoot.find('tr:eq(1) th:eq(0)').attr('colspan', function (i, attr) { 
+            return parseInt(attr, 10) + 1; 
+        });
+        // add header column
+        $thead.find('tr:eq(1)').append('<th class="g">' + value + '</th>');
+        $tfoot.find('tr:eq(0)').append('<th class="g">' + value + '</th>');
+        // add body column
+        $tbody.find('tr').each(function () { 
+            var $tr = $(this);
+            var name = $tr.find(':radio:eq(0)').attr('name');
+            $tr.append('<th class="g"><input type="radio" name="' + name + '" value="' + value + '"></th>');
+        });
+    });
+    // save changes
+    $('#form-quiz-groups').submit(function (e) {
+        e.preventDefault();
+        var $form = $(this);
+        // send request
+        $.ajax(this.action, {
+            type: 'put',
+            data: $form.serialize(), 
+            success: function (res) {
+                if (res.status) {
+                    window.location.reload(true);
+                }
+            }
+        });
+    });
+    // refresh table
+    $('#btn-refresh-groups').click(function (e) {
+        e.preventDefault();
+        window.location.reload(true);
+    });
+});
+</script>
+
 <%- include ./footer -%>

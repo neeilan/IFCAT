@@ -22,9 +22,17 @@ exports.getUser = function (req, res, next, us3r) {
 
 // route handlers
 
-// Login user
-exports.login = function (req, res) {
-    res.render('login', { message: req.flash('message') }); 
+// Retrieve student login form
+exports.getLoginForm = function (req, res) {
+    res.render('login', { 
+        title: 'Login'
+    }); 
+};
+// Retrieve admin login form
+exports.getAdminLoginForm = function (req, res) {
+    res.render('admin/login', { 
+        title: 'Login'
+    }); 
 };
 // Logout user
 exports.logout = function (req, res) {

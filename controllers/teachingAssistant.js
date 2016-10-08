@@ -6,13 +6,19 @@ var models = require('../models');
 // Retrieve list of teaching assistants for course
 exports.getTeachingAssistantListByCourse = function (req, res) {
     req.course.withTutorials().withTeachingAssistants().execPopulate().then(function (err) {
-        res.render('admin/course-teaching-assistants', { course: req.course });
+        res.render('admin/course-teaching-assistants', { 
+            title: 'Teaching assistants',
+            course: req.course
+        });
     });
 };
 // Retrieve list of teaching assistants matching search query
 exports.getTeachingAssistantListBySearchQuery = function (req, res) {
     models.User.findUsersBySearchQuery(req.query.q, 'teachingAssistant').exec(function (err, users) {
-        res.render('admin/course-teaching-assistants-search-results', { course: req.course, users: users });
+        res.render('admin/course-teaching-assistants-search-results', { 
+            course: req.course, 
+            users: users 
+        });
     });
 };
 // Add teaching assistant to course

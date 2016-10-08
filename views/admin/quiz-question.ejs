@@ -247,4 +247,76 @@
     </div>
 </script>
 
+<%- include ./body-js -%>
+
+<script>
+$(function () {
+    // show choices based on question type
+    $('#form-question [name=type]').change(function () {
+        var type = _.kebabCase(this.value);
+        // show related items for type; hide otherwise
+        $('.multiple-choice, .multiple-select, .short-answer').each(function () {
+            var $col = $(this);
+                $col.toggle($col.hasClass(type));
+                $col.find(':input').prop('disabled', !$col.hasClass(type));
+        });
+    }).change();
+    // toggle checkboxes for selecting/unselecting files
+    $('#modal-show-files .list-group-item :checkbox').click(function () {
+        var $listGroup = $(this).closest('.list-group'),
+            $listGroupItem = $(this).closest('.list-group-item');
+        // toggle active state based on checkbox' state
+        $listGroupItem.toggleClass('active', this.checked);
+    });
+    // open media in preview window
+    $('#modal-show-files .list-group-item:has(.preview) a').click(function (e) {
+        e.preventDefault();
+        $(this).closest('.modal-body').find('.col-preview').html(
+            $(this).next('.preview').clone().css('display', '')
+        );
+    });
+    // change file counter
+    $('#modal-show-files').on('hidden.bs.modal', function () {
+        var count = $(this).find(':checked').length;
+        $('#file-counter').text(count !== 1 ? count + ' files selected' : '1 file selected');
+    });
+    // add new link input
+    $('#btn-add-link').click(function () {
+        var $formGroup = $(this).prev('.form-group');
+        // create new group
+        var $newGroup = $formGroup.clone();
+            $newGroup.find('[name^=links]').val('');
+            $formGroup.after($newGroup);
+    });
+    // change link counter
+    $('#modal-show-links').on('hidden.bs.modal', function () {
+        var count = $(this).find('[name^=links]').filter(function() {
+            return this.value !== '';
+        }).length;
+        $('#link-counter').text(count !== 1 ? count + ' links added' : '1 link added');
+    });
+    // remove choice input
+    $('.multiple-choice, .multiple-select, .short-answer').on('click', '.btn-remove-choice', function (e) {
+        e.preventDefault();
+        $(this).closest('.form-group').remove();
+    });
+    // add choice input
+    $('.multiple-choice, .multiple-select, .short-answer').on('click', '.btn-add-choice', function (e) {
+        e.preventDefault();
+        var $col = $(e.delegateTarget), 
+            type = 'multiple-choice';
+        if ($col.hasClass('multiple-select')) {
+            type = 'multiple-select';
+        } else if ($col.hasClass('short-answer')) {
+            type = 'short-answer';
+        }
+        $(e.target).closest('.form-group').before(
+            _.template($('[id=' + type + '-template]').text())({
+                id: parseInt(_.uniqueId(), 10) + 999 // unlikely conflicting number
+            })
+        );
+    });
+});    
+</script>
+
 <%- include ./footer -%>

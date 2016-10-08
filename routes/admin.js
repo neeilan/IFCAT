@@ -43,13 +43,6 @@ var anyUpload = multer({
 
 var csvUpload = multer({ storage: multer.MemoryStorage });
 
-// non-authenticated routes
-router.post('/login', passport.authenticate('local-login', {
-    successRedirect: '/admin/courses',
-    failureRedirect: '/login',
-    failureFlash: true
-}));
-
 // lifesaver: query single objects
 router.param('us3r', controllers.User.getUser);
 router.param('course', controllers.Course.getCourse);
@@ -59,6 +52,15 @@ router.param('question', controllers.Question.getQuestion);
 router.param('fil3', controllers.File.getFile);
 router.param('tutorialQuiz', controllers.TutorialQuiz.getQuiz);
 router.param('group', controllers.Group.getGroup);
+
+// non-authenticated routes
+router.get('/login', controllers.User.getAdminLoginForm);
+
+router.post('/login', passport.authenticate('local-login', {
+    successRedirect: '/admin/courses',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
 
 // check if user is authenticated
 router.use(function (req, res, next) {
@@ -100,7 +102,6 @@ router.use(function (req, res, next) {
 });
 
 // authenticated routes
-// @TODO: handle delete routes e.g. deleting course = deleting every related to the course
 // @TODO: handle unexpected errors
 // @TODO: model validation
 
@@ -147,9 +148,7 @@ router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/unlock', controllers
 router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/activate', controllers.TutorialQuiz.activateQuiz);
 
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups', controllers.Group.getGroupList);
-//router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroups);
 router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups', controllers.Group.saveGroupList);
-//router.delete('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group', controllers.Group.deleteGroupFromTutorial);
 
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/responses', controllers.Response.getResponseList);
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/responses/export', controllers.Response.exportResponseList);
