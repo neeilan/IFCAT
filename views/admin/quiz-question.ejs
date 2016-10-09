@@ -8,19 +8,19 @@
 <form id="form-question" action="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= 
     question.isNew ? '' : question.id + '?_method=put' %>" method="post" class="form-horizontal">
     <div class="form-group">
-        <label for="question" class="col-sm-2 control-label">Number</label>
+        <label class="col-sm-2 control-label">Number</label>
         <div class="col-sm-2">
             <input name="number" value="<%= question.number %>" maxlength="6" class="form-control" placeholder="e.g. 1, A or 1a">
         </div>
     </div>
     <div class="form-group">
-        <label for="question" class="col-sm-2 control-label">Question</label>
+        <label class="col-sm-2 control-label">Question</label>
         <div class="col-sm-10">
             <textarea name="question" class="form-control" rows="3"><%= question.question %></textarea>
         </div>
     </div>
     <div class="form-group">
-        <label for="type" class="col-sm-2 control-label">Type</label>
+        <label class="col-sm-2 control-label">Type</label>
         <div class="col-sm-10">
             <select name="type" class="form-control">
             <% _.each(question.schema.path('type').enumValues, function (type) { %>
@@ -32,7 +32,7 @@
     </div>
     <!-- files -->
     <div class="form-group">
-        <label for="type" class="col-sm-2 control-label">Files</label>
+        <label class="col-sm-2 control-label">Files</label>
         <div class="col-sm-10">
             <a href="#" class="btn btn-default btn-sm<%= course.files.length ? 
                 '' : ' disabled' %>" data-toggle="modal" data-target="#modal-show-files">
@@ -42,7 +42,7 @@
     </div>
     <!-- links -->
     <div class="form-group">
-        <label for="type" class="col-sm-2 control-label">Links</label>
+        <label class="col-sm-2 control-label">Links</label>
         <div class="col-sm-10">
             <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-show-links">
                 <span class="glyphicon glyphicon-link"></span> Show links</a>
@@ -54,8 +54,8 @@
     <div class="form-group">
         <!-- for multiple choice -->
         <% if (question.isNew || !question.isMultipleChoice()) { %>
-        <div class="multiple-choice" style="display: none;">
-            <label for="question" class="col-sm-2 control-label">Choices &amp; Answer</label>
+        <div data-type="multiple-choice" style="display: none;">
+            <label class="col-sm-2 control-label">Choices &amp; Answer</label>
             <div class="col-sm-10">
             <% for (var i = 0, len = 3; i < 3; i++) { %>    
                 <div class="form-group">
@@ -69,8 +69,8 @@
                 </div>
             <% } %>
         <% } else { %>
-        <div class="multiple-choice">
-            <label for="question" class="col-sm-2 control-label">Choices &amp; Answer</label>
+        <div data-type="multiple-choice">
+            <label class="col-sm-2 control-label">Choices &amp; Answer</label>
             <div class="col-sm-10">
             <% _.each(question.choices, function (choice, i) { %>    
                 <div class="form-group">
@@ -95,8 +95,8 @@
         </div>
         <!-- for multiple select -->
         <% if (question.isNew || !question.isMultipleSelect()) { %>
-        <div class="multiple-select" style="display: none;">
-            <label for="question" class="col-sm-2 control-label">Choices &amp; Answers</label>
+        <div data-type="multiple-select" style="display: none;">
+            <label class="col-sm-2 control-label">Choices &amp; Answers</label>
             <div class="col-sm-10">
             <% for (var i = 0, len = 3; i < 3; i++) { %>    
                 <div class="form-group">
@@ -109,8 +109,8 @@
                 </div>
             <% } %>
         <% } else { %>
-        <div class="multiple-select">
-            <label for="question" class="col-sm-2 control-label">Choices &amp; Answers</label>
+        <div data-type="multiple-select">
+            <label class="col-sm-2 control-label">Choices &amp; Answers</label>
             <div class="col-sm-10">
             <% _.each(question.choices, function (choice, i) { %>    
                 <div class="form-group">
@@ -135,8 +135,8 @@
         </div>
         <!-- for short answer -->
         <% if (question.isNew || !question.isShortAnswer()) { %>
-        <div class="short-answer" style="display: none;">
-            <label for="question" class="col-sm-2 control-label">Acceptable Answers</label>
+        <div data-type="short-answer" style="display: none;">
+            <label class="col-sm-2 control-label">Acceptable Answers</label>
             <div class="col-sm-10">
             <% for (var i = 0, len = 3; i < 3; i++) { %>
                 <div class="form-group">
@@ -146,9 +146,9 @@
                 </div>
             <% } %>
         <% } else { %>
-        <div class="short-answer">
-            <label for="question" class="col-sm-2 control-label">Acceptable Answers</label>
-            <div class="col-sm-10 short-answer">
+        <div data-type="short-answer">
+            <label class="col-sm-2 control-label">Acceptable Answers</label>
+            <div class="col-sm-10">
             <% _.each(question.choices, function (choice, i) { %>    
                 <div class="form-group">
                     <div class="col-xs-8"> 
@@ -165,6 +165,13 @@
                     </div>
                 </div>
             </div>
+            <label class="col-sm-2 control-label">Case-sensitive</label>
+            <div class="form-group">    
+                <div class="col-sm-6">
+                    <input type="checkbox" name="caseSensitive" value="1" class="bootstrap-switch"<%= 
+                        question.caseSensitive ? ' checked' : '' %>>
+                </div>
+            </div>
         </div>
     </div>
     <!-- options -->
@@ -175,35 +182,35 @@
     </div>
     <div id="options" class="collapse">
         <div class="form-group">
-            <label for="question" class="col-sm-2 control-label">Shuffle choices?</label>
+            <label class="col-sm-2 control-label">Shuffle choices?</label>
             <div class="col-sm-6">
                 <input type="checkbox" name="shuffleChoices" value="1" class="bootstrap-switch"<%= 
                     _.defaultTo(question.shuffleChoices, quiz.shuffleChoices) == 1 ? ' checked' : '' %> >
             </div>
         </div>
         <div class="form-group">
-            <label for="question" class="col-sm-2 control-label">Format using LaTeX?</label>
+            <label class="col-sm-2 control-label">Format using LaTeX?</label>
             <div class="col-sm-6">
                 <input type="checkbox" name="useLaTeX" value="1"  class="bootstrap-switch"<%= 
                     _.defaultTo(question.useLaTeX, quiz.useLaTeX) == 1 ? ' checked' : '' %>>
             </div>
         </div>
         <div class="form-group">
-            <label for="question" class="col-sm-2 control-label">Points possible</label>
+            <label class="col-sm-2 control-label">Points possible</label>
             <div class="col-sm-6">
                 <input type="number" name="points" value="<%= 
                     _.defaultTo(question.points, quiz.points) %>" min="0" max="7" class="form-control">
             </div>
         </div>
         <div class="form-group">
-            <label for="question" class="col-sm-2 control-label">First-try bonus</label>
+            <label class="col-sm-2 control-label">First-try bonus</label>
             <div class="col-sm-6">
                 <input type="number" name="firstTryBonus" value="<%= 
                     _.defaultTo(question.firstTryBonus, quiz.firstTryBonus) %>" min="0" max="7" class="form-control">
             </div>
         </div>
         <div class="form-group">
-            <label for="question" class="col-sm-2 control-label">Penalty per attempt</label>
+            <label class="col-sm-2 control-label">Penalty per attempt</label>
             <div class="col-sm-6">
                 <input type="number" name="penalty" value="<%= 
                     _.defaultTo(question.penalty, quiz.penalty) %>" min="0" max="7" class="form-control">
@@ -219,7 +226,7 @@
 </form>
 
 <!-- templates -->
-<script type="text/template" id="multiple-choice-template">
+<script type="text/template" id="tpl-multiple-choice">
     <div class="form-group">
         <div class="col-xs-8"> 
             <textarea name="choices[${ id }]" class="form-control" rows="1"></textarea>
@@ -229,7 +236,7 @@
         </div>
     </div>
 </script>
-<script type="text/template" id="multiple-select-template">
+<script type="text/template" id="tpl-multiple-select">
     <div class="form-group">
         <div class="col-xs-8"> 
             <textarea name="choices[${ id }]" class="form-control" rows="1"></textarea>
@@ -239,7 +246,7 @@
         </div>
     </div>
 </script>
-<script type="text/template" id="short-answer-template">
+<script type="text/template" id="tpl-short-answer">
     <div class="form-group">
         <div class="col-xs-8"> 
             <textarea name="choices[${ id }]" class="form-control" rows="1"></textarea>
@@ -255,10 +262,10 @@ $(function () {
     $('#form-question [name=type]').change(function () {
         var type = _.kebabCase(this.value);
         // show related items for type; hide otherwise
-        $('.multiple-choice, .multiple-select, .short-answer').each(function () {
+        $('[data-type]').each(function () {
             var $col = $(this);
-                $col.toggle($col.hasClass(type));
-                $col.find(':input').prop('disabled', !$col.hasClass(type));
+            var display = $col.data('type') === type;
+            $col.toggle(display).find(':input').prop('disabled', !display);
         });
     }).change();
     // toggle checkboxes for selecting/unselecting files
@@ -290,31 +297,18 @@ $(function () {
     });
     // change link counter
     $('#modal-show-links').on('hidden.bs.modal', function () {
-        var count = $(this).find('[name^=links]').filter(function() {
-            return this.value !== '';
-        }).length;
+        var count = $(this).find('[name^=links]').filter(function() { return this.value !== ''; }).length;
         $('#link-counter').text(count !== 1 ? count + ' links added' : '1 link added');
     });
     // remove choice input
-    $('.multiple-choice, .multiple-select, .short-answer').on('click', '.btn-remove-choice', function (e) {
-        e.preventDefault();
+    $('div[data-type]').on('click', '.btn-remove-choice', function (e) {
         $(this).closest('.form-group').remove();
     });
     // add choice input
-    $('.multiple-choice, .multiple-select, .short-answer').on('click', '.btn-add-choice', function (e) {
-        e.preventDefault();
-        var $col = $(e.delegateTarget), 
-            type = 'multiple-choice';
-        if ($col.hasClass('multiple-select')) {
-            type = 'multiple-select';
-        } else if ($col.hasClass('short-answer')) {
-            type = 'short-answer';
-        }
-        $(e.target).closest('.form-group').before(
-            _.template($('[id=' + type + '-template]').text())({
-                id: parseInt(_.uniqueId(), 10) + 999 // unlikely conflicting number
-            })
-        );
+    $('div[data-type]').on('click', '.btn-add-choice', function (e) {
+        var $tpl = $('#tpl-' + $(e.delegateTarget).data('type'));
+        var newGroup = _.template($tpl.text())({ id: parseInt(_.uniqueId(), 10) + 999 });
+        $(e.target).closest('.form-group').before(newGroup);
     });
 });    
 </script>

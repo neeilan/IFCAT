@@ -11,6 +11,7 @@ var QuestionSchema = new mongoose.Schema({
     answers: [String],
     files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
     links: [String],
+    caseSensitive: Boolean,
     shuffleChoices: Boolean,
     useLaTeX: Boolean,
     points: Number,
@@ -55,6 +56,7 @@ QuestionSchema.methods.store = function (obj, callback) {
     this.type = obj.type;
     this.files = obj.files;
     this.links = _.filter(obj.links, Boolean);
+    this.caseSensitive = !!obj.caseSensitive;
     this.shuffleChoices = !!obj.shuffleChoices;
     this.useLaTeX = !!obj.useLaTeX;
     this.points = obj.points;
