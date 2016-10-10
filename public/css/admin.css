@@ -1,6 +1,3 @@
-.row.flush-col > [class*="col-"] {
-    padding: 0px;
-}
 body {
     margin-bottom: 100px;
 }
@@ -11,26 +8,9 @@ textarea.form-control {
     max-width: 100%;
 }
 
-#col-unassigned-students .sortable {
-    background: #f9f9f9;
-    min-height: 300px;
-}
-#col-groups .panel {
-    position: relative;;
-}
-#col-groups .panel > .dropdown {
-    top: 8px;
-    position: absolute;
-    right: 20px;
-}
-.ui-sortable-helper {
-    cursor: pointer;
-    display: table !important;
-}
-.ui-sortable-handle {
-    margin-bottom: 5px;
-}
 
+
+/* File listing styles */
 
 .modal-upload-files .modal-body {
     padding: 0;
@@ -60,11 +40,11 @@ textarea.form-control {
     margin: 0 auto;
 }
 
+/* Question form styles */
 
-#form-question a.counter {
+a.counter {
     margin-left: 10px;
 }
-
 
 #modal-show-files .modal-body {
     max-height: 500px;
@@ -114,15 +94,22 @@ textarea.form-control {
     margin-right: auto;
 }
 
-#form-quiz-groups {
-    display: inline-block;
+/* Group listing styles */
+
+.col {
+    width: 180px;
 }
-#form-quiz-groups table {
+.col > span {
+    display: inline-block;
+    width: 75px;
+}
+
+#table-quiz-groups {
     border-top: 1px solid #ddd;
     border-left: 1px solid #ddd;
     margin-top: 10px;
 }
-#form-quiz-groups th, #form-quiz-groups td {
+#table-quiz-groups th, #table-quiz-groups td {
     border-bottom: 1px solid #ddd;
     border-right: 1px solid #ddd;
     height: 30px;
@@ -132,18 +119,18 @@ textarea.form-control {
     vertical-align: middle;
     white-space: nowrap;
 }
-#form-quiz-groups th.s, #form-quiz-groups td.s {
+#table-quiz-groups th.s, #table-quiz-groups td.s {
    width: 200px; 
 }
-#form-quiz-groups th.u, #form-quiz-groups td.u {
+#table-quiz-groups th.u, #table-quiz-groups td.u {
    width: 110px; 
 }
-#form-quiz-groups th.g, #form-quiz-groups td.g {
+#table-quiz-groups th.g, #table-quiz-groups td.g {
    width: 55px; 
 }
-#form-quiz-groups tr td:first-child {
+#table-quiz-groups tr td:first-child {
     text-align: left;
 }
-#form-quiz-groups tbody td {
+#table-quiz-groups tbody td {
     padding: 0 5px;
 }

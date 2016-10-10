@@ -24,7 +24,11 @@ exports.getGroupList = function (req, res) {
         res.render('admin/quiz-groups', {
             title: 'Groups',
             course: req.course, 
-            tutorialQuiz: req.tutorialQuiz 
+            tutorialQuiz: req.tutorialQuiz,
+            tutorial: req.tutorialQuiz.tutorial,
+            quiz: req.tutorialQuiz.quiz,
+            groups: req.tutorialQuiz.groups,
+            disable: _.isEmpty(req.tutorialQuiz.tutorial.students)
         });
     });
 };

@@ -38,7 +38,5 @@ router.get('/logout', controllers.User.logout);
 router.get('/courses', controllers.Student.getCourseList);
 router.get('/courses/:course/quizzes', controllers.Student.getQuizList);
 router.get('/courses/:course/quizzes/:tutorialQuiz/start', controllers.TutorialQuiz.startQuiz);
-router.get('/courses/:course/quizzes/:tutorialQuiz/questions/:question', controllers.TutorialQuiz.getNextQuestion);
-router.get('/courses/:course/quizzes/:tutorialQuiz/end', controllers.TutorialQuiz.endQuiz);
 
 module.exports = router;

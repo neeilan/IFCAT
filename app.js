@@ -82,11 +82,11 @@ app.use(function (err, req, res, next) {
 });
 
 io.use(passportSocketIo.authorize({
-  key: 'connect.sid',
-  secret: config.session.secret,
-  store: sessionStore,
-  passport: passport,
-  cookieParser: cookieParser
+    key: 'connect.sid',
+    secret: config.session.secret,
+    store: sessionStore,
+    passport: passport,
+    cookieParser: cookieParser
 }));
 
 // Socket io handler for quizzes

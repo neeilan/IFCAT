@@ -1,83 +1,81 @@
 <%- include ./header -%>
-<div class="row">
-    <div class = "col-xs-10 col-xs-offset-1 alert alert-info">
-        A <b>published</b> quiz is available for students in the tutorial to open and be assigned to a group automatically (you can assign/change groups manually at any time).
-        An <b>active</b> quiz is one currently in progress: the questions are visible to students and they can submit responses while a quiz is active.
-        Note that students will not be automatically assigned to groups while a quiz is active - you will have to do it manually.
-    </div>
-    <br/>
+
+
+<div class="alert alert-info center-block" style="max-width: 90%">
+    A <b>published</b> quiz is available for students in the tutorial to open and be assigned to a group automatically (you can assign/change groups manually at any time).
+    An <b>active</b> quiz is one currently in progress: the questions are visible to students and they can submit responses while a quiz is active.
+    Note that students will not be automatically assigned to groups while a quiz is active - you will have to do it manually.
 </div>
-<div class="row">
-    <label class="col-xs-3 col-sm-2 col-md-2 col-lg-1 control-label">Published?</label>
-    <div class="col-xs-3 col-sm-2 col-md-2 col-lg-1">
-        <input type="checkbox" id="publish-tutorial-quiz" value="1" class="bootstrap-switch"<%= 
-            tutorialQuiz.published ? ' checked' : '' %>>
-    </div>
-    <label class="col-xs-3 col-sm-2 col-md-2 col-lg-1 control-label">Active?</label>
-    <div class="col-xs-3 col-sm-2 col-md-2 col-lg-1">
-        <input type="checkbox" id="activate-tutorial-quiz" value="1" class="bootstrap-switch"<%= 
-            tutorialQuiz.active ? ' checked' : '' %>>
-    </div>
-</div>
+
+<p>
+    <label class="col control-label">
+        <span>Publish?</span>
+        <input type="checkbox" value="1" class="bootstrap-switch" id="publish"<%= 
+            tutorialQuiz.published ? ' checked' : '' %><%= disable ? ' disabled' : '' %>>
+    </label>
+    <label class="col control-label">
+        <span>Active?</span> 
+        <input type="checkbox" value="1" class="bootstrap-switch" id="activate"<%= 
+            tutorialQuiz.active ? ' checked' : '' %><%= disable ? ' disabled' : '' %>>
+    </label>
+    <label class="col control-label">
+        <span>Archive?</span>
+        <input type="checkbox" value="1" class="bootstrap-switch" id="archive"<%= 
+            tutorialQuiz.archived ? ' checked' : '' %><%= disable ? ' disabled' : '' %>>
+    </label>
+</p>
 
 <h1>Groups</h1>
 
 <%- include ./messages %>
 
-<form action="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups?_method=put" 
-    method="post" id="form-quiz-groups">
-    <button type="button" class="btn btn-default btn-sm" id="btn-refresh-groups"><span 
-    class="glyphicon glyphicon-refresh"></span> Refresh</button>
-    <button type="button" class="btn btn-default btn-sm" id="btn-add-group"><span 
-    class="glyphicon glyphicon-plus"></span> Add group</button>
-    <button type="submit" class="btn btn-default btn-sm btn-primary pull-right">Save</button>
-    
-    <table>
-        <thead>
-            <tr>
-                <th rowspan="2" class="s">&nbsp;</th>
-                <th colspan="<%= 1 + tutorialQuiz.groups.length %>">Groups</th>
-            </tr>
+<p>
+    <button type="button" class="btn btn-default btn-sm" id="btn-refresh-groups"<%= disable ? 
+        ' disabled' : '' %>><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+    <button type="button" class="btn btn-default btn-sm" id="btn-add-group"<%= disable ? 
+        ' disabled' : '' %>><span class="glyphicon glyphicon-plus"></span> Add group</button>
+    <button type="button" class="btn btn-default btn-sm btn-primary" id="btn-save-groups"<%= disable ? 
+        ' disabled' : '' %>><span class="glyphicon glyphicon-ok"></span> Save groups</button>
+</p>
+
+<table id="table-quiz-groups">
+    <thead>
+        <tr>
+            <th rowspan="2" class="s">&nbsp;</th>
+            <th colspan="<%= 1 + groups.length %>">Groups</th>
+        </tr>
+        <% if (!disable) { %>
             <tr>
                 <th class="u">Unassigned</th>
-            <% _.each(tutorialQuiz.groups, function (group) { %>
-                <th class="g"><%= group.name %></th>
-            <% }) %>
-            </tr>
-        </thead>
-        <tfoot>
-            <tr>
-                <th rowspan="2" class="s">&nbsp;</th>
-                <th class="u">Unassigned</th>
-                <% _.each(tutorialQuiz.groups, function (group) { %>
+                <% _.each(groups, function (group) { %>
                     <th class="g"><%= group.name %></th>
                 <% }) %>
             </tr>
-            <tr>
-                <th colspan="<%= 1 + tutorialQuiz.groups.length %>">Groups</th>
-            </tr>
-        </tfoot>
-        <tbody>
-        <% _.each(tutorialQuiz.tutorial.students, function (student) { %>
+        <% } %>
+    </thead>
+    <tbody>
+    <% if (!disable) { %>
+        <% _.each(tutorial.students, function (student) { %>
             <tr>
                 <td class="s">
                     <a href="/admin/courses/<%= course.id %>/students/<%= student.id %>/marks"><%= student.name.full %></a>
                 </td>
                 <td class="u">
-                    <input type="radio" name="groups[<%= student.id %>]" value="unassigned"<%=
-                        !_.find(tutorialQuiz.groups, function (group) { 
-                            return _.find(group.members, { id: student.id });
-                        }) ? ' checked' : '' %>>
+                    <input type="radio" name="groups[<%= student.id %>]" value="unassigned">
                 </td>
-                <% _.each(tutorialQuiz.groups, function (group) { %>
+                <% _.each(groups, function (group) { %>
                     <td class="g"><input type="radio" name="groups[<%= student.id %>]" value="<%= group.id %>"<%=
                         _.find(group.members, { id: student.id }) ? ' checked' : '' %>></td>
                 <% }) %>
             </tr>
         <% }) %>
-        </tbody>
-    </table>
-</form>
+    <% } else { %>
+        <tr>
+            <td colspan="2">No students have been added into the tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students into tutorial.</td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
 
 <script type="text/template" id="panel-group-template">
     <div class="panel panel-default" data-group-id="new">
@@ -91,34 +89,21 @@
     </div>
 </script>
 
-<!--input type="hidden" id="save-groups-url" 
-    value="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups/save"-->
-
-<input type="hidden" id="publish-tutorial-quiz-url" 
-    value="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/publish">
-<input type="hidden" id="activate-tutorial-quiz-url" 
-    value="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/activate">
-
-
 <%- include ./body-js -%>
 
 <script>
 $(function () {
-    // publish/unpublish quiz in tutorial
-    $('#publish-tutorial-quiz').on('switchChange.bootstrapSwitch', function (e, state) {
-        $.ajax($('#publish-tutorial-quiz-url').val(), {
+    var url = {
+        publish: '/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/publish',
+        activate: '/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/activate',
+        archive: '/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/archive',
+        save: '/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups'
+    };
+    // set option on quiz in tutorial
+    $(':checkbox').on('switchChange.bootstrapSwitch', function (e, state) {
+        $.ajax(url[this.id], {
             type: 'put',
-            data: { published: state }, 
-            success: function (res) {
-                console.log(res.status);
-            }
-        });
-    });
-    // activate/deactivate quiz in tutorial
-    $('#activate-tutorial-quiz').on('switchChange.bootstrapSwitch', function (e, state) {
-        $.ajax($('#activate-tutorial-quiz-url').val(), {
-            type: 'put',
-            data: { active: state }, 
+            data: { state: state }, 
             success: function (res) {
                 console.log(res.status);
             }
@@ -126,9 +111,8 @@ $(function () {
     });
     // add new group to table
     $('#btn-add-group').click(function () {
-        var $table = $(this).closest('form').find('table'),
+        var $table = $('#table-quiz-groups'),
             $thead = $table.find('thead'),
-            $tfoot = $table.find('tfoot'),
             $tbody = $table.find('tbody');
         // get next group #
         var numbers = [];
@@ -142,12 +126,8 @@ $(function () {
         $thead.find('tr:eq(0) th:eq(1)').attr('colspan', function (i, attr) { 
             return parseInt(attr, 10) + 1; 
         });
-        $tfoot.find('tr:eq(1) th:eq(0)').attr('colspan', function (i, attr) { 
-            return parseInt(attr, 10) + 1; 
-        });
         // add header column
         $thead.find('tr:eq(1)').append('<th class="g">' + value + '</th>');
-        $tfoot.find('tr:eq(0)').append('<th class="g">' + value + '</th>');
         // add body column
         $tbody.find('tr').each(function () { 
             var $tr = $(this);
@@ -156,13 +136,10 @@ $(function () {
         });
     });
     // save changes
-    $('#form-quiz-groups').submit(function (e) {
-        e.preventDefault();
-        var $form = $(this);
-        // send request
-        $.ajax(this.action, {
+    $('#btn-save-groups').click(function () {
+        $.ajax(url.save, {
             type: 'put',
-            data: $form.serialize(), 
+            data: $('#table-quiz-groups :input').serialize(), 
             success: function (res) {
                 if (res.status) {
                     window.location.reload(true);
@@ -174,6 +151,10 @@ $(function () {
     $('#btn-refresh-groups').click(function (e) {
         e.preventDefault();
         window.location.reload(true);
+    });
+    // mark students with no groups as unassigned
+    $('#table-quiz-groups tbody tr:not(:has(:checked))').each(function () {
+        $(this).find('.u :radio').prop('checked', true);
     });
 });
 </script>

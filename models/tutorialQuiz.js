@@ -12,7 +12,7 @@ var TutorialQuizSchema = new mongoose.Schema({
     // or will manually be placed into groups by the admins
     allocateMembers: { 
         type: String, 
-        enum: ['unaided', 'automatically', 'manually'],
+        enum: ['unaided', 'automatically', 'self-selection'],
         default: 'automatically'
     },
     // max # of groups OR members per group
@@ -22,10 +22,11 @@ var TutorialQuizSchema = new mongoose.Schema({
     },
     // make quiz visible to students
     published: Boolean,
-    // allow students to enter pre-phase of the quiz
-    unlocked: Boolean, // deprecated
     // allow students to do quiz
-    active: Boolean
+    active: Boolean,
+    // allow students to see their quiz results
+    archived: Boolean
+
 }, {
     timestamps: true 
 });
@@ -84,9 +85,7 @@ TutorialQuizSchema.methods.store = function (obj, callback) {
     this.allocateMembers = obj.allocateMembers;
     this.max = {};
     this.max[obj.max.key] = obj.max.value;
-    /*this.published = obj.published;
-    this.unlocked = obj.unlocked;
-    this.active = obj.active;*/
+    this.archived = obj.archived;
     return this.save(callback);
 };
 // Find quizzes within tutorial

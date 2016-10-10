@@ -81,26 +81,23 @@ exports.editQuiz = function (req, res) {
 };
 // Publish quiz for tutorial
 exports.publishQuiz = function (req, res) {
-    req.tutorialQuiz.published = req.body.published;
+    req.tutorialQuiz.published = req.body.state;
     req.tutorialQuiz.save(function (err) {
-        res.json({ status: true });
-    });
-};
-// Unlock quiz for tutorial
-exports.unlockQuiz = function (req, res) {
-    req.tutorialQuiz.unlocked = req.body.unlocked;
-    req.tutorialQuiz.save(function (err) {
-        req.app.locals.io.in('tutorialQuiz:' + req.tutorialQuiz.id)
-        .emit('quizUnlocked' , req.tutorialQuiz);
         res.json({ status: true });
     });
 };
 // Activate quiz for tutorial
 exports.activateQuiz = function (req, res) {
-    req.tutorialQuiz.active = req.body.active;
+    req.tutorialQuiz.active = req.body.state;
     req.tutorialQuiz.save(function (err) {
-        req.app.locals.io.in('tutorialQuiz:' + req.tutorialQuiz.id)
-        .emit('quizActivated', req.tutorialQuiz);
+        req.app.locals.io.in('tutorialQuiz:' + req.tutorialQuiz.id).emit('quizActivated', req.tutorialQuiz);
+        res.json({ status: true });
+    });
+};
+// Archive quiz for tutorial
+exports.archiveQuiz = function (req, res) {
+    req.tutorialQuiz.archived = req.body.state;
+    req.tutorialQuiz.save(function (err) {
         res.json({ status: true });
     });
 };
@@ -115,22 +112,4 @@ exports.startQuiz = function (req, res) {
             tutorialQuiz: req.tutorialQuiz,
             quiz: req.tutorialQuiz.quiz
         });
-};
-
-exports.getNextQuestion = function (req, res) {
-
-        req.question.choices = _.shuffle(req.question.choices);
-
-        res.render('student/quiz-question', { 
-            course: req.course,
-            tutorialQuiz: req.tutorialQuiz,
-            quiz: req.tutorialmodels.Quiz.quiz,
-            question: req.question,
-            n: req.tutorialmodels.Quiz.quiz.questions.indexOf(req.question.id)
-        });
-
-};
-
-exports.endQuiz = function (req, res) {
-
 };

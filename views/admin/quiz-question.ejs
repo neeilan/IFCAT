@@ -262,7 +262,7 @@ $(function () {
     $('#form-question [name=type]').change(function () {
         var type = _.kebabCase(this.value);
         // show related items for type; hide otherwise
-        $('[data-type]').each(function () {
+        $('div[data-type]').each(function () {
             var $col = $(this);
             var display = $col.data('type') === type;
             $col.toggle(display).find(':input').prop('disabled', !display);
@@ -270,10 +270,7 @@ $(function () {
     }).change();
     // toggle checkboxes for selecting/unselecting files
     $('#modal-show-files .list-group-item :checkbox').click(function () {
-        var $listGroup = $(this).closest('.list-group'),
-            $listGroupItem = $(this).closest('.list-group-item');
-        // toggle active state based on checkbox' state
-        $listGroupItem.toggleClass('active', this.checked);
+        $(this).closest('.list-group-item').toggleClass('active', this.checked);
     });
     // open media in preview window
     $('#modal-show-files .list-group-item:has(.preview) a').click(function (e) {

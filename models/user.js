@@ -15,7 +15,10 @@ var UserSchema = new mongoose.Schema({
         id: String,
         token: String,
     },
-    UTORid: String, // not sure if we are using it
+    UTORid: {
+        type: String,
+        lowercase: true
+    },
     teachingPoints: {
         type: Number,
         default: 0
