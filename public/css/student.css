@@ -74,19 +74,23 @@ body {
   margin-top: 15px;
 }
 
-#questionScore{
-  display:none;
-}
+/*#questionScore{*/
+/*  display:none;*/
+/*}*/
 #questionScore .fa {
   color: orange;
 }
 
-@media all and (max-width: 725px) {
-    .questionPoints{display:none;}
-    #questionScore{display:block;}
+.fa {
+  font-size : 10px;
 }
 
-
-div {
-  /*border: solid 1px red;*/
+@media all and (max-width: 725px) {
+    .questionPoints{display:none;}
+    #questionScore{
+      display:block;
+    }
+}
+#questionScore .fa {
+  font-size : 30px;
 }
