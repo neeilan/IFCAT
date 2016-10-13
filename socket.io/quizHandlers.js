@@ -157,7 +157,14 @@ module.exports = function(io){
                 }
             }
             else if (question.isShortAnswer()){
-                answerIsCorrect = (question.answers.indexOf(data.answer[0]) > -1);
+                if (!question.caseSensitive){
+                    var answer = data.answer[0].toLowerCase();
+                    var correctAnswers = question.answers.map(ans => ans.toLowerCase())
+                    answerIsCorrect = (correctAnswers.indexOf(answer) > -1);
+                }
+                else{
+                    answerIsCorrect = (question.answers.indexOf(data.answer[0]) > -1);
+                }
             }
             
             models.Response.findOne({ group : data.groupId, question: data.questionId })
