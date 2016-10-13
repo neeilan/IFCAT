@@ -3,23 +3,53 @@ $('.quizBtn').attr('disabled', true); // Disable quiz buttons (enable if assigne
 var url = window.location.href;
 var quizId = url.slice(url.indexOf('/quizzes/') + 9, url.indexOf('/start'));
 var socket = io();
-var quizData, groupId, isDriver,  responses = {}, currentQuestionId, currentQuestionIndex, score = 0;
+var quizData, userId, groupId, isDriver,  responses = {}, currentQuestionId, currentQuestionIndex, score = 0;
     
 socket.emit('requestQuiz', quizId);
+socket.on('setGroup', function(id){
+    groupId = id;
+})
 
 socket.on('quizData', function(tutorialQuiz){
   console.log(tutorialQuiz)
   quizData = tutorialQuiz.quiz;
   groupId = tutorialQuiz.groupId;
+  userId = tutorialQuiz.userId;
   
-  $('#groupName').html(tutorialQuiz.groupName);
-  $('#currentGroup').html(tutorialQuiz.groupName);
+   if (quizData.allocateMembers == 'automatically'){
+      $('#groupName').html(tutorialQuiz.groupName);
+      $('#currentGroup').html(tutorialQuiz.groupName);
+   }
+    else if (quizData.allocateMembers == 'self-selection') {
+      renderGroups(tutorialQuiz.quiz.groups);
+    }
   
   if (quizData.active){
-    $('#driverSelect').show();  
+         $('#driverSelect').show();  
   }
   
 })
+
+socket.on('groupsUpdated', function(data){
+    renderGroups(data.groups);
+})
+
+function renderGroups(groups, currentGroupId){
+    console.log(userId)
+    $('#groupSelfSelect').show();
+    var html = '';
+    groups.forEach(function(group){
+        
+        var btnClass = group.members.includes(userId) ? 'btn-success' : 'btn-default' ;
+        html+= '<br/><a class="btn '+ btnClass+' joinGroup" id="'+ group._id +'">Group ' + group.name + '\t(Members: '+ group.members.length +')</a>'
+    })
+    $('#groupsList').html(html); 
+    $('.joinGroup').click(function(e){
+        console.log(e.target.id)
+        emit('joinGroup', { newGroup : e.target.id });
+    })
+}
+
 
 // When a question is answered by leader, a 'groupAttempt' event is emitted
 socket.on('groupAttempt', function(data){
@@ -66,6 +96,11 @@ $(document).on('click', '#deferDriverBtn', function(){
   if (quizData.active){
     renderQuestion(quizData.quiz, 0);
   }
+})
+
+// Group creation
+$(document).on('click','#createGroupBtn', function(){
+    emit('createGroup');
 })
 
 function renderStars(question, empty, full, returnHTML){

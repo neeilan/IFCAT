@@ -17,8 +17,8 @@ var TutorialQuizSchema = new mongoose.Schema({
     },
     // max # of groups OR members per group
     max: {
-        groups: Number,
-        membersPerGroup: Number
+        groups: { type : Number},
+        membersPerGroup: { type : Number, default : 2 } 
     },
     // make quiz visible to students
     published: Boolean,

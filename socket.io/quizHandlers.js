@@ -1,4 +1,5 @@
-var models = require('../models');
+var models = require('../models'),
+    _ = require('lodash');
 
 module.exports = function(io){
     
@@ -40,6 +41,7 @@ module.exports = function(io){
         ])
         .exec()
         .then(function(tutQuiz){
+
             var studentsGroup, studentsGroupId = null;
             
             // Socket room for all students in this tutorial taking this quiz
@@ -52,7 +54,7 @@ module.exports = function(io){
                     console.log('Joined enrolled group ', group.name);
                     studentsGroup = group.name;
                     studentsGroupId = group._id;
-                    socket.emit('quizData', { quiz : tutQuiz, groupName : studentsGroup, groupId: group._id} );
+                    socket.emit('quizData', { userId : socket.request.user._id, quiz : tutQuiz, groupName : studentsGroup, groupId: group._id} );
                 }
             })
             
@@ -62,7 +64,12 @@ module.exports = function(io){
                 return; // don't allow new group joining if a quiz is active
             }
 
-            // student doesn't already have a group - need to add them to one
+            // student doesn't already have a group - need to add them to one if selection automatic. Otherwise send them list of groups to pick from.
+            if (tutQuiz.allocateMembers == 'self-selection'){
+                socket.emit('quizData', { userId : socket.request.user._id, quiz : tutQuiz } );
+                return;
+            }
+            
             
             var groupsWithRoom = tutQuiz.groups.filter(function(group){
                 if (!tutQuiz.max || !tutQuiz.max.membersPerGroup){
@@ -79,7 +86,7 @@ module.exports = function(io){
                     console.log('Joining existing group ', groupsWithRoom[0]._id);
                  
                     socket.join('group:' + groupsWithRoom[0]._id);
-                    socket.emit('quizData', { quiz : tutQuiz, groupName : groupsWithRoom[0].name, groupId: groupsWithRoom[0]._id} );
+                    socket.emit('quizData', { userId : socket.request.user._id, quiz : tutQuiz, groupName : groupsWithRoom[0].name, groupId: groupsWithRoom[0]._id} );
                     return;
                 });
                 
@@ -98,7 +105,7 @@ module.exports = function(io){
                         if (err) throw err;
                      console.log('Created and joined a new group ', group.name);
                      socket.join('group:'+ group._id);
-                     socket.emit('quizData', { quiz : tutQuiz, groupName : group.name, groupId: group._id } );
+                     socket.emit('quizData', { userId : socket.request.user._id, quiz : tutQuiz, groupName : group.name, groupId: group._id } );
                      return;
                      })
                      
@@ -222,6 +229,66 @@ module.exports = function(io){
         })
     })
     
+    
+    socket.on('joinGroup', function(data){
+        models.TutorialQuiz.findById(data.quizId).exec()
+        .then(function(tutQuiz){
+            console.log('here1')
+            models.Group.update({ _id : { $in :  tutQuiz.groups } }, { $pull : { members : socket.request.user._id } }, { multi : true} ) // make sure user isn't in 2 groups
+            .exec()
+            .then(function(){
+              return models.Group.findByIdAndUpdate(data.newGroup, { $push : { members : socket.request.user._id } }, { new : true } ).exec() // add new group to TutQuiz 
+            })
+            .then(function(group){
+                console.log('here2')
+                models.TutorialQuiz.findById(data.quizId).populate('groups').exec()
+                .then(function(populatedTQ){
+                    // console.log(populatedTQ);
+                    console.log('here3')
+                    socket.join('group:'+ data.newGroup);
+                    socket.emit('setGroup', data.newGroup)
+                    socket.emit('info', {message : 'Joined Group ' + group.name });
+                    emitters.emitToTutorialQuiz(tutQuiz._id, 'groupsUpdated', { groups : populatedTQ.groups })
+                    //  socket.emit('quizData', { quiz : tutQuiz, groupName : group.name, groupId: group._id }
+                })
+
+            })       
+        
+        })
+    })
+    
+    socket.on('createGroup', function(data){
+        models.TutorialQuiz.findById(data.quizId).exec()
+        .then(function(tutQuiz){
+            
+            var group = new models.Group();
+            group.name = (tutQuiz.groups.length + 1).toString();
+            group.members = [ socket.request.user._id ];
+            group.save( function(err, group){
+                console.log(group)
+                if (err) console.log (err);
+                    
+                models.Group.update({ _id : { $in :  tutQuiz.groups } }, { $pull : { members : socket.request.user._id } }, { multi : true },
+                function(err, doc){
+                    console.log(doc);
+                  models.TutorialQuiz.findByIdAndUpdate(data.quizId, { $push : { groups : group._id } })
+                  .exec() // add new group to TutQuiz 
+                .then(function(tq){
+                    return models.TutorialQuiz.findById(tq._id).populate('groups').exec();
+                })
+                .then(function(populatedTQ){
+                    // console.log(populatedTQ)
+                    socket.join('group:'+ group._id);
+                    socket.emit('info', {message : 'Created and joined Group ' + group.name });
+                    emitters.emitToTutorialQuiz(tutQuiz._id, 'groupsUpdated', { groups : populatedTQ.groups })
+                    //  socket.emit('quizData', { quiz : tutQuiz, groupName : group.name, groupId: group._id }
+                })
+                    
+                }) // make sure user isn't in 2 groups
+            });
+        })
+        
+    })
     }
     
 }
