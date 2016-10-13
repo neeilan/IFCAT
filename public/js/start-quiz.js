@@ -284,7 +284,7 @@ function renderQuestion(quiz, n){
     $("#submitQuestion").click(function(e){
       var currentlyChosen = $('.currentlyChosen');
       var textAnswer = $('#textInput').val();
-      if (currentlyChosen.length === 0 && textAnswer.length == 0){
+      if (currentlyChosen.length === 0 && textAnswer.length === 0){
           console.log('returning')
         return;
       }

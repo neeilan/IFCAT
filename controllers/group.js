@@ -21,6 +21,9 @@ exports.getGroup = function (req, res, next, group) {
 // Retrieve list of groups for tutorial
 exports.getGroupList = function (req, res) { 
     req.tutorialQuiz.withStudents().withGroups().execPopulate().then(function (err) {
+
+        console.log( req.tutorialQuiz.groups );
+
         res.render('admin/quiz-groups', {
             title: 'Groups',
             course: req.course, 
@@ -28,43 +31,45 @@ exports.getGroupList = function (req, res) {
             tutorial: req.tutorialQuiz.tutorial,
             quiz: req.tutorialQuiz.quiz,
             groups: req.tutorialQuiz.groups,
-            disable: _.isEmpty(req.tutorialQuiz.tutorial.students)
+            students: req.tutorialQuiz.tutorial.students
         });
     });
 };
 // Temporarily generate groups
-/*exports.generateGroups = function (req, res) {
+exports.generateGroupList = function (req, res) {
     // get students within tutorial
     req.tutorialQuiz.withStudents().execPopulate().then(function () {
         // randomize students
-        var students = _.shuffle(req.tutorialQuiz.tutorial.students), maxMembersPerGroup;
+        var students = _.shuffle(req.tutorialQuiz.tutorial.students);
         // determine number of members per group
+        var size = req.tutorialQuiz.max.membersPerGroup;
         if (req.tutorialQuiz.max.groups) {
-            maxMembersPerGroup = Math.ceil(students.length / req.tutorialQuiz.max.groups); 
-        } else {
-            maxMembersPerGroup = req.tutorialQuiz.max.membersPerGroup;
+            size = Math.ceil(students.length / req.tutorialQuiz.max.groups); 
         }
-        // split students into groups according to maximum size
-        var groups = [], members = [];
-        for (var i = 0; i < students.length; i++) {
-            // group size reached
-            if (maxMembersPerGroup && members.length === maxMembersPerGroup) {
-                // add new group
-                groups.push({ members: members });
-                // start a new group
-                members = [];
-            }
-            // add student to group
-            members.push(students[i]);
-            // add last group
-            if (i + 1 === students.length) {
-                groups.push({ members: members });
-            }
-        }
-        res.json({ groups: groups });
-    });
-};*/
+        // split into chunks of size
+        var chunks = _.chunk(students, size);
+        // map chunks to groups
+        var groups = _.map(chunks, function (chunk, i) {
+            return {
+                id: i + 1,
+                name: i + 1,
+                members: chunk
+            };
+        });
 
+        console.log( groups );
+
+        res.render('admin/quiz-groups', {
+            title: 'Groups',
+            course: req.course, 
+            tutorialQuiz: req.tutorialQuiz,
+            tutorial: req.tutorialQuiz.tutorial,
+            quiz: req.tutorialQuiz.quiz,
+            groups: groups,
+            students: req.tutorialQuiz.tutorial.students
+        });
+    });
+};
 // Create new group for tutorial
 exports.saveGroupList = function (req, res) { 
     // sort groups
@@ -109,14 +114,16 @@ exports.saveGroupList = function (req, res) {
         }
     // delete members from other groups
     }, function (err) {
-        models.Group.update({ 
-            _id: {
-                $nin: ids
-            }
-        }, { 
-            members: [] 
-        }, { 
-            multi: true 
+        models.Group.remove({ 
+            $and: [{
+                _id: {
+                    $nin: ids
+                }
+            }, {
+                _id: {
+                    $in: req.tutorialQuiz.groups
+                }
+            }]
         }, function (err) {
             if (err) {
                 req.flash('failure', 'Unable to save groups at this time.');

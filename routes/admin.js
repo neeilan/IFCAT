@@ -148,6 +148,7 @@ router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/activate', controlle
 router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/archive', controllers.TutorialQuiz.archiveQuiz);
 
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups', controllers.Group.getGroupList);
+router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroupList);
 router.put('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups', controllers.Group.saveGroupList);
 
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/responses', controllers.Response.getResponseList);

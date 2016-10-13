@@ -7,36 +7,39 @@
     Note that students will not be automatically assigned to groups while a quiz is active - you will have to do it manually.
 </div>
 
+<% if (!_.isEmpty(students)) { %>
 <p>
     <label class="col control-label">
         <span>Publish?</span>
-        <input type="checkbox" value="1" class="bootstrap-switch" id="publish"<%= 
-            tutorialQuiz.published ? ' checked' : '' %><%= disable ? ' disabled' : '' %>>
+        <input type="checkbox" value="1" class="bootstrap-switch" id="publish"<%= tutorialQuiz.published ? ' checked' : '' %>>
     </label>
     <label class="col control-label">
         <span>Active?</span> 
-        <input type="checkbox" value="1" class="bootstrap-switch" id="activate"<%= 
-            tutorialQuiz.active ? ' checked' : '' %><%= disable ? ' disabled' : '' %>>
+        <input type="checkbox" value="1" class="bootstrap-switch" id="activate"<%= tutorialQuiz.active ? ' checked' : '' %>>
     </label>
     <label class="col control-label">
         <span>Archive?</span>
-        <input type="checkbox" value="1" class="bootstrap-switch" id="archive"<%= 
-            tutorialQuiz.archived ? ' checked' : '' %><%= disable ? ' disabled' : '' %>>
+        <input type="checkbox" value="1" class="bootstrap-switch" id="archive"<%= tutorialQuiz.archived ? ' checked' : '' %>>
     </label>
 </p>
+<% } %>
 
 <h1>Groups</h1>
 
 <%- include ./messages %>
 
+<% if (!_.isEmpty(students)) { %>
 <p>
-    <button type="button" class="btn btn-default btn-sm" id="btn-refresh-groups"<%= disable ? 
-        ' disabled' : '' %>><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
-    <button type="button" class="btn btn-default btn-sm" id="btn-add-group"<%= disable ? 
-        ' disabled' : '' %>><span class="glyphicon glyphicon-plus"></span> Add group</button>
-    <button type="button" class="btn btn-default btn-sm btn-primary" id="btn-save-groups"<%= disable ? 
-        ' disabled' : '' %>><span class="glyphicon glyphicon-ok"></span> Save groups</button>
+    <button type="button" class="btn btn-default btn-sm" id="btn-refresh-groups"><span 
+        class="glyphicon glyphicon-refresh"></span> Refresh</button>
+    <button type="button" class="btn btn-default btn-sm" id="btn-add-group"><span 
+        class="glyphicon glyphicon-plus"></span> Add group</button>
+    <button type="button" class="btn btn-default btn-sm" id="btn-randomize-groups"><span 
+        class="glyphicon glyphicon-random"></span> Randomize groups</button>
+    <button type="button" class="btn btn-default btn-sm btn-primary" id="btn-save-groups"><span 
+        class="glyphicon glyphicon-ok"></span> Save groups</button>
 </p>
+<% } %>
 
 <table id="table-quiz-groups">
     <thead>
@@ -44,7 +47,7 @@
             <th rowspan="2" class="s">&nbsp;</th>
             <th colspan="<%= 1 + groups.length %>">Groups</th>
         </tr>
-        <% if (!disable) { %>
+        <% if (!_.isEmpty(students)) { %>
             <tr>
                 <th class="u">Unassigned</th>
                 <% _.each(groups, function (group) { %>
@@ -54,8 +57,8 @@
         <% } %>
     </thead>
     <tbody>
-    <% if (!disable) { %>
-        <% _.each(tutorial.students, function (student) { %>
+    <% if (!_.isEmpty(students)) { %>
+        <% _.each(students, function (student) { %>
             <tr>
                 <td class="s">
                     <a href="/admin/courses/<%= course.id %>/students/<%= student.id %>/marks"><%= student.name.full %></a>
@@ -65,7 +68,7 @@
                 </td>
                 <% _.each(groups, function (group) { %>
                     <td class="g"><input type="radio" name="groups[<%= student.id %>]" value="<%= group.id %>"<%=
-                        _.find(group.members, { id: student.id }) ? ' checked' : '' %>></td>
+                        _.find(group.members, { '_id' : student._id }) ? ' checked' : '' %>></td>
                 <% }) %>
             </tr>
         <% }) %>
@@ -97,8 +100,14 @@ $(function () {
         publish: '/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/publish',
         activate: '/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/activate',
         archive: '/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/archive',
+        generate: '/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups/generate',
         save: '/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups'
     };
+
+    var $table = $('#table-quiz-groups'),
+        $thead = $table.find('thead'),
+        $tbody = $table.find('tbody');
+
     // set option on quiz in tutorial
     $(':checkbox').on('switchChange.bootstrapSwitch', function (e, state) {
         $.ajax(url[this.id], {
@@ -109,11 +118,16 @@ $(function () {
             }
         });
     });
+    // refresh table
+    $('#btn-refresh-groups').click(function () {
+        window.location.reload(true);
+    });
+    // ramdomize table
+    $('#btn-randomize-groups').click(function () {
+        $table.load(url.generate + ' #' + $table[0].id + ' > *');
+    });
     // add new group to table
     $('#btn-add-group').click(function () {
-        var $table = $('#table-quiz-groups'),
-            $thead = $table.find('thead'),
-            $tbody = $table.find('tbody');
         // get next group #
         var numbers = [];
         $thead.find('tr:eq(1) th').each(function () {
@@ -139,22 +153,13 @@ $(function () {
     $('#btn-save-groups').click(function () {
         $.ajax(url.save, {
             type: 'put',
-            data: $('#table-quiz-groups :input').serialize(), 
+            data: $('#table-quiz-groups :radio').serialize(), 
             success: function (res) {
                 if (res.status) {
                     window.location.reload(true);
                 }
             }
         });
-    });
-    // refresh table
-    $('#btn-refresh-groups').click(function (e) {
-        e.preventDefault();
-        window.location.reload(true);
-    });
-    // mark students with no groups as unassigned
-    $('#table-quiz-groups tbody tr:not(:has(:checked))').each(function () {
-        $(this).find('.u :radio').prop('checked', true);
     });
 });
 </script>
