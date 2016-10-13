@@ -234,26 +234,38 @@ module.exports = function(io){
         models.TutorialQuiz.findById(data.quizId).exec()
         .then(function(tutQuiz){
             console.log('here1')
-            models.Group.update({ _id : { $in :  tutQuiz.groups } }, { $pull : { members : socket.request.user._id } }, { multi : true} ) // make sure user isn't in 2 groups
-            .exec()
-            .then(function(){
-              return models.Group.findByIdAndUpdate(data.newGroup, { $push : { members : socket.request.user._id } }, { new : true } ).exec() // add new group to TutQuiz 
+            if (tutQuiz.max.membersPerGroup){
+            models.Group.findById(data.newGroup).exec()
+            .then(function(gr){
+                if (gr.members.length >= tutQuiz.max.membersPerGroup){
+                    socket.emit('info', {message : 'This group already has the maximum number of members for this activity'});
+                    return false;
+                }
+                else return true;
             })
-            .then(function(group){
-                console.log('here2')
-                models.TutorialQuiz.findById(data.quizId).populate('groups').exec()
-                .then(function(populatedTQ){
-                    // console.log(populatedTQ);
-                    console.log('here3')
-                    socket.join('group:'+ data.newGroup);
-                    socket.emit('setGroup', data.newGroup)
-                    socket.emit('info', {message : 'Joined Group ' + group.name });
-                    emitters.emitToTutorialQuiz(tutQuiz._id, 'groupsUpdated', { groups : populatedTQ.groups })
-                    //  socket.emit('quizData', { quiz : tutQuiz, groupName : group.name, groupId: group._id }
+            .then(function(proceed){
+                if (!proceed) return;
+               models.Group.update({ _id : { $in :  tutQuiz.groups } }, { $pull : { members : socket.request.user._id } }, { multi : true} ) // make sure user isn't in 2 groups
+                .exec()
+                .then(function(){
+                  return models.Group.findByIdAndUpdate(data.newGroup, { $push : { members : socket.request.user._id } }, { new : true } ).exec() // add new group to TutQuiz 
                 })
-
-            })       
-        
+                .then(function(group){
+                    console.log('here2')
+                    models.TutorialQuiz.findById(data.quizId).populate('groups').exec()
+                    .then(function(populatedTQ){
+                        // console.log(populatedTQ);
+                        console.log('here3');
+                        socket.join('group:'+ data.newGroup);
+                        socket.emit('setGroup', data.newGroup)
+                        socket.emit('info', {message : 'Joined Group ' + group.name });
+                        emitters.emitToTutorialQuiz(tutQuiz._id, 'groupsUpdated', { groups : populatedTQ.groups })
+                        socket.emit('quizData', { userId : socket.request.user._id, quiz : populatedTQ, groupName : group.name, groupId: group._id });
+                    })
+    
+                })
+            })
+            }
         })
     })
     
@@ -281,7 +293,7 @@ module.exports = function(io){
                     socket.join('group:'+ group._id);
                     socket.emit('info', {message : 'Created and joined Group ' + group.name });
                     emitters.emitToTutorialQuiz(tutQuiz._id, 'groupsUpdated', { groups : populatedTQ.groups })
-                    //  socket.emit('quizData', { quiz : tutQuiz, groupName : group.name, groupId: group._id }
+                    socket.emit('quizData', { userId : socket.request.user._id, quiz : populatedTQ, groupName : group.name, groupId: group._id });
                 })
                     
                 }) // make sure user isn't in 2 groups

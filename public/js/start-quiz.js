@@ -11,21 +11,21 @@ socket.on('setGroup', function(id){
 })
 
 socket.on('quizData', function(tutorialQuiz){
-  console.log(tutorialQuiz)
-  quizData = tutorialQuiz.quiz;
+  quizData = quizData || tutorialQuiz.quiz;
   groupId = tutorialQuiz.groupId;
-  userId = tutorialQuiz.userId;
+  userId = userId || tutorialQuiz.userId;
   
-   if (quizData.allocateMembers == 'automatically'){
+   if (tutorialQuiz.groupName){
       $('#groupName').html(tutorialQuiz.groupName);
       $('#currentGroup').html(tutorialQuiz.groupName);
    }
-    else if (quizData.allocateMembers == 'self-selection') {
+   if (quizData.allocateMembers == 'self-selection') {
       renderGroups(tutorialQuiz.quiz.groups);
     }
   
   if (quizData.active){
-         $('#driverSelect').show();  
+        $('#groupSelfSelect').hide();
+        $('#driverSelect').show();  
   }
   
 })
@@ -118,6 +118,7 @@ function renderStars(question, empty, full, returnHTML){
 
 socket.on('quizActivated', function(tutQuiz){ // active = start questions
   quizData.active = tutQuiz.active;
+  $('#groupSelfSelect').hide();
   if (tutQuiz.active){
     $('#postQuiz').hide();
     swal('','The quiz is now active. Select a driver and proceed','info')
