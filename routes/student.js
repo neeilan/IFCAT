@@ -1,6 +1,8 @@
 var passport = require('passport'),
     router = require('express').Router(),
     models = require('../models');
+var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn();
+
 
 var controllers = require('../controllers');
 
@@ -20,7 +22,9 @@ router.post('/login', passport.authenticate('local-login', {
 }));
 
 router.post('/uteach-login', passport.authenticate('auth0', {
-    
+    successRedirect: '/student/courses',
+    failureRedirect: '/login',
+    failureFlash: true    
 }), function(req,res){
     res.redirect('/student/courses');
 });

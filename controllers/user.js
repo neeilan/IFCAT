@@ -24,7 +24,11 @@ exports.getUser = function (req, res, next, us3r) {
 
 // Retrieve student login form
 exports.getLoginForm = function (req, res) {
-    res.render('login', { 
+    var auth0Config =  require('../config/common').auth0;
+    res.render('login', {
+        domain : auth0Config.domain,
+        clientId : auth0Config.clientId,
+        callbackUrl : auth0Config.callbackUrl,
         title: 'Login'
     }); 
 };

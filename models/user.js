@@ -6,8 +6,7 @@ var UserSchema = new mongoose.Schema({
     local: {
         email: { 
             type: String,
-            lowercase: true,
-            unique: true
+            lowercase: true
         },
         password: String
     },
