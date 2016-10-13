@@ -1,5 +1,6 @@
 var passport = require('passport'),
-    router = require('express').Router();
+    router = require('express').Router(),
+    models = require('../models');
 
 var controllers = require('../controllers');
 
@@ -39,4 +40,6 @@ router.get('/courses', controllers.Student.getCourseList);
 router.get('/courses/:course/quizzes', controllers.Student.getQuizList);
 router.get('/courses/:course/quizzes/:tutorialQuiz/start', controllers.TutorialQuiz.startQuiz);
 
+
+router.get('/file/:id', controllers.File.getFileLinkById);
 module.exports = router;

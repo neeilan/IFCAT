@@ -73,3 +73,16 @@ exports.deleteFiles = function (req, res) {
         res.json({ status: true });
     });
 };
+
+// Retrieve a file by Id
+exports.getFileLinkById = function (req,res){
+    models.Course.findOne({ files : req.params.id }).exec()
+    .then(function(course){
+        models.File.findById(req.params.id).exec()
+        .then(function(file){
+            var fileUrl = '/upl/' + course._id + '/' + file.name;
+            res.redirect(fileUrl);
+        })      
+    })
+
+}
