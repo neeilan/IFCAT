@@ -1,0 +1,64 @@
+<%- include ./header -%>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
+  });
+</script>
+
+<div>
+    <!-- -->
+    <div class="col-xs-10 col-xs-offset-1"> 
+        <div class="centerText"><h4>You participated in this quiz as a member of Group <%=group%></h4></div>
+        <% _.each(quiz.questions, function (question) { %>
+            <div class = "well">
+                <h4>Question <%=question.number || '' %>:</h4>
+                <% if (question.useLaTeX) {%>
+                    <p class="tex2jax_process"><%= question.question %></p>
+                <% } else { %>
+                    <p><%= question.question %></p>
+                <% } %>
+                <h4>Choices:</h4>
+                <% if (question.useLaTeX) {%>
+                <ul class="tex2jax_process">
+                <% } else { %>
+                    <ul>
+                <% } %>
+                 <% _.each(question.choices, function (choice) { %>
+                    <li><%= choice %></li>
+                 <% }) %>
+                </ul>
+                <h4>Answer(s):</h4>
+                <ul>
+                 <% _.each(question.answers, function (answer) { %>
+                    <li><%= answer %></li>
+                 <% }) %>
+                 </ul>
+                 <br/>
+                 <% if(responses[question._id] && responses[question._id].correct) { %>
+                     <p>You answered this question correctly with <%= responses[question._id].attempts %> incorrect attempt(s), earning <%= responses[question._id].points %> point(s).</p>
+                 <% } else if (responses[question._id]) { %>
+                     <p>You did not answer this question correctly.</p>
+                 <% } else { %>
+                     <p>No response was recorded.</p>
+                 <% } %>
+                 <% if(question.files && question.files.length) { %>
+                    <h4>Attachments:</h4>
+                     <% _.each(question.files, function (file, i) { %>
+                        <li><a target="_blank" href="/student/file/<%= file %>"><%=(i+1)%></a></li>
+                     <% }) %>
+                <% } %>
+                 <% if(question.links && question.links.length) { %>
+                    <h4>Links:</h4>
+                     <% _.each(question.links, function (link, i) { %>
+                        <li><a target="_blank" href="<%= link %>"><%=(i+1)%></a></li>
+                     <% }) %>
+                <% } %>
+            </div>
+        <% }) %>
+    </div>
+    
+</div>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full"></script>
+
+<%- include ./body-js -%>
+<%- include ./footer -%>3.
