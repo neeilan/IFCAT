@@ -26,14 +26,14 @@
             </tr>
         </tfoot>
         <tbody>
-        <% for (var i = 0, len = responses.length; i < len; i++) { %>
+        <% _.each(responses, function (response) { %>
             <tr>
-                <td style="width: 10px;"><%= responses[i].question.number %>.</td>
-                <td style="max-width: 250px;"><%= responses[i].question.question %></td>
-                <td class="text-center"><%= responses[i].attempts %></td>
-                <td class="text-center"><%= responses[i].points %></td>
+                <td style="width: 10px;"><%= response.question.number %>.</td>
+                <td style="max-width: 250px;"><%= response.question.question %></td>
+                <td class="text-center"><%= response.attempts %></td>
+                <td class="text-center"><%= response.points %></td>
             </tr>
-        <% } %>
+        <% }) %>
         </tbody>
     <% } else { %>
         <tbody>

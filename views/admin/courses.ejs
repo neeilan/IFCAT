@@ -18,7 +18,12 @@
         </tr>
     </thead>
     <tbody>
-    <% if (!_.isEmpty(courses)) { %>
+    <% if (_.isEmpty(courses)) { %>
+        <tr>
+            <td colspan="5">No courses have been added yet. Click <a 
+                href="/admin/courses/new">here</a> to add a new course.</td>
+        </tr>
+    <% } else { %>
         <% _.each(courses, function (course) { %>
             <tr>
                 <td><%= course.code %></td>
@@ -69,8 +74,6 @@
                 </td>
             </tr>
         <% }) %>
-    <% } else { %>
-        <tr><td colspan="5"> No courses have been added yet.</td></tr>
     <% } %>
     </tbody>
 </table>

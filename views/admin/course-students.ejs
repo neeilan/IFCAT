@@ -4,11 +4,11 @@
 
 <%- include ./messages %>
 
-<a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-import-students">
-    <span class="glyphicon glyphicon-save"></span> Import students</a>
+<button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-import-students">
+    <span class="glyphicon glyphicon-save"></span> Import students</button>
 
-<a href="#find" class="btn btn-default btn-sm">
-    <span class="glyphicon glyphicon-user"></span> Find students</a>
+<button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-find">
+    <span class="glyphicon glyphicon-search"></span> Find students</button>
 
 <!-- Show current student. -->
 
@@ -17,28 +17,33 @@
         <tr>
             <th rowspan="2">UTORid</th>
             <th rowspan="2">Name</th>
-            <th rowspan="2">Email</th>
             <% if (!_.isEmpty(course.tutorials)) { %>
                 <th colspan="<%= course.tutorials.length %>" class="text-center">Tutorials</th>
             <% } %>
             <th rowspan="2"></th>
         </tr>
         <tr>
-        <% course.tutorials.forEach(function (tutorial) { %>
+        <% _.each(course.tutorials, function (tutorial) { %>
             <th class="text-center"><%= tutorial.number %></th>
         <% }) %>
         </tr>
     </thead>
     <tbody>
-    <% if (!_.isEmpty(course.students)) { %>
+    <% if (_.isEmpty(course.students)) { %>
+        <tr>
+            <td colspan="<%= 3 + course.tutorials.length %>">
+                No students have been added to the course yet. Click <a 
+                href="#" data-toggle="modal" data-target="#modal-find">here</a> to add students to the course.
+            </td>
+        </tr>
+    <% } else { %>
         <% _.each(course.students, function (student) { %>
             <tr>
                 <td><%= student.UTORid %></td>
                 <td><%= student.name.full %></td>
-                <td><%= student.local.email %></td>
                 <% _.each(course.tutorials, function (tutorial) { %>
                     <td class="text-center"><input type="radio" name="tutorial[<%= student.id %>]" 
-                        value="<%= tutorial.id %>"<%= tutorial.students.indexOf(student.id) !== -1 ? ' checked' : '' %>></td>
+                        value="<%= tutorial.id %>"<%= tutorial.hasStudent(student.id) ? ' checked' : '' %>></td>
                 <% }) %>
                 <td>
                     <div class="dropdown">
@@ -47,46 +52,22 @@
                         </button>
                         <ul class="dropdown-menu">
                         <% if (!_.isEmpty(course.tutorials)) { %>
-                            <li><a href="#" class="btn-update-user"
-                        data-url="/admin/courses/<%= course.id %>/students/<%= student.id %>">Update tutorial</a></li>
+                            <li><a href="/admin/courses/<%= course.id %>/students/<%= student.id %>" 
+                                class="btn-update-user">Update tutorial</a></li>
                             <li class="divider">
                         <% } %>
-                            <li><a href="#" class="btn-delete-user"
-                        data-url="/admin/courses/<%= course.id %>/students/<%= student.id %>">Remove from course</a></li>
+                            <li><a href="/admin/courses/<%= course.id %>/students/<%= student.id %>" 
+                                class="btn-delete-user">Remove from course</a></li>
                         </ul>
                     </div>
                 </td>
             </tr>
         <% }) %>
-    <% } else { %>
-        <tr><td colspan="<%= 4 + course.tutorials.length %>">No students have been added to the course yet.</td></tr>
     <% } %>
     </tbody>
 </table>
 
-<!-- Search student. -->
-
-<h1 id="find"><small>Find students</small></h1>
-
-<form id="form-search-user" action="/admin/courses/<%= course.id %>/students/search" method="get">
-    <div class="form-group">
-        <label class="col-md-3 control-label">Enter name (or leave blank)</label>
-        <div class="col-md-4">
-            <div class="row">
-                <div class="col-xs-10">
-                    <input type="text" name="q" value="" class="form-control input-sm">
-                </div>
-                <div class="col-xs-2">
-                    <input type="submit" value="Go" class="btn btn-primary btn-sm">
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
-
-<div id="search-user-results"></div>
-
 <%- include ./modals/import-students %>
-
-<%- include ./body-js -%>
-<%- include ./footer -%>
+<%- include ./modals/find-students %>
+<%- include ./body-js %>
+<%- include ./footer %>

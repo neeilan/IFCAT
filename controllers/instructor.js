@@ -15,9 +15,9 @@ exports.getInstructorListByCourse = function (req, res) {
 // Retrieve list of instructors matching search query
 exports.getInstructorListBySearchQuery = function (req, res) {
     models.User.findUsersBySearchQuery(req.query.q, 'instructor').exec(function (err, users) {
-        res.render('admin/course-instructors-search-results', { 
+        res.render('admin/tables/course-instructors-search-results', { 
             course: req.course, 
-            users: users 
+            instructors: users 
         });
     });
 };

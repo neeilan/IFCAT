@@ -7,19 +7,27 @@ var models = require('../models');
 // Retrieve list of students for course
 exports.getStudentListByCourse = function (req, res) { 
     req.course.withTutorials().withStudents().execPopulate().then(function (err) {
-        res.render('admin/course-students', { course: req.course });
+        res.render('admin/course-students', { 
+            course: req.course
+        });
     }); 
 };
 // Retrieve list of students matching search query
 exports.getStudentListBySearchQuery = function (req, res) {
     models.User.findUsersBySearchQuery(req.query.q, 'student').exec(function (err, users) {
-        res.render('admin/course-students-search-results', { course: req.course, users: users });
+        res.render('admin/tables/course-students-search-results', { 
+            course: req.course, 
+            students: users
+        });
     });
 };
 // Retrieve list of students for tutorial
 exports.getStudentsByTutorial = function (req, res) { 
     req.tutorial.withStudents().execPopulate().then(function () {
-        res.render('admin/tutorial-students', { course: req.course, tutorial: req.tutorial });
+        res.render('admin/tutorial-students', { 
+            course: req.course, 
+            tutorial: req.tutorial
+        });
     });
 };
 // Add student to course
@@ -91,11 +99,15 @@ exports.importStudents = function (req, res) {
                         if (!us3r) {
                             //console.log('new')
                             us3r = new models.User();
-                            us3r.UTORid = row.utorid;
-                            us3r.local.email = row.email;
-                            us3r.name.first = row.first;
-                            us3r.name.last = row.last;
-                            us3r.local.password = us3r.generateHash(row.password);
+                            us3r.UTORid = row.UTORid;
+                            us3r.name.first = row['First Name'];
+                            us3r.name.last = row['Last Name'];
+                            if (row.Email) {
+                                us3r.local.email = row.Email;
+                            }
+                            if (row.Password) {
+                                us3r.local.password = us3r.generateHash(row.Password);
+                            }
                         }
                         //console.log('add student role')
                         // mark them as student
@@ -118,10 +130,10 @@ exports.importStudents = function (req, res) {
                 // ugly: move student into tutorial if they are not already
                 function (us3r, done) {
                     async.eachSeries(req.course.tutorials, function (tutorial, done) {
-                        if (_.toInteger(tutorial.number) !== _.toInteger(row.tutorial)) {
-                            tutorial.deleteStudent(us3r.id);
-                        } else {
+                        if (_.toInteger(tutorial.number) === _.toInteger(row.Tutorial)) {
                             tutorial.addStudent(us3r.id);
+                        } else {
+                            tutorial.deleteStudent(us3r.id);
                         }
                         //console.log('move student into tutorial')
                         tutorial.save(done);

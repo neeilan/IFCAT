@@ -13,7 +13,7 @@ exports.getGroup = function (req, res, next, group) {
         if (!group) {
             return next(new Error('No group is found.'));
         }
-        console.log('got group');
+        //console.log('got group');
         req.group = group;
         next();
     });
@@ -21,9 +21,6 @@ exports.getGroup = function (req, res, next, group) {
 // Retrieve list of groups for tutorial
 exports.getGroupList = function (req, res) { 
     req.tutorialQuiz.withStudents().withGroups().execPopulate().then(function (err) {
-
-        console.log( req.tutorialQuiz.groups );
-
         res.render('admin/quiz-groups', {
             title: 'Groups',
             course: req.course, 
@@ -57,8 +54,6 @@ exports.generateGroupList = function (req, res) {
             };
         });
 
-        console.log( groups );
-
         res.render('admin/quiz-groups', {
             title: 'Groups',
             course: req.course, 
@@ -73,64 +68,48 @@ exports.generateGroupList = function (req, res) {
 // Create new group for tutorial
 exports.saveGroupList = function (req, res) { 
     // sort groups
-    var groups = {};
-    _.each(req.body.groups, function (groupId, studentId) {
-        if (!_.has(groups, groupId)) {
-            groups[groupId] = [];
-        }
-        groups[groupId].push(studentId);
-    });
-    // keep track of which groups were modified
-    var ids = [];
-    // update existing groups
-    async.eachOfSeries(groups, function (members, id, done) {
-        // skip unassigned groups
-        if (id === 'unassigned') {
-            done();
-        // create new group in tutorialQuiz
-        } else if (!isNaN(id)) {
-            models.Group.create({ name: id, members: members }, function (err, group) {
-                // mark group as modified
-                ids.push(group.id);
-                req.tutorialQuiz.groups.push(group.id);
-                req.tutorialQuiz.save(done);
-            });
-         // update existing group
-        } else if (mongoose.Types.ObjectId.isValid(id)) {
-            models.Group.findById(id, function (err, group) {
-                // mark group as modified
-                ids.push(group.id);
-                // check if changes are needed
-                if (_.isEqual(
-                        group.members.slice().sort().toString(), 
-                        members.slice().sort().toString()
-                    )) {
-                    done();
-                } else {
-                    group.members = members;
-                    group.save(done);
-                }
-            });
-        }
-    // delete members from other groups
-    }, function (err) {
-        models.Group.remove({ 
-            $and: [{
-                _id: {
-                    $nin: ids
-                }
-            }, {
-                _id: {
-                    $in: req.tutorialQuiz.groups
-                }
-            }]
-        }, function (err) {
-            if (err) {
-                req.flash('failure', 'Unable to save groups at this time.');
-            } else {
-                req.flash('success', 'The groups have been updated successfully.');
+    var newGroups = {};
+    _.each(req.body.groups, function (idName, studentId) {
+        if (idName !== 'unassigned') {
+            if (!newGroups.hasOwnProperty(idName)) {
+                newGroups[idName] = [];
             }
-            res.json({ status: true });
+            newGroups[idName].push(studentId);
+        }
+    });
+
+    //console.log('new',newGroups);
+
+    req.tutorialQuiz.withGroups().execPopulate().then(function () {
+        async.each(req.tutorialQuiz.groups, function (group, done) {
+            //console.log(req.tutorialQuiz.groups.length);
+            // update existing groups
+            if (newGroups.hasOwnProperty(group._id)) {
+                //console.log('updating', group._id);
+                group.members = newGroups[group._id];
+                delete newGroups[group._id];
+                group.save(done);
+            // delete existing groups
+            } else {
+                //console.log('deleting', group._id);
+                group.remove(function (err) {
+                    req.tutorialQuiz.groups.pull({ _id: group._id });
+                    req.tutorialQuiz.save(done);
+                });
+            }
+        }, function (err) {
+            //console.log('err1', err);
+            // add new groups
+            async.eachOfSeries(newGroups, function (members, name, done) {
+                //console.log('adding', name);
+                models.Group.create({ name: name, members: members }, function (err, group) {
+                    req.tutorialQuiz.groups.push(group);
+                    req.tutorialQuiz.save(done);
+                });
+            }, function (err) {
+                //console.log('err2', err);
+                res.json({ status: true });
+            });
         });
     });
 };

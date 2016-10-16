@@ -8,8 +8,8 @@
                 </div>
                 <div class="modal-body">
                     <p>This import will add new students into the course and their tutorials.</p>
-                    <p>The first row of the file <b>must</b> have the following cells (all in lowercase):<br>
-                        <b>utorid</b>, <b>email</b>, <b>first</b>, <b>last</b>, and optionally, <b>tutorial</b>.</p>
+                    <p>The first row of the file <b>must</b> have the following cells (case-sensitive):<br>
+                        <b>UTORid</b>, <b>First Name</b>, <b>Last Name</b>, and optionally, <b>Email</b>, <b>Password</b>, <b>Tutorial</b>.</p>
                     <p>If there are no tutorials matching the cell data, the student will not be added into a tutorial. Therefore, it is a good idea to <a href="/admin/courses/<%= course.id %>/tutorials" target="_blank">create the tutorials</a> before importing.</p>
                     <br>
                     <label class="control-label">Select the file (.csv)</label>&nbsp;&nbsp;

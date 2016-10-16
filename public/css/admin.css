@@ -8,7 +8,30 @@ textarea.form-control {
     max-width: 100%;
 }
 
+/* Find users styles */
 
+#modal-find form {
+    overflow: hidden;
+}
+#modal-find form * {
+    float: left;
+}
+#modal-find form label {
+    margin: 0;
+    padding: 5px 0;
+    width: 200px;
+}
+#modal-find form input[type=text] {
+    margin-right: 10px;
+    width: 300px;
+}
+#modal-find table {
+    margin: 15px 0 0;
+
+}
+#modal-find th, #modal-find td {
+    padding: 8px 0;
+}
 
 /* File listing styles */
 

@@ -13,16 +13,19 @@
             <th>Name</th>
             <th class="text-center"># of questions</th>
             <th></th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
-    <% if (!_.isEmpty(course.quizzes)) { %>
+    <% if (_.isEmpty(course.quizzes)) { %>
+        <tr>
+            <td colspan="3">No quizzes have been added yet. Click <a 
+                href="/admin/courses/<%= course.id %>/quizzes/new">here</a> to add a new quiz.</td>
+        </tr>
+    <% } else { %>
         <% _.each(course.quizzes, function (quiz) { %>
             <tr>
                 <td><%= quiz.name %></td>
                 <td class="text-center"><%= quiz.questions.length %></td>
-                <td></td>
                 <td>
                     <div class="dropdown">
                         <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
@@ -41,8 +44,6 @@
                 </td>
             </tr>
         <% }) %>
-    <% } else { %>
-        <tr><td colspan="4">No quizzes have been added yet.</td></tr>
     <% } %>
     </tbody>
 </table>

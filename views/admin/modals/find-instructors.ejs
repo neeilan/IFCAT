@@ -1,0 +1,19 @@
+<!-- find instructors modal -->
+<div class="modal fade" id="modal-find" tabindex="-1" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Find instructors</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/admin/courses/<%= course.id %>/instructors/search">
+                    <label>Enter name (or leave blank)</label>
+                    <input type="text" name="q" value="" class="form-control input-sm">
+                    <input type="submit" value="Go" class="btn btn-primary btn-sm">
+                </form>
+                <div></div>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% if (_.isEmpty(teachingAssistants)) { %>
+        <tr>
+            <td colspan="3">No teaching assistants were found matching the given query.</td>
+        </tr>
+    <% } else { %>
+        <% _.each(teachingAssistants, function (teachingAssistant) { %> 
+            <tr>
+                <td><%= teachingAssistant.name.full %></td>
+                <td><%= teachingAssistant.local.email %></td>
+                <td><a href="/admin/courses/<%= course.id %>/teaching-assistants/<%= teachingAssistant.id %>" 
+                    class="btn btn-default btn-sm btn-add-user">Add</a></td>
+            </tr>
+        <% }) %>
+    <% } %>
+    </tbody>
+</table>

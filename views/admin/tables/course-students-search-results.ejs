@@ -1,0 +1,25 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>UTORid</th>
+            <th>Name</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% if (_.isEmpty(students)) { %>
+        <tr>
+            <td colspan="3">No students were found matching the given query.</td>
+        </tr>
+    <% } else { %> 
+        <% _.each(students, function (student) { %>
+            <tr>
+                <td><%= student.UTORid %></td>
+                <td><%= student.name.full %></td>
+                <td><a href="/admin/courses/<%= course.id %>/students/<%= student.id %>"
+                    class="btn btn-default btn-sm btn-add-user">Add</a></td>
+            </tr>
+        <% }) %>
+    <% } %>
+    </tbody>
+</table>

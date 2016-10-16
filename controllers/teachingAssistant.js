@@ -15,9 +15,9 @@ exports.getTeachingAssistantListByCourse = function (req, res) {
 // Retrieve list of teaching assistants matching search query
 exports.getTeachingAssistantListBySearchQuery = function (req, res) {
     models.User.findUsersBySearchQuery(req.query.q, 'teachingAssistant').exec(function (err, users) {
-        res.render('admin/course-teaching-assistants-search-results', { 
+        res.render('admin/tables/course-teaching-assistants-search-results', { 
             course: req.course, 
-            users: users 
+            teachingAssistants: users 
         });
     });
 };

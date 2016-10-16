@@ -22,42 +22,35 @@
         <label class="col-sm-2 control-label">Roles</label>
         <div class="col-sm-8">
             <select name="roles" multiple class="form-control">
-            <% _.each([
-                    { text: 'Administrator', value: 'admin' },
-                    { text: 'Instructor', value: 'instructor' },
-                    { text: 'Teaching assistant', value: 'teachingAssistant' },
-                    { text: 'Student', value: 'student' }
-                ], function (role) { %>
-         
-                <option value="<%= role.value %>"<%= us3r.roles.indexOf(role.value) !== -1 ? 
-                    ' selected' : '' %>><%= role.text %></option>
-
-            <% }) %>
+                <option value="admin"<%= us3r.roles.indexOf('admin') !== -1 ? 
+                    ' selected' : '' %>>Administrator</option>
+                <option value="instructor"<%= us3r.roles.indexOf('instructor') !== -1 ? 
+                    ' selected' : '' %>>Instructor</option>
+                <option value="teachingAssistant"<%= us3r.roles.indexOf('teachingAssistant') !== -1 ? 
+                    ' selected' : '' %>>Teaching assistant</option>
+                <option value="student"<%= us3r.roles.indexOf('student') !== -1 ? 
+                    ' selected' : '' %>>Student</option>
             </select>
         </div>
     </div>
-
     <div class="form-group">
         <label class="col-sm-2 control-label">UTORid</label>
         <div class="col-sm-8">
             <input type="text" name="UTORid" value="<%= us3r.UTORid %>" class="form-control">   
         </div>
     </div>
-
     <div class="form-group">
         <label class="col-sm-2 control-label">Email</label>
         <div class="col-sm-8">
             <input type="text" name="local[email]" value="<%= us3r.local.email %>" class="form-control" autocomplete="off">   
         </div>
     </div>
-
     <div class="form-group">
         <label class="col-sm-2 control-label">Password</label>
         <div class="col-sm-8">
             <input type="password" name="local[password]" value="" class="form-control" autocomplete="off">   
         </div>
     </div>
-
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <a href="/admin/users" class="btn btn-default btn-sm">Cancel</a>

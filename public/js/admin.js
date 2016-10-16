@@ -14,51 +14,44 @@ $(function () {
     });
 
     // search users when form is submitted
-    $('#form-search-user').submit(function (e) {
+    $('#modal-find form').submit(function (e) {
         e.preventDefault();
-        $('#search-user-results').load(this.action, $(this).serialize());
+        var $form = $(this);
+            $form.next('div').load(this.action, $form.serialize());
     });
-
+    // add user to course when button is clicked
+    $('#modal-find').on('click', 'a', function (e) {
+        e.preventDefault();
+        $.post(this.href, function (res) {
+            if (res.status) {
+                window.location.reload(true);
+            }
+        });
+    });
     // update user in tutorials when button is clicked
-    $('.btn-update-user').click(function () {
-        var $tr = $(this).closest('tr');
-        // send request
-        $.ajax($(this).data('url'), {
+    $('.btn-update-user').click(function (e) {
+        e.preventDefault();
+        $.ajax(this.href, {
             type: 'put',
-            data: $tr.find(':input').serialize(),
+            data: $(this).closest('tr').find(':input').serialize(),
             success: function (res) {
                 if (res.status) {
                     window.location.reload(true);
                 }
-            },
-            dataType: 'json'
+            }
         });
     });
-
     // delete user from course when button is clicked
-    $('.btn-delete-user').click(function () {
-        var $tr = $(this).closest('tr');
-        // send request
-        $.ajax($(this).data('url'), {
+    $('.btn-delete-user').click(function (e) {
+        e.preventDefault();
+        $.ajax(this.href, {
             type: 'delete',
             success: function (res) {
                 if (res.status) {
                     window.location.reload(true);
                 }
-            },
-            dataType: 'json'
-        });
-    });
-
-    // add user to course when button is clicked
-    $('#search-user-results').on('click', '.btn-add-user', function () {
-        var $tr = $(this).closest('tr');
-        // send request
-        $.post($(this).data('url'), function (res) {
-            if (res.status) {
-                window.location.reload(true);
             }
-        }, 'json');
+        });
     });
 
     $('.btn-delete').click(function (e) {

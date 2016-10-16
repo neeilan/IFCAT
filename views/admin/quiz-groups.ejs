@@ -80,18 +80,6 @@
     </tbody>
 </table>
 
-<script type="text/template" id="panel-group-template">
-    <div class="panel panel-default" data-group-id="new">
-        <div class="panel-heading" data-parent="#panel-groups" data-target="#group-${ id }">
-            <h4 class="panel-title">New group</h4>
-            <a href="#" class="btn btn-defaut"><span class="glyphicon glyphicon-remove"></span> Delete Group</a>
-        </div>
-        <div id="group-${ id }" class="panel-collapse collapse in">
-            <div class="panel-body sortable"></div>
-        </div>
-    </div>
-</script>
-
 <%- include ./body-js -%>
 
 <script>
@@ -103,11 +91,6 @@ $(function () {
         generate: '/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups/generate',
         save: '/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups'
     };
-
-    var $table = $('#table-quiz-groups'),
-        $thead = $table.find('thead'),
-        $tbody = $table.find('tbody');
-
     // set option on quiz in tutorial
     $(':checkbox').on('switchChange.bootstrapSwitch', function (e, state) {
         $.ajax(url[this.id], {
@@ -120,14 +103,19 @@ $(function () {
     });
     // refresh table
     $('#btn-refresh-groups').click(function () {
-        window.location.reload(true);
+        var $table = $('#table-quiz-groups');
+        $table.load(window.location.href + ' #' + $table[0].id + ' > *');
     });
     // ramdomize table
     $('#btn-randomize-groups').click(function () {
+        var $table = $('#table-quiz-groups');
         $table.load(url.generate + ' #' + $table[0].id + ' > *');
     });
     // add new group to table
     $('#btn-add-group').click(function () {
+        var $table = $('#table-quiz-groups'),
+            $thead = $table.find('thead'),
+            $tbody = $table.find('tbody');
         // get next group #
         var numbers = [];
         $thead.find('tr:eq(1) th').each(function () {
