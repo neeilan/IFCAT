@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 var _ = require('lodash'),
     async = require('async');
 
@@ -67,8 +69,33 @@ exports.editFile = function (req, res) {
 };
 // Delete specific file for course
 exports.deleteFiles = function (req, res) {
-    async.eachSeries(req.body.files, function (id, done) {
-        models.File.findByIdAndRemove(id, done);
+    async.eachSeries(req.body.files, function (id, done) { 
+        models.File.findById(id, function (err, fil3) {
+            if (err) {
+                return done(err);
+            }
+            var path = 'public/upl/' + req.course.id + '/' + fil3.name;
+            // remove file from collection
+            fil3.remove(function (err) {
+                if (err) {
+                    return done(err);
+                }
+                // remove file from filesystem
+                fs.stat(path, function (err, stats) {
+                    if (err && err.code === 'ENOENT') {
+                        console.log('ENOENT', path);
+                        return done();
+                    } else if (err) {
+                        console.log('ERROR', err);
+                        return done(err);
+                    }
+                    if (stats.isFile()) {
+                        console.log('DEL', path);
+                        fs.unlink(path, done);
+                    }
+                });
+            });
+        });
     }, function (err) {
         res.json({ status: true });
     });
@@ -82,7 +109,6 @@ exports.getFileLinkById = function (req,res){
         .then(function(file){
             var fileUrl = '/upl/' + course._id + '/' + file.name;
             res.redirect(fileUrl);
-        })      
-    })
-
-}
+        });      
+    });
+};
