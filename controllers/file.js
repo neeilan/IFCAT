@@ -68,32 +68,24 @@ exports.editFile = function (req, res) {
     });
 };
 // Delete specific file for course
-exports.deleteFiles = function (req, res) {
-    async.eachSeries(req.body.files, function (id, done) { 
-        models.File.findById(id, function (err, fil3) {
+exports.deleteFiles = function (req, res, next) {
+    async.eachSeries(req.body.files, function (id, done) {
+        // remove file from collection
+        models.File.findByIdAndRemove(id, function (err, fil3) {
             if (err) {
-                return done(err);
+                return next(err);
             }
-            var path = 'public/upl/' + req.course.id + '/' + fil3.name;
-            // remove file from collection
-            fil3.remove(function (err) {
-                if (err) {
-                    return done(err);
+            var path = __dirname + '/../public/upl/' + req.course.id + '/' + fil3.name;
+            // remove file from filesystem
+            fs.stat(path, function (err, stats) {
+                if (err && err.code === 'ENOENT') {
+                    return done();
+                } else if (err) {
+                    return next(err);
                 }
-                // remove file from filesystem
-                fs.stat(path, function (err, stats) {
-                    if (err && err.code === 'ENOENT') {
-                        console.log('ENOENT', path);
-                        return done();
-                    } else if (err) {
-                        console.log('ERROR', err);
-                        return done(err);
-                    }
-                    if (stats.isFile()) {
-                        console.log('DEL', path);
-                        fs.unlink(path, done);
-                    }
-                });
+                if (stats.isFile()) {
+                    fs.unlink(path, done);
+                }
             });
         });
     }, function (err) {

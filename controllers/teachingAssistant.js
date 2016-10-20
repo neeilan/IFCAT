@@ -21,6 +21,28 @@ exports.getTeachingAssistantListBySearchQuery = function (req, res) {
         });
     });
 };
+// Update list of teaching assistants for course
+exports.editTeachingAssistantList = function (req, res) {
+    var tutorials = req.body.tutorials || {};
+    // save
+    req.course.withTutorials().execPopulate().then(function (err) {
+        async.eachSeries(req.course.tutorials, function (tutorial, done) {
+            var newAssistants = [];
+            if (tutorials.hasOwnProperty(tutorial.id)) {
+                newAssistants = tutorials[tutorial.id]; 
+            }
+            // check if changes were made
+            if (_.difference(tutorial.teachingAssistants, newAssistants)) {
+                tutorial.teachingAssistants = newAssistants;
+                tutorial.save(done);
+            } else {
+                done();
+            }
+        }, function (err) {
+            res.json({ status: true });
+        });
+    });
+};
 // Add teaching assistant to course
 exports.addTeachingAssistant = function (req, res) {
     req.course.addTeachingAssistant(req.us3r.id);
