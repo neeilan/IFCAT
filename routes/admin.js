@@ -58,7 +58,7 @@ router.get('/login', controllers.User.getAdminLoginForm);
 
 router.post('/login', passport.authenticate('local-login', {
     successRedirect: '/admin/courses',
-    failureRedirect: '/login',
+    failureRedirect: '/admin/login',
     failureFlash: true
 }));
 
@@ -107,7 +107,7 @@ router.use(function (req, res, next) {
 
 router.get('/logout', controllers.User.logout);
 
-router.get('/courses/generate', controllers.Course.generateData);
+//router.get('/courses/generate', controllers.Course.generateData);
 
 router.get('/courses', controllers.Course.getCourseList);
 router.get('/courses/new', controllers.Course.getCourseForm);

@@ -25,7 +25,7 @@ router.post('/uteach-login', passport.authenticate('auth0', {
     successRedirect: '/student/courses',
     failureRedirect: '/login',
     failureFlash: true    
-}), function(req,res){
+}), function(req,res) {
     res.redirect('/student/courses');
 });
 

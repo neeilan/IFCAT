@@ -5,7 +5,6 @@ var LocalStrategy = require('passport-local').Strategy,
 var User = require('../models').User;
 
 passport.serializeUser(function (user, done) {
-    console.log(user)
     done(null, user.id);
 });
 
@@ -49,8 +48,7 @@ function (req, email, password, done) {
 passport.use('local-login', new LocalStrategy({
     usernameField: 'email',
     passReqToCallback : true
-}, 
-function (req, email, password, done) {
+}, function (req, email, password, done) {
     User.findOne({ 'local.email': email }, function (err, user) {
         if (err) {
             return done(err);
@@ -72,7 +70,7 @@ var strategy = new Auth0Strategy({
     clientID:     auth0Config.clientId,
     clientSecret: auth0Config.clientSecret,
     callbackURL:  auth0Config.callbackUrl || 'http://localhost:3000/callback'
-  }, function(accessToken, refreshToken, extraParams, profile, done) {
+}, function(accessToken, refreshToken, extraParams, profile, done) {
     // accessToken is the token to call Auth0 API (not needed in the most cases)
     // extraParams.id_token has the JSON Web Token
     // profile has all the information from the user
@@ -80,7 +78,7 @@ var strategy = new Auth0Strategy({
     .exec()
     .then(function(user){
         if (!user){
-            var user = new User();
+            user = new User();
             user.UTORid = profile._json.UTORid;
             user.name.first = profile._json.firstName;
             user.name.last = profile._json.lastName;
@@ -93,18 +91,17 @@ var strategy = new Auth0Strategy({
             .catch(function(e){
                 console.log(e);
                 return done(e);
-            })
-        }
-        else{
-        console.log(user);
-        done(null, user);
+            });
+        } else {
+            console.log(user);
+            done(null, user);
         }
     })
     .catch(function(e){
         return done(e);
-    })
-    
-  });
+    });
+});
+
 passport.use(strategy);
 
 module.exports = passport;

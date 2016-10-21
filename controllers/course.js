@@ -36,8 +36,8 @@ exports.getCourseList = function (req, res) {
             }
         ], function (err, results) {
             res.render('admin/courses', { 
-                'instructor.courses': results[0],
-                'teachingAssistant.courses': results[1] 
+                title: 'Courses',
+                courses: _.union(results[0], results[1])
             });
         });
     }
@@ -84,7 +84,7 @@ exports.deleteCourse = function (req, res) {
 
 // FOR TEST PURPOSES ONLY
 
-exports.generateData = function (req, res) {
+/*exports.generateData = function (req, res) {
     var course, 
         tutorial, 
         quiz,
@@ -219,4 +219,4 @@ exports.generateData = function (req, res) {
     ], function (done) {
         res.redirect('/admin/courses');
     });
-};
+};*/
