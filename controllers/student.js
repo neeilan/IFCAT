@@ -81,7 +81,7 @@ exports.deleteStudent = function (req, res) {
     });  
 };
 // Import list of students
-exports.importStudents = function (req, res) {
+exports.importStudentList = function (req, res) {
     // read spreadsheet
     csv.parse(req.file.buffer.toString(), {
         columns: true,
@@ -89,27 +89,45 @@ exports.importStudents = function (req, res) {
         skip_empty_lines: true
     }, function (err, rows) {
         async.eachSeries(rows, function (row, done) {
+            // normalize properties
+            _.each(_.keys(row), function (key) {
+                if (/^utorid/i.test(key)) {
+                    row.UTORid = row[key];
+                } else if (/^first/i.test(key)) {
+                    row.first = row[key];
+                } else if (/^last/i.test(key)) {
+                    row.last = row[key];
+                } else if (/^e\-?mail/i.test(key)) {
+                    row.email = row[key];
+                } else if (/^password/i.test(key)) {
+                    row.password = row[key];
+                } else if (/^tutorial/i.test(key)) {
+                    row.tutorial = row[key];
+                }
+            });
             async.waterfall([
                 // add student if they do not already exist
-                function (done) {
-                    //console.log('find')
+                function (done) {     
                     // check if user exist already with UTORid
-                    models.User.findUserByUTOR(row.utorid).then(function (us3r) {
+                    models.User.findUserByUTOR(row.UTORid).then(function (us3r) {
                         // if user does not already exist, create them
                         if (!us3r) {
-                            //console.log('new')
                             us3r = new models.User();
                             us3r.UTORid = row.UTORid;
-                            us3r.name.first = row['First Name'];
-                            us3r.name.last = row['Last Name'];
-                            if (row.Email) {
-                                us3r.local.email = row.Email;
-                            }
-                            if (row.Password) {
-                                us3r.local.password = us3r.generateHash(row.Password);
-                            }
                         }
-                        //console.log('add student role')
+                        // update fields
+                        if (row.first) {
+                            us3r.name.first = row.first;
+                        }
+                        if (row.last) {
+                            us3r.name.last = row.last;
+                        }
+                        if (row.email) {
+                            us3r.local.email = row.email;
+                        }
+                        if (row.password) {
+                            us3r.local.password = us3r.generateHash(row.password);
+                        }
                         // mark them as student
                         us3r.addRole('student');
                         us3r.save(function (err) {
@@ -130,7 +148,7 @@ exports.importStudents = function (req, res) {
                 // ugly: move student into tutorial if they are not already
                 function (us3r, done) {
                     async.eachSeries(req.course.tutorials, function (tutorial, done) {
-                        if (_.toInteger(tutorial.number) === _.toInteger(row.Tutorial)) {
+                        if (_.toInteger(tutorial.number) === _.toInteger(row.tutorial)) {
                             tutorial.addStudent(us3r.id);
                         } else {
                             tutorial.deleteStudent(us3r.id);
@@ -146,11 +164,40 @@ exports.importStudents = function (req, res) {
         }, function (err) {
             //console.log('done all')
             if (err) {
-                req.flash('failure', 'An error occurred while trying to import students.');
+                req.flash('failure', 'An error occurred while trying to import students. ' + err);
             } else {
                 req.flash('success', 'The students have been imported successfully.');
             }
             res.redirect('/admin/courses/' + req.course.id + '/students');
+        });
+    });
+};
+
+exports.editStudentList = function (req, res) {
+    var tutorials = {};
+    // group user IDs by tutorial IDs
+    _.each(req.body.tutorials, function (id, userId) {
+        if (!tutorials.hasOwnProperty(id)) {
+            tutorials[id] = [];
+        }
+        tutorials[id].push(userId);
+    });
+    // save
+    req.course.withTutorials().execPopulate().then(function (err) {
+        async.eachSeries(req.course.tutorials, function (tutorial, done) {
+            var newStudents = [];
+            if (tutorials.hasOwnProperty(tutorial.id)) {
+                newStudents = tutorials[tutorial.id]; 
+            }
+            // check if changes were made
+            if (_.difference(tutorial.students, newStudents)) {
+                tutorial.students = newStudents;
+                tutorial.save(done);
+            } else {
+                done();
+            }
+        }, function (err) {
+            res.json({ status: true });
         });
     });
 };

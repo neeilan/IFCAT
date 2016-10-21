@@ -18,6 +18,16 @@ exports.getResponseList = function (req, res) {
             return sum + response.points;
         }, 0);
 
+        // var teachingPoints = {};
+        // _.each(req.group.teachingPoints, function(recipient){
+        //     if (!(recipient in teachingPoints)){
+        //         teachingPoints[recipient] = 1;
+        //     }
+        //     else {
+        //         teachingPoints[recipient]++;
+        //     }
+        // })
+        
         res.render('admin/group-responses', { 
             course: req.course,
             tutorialQuiz: req.tutorialQuiz,

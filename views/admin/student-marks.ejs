@@ -2,6 +2,7 @@
 
 <h1><%= course.code + ' - ' + course.name %><br>
 <small><%= student.name.full %> - Marks</h1>
+<small><%= teachingPoints %> - Teaching points received</h1>
 
 <table class="table table-striped">
     <thead>
@@ -9,6 +10,7 @@
             <th>Quiz</th>
             <th>Group</th>
             <th class="text-center">Points awarded</th>
+            <th class="text-center">Teaching points received</th>
         </tr>
     </thead>
     <% if (!_.isEmpty(marks)) { %>
@@ -16,6 +18,12 @@
             <tr class="total-points">
                 <th colspan="2" style="text-align: right">Total Points</th>
                 <th class="text-center"><%= totalPoints %></th>
+            </tr>
+        </tfoot>
+        <tfoot>
+            <tr class="total-points">
+                <th colspan="2" style="text-align: right">Total Teaching Pts</th>
+                <th class="text-center"><%= totalTeachingPoints %></th>
             </tr>
         </tfoot>
         <tbody>
@@ -26,6 +34,8 @@
                     <a href="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= mark.tutorialQuiz.id %>/groups/<%= mark.group.id %>/responses">Group <%= mark.group.name %></a>       
                 </td>
                 <td class="text-center"><%= mark.points %></td>
+                <td class="text-center"><%= mark.teachingPoints %></td>
+
             </tr>
         <% }) %>
         </tbody>
