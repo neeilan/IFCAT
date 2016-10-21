@@ -1,8 +1,8 @@
 <%- include ./header -%>
 
 <h1><%= course.code + ' - ' + course.name %><br>
-<small><%= student.name.full %> - Marks</h1>
-<small><%= teachingPoints %> - Teaching points received</h1>
+<small><%= student.name.full %> - Marks</small></h1>
+<small><%= totalTeachingPoints %> total teaching points received</small>
 
 <table class="table table-striped">
     <thead>
@@ -16,13 +16,8 @@
     <% if (!_.isEmpty(marks)) { %>
         <tfoot>
             <tr class="total-points">
-                <th colspan="2" style="text-align: right">Total Points</th>
+                <th colspan="2" style="text-align: right">Total</th>
                 <th class="text-center"><%= totalPoints %></th>
-            </tr>
-        </tfoot>
-        <tfoot>
-            <tr class="total-points">
-                <th colspan="2" style="text-align: right">Total Teaching Pts</th>
                 <th class="text-center"><%= totalTeachingPoints %></th>
             </tr>
         </tfoot>

@@ -232,6 +232,7 @@ exports.getQuizList = function (req, res) {
     });
 };
 // 
+
 exports.getMarks = function (req, res) {
     req.course.withTutorials().execPopulate().then(function () {
         // find tutorials that student is in
@@ -256,7 +257,8 @@ exports.getMarks = function (req, res) {
             }]).exec(function (err, tutorialQuizzes) {
                 // ugly: find marks by student
                 var marks = _.map(tutorialQuizzes, function (tutorialQuiz) {
-                    return {
+                    // teaching points
+                    var result = {
                         tutorialQuiz: tutorialQuiz,
                         group: _.find(tutorialQuiz.groups, function (group) {
                             return group.members.indexOf(req.us3r.id) !== -1;
@@ -268,10 +270,21 @@ exports.getMarks = function (req, res) {
                             return sum;
                         }, 0)
                     };
+                    
+                    result.teachingPoints = (result.group.teachingPoints.reduce(function(sum, recipient){
+                        if (recipient === req.us3r.id)
+                            sum ++;
+                        return sum;
+                    }, 0))/2
+                    
+                    return result;
                 });
                 // tally the points
                 var totalPoints = _.reduce(marks, function (sum, mark) {
                     return sum + mark.points;
+                }, 0);
+                 var totalTeachingPoints = _.reduce(marks, function (sum, mark) {
+                    return sum + mark.teachingPoints;
                 }, 0);
 
                 res.render('admin/student-marks', {
@@ -279,7 +292,8 @@ exports.getMarks = function (req, res) {
                     course: req.course,
                     tutorial: tutorial,
                     marks: marks,
-                    totalPoints: totalPoints
+                    totalPoints: totalPoints,
+                    totalTeachingPoints : totalTeachingPoints
                 });
             });
         }
