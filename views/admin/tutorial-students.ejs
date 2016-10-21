@@ -19,7 +19,11 @@
         </tr>
     </tfoot>
     <tbody>
-    <% if (!_.isEmpty(tutorial.students)) { %>
+    <% if (_.isEmpty(tutorial.students)) { %>
+        <tr>
+            <td colspan="3">No students have been added to this tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students</a> into the tutorial.</td>
+        </tr>
+    <% } else { %>  
         <% _.each(tutorial.students, function (student, i) { %>
             <tr>
                 <td><%= student.name.full %></td>
@@ -36,10 +40,6 @@
                 </th>
             </tr>
         <% }) %>
-    <% } else { %>
-        <tr>
-            <td colspan="3">No students have been added to this tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students</a> into the tutorial.</td>
-        </tr>
     <% } %>
     </tbody>
 </table>

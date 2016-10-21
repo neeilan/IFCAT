@@ -24,21 +24,5 @@
 
 </form>
 
-<h3>Add multiple tutorials</h3>
-
-<form action="/admin/courses/<%= course.id %>/tutorials" method="post">
-
-    <div class="form-inline">
-        <label class="control-label">Add</label>
-        <input type="number" name="number" value="<%= tutorial.number %>" min="1" class="form-control" 
-            style="margin: 0 10px; width: 70px">
-        <label class="control-label">tutorials starting from</label>
-        <input type="number" name="number" value="<%= tutorial.number %>" min="1" class="form-control" maxlength="4" 
-            style="margin: 0 10px; width: 70px">
-        <button type="submit" class="btn btn-primary btn-sm">Go</button>
-    </div>
-
-</form>
-
 <%- include ./body-js -%>
 <%- include ./footer -%>

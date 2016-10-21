@@ -23,7 +23,9 @@
         </tr>
     </thead>
     <tbody>
-    <% if (!_.isEmpty(course.files)) { %>
+    <% if (_.isEmpty(course.files)) { %> 
+        <tr><td colspan="4">No files have been added yet.</td></tr>
+    <% } else { %>  
         <% _.each(course.files, function (file) { %>
             <tr>
                 <td><input type="checkbox" name="files[]" value="<%= file.id %>"></td>
@@ -41,8 +43,6 @@
                 <td><%= moment(file.createdAt).format(dateFormat) %></td>
             </tr>
         <% }) %>
-    <% } else { %>
-        <tr><td colspan="4">No files have been added yet.</td></tr>
     <% } %>
     </tbody>
 </table>

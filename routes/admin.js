@@ -117,6 +117,7 @@ router.put('/courses/:course', controllers.Course.editCourse);
 router.delete('/courses/:course', controllers.Course.deleteCourse);
 
 router.get('/courses/:course/tutorials', controllers.Tutorial.getTutorialList);
+router.post('/courses/:course/tutorials/generate', controllers.Tutorial.addTutorialList);
 router.get('/courses/:course/tutorials/new', controllers.Tutorial.getTutorialForm);
 router.get('/courses/:course/tutorials/:tutorial/edit', controllers.Tutorial.getTutorialForm);
 router.post('/courses/:course/tutorials', controllers.Tutorial.addTutorial);

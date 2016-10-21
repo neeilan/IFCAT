@@ -57,7 +57,11 @@
         <% } %>
     </thead>
     <tbody>
-    <% if (!_.isEmpty(students)) { %>
+    <% if (_.isEmpty(students)) { %>
+        <tr>
+            <td colspan="2">No students have been added into the tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students into tutorial.</td>
+        </tr>
+    <% } else { %>
         <% _.each(students, function (student) { %>
             <tr>
                 <td class="s">
@@ -72,10 +76,6 @@
                 <% }) %>
             </tr>
         <% }) %>
-    <% } else { %>
-        <tr>
-            <td colspan="2">No students have been added into the tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students into tutorial.</td>
-        </tr>
     <% } %>
     </tbody>
 </table>
