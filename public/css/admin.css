@@ -9,7 +9,7 @@ textarea.form-control {
 }
 
 .stretch {
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 .container > .table,
 .container > .stretch .table {

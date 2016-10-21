@@ -18,9 +18,7 @@
         <thead>
             <tr>
                 <th rowspan="2">Name</th>
-                <% if (!_.isEmpty(course.tutorials)) { %>
-                    <th colspan="<%= course.tutorials.length %>">Tutorials</th>
-                <% } %>
+                <th colspan="<%= course.tutorials.length ? course.tutorials.length : 1 %>">Tutorials</th>
                 <th rowspan="2" style="width: 100px"></th>
             </tr>
             <tr>
@@ -41,10 +39,14 @@
             <% _.each(course.teachingAssistants, function (assistant) { %>
                 <tr>
                     <td><%= assistant.name.full %></td>
-                    <% _.each(course.tutorials, function (tutorial) { %>
-                        <td class="text-center"><input type="checkbox" name="tutorials[<%= tutorial.id %>]" 
-                            value="<%= assistant.id %>"<%= tutorial.hasTeachingAssistant(assistant.id) ? ' checked' : '' %>></td>
-                    <% }) %>
+                    <% if (_.isEmpty(course.tutorials)) { %>
+                        <td>&nbsp;</td>
+                    <% } else { %>
+                        <% _.each(course.tutorials, function (tutorial) { %>
+                            <td class="text-center"><input type="checkbox" name="tutorials[<%= tutorial.id %>]" 
+                                value="<%= assistant.id %>"<%= tutorial.hasTeachingAssistant(assistant.id) ? ' checked' : '' %>></td>
+                        <% }) %>
+                    <% } %>
                     <td><a href="/admin/courses/<%= course.id %>/teaching-assistants/<%= assistant.id %>" 
                             class="btn btn-danger btn-sm btn-delete-user"><span 
                             class="glyphicon glyphicon-remove"></span> Remove</a></td>
