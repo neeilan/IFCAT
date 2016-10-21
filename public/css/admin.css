@@ -8,10 +8,15 @@ textarea.form-control {
     max-width: 100%;
 }
 
-.table {
+.stretch {
+    overflow-x: scroll;
+}
+.container > .table,
+.container > .stretch .table {
     width: auto;
     min-width: 700px;
 }
+
 /* Find users styles */
 
 #modal-find form {
