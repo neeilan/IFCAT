@@ -4,65 +4,76 @@
 
 <%- include ./messages %>
 
-<button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-find">
-    <span class="glyphicon glyphicon-search"></span> Find teaching assistants</button>
+<div class="actions">
+    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-find">
+        <span class="glyphicon glyphicon-search"></span> Find teaching assistants</button>
+    <button type="button" class="btn btn-primary btn-sm" id="btn-update">
+        <span class="glyphicon glyphicon-ok"></span> Update tutorials</button>
+</div>
 
 <!-- Show current TAs -->
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th rowspan="2">Name</th>
-            <th rowspan="2">Email</th>
-            <% if (!_.isEmpty(course.tutorials)) { %>
-                <th colspan="<%= course.tutorials.length %>" class="text-center">Tutorials</th>
-            <% } %>
-            <th rowspan="2"></th>
-        </tr>
-        <tr>
-        <% _.each(course.tutorials, function (tutorial) { %>
-            <th class="text-center"><%= tutorial.number %></th>
-        <% }) %>
-        </tr>
-    </thead>
-    <tbody>
-    <% if (_.isEmpty(course.teachingAssistants)) { %>
-        <tr>
-            <td colspan="<%= 3 + course.tutorials.length %>">
-                No teaching assistants have been added to the course yet. Click <a 
-                href="#" data-toggle="modal" data-target="#modal-find">here</a> to add teaching assistants to the course.
-            </td>
-        </tr>
-    <% } else { %>
-        <% _.each(course.teachingAssistants, function (teachingAssistant) { %>
+<div class="stretch">
+    <table class="table table-striped">
+        <thead>
             <tr>
-                <td><%= teachingAssistant.name.full %></td>
-                <td><%= teachingAssistant.local.email %></td>
-                <% _.each(course.tutorials, function (tutorial) { %>
-                    <td class="text-center"><input type="checkbox" name="tutorials[]" value="<%= tutorial.id %>"<%= 
-                        tutorial.hasTeachingAssistant(teachingAssistant.id) ? ' checked' : '' %>></td>
-                <% }) %>
-                <td>
-                    <div class="dropdown">
-                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                            Actions<span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu">
-                        <% if (!_.isEmpty(course.tutorials)) { %>
-                            <li><a href="/admin/courses/<%= course.id %>/teaching-assistants/<%= teachingAssistant.id %>" 
-                                class="btn-update-user">Update tutorials</a></li>
-                        <% } %>
-                            <li><a href="/admin/courses/<%= course.id %>/teaching-assistants/<%= teachingAssistant.id %>"
-                                class="btn-delete-user">Remove from course</a></li>
-                        </ul>
-                    </div>
+                <th rowspan="2">Name</th>
+                <th colspan="<%= course.tutorials.length ? course.tutorials.length : 1 %>">Tutorials</th>
+                <th rowspan="2" style="width: 100px"></th>
+            </tr>
+            <tr>
+            <% _.each(course.tutorials, function (tutorial) { %>
+                <th class="text-center"><%= tutorial.number %></th>
+            <% }) %>
+            </tr>
+        </thead>
+        <tbody>
+        <% if (_.isEmpty(course.teachingAssistants)) { %>
+            <tr>
+                <td colspan="<%= 2 + course.tutorials.length %>">
+                    No teaching assistants have been added to the course yet. Click <a 
+                    href="#" data-toggle="modal" data-target="#modal-find">here</a> to add teaching assistants to the course.
                 </td>
             </tr>
-        <% }) %>
-    <% } %>
-    </tbody>
-</table>
+        <% } else { %>
+            <% _.each(course.teachingAssistants, function (assistant) { %>
+                <tr>
+                    <td><%= assistant.name.full %></td>
+                    <% if (_.isEmpty(course.tutorials)) { %>
+                        <td>&nbsp;</td>
+                    <% } else { %>
+                        <% _.each(course.tutorials, function (tutorial) { %>
+                            <td class="text-center"><input type="checkbox" name="tutorials[<%= tutorial.id %>]" 
+                                value="<%= assistant.id %>"<%= tutorial.hasTeachingAssistant(assistant.id) ? ' checked' : '' %>></td>
+                        <% }) %>
+                    <% } %>
+                    <td><a href="/admin/courses/<%= course.id %>/teaching-assistants/<%= assistant.id %>" 
+                            class="btn btn-danger btn-sm btn-delete-user"><span 
+                            class="glyphicon glyphicon-remove"></span> Remove</a></td>
+                </tr>
+            <% }) %>
+        <% } %>
+        </tbody>
+    </table>
+</div>
 
 <%- include ./modals/find-teaching-assistants %>
 <%- include ./body-js -%>
+
+<script>
+$(function () {
+    $('#btn-update').click(function () {
+        $.ajax(window.location.href, {
+            type: 'put',
+            data: $(':checkbox').serialize(),
+            success: function (res) {
+                if (res.status) {
+                    window.location.reload(true);
+                }
+            }
+        })
+    });
+});
+</script>
+
 <%- include ./footer -%>

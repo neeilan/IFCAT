@@ -21,7 +21,11 @@
             <th></th>
         </tr>
     </thead>
-    <% if (!_.isEmpty(quiz.questions)) { %>
+    <% if (_.isEmpty(quiz.questions)) { %>
+        <tbody>
+            <tr><td colspan="5">No questions have been added yet.</td></tr> 
+        </tbody>
+    <% } else { %>
         <tbody class="sortable">
         <% _.each(quiz.questions, function (question, i) { %>
             <tr>
@@ -47,10 +51,6 @@
                 </td>
             </tr>
         <% }) %>
-        </tbody>
-    <% } else { %>
-        <tbody>
-            <tr><td colspan="5">No questions have been added yet.</td></tr> 
         </tbody>
     <% } %>
 </table>

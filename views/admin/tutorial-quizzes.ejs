@@ -12,7 +12,11 @@
         </tr>
     </thead>
     <tbody>
-    <% if (!_.isEmpty(tutorialQuizzes)) { %>
+    <% if (_.isEmpty(tutorialQuizzes)) { %>
+        <tr>
+            <td colspan="2">No quizzes have been added for this tutorial yet. Click <a href="/admin/courses/<%= course.id %>/quizzes/">here</a> to add  quizzes</a> into the tutorial.</td>
+        </tr>
+    <% } else { %>
         <% _.each(tutorialQuizzes, function (tutorialQuiz) { %>
             <tr>
                 <td><%= tutorialQuiz.quiz.name %></td>
@@ -29,10 +33,6 @@
                 </td>
             </tr>
         <% }) %>
-    <% } else { %>
-        <tr>
-            <td colspan="2">No quizzes have been added for this tutorial yet. Click <a href="/admin/courses/<%= course.id %>/quizzes/">here</a> to add  quizzes</a> into the tutorial.</td>
-        </tr>
     <% } %>
     </tbody>
 </table>

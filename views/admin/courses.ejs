@@ -4,8 +4,10 @@
 
 <%- include ./messages %>
 
-<a href="/admin/courses/new" class="btn btn-default btn-sm"><span 
-    class="glyphicon glyphicon-plus"></span> Add New Course</a>
+<div class="actions">
+    <a href="/admin/courses/new" class="btn btn-default btn-sm"><span 
+        class="glyphicon glyphicon-plus"></span> Add New Course</a>
+</div>
 
 <table class="table table-striped">
     <thead>
@@ -13,14 +15,13 @@
             <th>Code</th>
             <th>Name</th>
             <th>Instructors</th>
-            <th>Tutorials (TAs)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
     <% if (_.isEmpty(courses)) { %>
         <tr>
-            <td colspan="5">No courses have been added yet. Click <a 
+            <td colspan="4">No courses have been added yet. Click <a 
                 href="/admin/courses/new">here</a> to add a new course.</td>
         </tr>
     <% } else { %>
@@ -33,19 +34,6 @@
                     <div><%= instructor.name.full %></div>
                 <% }) %>
                 </td>
-                <td class="tutorial">
-                <% _.each(course.tutorials, function (tutorial) { %>
-                    <div>
-                        <span class="number"><%= 'TUT ' + tutorial.number %></span>
-                    <% if (tutorial.teachingAssistants.length) { %>
-                        <span class="teaching-assistants"><%=  
-                            '(' + _.map(tutorial.teachingAssistants, function (teachingAssistant) { 
-                                return teachingAssistant.name.full; 
-                            }).join(', ') + ')'
-                        %></span>
-                    <% } %>
-                    </div>
-                <% }) %>
                 <td>
                     <div class="dropdown">
                         <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">

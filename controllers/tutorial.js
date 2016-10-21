@@ -26,6 +26,43 @@ exports.getTutorialList = function (req, res) {
         });
     });
 };
+// Add multiple tutorials for course
+exports.addTutorialList = function (req, res) {
+    var len = Math.abs(_.toInteger(req.body.len)),
+        start = Math.abs(_.toInteger(req.body.start)),
+        range = _.range(start, len + start);
+
+    req.course.withTutorials().execPopulate().then(function () {
+        // get list of tutorial numbers
+        var numbers = _.map(req.course.tutorials, function (tutorial) {
+            return tutorial.number;
+        });
+        // add new tutorials
+        async.eachSeries(range, function (n, done) {
+            // format number e.g. 13 => 0013  
+            n = _.padStart(n, 4, '0');
+            // check whether number has not already been processed
+            if (numbers.indexOf(n) !== -1) {
+                return done();
+            }
+            // check whether tutorial has already been
+            models.Tutorial.create({ number: n }, function (err, tutorial) {
+                if (err) {
+                    return done(err);
+                }
+                req.course.tutorials.push(tutorial);
+                req.course.save(done);
+            });
+        }, function (err) {
+            if (err) {
+                req.flash('failure', 'Unable to create tutorials at this time.');
+            } else {
+                req.flash('success', 'The tutorials have been created successfully.');
+            }
+            res.redirect('/admin/courses/' + req.course.id + '/tutorials');
+        });
+    });
+};
 // Retrieve specific tutorial for tutorial
 exports.getTutorialForm = function (req, res) { 
     if (!req.tutorial) {

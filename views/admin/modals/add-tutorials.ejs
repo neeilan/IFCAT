@@ -1,0 +1,24 @@
+<!-- add multiple tutorials modal -->
+<div class="modal fade" id="modal-add-tutorials" tabindex="-1" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add multiple tutorials</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/admin/courses/<%= course.id %>/tutorials/generate" method="post">
+                    <div class="form-inline">
+                        <label class="control-label">Add</label>
+                        <input type="number" name="len" value="" min="1" 
+                            class="form-control" style="margin: 0 10px; width: 70px">
+                        <label class="control-label">tutorials starting from </label>
+                        <input type="number" name="start" value="<%= course.tutorials.length + 1 %>" min="1" 
+                            class="form-control" maxlength="4" style="margin: 0 10px; width: 70px">
+                        <button type="submit" class="btn btn-primary btn-sm">Go</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>

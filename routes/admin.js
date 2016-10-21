@@ -117,6 +117,7 @@ router.put('/courses/:course', controllers.Course.editCourse);
 router.delete('/courses/:course', controllers.Course.deleteCourse);
 
 router.get('/courses/:course/tutorials', controllers.Tutorial.getTutorialList);
+router.post('/courses/:course/tutorials/generate', controllers.Tutorial.addTutorialList);
 router.get('/courses/:course/tutorials/new', controllers.Tutorial.getTutorialForm);
 router.get('/courses/:course/tutorials/:tutorial/edit', controllers.Tutorial.getTutorialForm);
 router.post('/courses/:course/tutorials', controllers.Tutorial.addTutorial);
@@ -174,13 +175,15 @@ router.delete('/courses/:course/instructors/:us3r', controllers.Instructor.delet
 
 router.get('/courses/:course/teaching-assistants', controllers.TeachingAssistant.getTeachingAssistantListByCourse);
 router.get('/courses/:course/teaching-assistants/search', controllers.TeachingAssistant.getTeachingAssistantListBySearchQuery);
+router.put('/courses/:course/teaching-assistants', controllers.TeachingAssistant.editTeachingAssistantList);
 router.post('/courses/:course/teaching-assistants/:us3r', controllers.TeachingAssistant.addTeachingAssistant);
 router.put('/courses/:course/teaching-assistants/:us3r', controllers.TeachingAssistant.editTeachingAssistant);
 router.delete('/courses/:course/teaching-assistants/:us3r', controllers.TeachingAssistant.deleteTeachingAssistant);
 
 router.get('/courses/:course/students', controllers.Student.getStudentListByCourse);
 router.get('/courses/:course/students/search', controllers.Student.getStudentListBySearchQuery);
-router.post('/courses/:course/students/import', csvUpload.single('file'), controllers.Student.importStudents);
+router.post('/courses/:course/students/import', csvUpload.single('file'), controllers.Student.importStudentList);
+router.put('/courses/:course/students', controllers.Student.editStudentList);
 router.post('/courses/:course/students/:us3r', controllers.Student.addStudent);
 router.put('/courses/:course/students/:us3r', controllers.Student.editStudent);
 router.delete('/courses/:course/students/:us3r', controllers.Student.deleteStudent);

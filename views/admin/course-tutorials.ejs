@@ -4,8 +4,12 @@
 
 <%- include ./messages %>
 
-<a href="/admin/courses/<%= course.id %>/tutorials/new" class="btn btn-default btn-sm"><span 
-    class="glyphicon glyphicon-plus"></span> Add New Tutorial</a>
+<div class="actions">
+    <a href="/admin/courses/<%= course.id %>/tutorials/new" class="btn btn-default btn-sm"><span 
+        class="glyphicon glyphicon-plus"></span> Add New Tutorial</a>
+    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-add-tutorials">
+        <span class="glyphicon glyphicon-plus"></span> Add Multiple Tutorials</button>
+</div>
 
 <table class="table table-striped">
     <thead>
@@ -17,7 +21,11 @@
         </tr>
     </thead>
     <tbody>
-    <% if (!_.isEmpty(course.tutorials)) { %>
+    <% if (_.isEmpty(course.tutorials)) { %>
+        <tr>
+            <td colspan="4">No tutorials have been added yet.</td>
+        </tr>
+    <% } else { %>
         <% _.each(course.tutorials, function (tutorial) { %>
             <tr>
                 <td>TUT <%= tutorial.number %></td>
@@ -42,8 +50,6 @@
                 </td>
             </tr>
         <% }) %>
-    <% } else { %>
-        <tr><td colspan="4">No tutorials have been added yet.</td></tr>        
     <% } %>
     </tbody>
 </table>
@@ -53,5 +59,6 @@
     <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>
 </script>
 
+<%- include ./modals/add-tutorials -%>
 <%- include ./body-js -%>
 <%- include ./footer -%>

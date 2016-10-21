@@ -10,8 +10,6 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th>Email</th>
-            <th>UTORid</th>
             <th class="text-center">Admin</th>
             <th class="text-center">Instructor</th>
             <th class="text-center">TA</th>
@@ -20,15 +18,17 @@
         </tr>
     </thead>
     <tbody>
-    <% if (!_.isEmpty(users)) { %>
-        <% for (var i = 0, len = users.length; i < len; i++) { %>
+    <% if (_.isEmpty(users)) { %>
+        <tr>
+            <td colspan="6">No users have been added yet.</td>
+        </tr>
+    <% } else { %>
+        <% _.each(users, function (user) { %>
             <tr>
-                <td><%= users[i].name.full %></td>
-                <td><%= users[i].local.email %></td>
-                <td><%= users[i].UTORid %></td>
-                <% ['admin', 'instructor', 'teachingAssistant', 'student'].forEach(function (role) { %>
+                <td><%= user.name.full %></td>
+                <% _.each(['admin', 'instructor', 'teachingAssistant', 'student'], function (role) { %>
                     <td class="text-center">
-                    <% if (users[i].hasRole(role)) { %>
+                    <% if (user.hasRole(role)) { %>
                         <span class="glyphicon glyphicon-ok"></span>
                     <% } %>
                     </td>
@@ -39,16 +39,14 @@
                             Actions<span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="/admin/users/<%= users[i].id %>/edit"><span class="glyphicon glyphicon-pencil"></span> Edit user</a></li>
+                            <li><a href="/admin/users/<%= user.id %>/edit"><span class="glyphicon glyphicon-pencil"></span> Edit user</a></li>
                             <li class="divider">
-                            <li><a href="/admin/users/<%= users[i].id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete user</a></li>
+                            <li><a href="/admin/users/<%= user.id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete user</a></li>
                         </ul>
                     </div>
                 </td>
             </tr>
-        <% } %>
-    <% } else { %>
-        <tr><td colspan="8">No users have been added yet.</td></tr>
+        <% }) %>
     <% } %>
     </tbody>
 </table>
