@@ -177,7 +177,6 @@ router.get('/courses/:course/teaching-assistants', controllers.TeachingAssistant
 router.get('/courses/:course/teaching-assistants/search', controllers.TeachingAssistant.getTeachingAssistantListBySearchQuery);
 router.put('/courses/:course/teaching-assistants', controllers.TeachingAssistant.editTeachingAssistantList);
 router.post('/courses/:course/teaching-assistants/:us3r', controllers.TeachingAssistant.addTeachingAssistant);
-router.put('/courses/:course/teaching-assistants/:us3r', controllers.TeachingAssistant.editTeachingAssistant);
 router.delete('/courses/:course/teaching-assistants/:us3r', controllers.TeachingAssistant.deleteTeachingAssistant);
 
 router.get('/courses/:course/students', controllers.Student.getStudentListByCourse);
@@ -185,7 +184,6 @@ router.get('/courses/:course/students/search', controllers.Student.getStudentLis
 router.post('/courses/:course/students/import', csvUpload.single('file'), controllers.Student.importStudentList);
 router.put('/courses/:course/students', controllers.Student.editStudentList);
 router.post('/courses/:course/students/:us3r', controllers.Student.addStudent);
-router.put('/courses/:course/students/:us3r', controllers.Student.editStudent);
 router.delete('/courses/:course/students/:us3r', controllers.Student.deleteStudent);
 router.get('/courses/:course/students/:us3r/marks', controllers.Student.getMarks);
 

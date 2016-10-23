@@ -23,9 +23,7 @@ $(function () {
     $('#modal-find').on('click', 'a', function (e) {
         e.preventDefault();
         $.post(this.href, function (res) {
-            if (res.status) {
-                window.location.reload(true);
-            }
+            window.location.reload(true); // TO-FIX
         });
     });
     // update user in tutorials when button is clicked
@@ -35,9 +33,7 @@ $(function () {
             type: 'put',
             data: $(this).closest('tr').find(':input').serialize(),
             success: function (res) {
-                if (res.status) {
-                    window.location.reload(true);
-                }
+                window.location.reload(true); // TO-FIX
             }
         });
     });
@@ -47,9 +43,7 @@ $(function () {
         $.ajax(this.href, {
             type: 'delete',
             success: function (res) {
-                if (res.status) {
-                    window.location.reload(true);
-                }
+                window.location.reload(true); // TO-FIX
             }
         });
     });

@@ -19,32 +19,6 @@ TutorialSchema.methods.withStudents = function () {
         }
     });
 };
-// Add teaching assistant
-TutorialSchema.methods.addTeachingAssistant = function (userId) {
-    if (this.teachingAssistants.indexOf(userId) === -1) {
-        this.teachingAssistants.push(userId);
-    }
-};
-// Add student
-TutorialSchema.methods.addStudent = function (userId) {
-    if (this.students.indexOf(userId) === -1) {
-        this.students.push(userId);
-    }
-};
-// Delete teaching assistant
-TutorialSchema.methods.deleteTeachingAssistant = function (userId) {
-    var index = this.teachingAssistants.indexOf(userId);
-    if (index !== -1) {
-        this.teachingAssistants.splice(index, 1);
-    }
-};
-// Delete student
-TutorialSchema.methods.deleteStudent = function (userId) {
-    var index = this.students.indexOf(userId);
-    if (index !== -1) {
-        this.students.splice(index, 1);
-    }
-};
 // Check if student belongs to tutorial
 TutorialSchema.methods.hasStudent = function (userId) {
     return this.students.indexOf(userId) !== -1;

@@ -76,45 +76,6 @@ CourseSchema.methods.withFiles = function () {
         }
     });
 };
-// Add instructor
-CourseSchema.methods.addInstructor = function (user) {
-    if (this.instructors.indexOf(user) === -1) {
-        this.instructors.push(user);
-    }
-};
-// Add teaching assistant
-CourseSchema.methods.addTeachingAssistant = function (user) {
-    if (this.teachingAssistants.indexOf(user) === -1) {
-        this.teachingAssistants.push(user);
-    }
-};
-// Add student
-CourseSchema.methods.addStudent = function (user) {
-    if (this.students.indexOf(user) === -1) {
-        this.students.push(user);
-    }
-};
-// Delete isntructor
-CourseSchema.methods.deleteInstructor = function (user) {
-    var index = this.instructors.indexOf(user);
-    if (index !== -1) {
-        this.instructors.splice(index, 1);
-    }
-};
-// Delete teaching assistant
-CourseSchema.methods.deleteTeachingAssistant = function (user) {
-    var index = this.teachingAssistants.indexOf(user);
-    if (index !== -1) {
-        this.teachingAssistants.splice(index, 1);
-    }
-};
-// Delete student
-CourseSchema.methods.deleteStudent = function (user) {
-    var index = this.students.indexOf(user);
-    if (index !== -1) {
-        this.students.splice(index, 1);
-    }
-};
 // Find courses
 CourseSchema.statics.findCourses = function () {
     return this.find().sort('code').populate([{

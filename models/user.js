@@ -18,6 +18,9 @@ var UserSchema = new mongoose.Schema({
         type: String,
         lowercase: true
     },
+    studentNumber: {
+        type: String
+    },
     teachingPoints: {
         type: Number,
         default: 0

@@ -24,8 +24,7 @@ exports.getTeachingAssistantListBySearchQuery = function (req, res) {
 // Update list of teaching assistants for course
 exports.editTeachingAssistantList = function (req, res) {
     var tutorials = req.body.tutorials || {};
-    // save
-    req.course.withTutorials().execPopulate().then(function (err) {
+    req.course.withTutorials().execPopulate().then(function () {
         async.eachSeries(req.course.tutorials, function (tutorial, done) {
             var newAssistants = [];
             if (tutorials.hasOwnProperty(tutorial.id)) {
@@ -33,52 +32,52 @@ exports.editTeachingAssistantList = function (req, res) {
             }
             // check if changes were made
             if (_.difference(tutorial.teachingAssistants, newAssistants)) {
-                tutorial.teachingAssistants = newAssistants;
-                tutorial.save(done);
+                tutorial.update({ $set: { teachingAssistants: newAssistants }}, done);
             } else {
                 done();
             }
         }, function (err) {
-            res.json({ status: true });
+            if (err) {
+                req.flash('failure', 'An error occurred while trying to perform operation.');
+            } else {
+                req.flash('success', 'The teaching assistants have been updated.');
+            }
+            res.json({ status: !!err });
         });
     });
 };
 // Add teaching assistant to course
 exports.addTeachingAssistant = function (req, res) {
-    req.course.addTeachingAssistant(req.us3r.id);
-    req.course.save(function (err) {
-        res.json({ status: true });
-    });
-};
-// Update teaching assistant in tutorials
-exports.editTeachingAssistant = function (req, res) {
-     req.course.withTutorials().execPopulate().then(function () {
-        // update teaching assistant in tutorial
-        async.eachSeries(req.course.tutorials, function (tutorial, done) {
-            if (!req.body.tutorials || req.body.tutorials.indexOf(tutorial.id) === -1) {
-                tutorial.deleteTeachingAssistant(req.us3r.id);
-            } else {
-                tutorial.addTeachingAssistant(req.us3r.id);
-            }
-            tutorial.save(done);
-        }, function (err) {
-            res.json({ status: true });
-        });
+    req.course.update({ $addToSet: { teachingAssistants: req.us3r.id }}, function (err) {
+        if (err) {
+            req.flash('failure', 'An error occurred while trying to perform operation.');
+        } else {
+            req.flash('success', 'The instructor <b>' + req.us3r.name.full + '</b> has been added to the course.');
+        }
+        res.json({ status: !!err });
     });
 };
 // Delete teaching assistant from course and associated tutorials
 exports.deleteTeachingAssistant = function (req, res) {
     req.course.withTutorials().execPopulate().then(function () {
-        // remove teaching assistant from tutorials
-        async.eachSeries(req.course.tutorials, function (tutorial, done) {
-            tutorial.deleteTeachingAssistant(req.us3r.id);
-            tutorial.save(done);
-        // remove teaching assistant from course
-        }, function (err) {
-            req.course.deleteTeachingAssistant(req.us3r.id);
-            req.course.save(function (err) {
-                res.json({ status: true });
-            });
+        async.waterfall([
+            // remove TA from course 
+            function (done) {
+                req.course.update({ $pull: { teachingAssistants: req.us3r.id }}, done);
+            },
+            // remove TA from any tutorial
+            function (course, done) {
+                async.eachSeries(req.course.tutorials, function (tutorial, done) {
+                    tutorial.update({ $pull: { teachingAssistants: req.us3r.id }}, done);
+                }, done);
+            }
+        ], function (err) {
+            if (err) {
+                req.flash('failure', 'An error occurred while trying to perform operation.');
+            } else {
+                req.flash('success', 'The teaching assistant <b>' + req.us3r.name.full + '</b> has been removed from the course.');
+            }
+            res.json({ status: !!err });
         });
     });  
 };

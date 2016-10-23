@@ -31,142 +31,115 @@ exports.getStudentsByTutorial = function (req, res) {
     });
 };
 // Add student to course
-exports.addStudent = function (req, res) { //console.log(req.us3r.id);
-    req.course.addStudent(req.us3r.id);
-    req.course.save(function (err) {
-        res.json({ status: true });
-    });
-};
-// Update student in tutorial
-exports.editStudent = function (req, res) {
-    req.course.withTutorials().execPopulate().then(function () {
-        // ugly: move student in tutorial
-        async.eachSeries(req.course.tutorials, function (tutorial, done) {
-            if (!req.body.tutorial[req.us3r.id] || req.body.tutorial[req.us3r.id] !== tutorial.id) {
-                tutorial.deleteStudent(req.us3r.id);
-            } else {
-                tutorial.addStudent(req.us3r.id);
-            }
-            tutorial.save(done);
-        }, function (err) {
-            if (err) {
-                req.flash('failure', 'An error occurred while trying to update student.');
-            } else {
-                req.flash('success', 'The student has been updated successfully.');
-            }
-            res.json({ status: true });
-        });
+exports.addStudent = function (req, res) {
+    req.course.update({ $addToSet: { students: req.us3r.id }}, function (err) {
+        if (err) {
+            req.flash('failure', 'An error occurred while trying to remove student.');
+        } else {
+            req.flash('success', 'The student <b>' + req.us3r.name.full + '</b> has been added into the course.');
+        }
+        res.json({ status: !!err });
     });
 };
 // Delete student from course and associated tutorial
 exports.deleteStudent = function (req, res) {
     req.course.withTutorials().execPopulate().then(function () {
-        // remove student from tutorial
-        async.eachSeries(req.course.tutorials, function (tutorial, done) {
-            tutorial.deleteStudent(req.us3r.id);
-            tutorial.save(done);
-        // remove student from course
-        }, function (err) {
-            //console.log(req.course.students, req.us3r.id);
-            req.course.deleteStudent(req.us3r.id);
-            req.course.save(function (err) {
-                if (err) {
-                    req.flash('failure', 'An error occurred while trying to remove student.');
-                } else {
-                    req.flash('success', 'The student has been removed successfully from course.');
-                }
-                res.json({ status: true });
-            });
+        async.waterfall([
+            // remove student from course 
+            function (done) {
+                req.course.update({ $pull: { students: req.us3r.id }}, done);
+            },
+            // remove student from any tutorial
+            function (course, done) {
+                async.eachSeries(req.course.tutorials, function (tutorial, done) {
+                    tutorial.update({ $pull: { students: req.us3r.id }}, done);
+                }, done);
+            }
+        ], function (err) {
+            if (err) {
+                req.flash('failure', 'An error occurred while trying to remove student.');
+            } else {
+                req.flash('success', 'The student <b>' + req.us3r.name.full + '</b> has been removed from the course.');
+            }
+            res.json({ status: !!err });
         });
-    });  
+    });
 };
 // Import list of students
 exports.importStudentList = function (req, res) {
+
+    var course = req.course;
     // read spreadsheet
     csv.parse(req.file.buffer.toString(), {
         columns: true,
         delimiter: ',',
         skip_empty_lines: true
     }, function (err, rows) {
+        /*if (err) {
+            console.error(err);
+            req.flash('failure', 'An error occurred while trying to perform operation.');
+            return;
+        }*/
         async.eachSeries(rows, function (row, done) {
+            row.UTORid = null;
+            row.name = {};
+            row.local = {};
             // normalize properties
             _.each(_.keys(row), function (key) {
                 if (/^utorid/i.test(key)) {
                     row.UTORid = row[key];
                 } else if (/^first/i.test(key)) {
-                    row.first = row[key];
+                    row.name.first = row[key];
                 } else if (/^last/i.test(key)) {
-                    row.last = row[key];
+                    row.name.last = row[key];
                 } else if (/^e\-?mail/i.test(key)) {
-                    row.email = row[key];
+                    row.local.email = row[key];
                 } else if (/^password/i.test(key)) {
-                    row.password = row[key];
+                    row.local.password = user.generateHash(row[key]);
                 } else if (/^tutorial/i.test(key)) {
                     row.tutorial = row[key];
                 }
             });
-            async.waterfall([
-                // add student if they do not already exist
-                function (done) {     
-                    // check if user exist already with UTORid
-                    models.User.findUserByUTOR(row.UTORid).then(function (us3r) {
-                        // if user does not already exist, create them
-                        if (!us3r) {
-                            us3r = new models.User();
-                            us3r.UTORid = row.UTORid;
+            // add or update student
+            async.waterfall([    
+                function (done) {
+                    models.User.findOneAndUpdate({ 
+                        UTORid: row.UTORid 
+                    }, {
+                        $set: row,
+                        $addToSet: { 
+                            roles: 'student' 
                         }
-                        // update fields
-                        if (row.first) {
-                            us3r.name.first = row.first;
-                        }
-                        if (row.last) {
-                            us3r.name.last = row.last;
-                        }
-                        if (row.email) {
-                            us3r.local.email = row.email;
-                        }
-                        if (row.password) {
-                            us3r.local.password = us3r.generateHash(row.password);
-                        }
-                        // mark them as student
-                        us3r.addRole('student');
-                        us3r.save(function (err) {
-                            done(err, us3r);
-                        });
-                    });
+                    }, { 
+                        upsert: true, 
+                        new: true 
+                    }, done);
                 },
                 // add student into course if they are not already
-                function (us3r, done) {
-                    req.course.withTutorials().execPopulate().then(function () {
-                        req.course.addStudent(us3r);
-                        req.course.save(function (err) {
-                            //console.log('add student into course')
-                            done(err, us3r);
+                function (user, done) {
+                    course.withTutorials().execPopulate().then(function () {
+                        course.update({ $addToSet: { students: user.id }}, function (err) {
+                            done(err, user);
                         });
                     });
                 },
                 // ugly: move student into tutorial if they are not already
-                function (us3r, done) {
-                    async.eachSeries(req.course.tutorials, function (tutorial, done) {
+                function (user, done) {
+                    async.eachSeries(course.tutorials, function (tutorial, done) {
                         if (_.toInteger(tutorial.number) === _.toInteger(row.tutorial)) {
-                            tutorial.addStudent(us3r.id);
+                            tutorial.update({ $addToSet: { students: user.id }}, done);
                         } else {
-                            tutorial.deleteStudent(us3r.id);
+                            tutorial.update({ $pull: { students: user.id }}, done);
                         }
-                        //console.log('move student into tutorial')
-                        tutorial.save(done);
-                    }, function (err) {
-                        //console.log('done')
-                        done(err, us3r);
-                    });
+                    }, done);
                 }
             ], done);
         }, function (err) {
-            //console.log('done all')
             if (err) {
-                req.flash('failure', 'An error occurred while trying to import students. ' + err);
+                console.error(err);
+                req.flash('failure', 'An error occurred while trying to perform operation.');
             } else {
-                req.flash('success', 'The students have been imported successfully.');
+                req.flash('success', 'The students have been imported.');
             }
             res.redirect('/admin/courses/' + req.course.id + '/students');
         });
@@ -183,7 +156,7 @@ exports.editStudentList = function (req, res) {
         tutorials[id].push(userId);
     });
     // save
-    req.course.withTutorials().execPopulate().then(function (err) {
+    req.course.withTutorials().execPopulate().then(function () {
         async.eachSeries(req.course.tutorials, function (tutorial, done) {
             var newStudents = [];
             if (tutorials.hasOwnProperty(tutorial.id)) {
@@ -191,12 +164,17 @@ exports.editStudentList = function (req, res) {
             }
             // check if changes were made
             if (_.difference(tutorial.students, newStudents)) {
-                tutorial.students = newStudents;
-                tutorial.save(done);
+                tutorial.update({ $set: { students: newStudents }}, done);
             } else {
                 done();
             }
         }, function (err) {
+            if (err) {
+                console.error(err);
+                req.flash('failure', 'An error occurred while trying to perform operation.');
+            } else {
+                req.flash('success', 'The students have been updated.');
+            }
             res.json({ status: true });
         });
     });
