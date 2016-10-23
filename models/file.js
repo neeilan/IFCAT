@@ -18,7 +18,9 @@ FileSchema.methods.isImage = function () {
 FileSchema.methods.store = function (obj, callback) {
     this.name = obj.filename;
     this.type = obj.mimetype;
-    return this.save(callback);
+    return this.save(function (err) {
+        callback(err);
+    });
 };
 
 module.exports = mongoose.model('File', FileSchema);

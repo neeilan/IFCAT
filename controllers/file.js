@@ -1,7 +1,8 @@
 var fs = require('fs');
 
 var _ = require('lodash'),
-    async = require('async');
+    async = require('async'),
+    mongoose = require('mongoose');
 
 var models = require('../models');
 
@@ -21,15 +22,15 @@ exports.getFile = function (req, res, next, fil3) {
 };
 // Retrieve all files in the course
 exports.getFileList = function (req, res) {
-    req.course.withFiles().execPopulate().then(function (err) {
-        /*if (err) {
-            return res.status(500).send("Unable to retrieve any files at this time (" + err.message + ").");
-        }*/
-        res.render('admin/course-files', { course: req.course });
+    req.course.withFiles().execPopulate().then(function () {
+        res.render('admin/course-files', { 
+            title: 'Files',
+            course: req.course
+        });
     });
 };
 // Retrieve specific file
-exports.getFileForm = function (req, res) {
+/*exports.getFileForm = function (req, res) {
     if (!req.fil3) {
         req.fil3 = new models.File();
     }
@@ -38,18 +39,25 @@ exports.getFileForm = function (req, res) {
         course: req.course, 
         fil3: req.fil3
     });
-};
+};*/
 // Add new files
 exports.addFiles = function (req, res) {
     async.eachSeries(req.files, function (obj, done) {
-        var fil3 = new models.File();
-        fil3.store(obj, function (err) {
-            req.course.files.push(fil3);
-            req.course.save(done); 
-        });
+        var file = new models.File();
+        async.waterfall([
+            // add file to collection
+            function (done) {
+                file.store(obj, done);
+            },
+            // add reference to course
+            function (done) {
+                req.course.update({ $push: { files: file.id }}, done);
+            }
+        ], done);
     }, function (err) {
         if (err) {
-            req.flash('failure', 'Unable to save files at this time.');
+            console.error(err);
+            req.flash('failure', 'An error occurred while trying to save the files.');
         } else {
             req.flash('success', 'The files have been saved successfully.');
         }
@@ -57,7 +65,7 @@ exports.addFiles = function (req, res) {
     });
 };
 // Update specific file for course
-exports.editFile = function (req, res) {
+/*exports.editFile = function (req, res) {
     req.fil3.store(req, function (err) {
         if (err) {
             req.flash('failure', 'Unable to update file at this time.');
@@ -66,29 +74,41 @@ exports.editFile = function (req, res) {
         }
         res.redirect('/admin/courses/' + req.course.id + '/files/' + req.fil3.id + '/edit');
     });
-};
-// Delete specific file for course
-exports.deleteFiles = function (req, res, next) {
-    async.eachSeries(req.body.files, function (id, done) {
-        // remove file from collection
-        models.File.findByIdAndRemove(id, function (err, fil3) {
-            if (err) {
-                return next(err);
+};*/
+// Delete specific files from course
+exports.deleteFiles = function (req, res) {
+    var prePath = __dirname + '/../public/upl/' + req.course.id + '/';
+    async.each(req.body.files, function (id, done) {
+        async.waterfall([
+            // delete file reference from course
+            function (done) {
+                req.course.update({ $pull: { files: id }}, done);
+            },
+            // delete file from collection
+            function (file, done) {
+                models.File.findByIdAndRemove(id, done);
+            },
+            // delete file from filesystem
+            function (file, done) {
+                var path = prePath + file.name;
+                fs.stat(path, function (err, stats) {
+                    if (err) {
+                        return done(err);
+                    } else if (stats.isFile()) {
+                        fs.unlink(path, done);
+                    } else {
+                        return done();
+                    }
+                });
             }
-            var path = __dirname + '/../public/upl/' + req.course.id + '/' + fil3.name;
-            // remove file from filesystem
-            fs.stat(path, function (err, stats) {
-                if (err && err.code === 'ENOENT') {
-                    return done();
-                } else if (err) {
-                    return next(err);
-                }
-                if (stats.isFile()) {
-                    fs.unlink(path, done);
-                }
-            });
-        });
+        ], done);
     }, function (err) {
+        if (err) {
+            console.error(err);
+            req.flash('failure', 'An error occurred while trying to delete the files.');
+        } else {
+            req.flash('success', 'The files have been deleted successfully.');
+        }
         res.json({ status: true });
     });
 };

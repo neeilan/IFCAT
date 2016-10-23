@@ -157,8 +157,8 @@ router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/respon
 
 router.get('/courses/:course/files', controllers.File.getFileList);
 router.post('/courses/:course/files', anyUpload.array('files'), controllers.File.addFiles);
-router.get('/courses/:course/files/:fil3/edit', controllers.File.getFileForm);
-router.put('/courses/:course/files/:fil3', controllers.File.editFile);
+//router.get('/courses/:course/files/:fil3/edit', controllers.File.getFileForm);
+//router.put('/courses/:course/files/:fil3', controllers.File.editFile);
 router.delete('/courses/:course/files', controllers.File.deleteFiles);
 
 router.get('/users', controllers.User.getUserList);
