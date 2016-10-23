@@ -44,16 +44,12 @@ exports.getFileList = function (req, res) {
 exports.addFiles = function (req, res) {
     async.eachSeries(req.files, function (obj, done) {
         var file = new models.File();
-        async.waterfall([
-            // add file to collection
-            function (done) {
-                file.store(obj, done);
-            },
-            // add reference to course
-            function (done) {
-                req.course.update({ $push: { files: file.id }}, done);
+        file.store(obj, function (err) {
+            if (err) {
+                return done(err);
             }
-        ], done);
+            req.course.update({ $push: { files: file.id }}, done);
+        });
     }, function (err) {
         if (err) {
             console.error(err);
@@ -80,11 +76,10 @@ exports.deleteFiles = function (req, res) {
     var prePath = __dirname + '/../public/upl/' + req.course.id + '/';
     async.each(req.body.files, function (id, done) {
         async.waterfall([
-            // delete file reference from course
+            // delete file & reference from database
             function (done) {
                 req.course.update({ $pull: { files: id }}, done);
             },
-            // delete file from collection
             function (file, done) {
                 models.File.findByIdAndRemove(id, done);
             },
