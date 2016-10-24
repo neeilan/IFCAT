@@ -1,10 +1,9 @@
-var fs = require('fs');
-
-var _ = require('lodash'),
-    async = require('async'),
+var async = require('async'),
+    fs = require('fs-extra'),
     mongoose = require('mongoose');
 
-var models = require('../models');
+var config = require('../lib/config'),
+    models = require('../models');
 
 // Retrieve file
 exports.getFile = function (req, res, next, fil3) {
@@ -29,17 +28,6 @@ exports.getFileList = function (req, res) {
         });
     });
 };
-// Retrieve specific file
-/*exports.getFileForm = function (req, res) {
-    if (!req.fil3) {
-        req.fil3 = new models.File();
-    }
-    res.render('admin/course-file', {
-        title: req.fil3.isNew ? 'Add new file' : 'Edit file',
-        course: req.course, 
-        fil3: req.fil3
-    });
-};*/
 // Add new files
 exports.addFiles = function (req, res) {
     async.eachSeries(req.files, function (obj, done) {
@@ -53,46 +41,35 @@ exports.addFiles = function (req, res) {
     }, function (err) {
         if (err) {
             console.error(err);
-            req.flash('failure', 'An error occurred while trying to save the files.');
+            req.flash('error', 'An error occurred while trying to perform operation.');
         } else {
             req.flash('success', 'The files have been saved successfully.');
         }
-        res.json({ status: true });
+        res.json({ status: !!err });
     });
 };
-// Update specific file for course
-/*exports.editFile = function (req, res) {
-    req.fil3.store(req, function (err) {
-        if (err) {
-            req.flash('failure', 'Unable to update file at this time.');
-        } else {
-            req.flash('success', 'The file has been updated successfully.');
-        }
-        res.redirect('/admin/courses/' + req.course.id + '/files/' + req.fil3.id + '/edit');
-    });
-};*/
 // Delete specific files from course
 exports.deleteFiles = function (req, res) {
-    var prePath = __dirname + '/../public/upl/' + req.course.id + '/';
+    var dir = config.uploadPath + '/' + req.course.id;
     async.each(req.body.files, function (id, done) {
         async.waterfall([
-            // delete file & reference from database
-            function (done) {
+            function deleteRef(done) {
                 req.course.update({ $pull: { files: id }}, done);
             },
-            function (file, done) {
+            function deleteDoc(file, done) {
                 models.File.findByIdAndRemove(id, done);
             },
-            // delete file from filesystem
-            function (file, done) {
-                var path = prePath + file.name;
+            function unlink(file, done) {
+                var path = dir + '/' + file.name;
                 fs.stat(path, function (err, stats) {
-                    if (err) {
-                        return done(err);
+                    if (err && err.code === 'ENOENT') {
+                        done();
+                    } else if (err) {
+                        done(err);
                     } else if (stats.isFile()) {
-                        fs.unlink(path, done);
+                        fs.remove(path, done);
                     } else {
-                        return done();
+                        done();
                     }
                 });
             }
@@ -100,11 +77,11 @@ exports.deleteFiles = function (req, res) {
     }, function (err) {
         if (err) {
             console.error(err);
-            req.flash('failure', 'An error occurred while trying to delete the files.');
+            req.flash('error', 'An error occurred while trying to perform operation.');
         } else {
             req.flash('success', 'The files have been deleted successfully.');
         }
-        res.json({ status: true });
+        res.json({ status: !!err });
     });
 };
 

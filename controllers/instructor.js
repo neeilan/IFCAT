@@ -25,21 +25,21 @@ exports.getInstructorListBySearchQuery = function (req, res) {
 exports.addInstructor = function (req, res) {
     req.course.update({ $addToSet: { instructors: req.us3r.id }}, function (err) {
         if (err) {
-            req.flash('failure', 'An error occurred while trying to perform operation.');
+            req.flash('error', 'An error occurred while trying to perform operation.');
         } else {
-            req.flash('success', 'The instructor <b>' + req.us3r.name.full + '</b> has been added to the course.');
+            req.flash('success', 'The instructor <b>%s</b> has been added to the course.', req.us3r.name.full);
         }
-        res.json({ status: true });
+        res.json({ status: !!err });
     });
 };
 // Delete instructor from course
 exports.deleteInstructor = function (req, res) {    
     req.course.update({ $pull: { instructors: req.us3r.id }}, function (err) {
         if (err) {
-            req.flash('failure', 'An error occurred while trying to perform operation.');
+            req.flash('error', 'An error occurred while trying to perform operation.');
         } else {
-            req.flash('success', 'The instructor <b>' + req.us3r.name.full + '</b> has been deleted from the course.');
+            req.flash('success', 'The instructor <b>%s</b> has been deleted from the course.', req.us3r.name.full);
         }
-        res.json({ status: true });
+        res.json({ status: !!err });
     }); 
 };

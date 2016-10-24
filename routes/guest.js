@@ -12,10 +12,10 @@ router.post('/signup', passport.authenticate('local-signup', {
     failureFlash: true
 }));
 
-router.get('/login/callback',
-  passport.authenticate('auth0', { failureRedirect: '/login' }),
-  function(req, res) {
-      console.log('login callback')
+router.get('/login/callback', passport.authenticate('auth0', { 
+    failureRedirect: '/login' 
+}), function(req, res) {
     res.redirect(req.session.returnTo || '/student/courses');
-  });
+});
+
 module.exports = router;

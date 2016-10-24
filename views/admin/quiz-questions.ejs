@@ -2,14 +2,15 @@
 
 <h1><%= course.code + ' - ' + course.name %><br><small>Quiz <%= quiz.name %> - Questions</small></h1>
 
-<%- include ./messages %>
+<%- include ./flash %>
 
-<a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/sort" 
-    class="btn btn-default btn-sm<%= quiz.questions.length ? '' : ' disabled' %>" id="btn-sort-questions"><span 
-    class="glyphicon glyphicon-ok"></span> Sort Questions</a>
-
-<a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/new"
-    class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add New Question</a>
+<div class="actions">
+    <a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/sort" 
+        class="btn btn-default btn-sm<%= quiz.questions.length ? '' : ' disabled' %>" id="btn-sort-questions"><span 
+        class="glyphicon glyphicon-ok"></span> Sort Questions</a>
+    <a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/new"
+        class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add New Question</a>
+</div>
 
 <table class="table table-striped">
     <thead>

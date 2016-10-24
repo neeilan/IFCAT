@@ -1,49 +1,11 @@
-var fs = require('fs'),
-    path = require('path');
-
 var _ = require('lodash'),
-    multer = require('multer'),
     passport = require('passport'),
     router = require('express').Router();
 
-var controllers = require('../controllers');
+var upload = require('../lib/upload'),
+    controllers = require('../controllers');
 
-// upload configurations
-var anyUpload = multer({ 
-    storage: multer.diskStorage({
-        destination: function (req, file, cb) {
-            var destination = __dirname + '/../public/upl/' + req.params.course;
-            // create course directory if it does not already exist
-            fs.mkdir(destination, function (e) {
-                if (e && e.code !== 'EEXIST') {
-                    console.log(e);
-                } else {
-                    cb(null, destination);  
-                }
-            });
-        },
-        filename: function (req, file, cb) {
-            var destination = __dirname + '/../public/upl/' + req.params.course,
-                extname = path.extname(file.originalname),
-                basename = path.basename(file.originalname, extname),
-                i = 1;
-            // create unique filename within folder
-            fs.readdir(destination, function (err, filenames) {
-                for (;;) {
-                    var newname = [basename, i > 1 ? ' (' + i + ')' : '', extname].join('');
-                    if (filenames.indexOf(newname) === -1) {
-                        return cb(null, newname);
-                    }
-                    i++;
-                }
-            });
-        }
-    })
-});
-
-var csvUpload = multer({ storage: multer.MemoryStorage });
-
-// lifesaver: query single objects
+// query single objects
 router.param('us3r', controllers.User.getUser);
 router.param('course', controllers.Course.getCourse);
 router.param('tutorial', controllers.Tutorial.getTutorial);
@@ -68,12 +30,6 @@ router.use(function (req, res, next) {
         return next();
     }
     res.redirect('/login');
-});
-
-router.use(function(req, res, next) {
-    res.locals.failure = req.flash('failure');
-    res.locals.success = req.flash('success');
-    next();
 });
 
 // build breadcrumbs
@@ -102,7 +58,6 @@ router.use(function (req, res, next) {
 });
 
 // authenticated routes
-// @TODO: handle unexpected errors
 // @TODO: model validation
 
 router.get('/logout', controllers.User.logout);
@@ -117,10 +72,8 @@ router.put('/courses/:course', controllers.Course.editCourse);
 router.delete('/courses/:course', controllers.Course.deleteCourse);
 
 router.get('/courses/:course/tutorials', controllers.Tutorial.getTutorialList);
-router.post('/courses/:course/tutorials/generate', controllers.Tutorial.addTutorialList);
-router.get('/courses/:course/tutorials/new', controllers.Tutorial.getTutorialForm);
+router.post('/courses/:course/tutorials', controllers.Tutorial.addTutorialList);
 router.get('/courses/:course/tutorials/:tutorial/edit', controllers.Tutorial.getTutorialForm);
-router.post('/courses/:course/tutorials', controllers.Tutorial.addTutorial);
 router.put('/courses/:course/tutorials/:tutorial', controllers.Tutorial.editTutorial);
 router.delete('/courses/:course/tutorials/:tutorial', controllers.Tutorial.deleteTutorial);
 
@@ -156,9 +109,7 @@ router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/respon
 router.get('/courses/:course/tutorial-quizzes/:tutorialQuiz/groups/:group/responses/export', controllers.Response.exportResponseList);
 
 router.get('/courses/:course/files', controllers.File.getFileList);
-router.post('/courses/:course/files', anyUpload.array('files'), controllers.File.addFiles);
-//router.get('/courses/:course/files/:fil3/edit', controllers.File.getFileForm);
-//router.put('/courses/:course/files/:fil3', controllers.File.editFile);
+router.post('/courses/:course/files', upload.any.array('files'), controllers.File.addFiles);
 router.delete('/courses/:course/files', controllers.File.deleteFiles);
 
 router.get('/users', controllers.User.getUserList);
@@ -181,7 +132,7 @@ router.delete('/courses/:course/teaching-assistants/:us3r', controllers.Teaching
 
 router.get('/courses/:course/students', controllers.Student.getStudentListByCourse);
 router.get('/courses/:course/students/search', controllers.Student.getStudentListBySearchQuery);
-router.post('/courses/:course/students/import', csvUpload.single('file'), controllers.Student.importStudentList);
+router.post('/courses/:course/students/import', upload.csv.single('file'), controllers.Student.importStudentList);
 router.put('/courses/:course/students', controllers.Student.editStudentList);
 router.post('/courses/:course/students/:us3r', controllers.Student.addStudent);
 router.delete('/courses/:course/students/:us3r', controllers.Student.deleteStudent);

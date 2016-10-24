@@ -7,6 +7,9 @@ body > .navbar {
 textarea.form-control {
     max-width: 100%;
 }
+.alert {
+    display: inline-block;
+}
 
 .stretch {
     overflow-x: auto;

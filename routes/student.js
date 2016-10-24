@@ -3,7 +3,6 @@ var passport = require('passport'),
     models = require('../models');
 var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn();
 
-
 var controllers = require('../controllers');
 
 // lifesaver: query single objects
@@ -39,11 +38,9 @@ router.use(function (req, res, next) {
 
 // authenticated routes
 router.get('/logout', controllers.User.logout);
-
 router.get('/courses', controllers.Student.getCourseList);
 router.get('/courses/:course/quizzes', controllers.Student.getQuizList);
 router.get('/courses/:course/quizzes/:tutorialQuiz/start', controllers.TutorialQuiz.startQuiz);
-
-
 router.get('/file/:id', controllers.File.getFileLinkById);
+
 module.exports = router;

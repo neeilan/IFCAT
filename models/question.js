@@ -1,6 +1,6 @@
 var _ = require('lodash'),
     mongoose = require('mongoose');
-
+    
 var models = require('.');
 
 var QuestionSchema = new mongoose.Schema({
@@ -20,6 +20,14 @@ var QuestionSchema = new mongoose.Schema({
 }, { 
     timestamps: true 
 });
+// Delete cascade
+/*QuestionSchema.pre('remove', function (next) {
+    var conditions = { questions: { $in: [this._id] }},
+        doc = { $pull: { questions: this._id }},
+        options = { multi: true };
+    models.Quiz.update(conditions, doc, options).exec();
+    next();
+});*/
 // Populate files
 QuestionSchema.methods.withFiles = function () {
     return this.populate({ 
@@ -103,7 +111,9 @@ QuestionSchema.methods.store = function (obj, callback) {
             }
         }
     }
-    return this.save(callback);
+    return this.save(function (err) {
+        callback(err);
+    });
 };
 
 module.exports = mongoose.model('Question', QuestionSchema);

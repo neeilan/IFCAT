@@ -54,9 +54,10 @@ exports.getCourseForm = function (req, res) {
 exports.addCourse = function (req, res) {
     models.Course.create(req.body, function (err, course) {
         if (err) {
-            req.flash('failure', 'Unable to create course at this time.');
+            console.error(err);
+            req.flash('error', 'An error occurred while trying to perform operation.');
         } else {
-            req.flash('success', 'The course has been created successfully.');
+            req.flash('success', 'The course <b>%s</b> has been created successfully.', course.name);
         }
         res.redirect('/admin/courses');
     });
@@ -65,9 +66,9 @@ exports.addCourse = function (req, res) {
 exports.editCourse = function (req, res) {
     _.extend(req.course, req.body).save(function (err) {  
         if (err) {
-            req.flash('failure', 'Unable to update course at this time.');
+            req.flash('error', 'An error occurred while trying to perform operation.');
         } else {
-            req.flash('success', 'The course has been updated successfully.');
+            req.flash('success', 'The course <b>%s</b> has been updated successfully.', req.course.name);
         }
         res.redirect('/admin/courses/' + req.course.id + '/edit');
     });
@@ -75,7 +76,13 @@ exports.editCourse = function (req, res) {
 // Delete course
 exports.deleteCourse = function (req, res) {
     req.course.remove(function (err) {
-        res.json({ status: true });
+        if (err) {
+            console.error(err);
+            req.flash('error', 'An error occurred while trying to perform operation.');
+        } else {
+            req.flash('success', 'The course <b>%s</b> has been deleted successfully.', req.course.name);
+        }
+        res.json({ status: !!err });
     });
 };
 

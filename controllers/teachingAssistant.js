@@ -6,7 +6,7 @@ var models = require('../models');
 // Retrieve list of teaching assistants for course
 exports.getTeachingAssistantListByCourse = function (req, res) {
     req.course.withTutorials().withTeachingAssistants().execPopulate().then(function (err) {
-        res.render('admin/course-teaching-assistants', { 
+        res.render('admin/course-teaching-assistants', {
             title: 'Teaching assistants',
             course: req.course
         });
@@ -38,7 +38,7 @@ exports.editTeachingAssistantList = function (req, res) {
             }
         }, function (err) {
             if (err) {
-                req.flash('failure', 'An error occurred while trying to perform operation.');
+                req.flash('error', 'An error occurred while trying to perform operation.');
             } else {
                 req.flash('success', 'The teaching assistants have been updated.');
             }
@@ -50,9 +50,9 @@ exports.editTeachingAssistantList = function (req, res) {
 exports.addTeachingAssistant = function (req, res) {
     req.course.update({ $addToSet: { teachingAssistants: req.us3r.id }}, function (err) {
         if (err) {
-            req.flash('failure', 'An error occurred while trying to perform operation.');
+            req.flash('error', 'An error occurred while trying to perform operation.');
         } else {
-            req.flash('success', 'The instructor <b>' + req.us3r.name.full + '</b> has been added to the course.');
+            req.flash('success', 'The instructor <b>%s</b> has been added to the course.', req.us3r.name.full);
         }
         res.json({ status: !!err });
     });
@@ -61,21 +61,19 @@ exports.addTeachingAssistant = function (req, res) {
 exports.deleteTeachingAssistant = function (req, res) {
     req.course.withTutorials().execPopulate().then(function () {
         async.waterfall([
-            // remove TA from course 
-            function (done) {
+            function deleteReferenceFromCourse(done) {
                 req.course.update({ $pull: { teachingAssistants: req.us3r.id }}, done);
             },
-            // remove TA from any tutorial
-            function (course, done) {
+            function deleteReferenceFromTutorials(course, done) {
                 async.eachSeries(req.course.tutorials, function (tutorial, done) {
                     tutorial.update({ $pull: { teachingAssistants: req.us3r.id }}, done);
                 }, done);
             }
         ], function (err) {
             if (err) {
-                req.flash('failure', 'An error occurred while trying to perform operation.');
+                req.flash('error', 'An error occurred while trying to perform operation.');
             } else {
-                req.flash('success', 'The teaching assistant <b>' + req.us3r.name.full + '</b> has been removed from the course.');
+                req.flash('success', 'The teaching assistant <b>%s</b> has been removed from the course.', req.us3r.name.full);
             }
             res.json({ status: !!err });
         });

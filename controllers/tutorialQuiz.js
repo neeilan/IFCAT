@@ -1,5 +1,3 @@
-var _ = require('lodash');
-
 var models = require('../models');
 
 // Retrieve course
@@ -68,7 +66,7 @@ exports.getQuizForm = function (req, res) {
 exports.editQuiz = function (req, res) {
     req.tutorialQuiz.store(req.body, function (err) {
         if (err) {
-            req.flash('failure', 'Unable to save quiz at this time.');
+            req.flash('error', 'An error occurred while trying to perform action.');
         } else {
             req.flash('success', 'The quiz has been updated successfully.');
         }
@@ -81,24 +79,36 @@ exports.editQuiz = function (req, res) {
 };
 // Publish quiz for tutorial
 exports.publishQuiz = function (req, res) {
-    req.tutorialQuiz.published = req.body.state;
-    req.tutorialQuiz.save(function (err) {
-        res.json({ status: true });
+    req.tutorialQuiz.update({ $set: { published: req.body.state }}, function (err) {
+        if (err) {
+            req.flash('error', 'An error occurred while trying to perform action.');
+        } else {
+            req.flash('success', 'The quiz has been updated successfully.');
+        }
+        res.json({ status: !!err });
     });
 };
 // Activate quiz for tutorial
 exports.activateQuiz = function (req, res) {
-    req.tutorialQuiz.active = req.body.state;
-    req.tutorialQuiz.save(function (err) {
+    req.tutorialQuiz.update({ $set: { active: req.body.state }}, function (err) {
+        if (err) {
+            req.flash('error', 'An error occurred while trying to perform action.');
+        } else {
+            req.flash('success', 'The quiz has been updated successfully.');
+        }
         req.app.locals.io.in('tutorialQuiz:' + req.tutorialQuiz.id).emit('quizActivated', req.tutorialQuiz);
-        res.json({ status: true });
+        res.json({ status: !!err });
     });
 };
 // Archive quiz for tutorial
 exports.archiveQuiz = function (req, res) {
-    req.tutorialQuiz.archived = req.body.state;
-    req.tutorialQuiz.save(function (err) {
-        res.json({ status: true });
+    req.tutorialQuiz.update({ $set: { archived: req.body.state }}, function (err) {
+        if (err) {
+            req.flash('error', 'An error occurred while trying to perform action.');
+        } else {
+            req.flash('success', 'The quiz has been updated successfully.');
+        }
+        res.json({ status: !!err });
     });
 };
 

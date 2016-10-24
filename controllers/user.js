@@ -1,8 +1,9 @@
 var _ = require('lodash'),
     async = require('async'),
     csv = require('csv');
-
-var models = require('../models');
+    
+var config = require('../lib/config'),
+    models = require('../models');
 
 // 
 exports.getUser = function (req, res, next, us3r) {
@@ -24,7 +25,7 @@ exports.getUser = function (req, res, next, us3r) {
 
 // Retrieve student login form
 exports.getLoginForm = function (req, res) {
-    var auth0Config =  require('../config/common').auth0;
+    var auth0Config = config.auth0;
     res.render('login', {
         domain : auth0Config.domain,
         clientId : auth0Config.clientId,
@@ -34,7 +35,8 @@ exports.getLoginForm = function (req, res) {
 };
 // Retrieve admin login form
 exports.getAdminLoginForm = function (req, res) {
-    res.render('admin/login', { 
+    res.render('admin/login', {
+        bodyClass: 'login',
         title: 'Login'
     }); 
 };
@@ -46,7 +48,8 @@ exports.logout = function (req, res) {
 // Retrieve list of users
 exports.getUserList = function (req, res) {
     models.User.find({}).exec(function (err, users) {
-        res.render('admin/users', { 
+        res.render('admin/users', {
+            bodyClass: 'users', 
             title: 'Users',
             users: models.User.sortByRole(users) 
         });
@@ -67,9 +70,9 @@ exports.addUser = function (req, res) {
     var user = new models.User();
     user.store(req.body, function (err) {
         if (err) {
-            req.flash('failure', 'Unable to create user at this time.');
+            req.flash('error', 'An error occurred while trying to perform action.');
         } else {
-            req.flash('success', 'The user has been created successfully.');
+            req.flash('success', 'The user <b>%s</b> has been created.', user.name.full);
         }
         res.redirect('/admin/users');
     });
@@ -78,9 +81,9 @@ exports.addUser = function (req, res) {
 exports.editUser = function (req, res) {
     req.us3r.store(req.body, function (err) {
         if (err) {
-            req.flash('failure', 'Unable to update user at this time.');
+            req.flash('error', 'An error occurred while trying to perform action.');
         } else {
-            req.flash('success', 'The user has been updated successfully.');
+            req.flash('success', 'The user <b>%s</b> has been updated.', req.us3r.name.full);
         }
         res.redirect('/admin/users/' + req.us3r.id + '/edit');
     });
@@ -88,6 +91,11 @@ exports.editUser = function (req, res) {
 // Delete specific user
 exports.deleteUser = function (req, res) {
     req.us3r.remove(function (err) {
-        res.json({ status: true });
+        if (err) {
+            req.flash('error', 'An error occurred while trying to perform action.');
+        } else {
+            req.flash('success', 'The user <b>%s</b> has been deleted.', req.us3r.name.full);
+        }
+        res.json({ status: !!err });
     });
 };

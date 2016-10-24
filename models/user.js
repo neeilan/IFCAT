@@ -1,7 +1,8 @@
 var _ = require('lodash'),
     bcrypt = require('bcryptjs'),
     mongoose = require('mongoose');
-    
+var models = require('.');
+
 var UserSchema = new mongoose.Schema({
     local: {
         email: { 
@@ -38,6 +39,27 @@ var UserSchema = new mongoose.Schema({
 // get full name
 UserSchema.virtual('name.full').get(function () {
     return this.name.first + ' ' + this.name.last;
+});
+// Delete cascade
+UserSchema.pre('remove', function (next) {
+    var conditions = {
+        $or: {
+            instructors: { $in: [this._id] },
+            teachingAssistants: { $in: [this._id] }, 
+            students: { $in: [this._id] }
+        }
+    },  doc = { 
+        $pull: {
+            instructors: this._id,
+            teachingAssistants: this._id,
+            students: this._id
+        }
+    }, options = {
+        multi: true
+    };
+    models.Course.update(conditions, doc, options).exec();
+    models.Tutorial.update(conditions, doc, options).exec();
+    next();
 });
 // generate salt
 UserSchema.methods.generateHash = function (s) {
@@ -105,6 +127,7 @@ UserSchema.statics.findUsersBySearchQuery = function (query, role) {
         {
             $or: [
                 { 'UTORid': regexp },
+                { 'studentNumber': regexp },
                 { 'name.first': regexp },
                 { 'last.first': regexp },
                 { 'local.email': regexp }
@@ -115,13 +138,19 @@ UserSchema.statics.findUsersBySearchQuery = function (query, role) {
         'name.last': 1
     });
 };
-// find user by UTORid
-UserSchema.statics.findUserByUTOR = function (UTORid) {
-    return this.findOne({ UTORid: UTORid });
-};
-// find user by email address
-UserSchema.statics.findUserByEmail = function (email) {
-    return this.findOne({ 'local.email': email });
+// Add or update student
+UserSchema.statics.saveStudent = function (update, callback) {
+    return this.findOneAndUpdate({ 
+        UTORid: update.UTORid 
+    }, {
+        $set: update,
+        $addToSet: { 
+            roles: 'student' 
+        }
+    }, { 
+        upsert: true, 
+        new: true 
+    }, callback);
 };
 
 module.exports = mongoose.model('User', UserSchema);

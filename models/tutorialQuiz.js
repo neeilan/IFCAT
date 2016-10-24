@@ -1,6 +1,5 @@
 var _ = require('lodash'),
     mongoose = require('mongoose');
-
 var models = require('.');
 
 var TutorialQuizSchema = new mongoose.Schema({
@@ -17,7 +16,7 @@ var TutorialQuizSchema = new mongoose.Schema({
     },
     // max # of groups OR members per group
     max: {
-        groups: { type : Number},
+        groups: { type : Number },
         membersPerGroup: { type : Number } 
     },
     // make quiz visible to students
@@ -26,7 +25,6 @@ var TutorialQuizSchema = new mongoose.Schema({
     active: Boolean,
     // allow students to see their quiz results
     archived: Boolean
-
 }, {
     timestamps: true 
 });

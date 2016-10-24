@@ -1,7 +1,6 @@
 var _ = require('lodash'),
     async = require('async'),
     mongoose = require('mongoose');
-
 var models = require('.');
 
 var QuizSchema = new mongoose.Schema({
@@ -17,7 +16,16 @@ var QuizSchema = new mongoose.Schema({
 }, { 
     timestamps: true
 });
-
+// Delete cascade
+/*QuizSchema.pre('remove', function (next) {
+    var conditions = { quizzes: { $in: [this._id] }},
+        doc = { $pull: { quizzes: this._id }},
+        options = { multi: true };
+    models.Tutorial.update(conditions, doc, options).exec();
+    models.TutorialQuiz.remove({ quiz: this._id });
+    models.Question.remove({ _id: { $in: this.questions }});
+    next();
+});*/
 // populate questions
 QuizSchema.methods.withQuestions = function () {
     return this.populate('questions');

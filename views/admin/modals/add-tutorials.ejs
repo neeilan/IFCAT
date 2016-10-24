@@ -6,7 +6,8 @@
                 <h4 class="modal-title">Add multiple tutorials</h4>
             </div>
             <div class="modal-body">
-                <form action="/admin/courses/<%= course.id %>/tutorials/generate" method="post">
+                <p>This form will generate and add a list of tutorials into the course based off the conditions specified. If a tutorial already exist, it will not be added.</p>
+                <form action="/admin/courses/<%= course.id %>/tutorials" method="post">
                     <div class="form-inline">
                         <label class="control-label">Add</label>
                         <input type="number" name="len" value="" min="1" 

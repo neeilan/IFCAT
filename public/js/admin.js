@@ -75,9 +75,7 @@ $(function () {
                                 type: 'delete',
                                 data: data,
                                 success: function (res) {
-                                    if (res.status) {
-                                        window.location.reload(true);
-                                    }     
+                                    window.location.reload(true); // TO-FIX     
                                 }
                             });
                         }

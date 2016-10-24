@@ -1,4 +1,5 @@
 var _ = require('lodash'),
+    async = require('async'),
     mongoose = require('mongoose');
 
 var models = require('../models');
@@ -25,25 +26,26 @@ exports.getQuestionList = function (req, res) {
 };
 // Sort list of questions
 exports.sortQuestionList = function (req, res) {
-    //var a = _.filter(req.quiz.questions, Boolean).slice().sort().toString(),
-        //b = [];
-    //if (_.isArray(req.body.questions)) {
-        //b = _.filter(req.body.questions, Boolean).slice().sort().toString();
-    //}
-    // ensure that same, IDs are given
-    //if (_.isEqual(a, b)) { 
-        // set new order of questions
-        req.quiz.questions = req.body.questions.map(function (str) { 
-            return new mongoose.Types.ObjectId(str); 
-        });
-    //}
-    req.quiz.save(function (err) {
+    var a = req.quiz.questions.slice().map(String), b = [];
+    if (_.isArray(req.body.questions)) {
+        b = req.body.questions.slice();
+    }
+    async.series([
+        // to make sure questions don't get lost
+        // known bug: fails if non-deleted references exist
+        function isEqual(done) {
+            done(_.isEqual(a, b) ? null : new Error('not equal'));
+        },
+        function updateSortOrder(done) {
+            req.quiz.update({ $set: { questions: b }}, done);
+        },
+    ], function (err) {
         if (err) {
-            req.flash('failure', 'Unable to sort questions at this time.');
+            req.flash('error', 'An error occurred while trying to perform operation.');
         } else {
             req.flash('success', 'The questions have been sorted successfully.');
         }
-        res.json({ status: true });       
+        res.json({ status: !!err });       
     });
 };
 // Retrieve specific question for quiz
@@ -51,7 +53,7 @@ exports.getQuestionForm = function (req, res) {
     if (!req.question) {
         req.question = new models.Question();
     }
-    req.course.withFiles().execPopulate().then(function (err) {
+    req.course.withFiles().execPopulate().then(function () {
         res.render('admin/quiz-question', {
             title: req.question.isNew ? 'Add new question' : 'Edit question',
             course: req.course, 
@@ -61,31 +63,31 @@ exports.getQuestionForm = function (req, res) {
     });
 };
 // Add new question for quiz
-exports.addQuestion = function (req, res, next) {
+exports.addQuestion = function (req, res) {
     var question = new models.Question();
-    question.store(req.body, function (err) { console.log(err);
-        req.quiz.questions.push(question);
-        req.quiz.save(function (err) {
-            if (err) {
-                req.flash('failure', 'Unable to create question at this time.');
-            } else {
-                req.flash('success', 'The question has been created successfully.');
-            }
-            res.redirect(
-                '/admin/courses/' + req.course.id + 
-                '/quizzes/' + req.quiz.id + 
-                '/questions'
-            );
-        });
+    async.series([
+        function addQuestion(done) {
+            question.store(req.body, done);
+        },
+        function addReference(done) {
+            req.quiz.update({ $addToSet: { questions: question.id }}, done);
+        }
+    ], function (err) {
+        if (err) {
+            req.flash('error', 'An error has occurred while trying to perform operation.');
+        } else {
+            req.flash('success', 'The question <b>%s</b> has been created successfully.', question.number);
+        }
+        res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/questions');
     });
 };
 // Update specific question for quiz
-exports.editQuestion = function (req, res, next) {
+exports.editQuestion = function (req, res) {
     req.question.store(req.body, function (err) {
         if (err) {
-            req.flash('failure', 'Unable to update question at this time.');
+            req.flash('error', 'An error has occurred while trying to perform operation.');
         } else {
-            req.flash('success', 'The question has been updated successfully.');
+            req.flash('success', 'The question <b>%s</b> has been updated successfully.', req.question.number);
         }
         res.redirect(
             '/admin/courses/' + req.course.id + 
@@ -98,9 +100,11 @@ exports.editQuestion = function (req, res, next) {
 // Delete specific question for quiz
 exports.deleteQuestion = function (req, res) {
     req.question.remove(function (err) {
-        req.quiz.questions.pull(req.question.id);
-        req.quiz.save(function () {
-            res.json({ status: true });
-        });
+        if (err) {
+            req.flash('error', 'An error has occurred while trying to perform operation.');
+        } else {
+            req.flash('success', 'The question <b>%s</b> has been deleted successfully.', req.question.number);
+        }
+        res.json({ status: !!err });
     });
 };

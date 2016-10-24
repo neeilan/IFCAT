@@ -2,7 +2,7 @@
 
 <h1><%= course.isNew ? 'Add new course' : 'Edit course' %></h1>
 
-<%- include ./messages %>
+<%- include ./flash %>
 
 <form action="/admin/courses/<%= course.isNew  ? '' : course.id + '?_method=put' %>" method="post" class="form-horizontal">
     <div class="form-group">

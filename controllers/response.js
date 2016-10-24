@@ -7,9 +7,6 @@ var models = require('../models');
 // Retrieve responses
 exports.getResponseList = function (req, res) {
     req.tutorialQuiz.withResponses().execPopulate().then(function () {
-        // ugly: filter out group responses
-        console.log('reponses' , req.tutorialQuiz)
-        console.log(req.group.id)
         var responses = _.filter(req.tutorialQuiz.responses, function (response) {
             return response.group.id === req.group.id;
         });
@@ -54,19 +51,18 @@ exports.exportResponseList = function (req, res) {
         // build header row
         data.push(['No.', 'Question', '# of attempts', 'Points awarded']);
         // build rows
-        for (var i = 0, len = responses.length; i < len; i++) {
-            data.push([
-                responses[i].question.number, 
-                responses[i].question.question, 
-                responses[i].attempts,
-                responses[i].points
-            ]);
-        }
+        _.each(responses, function (res) {
+            data.push([res.question.number, res.question.question, res.attempts, res.points]);
+        });
         // build footer row
         data.push(['', '', 'Total Points', totalPoints]);
         // send CSV
         res.setHeader('Content-disposition', 'attachment; filename=' + filename); 
         res.set('Content-Type', 'text/csv'); 
-        res.status(200).send(_.map(data, function (row) { return row.join(); }).join("\n"));
+        res.status(200).send(
+            _.reduce(data, function (lines, row) { 
+                return lines + row.join() + "\n"; 
+            }, '')
+        );
     });
 };

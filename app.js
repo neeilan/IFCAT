@@ -7,12 +7,11 @@ var bodyParser = require('body-parser'),
     methodOverride = require('method-override'),
     morgan = require('morgan'),
     mongoose = require('mongoose'),
-    passport = require('passport'),
     session = require('express-session'),
-    MongoStore = require("connect-mongo")(session),
+    MongoStore = require('connect-mongo')(session),
     passportSocketIo = require('passport.socketio');
 
-var config = require('./config/common'),
+var config = require('./lib/config'),
     routes = require('./routes');
 
 var app = express(),
@@ -45,29 +44,30 @@ app.use('/sweetalert', express.static(__dirname + '/node_modules/sweetalert'));
 app.use(express.static('public'));
 
 app.use(morgan('dev'));
-
 app.use(methodOverride('_method'));
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
-
 app.use(cookieParser());
 
 var sessionStore = new MongoStore({ mongooseConnection : mongoose.connection });
+
 app.use(session({ 
     secret: config.session.secret, 
     saveUninitialized: false, 
     store : sessionStore,
     resave: false 
 }));
+
 app.use(flash());
 
-var passport = require('./config/passport');
+var passport = require('./lib/passport');
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 // pass the user object to all responses
 app.use(function (req, res, next) {
+    res.locals.flash = req.flash();
     res.locals.url = req.originalUrl;
     res.locals.user = req.user;
     next();

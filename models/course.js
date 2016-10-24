@@ -1,5 +1,9 @@
-var _ = require('lodash'),
+var async = require('async'),
+    fs = require('fs-extra'),
     mongoose = require('mongoose');
+
+var config = require('../lib/config'),
+    models = require('.');
 
 var CourseSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -12,6 +16,36 @@ var CourseSchema = new mongoose.Schema({
     files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }]
 }, {
     timestamps: true
+});
+// Delete cascade
+CourseSchema.pre('remove', function (next) {
+    var course = this,
+        path = config.uploadPath + '/' + course._id;
+    async.parallel([
+        function deleteRef1(done) {
+            models.Tutorial.remove({ _id: { $in: course.tutorials }}, done);
+        },
+        function deleteRef2(done) {
+            models.Quiz.remove({ _id: { $in: course.quizzes }}, done);
+        },
+        function deleteRef3(done) {
+            models.File.remove({ _id: { $in: course.files }}, done);
+        },
+        // delete upload directory & files
+        function rmdir(done) {
+            fs.stat(path, function (err, stats) {
+                if (err && err.code === 'ENOENT') {
+                    done();
+                } else if (err) {
+                    done(err);
+                } else if (stats.isDirectory()) {
+                    fs.remove(path, done);  
+                } else {
+                    done();
+                }
+            });
+        }
+    ], next);
 });
 // Populate instructors
 CourseSchema.methods.withInstructors = function () {

@@ -1,0 +1,9 @@
+<% if (_.isObject(flash)) { %>
+    <% _.forOwn(flash, function (msgs, type) { %>
+        <% _.each(msgs, function (msg) { %>
+            <div class="alert alert-<%= type !== 'error' ? type : 'danger' %> alert-dismissible">
+                <a href="#" class="close" data-dismiss="alert">&times;</a><%- msg %>
+            </div>
+        <% }) %>
+    <% }) %>
+<% } %>

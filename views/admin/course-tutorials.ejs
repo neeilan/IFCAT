@@ -2,13 +2,11 @@
 
 <h1><%= course.code + ' - ' + course.name %><br><small>Tutorials</small></h1>
 
-<%- include ./messages %>
+<%- include ./flash %>
 
 <div class="actions">
-    <a href="/admin/courses/<%= course.id %>/tutorials/new" class="btn btn-default btn-sm"><span 
-        class="glyphicon glyphicon-plus"></span> Add New Tutorial</a>
     <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-add-tutorials">
-        <span class="glyphicon glyphicon-plus"></span> Add Multiple Tutorials</button>
+        <span class="glyphicon glyphicon-plus"></span> Add Tutorials</button>
 </div>
 
 <table class="table table-striped">

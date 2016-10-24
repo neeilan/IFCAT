@@ -3,7 +3,7 @@
 <h1><%= course.code + ' - ' + course.name %><br>
 <small>Quiz <%= quiz.number %> - <%= question.isNew ? 'Add new question' : 'Edit question' %></small></h1>
 
-<%- include ./messages %>
+<%- include ./flash %>
 
 <form id="form-question" action="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= 
     question.isNew ? '' : question.id + '?_method=put' %>" method="post" class="form-horizontal">

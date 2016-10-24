@@ -20,7 +20,8 @@ exports.getTutorial = function (req, res, next, tutorial) {
 // Retrieve list of tutorials for course
 exports.getTutorialList = function (req, res) {
     req.course.withTutorials(true).execPopulate().then(function (err) {
-        res.render('admin/course-tutorials', { 
+        res.render('admin/course-tutorials', {
+            bodyClass: 'tutorials',
             title: 'Tutorials',
             course: req.course 
         });
@@ -50,52 +51,35 @@ exports.addTutorialList = function (req, res) {
                 if (err) {
                     return done(err);
                 }
-                req.course.tutorials.push(tutorial);
-                req.course.save(done);
+                req.course.update({ $addToSet: { tutorials: tutorial.id }}, done);
             });
         }, function (err) {
             if (err) {
-                req.flash('failure', 'Unable to create tutorials at this time.');
+                req.flash('error', 'An error has occurred while trying to perform operation.');
             } else {
-                req.flash('success', 'The tutorials have been created successfully.');
+                req.flash('success', 'The tutorials have been created.');
             }
             res.redirect('/admin/courses/' + req.course.id + '/tutorials');
         });
     });
 };
 // Retrieve specific tutorial for tutorial
-exports.getTutorialForm = function (req, res) { 
-    if (!req.tutorial) {
-        req.tutorial = new models.Tutorial();
-    }
+exports.getTutorialForm = function (req, res) {
     res.render('admin/course-tutorial', {
-        title: req.tutorial.isNew ? 'Add new tutorial' : 'Edit tutorial',
+        bodyClass: 'tutorial',
+        title: 'Edit tutorial',
         course: req.course, 
         tutorial: req.tutorial 
-    });
-};
-// Add new tutorial for tutorial
-exports.addTutorial = function (req, res) {
-    models.Tutorial.create(req.body, function (err, tutorial) {
-        req.course.tutorials.push(tutorial);
-        req.course.save(function (err) {
-            if (err) {
-                req.flash('failure', 'Unable to create tutorial at this time.');
-            } else {
-                req.flash('success', 'The tutorial has been created successfully.');
-            }
-            res.redirect('/admin/courses/' + req.course.id + '/tutorials');
-        });
     });
 };
 // Update specific tutorial for course
 exports.editTutorial = function (req, res) {
     _.extend(req.tutorial, req.body).save(function (err) {
         if (err) {
-            req.flash('failure', 'Unable to update tutorial at this time.');
+            req.flash('error', 'An error has occurred while trying to perform operation.');
         } else {
-            req.flash('success', 'The tutorial has been created successfully.');
-        } 
+            req.flash('success', 'The tutorial <b>%s</b> has been updated.', req.tutorial.number);
+        }
         res.redirect(
             '/admin/courses/' + req.course.id + 
             '/tutorials/' + req.tutorial.id + 
@@ -106,6 +90,11 @@ exports.editTutorial = function (req, res) {
 // Delete specific tutorial for course
 exports.deleteTutorial = function (req, res) {
     req.tutorial.remove(function (err) {
-        res.json({ status: true });
+        if (err) {
+            req.flash('error', 'An error has occurred while trying to perform operation.');
+        } else {
+            req.flash('success', 'The tutorial <b>%s</b> has been deleted.', req.tutorial.number);
+        }
+        res.json({ status: !!err });
     });
 };
