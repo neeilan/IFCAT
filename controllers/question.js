@@ -13,7 +13,6 @@ exports.getQuestion = function (req, res, next, question) {
         if (!question) {
             return next(new Error('No question is found.'));
         }
-        console.log('got question'); 
         req.question = question;         
         next();
     });
@@ -26,24 +25,16 @@ exports.getQuestionList = function (req, res) {
 };
 // Sort list of questions
 exports.sortQuestionList = function (req, res) {
-    var a = req.quiz.questions.slice().map(String), b = [];
-    if (_.isArray(req.body.questions)) {
-        b = req.body.questions.slice();
-    }
-    async.series([
-        // to make sure questions don't get lost
-        // known bug: fails if non-deleted references exist
-        function isEqual(done) {
-            done(_.isEqual(a, b) ? null : new Error('not equal'));
-        },
-        function updateSortOrder(done) {
-            req.quiz.update({ $set: { questions: b }}, done);
-        },
-    ], function (err) {
+    var newOrder = req.body.questions;
+    // sort questions based off order given
+    req.quiz.questions.sort(function (a, b) {
+        return newOrder.indexOf(a) < newOrder.indexOf(b) ? -1 : 1;
+    });
+    req.quiz.save(function (err) {
         if (err) {
             req.flash('error', 'An error occurred while trying to perform operation.');
         } else {
-            req.flash('success', 'The questions have been sorted successfully.');
+            req.flash('success', 'The list of questions have been sorted.');
         }
         res.json({ status: !!err });       
     });
@@ -69,14 +60,14 @@ exports.addQuestion = function (req, res) {
         function addQuestion(done) {
             question.store(req.body, done);
         },
-        function addReference(done) {
+        function addRef(done) {
             req.quiz.update({ $addToSet: { questions: question.id }}, done);
         }
     ], function (err) {
         if (err) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         } else {
-            req.flash('success', 'The question <b>%s</b> has been created successfully.', question.number);
+            req.flash('success', 'Question <b>%s</b> has been created.', question.number);
         }
         res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/questions');
     });
@@ -87,7 +78,7 @@ exports.editQuestion = function (req, res) {
         if (err) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         } else {
-            req.flash('success', 'The question <b>%s</b> has been updated successfully.', req.question.number);
+            req.flash('success', 'Question <b>%s</b> has been updated.', req.question.number);
         }
         res.redirect(
             '/admin/courses/' + req.course.id + 
@@ -103,7 +94,7 @@ exports.deleteQuestion = function (req, res) {
         if (err) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         } else {
-            req.flash('success', 'The question <b>%s</b> has been deleted successfully.', req.question.number);
+            req.flash('success', 'Question <b>%s</b> has been deleted.', req.question.number);
         }
         res.json({ status: !!err });
     });
