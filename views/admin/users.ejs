@@ -4,16 +4,17 @@
 
 <%- include ./flash %>
 
-<a href="/admin/users/new" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add new user</a>
+<div class="nav-actions">
+    <a href="/admin/users/new" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add new user</a>
+</div>
 
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Name</th>
-            <th class="text-center">Admin</th>
-            <th class="text-center">Instructor</th>
-            <th class="text-center">TA</th>
-            <th class="text-center">Student</th>
+        <% _.each(['Admin', 'Instructor', 'TA', 'Student'], function (role) { %>
+            <th class="text-center"><%= role %></th>
+        <% }) %>
             <th></th>
         </tr>
     </thead>
@@ -26,13 +27,13 @@
         <% _.each(users, function (user) { %>
             <tr>
                 <td><%= user.name.full %></td>
-                <% _.each(['admin', 'instructor', 'teachingAssistant', 'student'], function (role) { %>
-                    <td class="text-center">
-                    <% if (user.hasRole(role)) { %>
-                        <span class="glyphicon glyphicon-ok"></span>
-                    <% } %>
-                    </td>
-                <% }) %>
+            <% _.each(['admin', 'instructor', 'teachingAssistant', 'student'], function (role) { %>
+                <td class="text-center">
+                <% if (user.hasRole(role)) { %>
+                    <span class="glyphicon glyphicon-ok"></span>
+                <% } %>
+                </td>
+            <% }) %>
                 <td>
                     <div class="dropdown">
                         <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">

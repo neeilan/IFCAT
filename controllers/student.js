@@ -33,102 +33,105 @@ exports.getStudentsByTutorial = function (req, res) {
 // Add student to course
 exports.addStudent = function (req, res) {
     req.course.update({ $addToSet: { students: req.us3r.id }}, function (err) {
-        if (err) {
-            req.flash('error', 'An error occurred while trying to remove student.');
-        } else {
-            req.flash('success', 'The student <b>%s</b> has been added into the course.', req.us3r.name.full);
-        }
-        res.json({ status: !!err });
+        if (err)
+            req.flash('error', 'An error has occurred while trying perform operation.');
+        else
+            req.flash('success', 'Student <b>%s</b> has been added into the course.', req.us3r.name.full);
+        res.json({ status: !err });
     });
 };
 // Delete student from course and associated tutorial
 exports.deleteStudent = function (req, res) {
     req.course.withTutorials().execPopulate().then(function () {
         async.waterfall([
-            function deleteReferenceFromCourse(done) {
+            function delRef1(done) {
                 req.course.update({ $pull: { students: req.us3r.id }}, done);
             },
-            function deleteReferenceFromTutorial(course, done) {
+            function delRef2(course, done) {
                 async.eachSeries(req.course.tutorials, function (tutorial, done) {
                     tutorial.update({ $pull: { students: req.us3r.id }}, done);
                 }, done);
             }
         ], function (err) {
-            if (err) {
-                req.flash('error', 'An error occurred while trying to remove student.');
-            } else {
-                req.flash('success', 'The student <b>%s</b> has been removed from the course.', req.us3r.name.full);
-            }
-            res.json({ status: !!err });
+            if (err)
+                req.flash('error', 'An error has occurred while trying perform operation.');
+            else
+                req.flash('success', 'Student <b>%s</b> has been removed from the course.', req.us3r.name.full);
+            res.json({ status: !err });
         });
     });
 };
 // Import list of students
 exports.importStudentList = function (req, res) {
-
-    var course = req.course;
     // read spreadsheet
     csv.parse(req.file.buffer.toString(), {
         columns: true,
         delimiter: ',',
         skip_empty_lines: true
     }, function (err, rows) {
-        /*if (err) {
-            console.error(err);
+        if (err) {
             req.flash('error', 'An error occurred while trying to perform operation.');
-            return;
-        }*/
+            return res.redirect('/admin/courses/' + req.course.id + '/students');
+        }
+        // process records
         async.eachSeries(rows, function (row, done) {
-            row.UTORid = null;
+            row.student = {};
             row.name = {};
             row.local = {};
             // normalize properties
             _.each(_.keys(row), function (key) {
-                if (/^utorid/i.test(key)) {
-                    row.UTORid = row[key];
-                } else if (/^student/i.test(key)) {
-                    row.studentNumber = row[key];
-                } else if (/^first/i.test(key)) {
+                if (/^utorid/i.test(key))
+                    row.student.UTORid = row[key];
+                else if (/^student/i.test(key))
+                    row.student.number = row[key];
+                else if (/^first/i.test(key))
                     row.name.first = row[key];
-                } else if (/^last/i.test(key)) {
+                else if (/^last/i.test(key))
                     row.name.last = row[key];
-                } else if (/^e\-?mail/i.test(key)) {
+                else if (/^e\-?mail/i.test(key))
                     row.local.email = row[key];
-                } else if (/^password/i.test(key)) {
-                    row.local.password = user.generateHash(row[key]);
-                } else if (/^tutorial/i.test(key)) {
+                else if (/^password/i.test(key))
+                    row.local.password = row[key];
+                else if (/^tutorial/i.test(key))
                     row.tutorial = row[key];
-                }
             });
 
             async.waterfall([    
-                function addStudent(done) {
-                    models.User.saveStudent(row, done);
+                function add(done) {
+                    models.User.findOne({ 'student.UTORid': update.student.UTORid }, function (err, user) {
+                        if (err)
+                            return done(err);
+                        if (!user)
+                            user = new models.User();
+                        user.set(update);
+                        user.roles.addToSet('student');
+                        user.save(done);
+                    });
                 },
-                function addStudentIntoCourse(user, done) {
-                    course.withTutorials().execPopulate().then(function () {
-                        course.update({ $addToSet: { students: user.id }}, function (err) {
+                function addRef1(user, done) {
+                    req.course.withTutorials().execPopulate().then(function () {
+                        req.course.update({ $addToSet: { students: user.id }}, function (err) {
                             done(err, user);
                         });
                     });
                 },
-                function moveStudentIntoTutorial(user, done) {
-                    async.eachSeries(course.tutorials, function (tutorial, done) {
-                        if (_.toInteger(tutorial.number) === _.toInteger(row.tutorial)) {
+                function addRef2(user, done) {
+                    // skip if no tutorial is given
+                    if (!row.tutorial)
+                        return done();
+                    async.eachSeries(req.course.tutorials, function (tutorial, done) {
+                        if (_.toInteger(tutorial.number) === _.toInteger(row.tutorial))
                             tutorial.update({ $addToSet: { students: user.id }}, done);
-                        } else {
+                        else
                             tutorial.update({ $pull: { students: user.id }}, done);
-                        }
                     }, done);
                 }
             ], done);
         }, function (err) {
-            if (err) {
-                console.error(err);
-                req.flash('error', 'An error occurred while trying to perform operation.');
-            } else {
+            if (err)
+                req.flash('error', 'An error has occurred while trying to perform operation.');
+            else
                 req.flash('success', 'The students have been imported.');
-            }
             res.redirect('/admin/courses/' + req.course.id + '/students');
         });
     });
@@ -138,32 +141,27 @@ exports.editStudentList = function (req, res) {
     var tutorials = {};
     // group user IDs by tutorial IDs
     _.each(req.body.tutorials, function (id, userId) {
-        if (!tutorials.hasOwnProperty(id)) {
+        if (!tutorials.hasOwnProperty(id))
             tutorials[id] = [];
-        }
         tutorials[id].push(userId);
     });
     // save
     req.course.withTutorials().execPopulate().then(function () {
         async.eachSeries(req.course.tutorials, function (tutorial, done) {
             var newStudents = [];
-            if (tutorials.hasOwnProperty(tutorial.id)) {
+            if (tutorials.hasOwnProperty(tutorial.id))
                 newStudents = tutorials[tutorial.id]; 
-            }
             // check if changes were made
-            if (_.difference(tutorial.students, newStudents)) {
+            if (_.difference(tutorial.students, newStudents))
                 tutorial.update({ $set: { students: newStudents }}, done);
-            } else {
+            else
                 done();
-            }
         }, function (err) {
-            if (err) {
-                console.error(err);
+            if (err)
                 req.flash('error', 'An error occurred while trying to perform operation.');
-            } else {
+            else
                 req.flash('success', 'The students have been updated.');
-            }
-            res.json({ status: !!err });
+            res.json({ status: !err });
         });
     });
 };

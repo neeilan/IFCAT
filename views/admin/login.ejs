@@ -1,5 +1,10 @@
 <%- include ./header -%>
 
+<% if (flash.error) { %>
+    <div class="alert alert-danger alert-dismissible" style="display: block; margin: 0 auto 30px; max-width: 360px;"><a 
+        href="#" class="close" data-dismiss="alert">&times;</a><%- flash.error %></div>
+<% } %>
+
 <form action="/admin/login" method="post" class="form-horizontal" style="margin: 0 auto; max-width: 330px;">
     <div class="form-group">
         <label>Email</label>
@@ -9,7 +14,7 @@
         <label>Password</label>
         <input type="password" name="password" value="admin" class="form-control">
     </div>
-    <div class="form-group" style="margin-top: 30px">
+    <div class="form-group" style="margin-top: 20px">
         <button type="submit" class="btn btn-default btn-block">Log in</button>
     </div>
 </form>

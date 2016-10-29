@@ -6,16 +6,15 @@ var config = require('../lib/config'),
     models = require('../models');
 
 // Retrieve file
-exports.getFile = function (req, res, next, fil3) {
-    models.File.findById(fil3, function (err, fil3) {
+exports.getFile = function (req, res, next, file) {
+    models.File.findById(file, function (err, file) {
         if (err) {
             return next(err);
         }
-        if (!fil3) {
+        if (!file) {
             return next(new Error('No file is found.'));
         }
-        console.log('got fil3');
-        req.fil3 = fil3; // careful: req.file is used by multer
+        req.fil3 = file; // careful: req.file is used by multer
         next();
     });
 };
@@ -33,19 +32,16 @@ exports.addFiles = function (req, res) {
     async.eachSeries(req.files, function (obj, done) {
         var file = new models.File();
         file.store(obj, function (err) {
-            if (err) {
+            if (err)
                 return done(err);
-            }
             req.course.update({ $push: { files: file.id }}, done);
         });
     }, function (err) {
-        if (err) {
-            console.error(err);
+        if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
-        } else {
-            req.flash('success', 'The files have been saved successfully.');
-        }
-        res.json({ status: !!err });
+        else
+            req.flash('success', 'The files have been added.');
+        res.json({ status: !err });
     });
 };
 // Delete specific files from course
@@ -53,35 +49,36 @@ exports.deleteFiles = function (req, res) {
     var dir = config.uploadPath + '/' + req.course.id;
     async.each(req.body.files, function (id, done) {
         async.waterfall([
-            function deleteRef(done) {
-                req.course.update({ $pull: { files: id }}, done);
+            function find(done) {
+                models.File.findById(id, done);
             },
-            function deleteDoc(file, done) {
-                models.File.findByIdAndRemove(id, done);
+            function del(file, done) {
+                file.remove(function (err) {
+                    if (err)
+                        done(err);
+                    done(null, file);
+                });
             },
             function unlink(file, done) {
                 var path = dir + '/' + file.name;
                 fs.stat(path, function (err, stats) {
-                    if (err && err.code === 'ENOENT') {
+                    if (err && err.code === 'ENOENT')
                         done();
-                    } else if (err) {
+                    else if (err)
                         done(err);
-                    } else if (stats.isFile()) {
+                    else if (stats.isFile())
                         fs.remove(path, done);
-                    } else {
+                    else
                         done();
-                    }
                 });
             }
         ], done);
     }, function (err) {
-        if (err) {
-            console.error(err);
+        if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
-        } else {
-            req.flash('success', 'The files have been deleted successfully.');
-        }
-        res.json({ status: !!err });
+        else
+            req.flash('success', 'The files have been deleted.');
+        res.json({ status: !err });
     });
 };
 

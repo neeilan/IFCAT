@@ -5,7 +5,7 @@
 <%- include ./flash %>
 
 <% if (user.hasRole('admin')) { %>
-<div class="actions">
+<div class="nav-actions">
     <a href="/admin/courses/new" class="btn btn-default btn-sm"><span 
         class="glyphicon glyphicon-plus"></span> Add New Course</a>
 </div>
@@ -16,15 +16,17 @@
         <tr>
             <th>Code</th>
             <th>Name</th>
-            <th>Instructors</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
     <% if (_.isEmpty(courses)) { %>
         <tr>
-            <td colspan="4">No courses have been added yet. Click <a 
-                href="/admin/courses/new">here</a> to add a new course.</td>
+            <td colspan="3">No courses have been added yet.
+                <% if (user.hasRole('admin')) { %>
+                    <span>Click <a href="/admin/courses/new">here</a> to add a new course.</span>
+                <% } %>
+            </td>
         </tr>
     <% } else { %>
         <% _.each(courses, function (course) { %>
@@ -32,17 +34,12 @@
                 <td><%= course.code %></td>
                 <td><%= course.name %></td>
                 <td>
-                <% _.each(course.instructors, function (instructor) { %>
-                    <div><%= instructor.name.full %></div>
-                <% }) %>
-                </td>
-                <td>
                     <div class="dropdown">
                         <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
                             Actions<span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                        <% if (user.hasRole('admin') || user.hasRole('instructor')) { %>
+                        <% if (user.hasRole('admin')) { %>
                             <li><a href="/admin/courses/<%= course.id %>/edit"><span 
                                 class="glyphicon glyphicon-pencil"></span> Edit Course</a></li>
                         <% } %>
@@ -52,7 +49,7 @@
                                 class="glyphicon glyphicon-list-alt"></span> Manage Quizzes</a></li>
                             <li><a href="/admin/courses/<%= course.id %>/files"><span 
                                 class="glyphicon glyphicon-picture"></span> Manage Files</a></li>
-                        <% if (user.hasRole('admin') || user.hasRole('instructor')) { %>
+                        <% if (user.hasRole('admin')) { %>
                             <li><a href="/admin/courses/<%= course.id %>/instructors"><span 
                                 class="glyphicon glyphicon-user"></span> Manage Instructors</a></li>
                         <% } %>
@@ -61,7 +58,7 @@
                             <li><a href="/admin/courses/<%= course.id %>/students"><span 
                                 class="glyphicon glyphicon-user"></span> Manage Students</a></li>
                             <li class="divider"></li>
-                        <% if (user.hasRole('admin') || user.hasRole('instructor')) { %>
+                        <% if (user.hasRole('admin')) { %>
                             <li><a href="/admin/courses/<%= course.id %>" class="btn-delete"><span 
                                 class="glyphicon glyphicon-remove"></span> Delete Course</a></li>
                         <% } %>

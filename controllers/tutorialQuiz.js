@@ -9,7 +9,6 @@ exports.getQuiz = function (req, res, next, tutorialQuiz) {
         if (!tutorialQuiz) {
             return next(new Error('No tutorial quiz is found.'));
         }
-        console.log('got tutorial quiz');
         req.tutorialQuiz = tutorialQuiz;
         next();
     });
@@ -65,11 +64,10 @@ exports.getQuizForm = function (req, res) {
 // Edit quiz for tutorial
 exports.editQuiz = function (req, res) {
     req.tutorialQuiz.store(req.body, function (err) {
-        if (err) {
+        if (err)
             req.flash('error', 'An error occurred while trying to perform action.');
-        } else {
-            req.flash('success', 'The quiz has been updated successfully.');
-        }
+        else
+            req.flash('success', 'Quiz has been updated successfully.');
         res.redirect(
             '/admin/courses/' + req.course.id + 
             '/tutorial-quizzes/' + req.tutorialQuiz.id +
@@ -83,32 +81,30 @@ exports.publishQuiz = function (req, res) {
         if (err) {
             req.flash('error', 'An error occurred while trying to perform action.');
         } else {
-            req.flash('success', 'The quiz has been updated successfully.');
+            req.flash('success', 'Quiz is now <b>%s</b>.', req.body.state ? 'published' : 'unpublished');
         }
-        res.json({ status: !!err });
+        res.json({ status: !err });
     });
 };
 // Activate quiz for tutorial
 exports.activateQuiz = function (req, res) {
     req.tutorialQuiz.update({ $set: { active: req.body.state }}, function (err) {
-        if (err) {
+        if (err)
             req.flash('error', 'An error occurred while trying to perform action.');
-        } else {
-            req.flash('success', 'The quiz has been updated successfully.');
-        }
+        else
+            req.flash('success', 'Quiz is now <b>%s</b>.', req.body.state ? 'active' : 'inactive');
         req.app.locals.io.in('tutorialQuiz:' + req.tutorialQuiz.id).emit('quizActivated', req.tutorialQuiz);
-        res.json({ status: !!err });
+        res.json({ status: !err, message: msg });
     });
 };
 // Archive quiz for tutorial
 exports.archiveQuiz = function (req, res) {
     req.tutorialQuiz.update({ $set: { archived: req.body.state }}, function (err) {
-        if (err) {
+        if (err)
             req.flash('error', 'An error occurred while trying to perform action.');
-        } else {
-            req.flash('success', 'The quiz has been updated successfully.');
-        }
-        res.json({ status: !!err });
+        else
+            req.flash('success', 'Quiz is now <b>%s</b>.', req.body.state ? 'archive' : 'inactive');
+        res.sendStatus({ status: !err });
     });
 };
 

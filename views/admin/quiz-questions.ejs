@@ -5,14 +5,11 @@
 <%- include ./flash %>
 
 <div class="nav-actions">
-    <a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/sort" 
-        class="btn btn-default btn-sm<%= quiz.questions.length ? '' : ' disabled' %>" id="btn-sort"><span 
-        class="glyphicon glyphicon-ok"></span> Sort Questions</a>
     <a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/new"
         class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add New Question</a>
 </div>
 
-<table class="table table-striped">
+<table class="table table-striped dim">
     <thead>
         <tr>
             <th style="width: 10px;"></th>
@@ -65,19 +62,31 @@
 
 <script>
 $(function () {
-    // enable sorting
-    $('.sortable').sortable({ axis: 'y', cancel: false });
-    // save sort order of questions
-    $('#btn-sort').click(function (e) {
-        e.preventDefault();
-        $.ajax(this.href, {
-            type: 'put',
-            data: $(':hidden').serialize(), 
-            success: function (res) {
-                window.location.reload(true); // TO-FIX
-            },
-            dataType: 'json'
-        });
+    $('.sortable').sortable({ 
+        axis: 'y', 
+        cancel: false,
+        start: function () {
+            $.bootstrapAlert('close');
+        },
+        update: function (e, ui) {
+            var $dim = $(e.target).closest('.dim').addClass('on');
+            $.bootstrapAlert('close');
+            $.ajax(window.location.href + '/sort', {
+                type: 'put',
+                data: $(':hidden').serialize(),
+                success: function (res) {
+                    $.bootstrapAlert('success', res).insertAfter($('.container > h1'));
+                },
+                error: function (xhr) {
+                    $.bootstrapAlert('danger', xhr.responseText).insertAfter($('.container > h1'));
+                },
+                complete: function () {
+                    setTimeout(function() { 
+                        $dim.removeClass('on');
+                    }, 1500);
+                }
+            });
+        }
     });
 });
 </script>

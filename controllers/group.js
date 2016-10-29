@@ -13,7 +13,6 @@ exports.getGroup = function (req, res, next, group) {
         if (!group) {
             return next(new Error('No group is found.'));
         }
-        //console.log('got group');
         req.group = group;
         next();
     });
@@ -78,7 +77,7 @@ exports.saveGroupList = function (req, res, next) {
 
     req.tutorialQuiz.withGroups().execPopulate().then(function () {
         async.series([
-            function updateExistingGroups(done) {
+            function updOldGrps(done) {
                 async.each(req.tutorialQuiz.groups, function (group, done) {
                     if (newGroups.hasOwnProperty(group._id)) {
                         group.update({ $set: { members: newGroups[group._id] }}, function (err) {
@@ -93,13 +92,12 @@ exports.saveGroupList = function (req, res, next) {
                             if (err) {
                                 return done(err);
                             }
-                            req.tutorialQuiz.groups.pull({ _id: group.id });
-                            req.tutorialQuiz.save(done);
+                            req.tutorialQuiz.update({ $pull: { groups: group.id }}, done);
                         });
                     }
                 }, done);
             },
-            function addRemainingGroups(done) {
+            function addNewGrps(done) {
                 async.eachOfSeries(newGroups, function (members, name, done) {
                     models.Group.create({ name: name, members: members }, function (err, group) {
                         if (err) {
@@ -114,9 +112,9 @@ exports.saveGroupList = function (req, res, next) {
                 console.error(err);
                 req.flash('error', 'An error occurred while trying to perform operation.');
             } else {
-                req.flash('success', 'The groups have been updated.');
+                req.flash('success', 'The list of groups have been updated.');
             }
-            res.json({ status: !!err });
+            res.json({ status: !err });
         });
     });
 };

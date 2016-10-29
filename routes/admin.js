@@ -16,6 +16,8 @@ router.param('tutorialQuiz', controllers.TutorialQuiz.getQuiz);
 router.param('group', controllers.Group.getGroup);
 
 // non-authenticated routes
+router.get('/install', controllers.User.install);
+
 router.get('/login', controllers.User.getAdminLoginForm);
 
 router.post('/login', passport.authenticate('local-login', {

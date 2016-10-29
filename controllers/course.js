@@ -12,35 +12,18 @@ exports.getCourse = function (req, res, next, course) {
         if (!course) {
             return next(new Error('No course is found.'));
         }
-        console.log('got course');
         req.course = course;
         next();
     });
 };
 // Retrieve many courses
 exports.getCourseList = function (req, res) {
-    if (req.user.hasRole('admin')) {
-        models.Course.findCourses().exec(function (err, courses) { 
-            res.render('admin/courses', { 
-                title: 'Courses', 
-                courses: courses 
-            });
+    models.Course.findCourses().exec(function (err, courses) { 
+        res.render('admin/courses', { 
+            title: 'Courses', 
+            courses: courses 
         });
-    } else {
-        async.series([
-            function (done) {
-                models.Course.findCoursesByInstructor(req.user.id).exec(done);
-            },
-            function (done) {
-                models.Course.findCoursesByTeachingAssistant(req.user.id).exec(done);
-            }
-        ], function (err, results) {
-            res.render('admin/courses', { 
-                title: 'Courses',
-                courses: _.union(results[0], results[1])
-            });
-        });
-    }
+    });
 };
 // Get form for course
 exports.getCourseForm = function (req, res) {
@@ -53,36 +36,31 @@ exports.getCourseForm = function (req, res) {
 // Add course
 exports.addCourse = function (req, res) {
     models.Course.create(req.body, function (err, course) {
-        if (err) {
-            console.error(err);
+        if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
-        } else {
-            req.flash('success', 'The course <b>%s</b> has been created successfully.', course.name);
-        }
+        else
+            req.flash('success', 'Course <b>%s</b> has been created.', course.name);
         res.redirect('/admin/courses');
     });
 };
 // Update course
 exports.editCourse = function (req, res) {
-    _.extend(req.course, req.body).save(function (err) {  
-        if (err) {
+    req.course.set(req.body).save(function (err) {  
+        if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
-        } else {
-            req.flash('success', 'The course <b>%s</b> has been updated successfully.', req.course.name);
-        }
+        else
+            req.flash('success', 'Course <b>%s</b> has been updated.', req.course.name);
         res.redirect('/admin/courses/' + req.course.id + '/edit');
     });
 };
 // Delete course
 exports.deleteCourse = function (req, res) {
     req.course.remove(function (err) {
-        if (err) {
-            console.error(err);
+        if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
-        } else {
-            req.flash('success', 'The course <b>%s</b> has been deleted successfully.', req.course.name);
-        }
-        res.json({ status: !!err });
+        else
+            req.flash('success', 'Course <b>%s</b> has been deleted.', req.course.name);
+        res.json({ status: !err });
     });
 };
 

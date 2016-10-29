@@ -12,7 +12,6 @@ exports.getQuiz = function (req, res, next, quiz) {
         if (!quiz) {
             return next(new Error('No quiz is found.'));
         }
-        console.log('got quiz');
         req.quiz = quiz;
         next();
     });
@@ -25,9 +24,8 @@ exports.getQuizList = function (req, res) {
 };
 // Retrieve quiz form
 exports.getQuizForm = function (req, res) {
-    if (!req.quiz) {
+    if (!req.quiz)
         req.quiz = new models.Quiz();
-    }
     req.course.withTutorials().execPopulate().then(function () {
         req.quiz.loadTutorials().then(function () {
             res.render('admin/course-quiz', {
@@ -42,40 +40,37 @@ exports.getQuizForm = function (req, res) {
 exports.addQuiz = function (req, res) {
     var quiz = new models.Quiz();
     async.series([
-        function addQuiz(done) {
+        function add(done) {
             quiz.store(req.body, done);
         },
-        function addReference(done) {
+        function addRef(done) {
             req.course.update({ $push: { quizzes: quiz.id }}, done);
         }
     ], function (err) {
-        if (err) {
+        if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
-        } else {
+        else
             req.flash('success', '<b>%s</b> has been created.', quiz.name);
-        }
         res.redirect('/admin/courses/' + req.course.id + '/quizzes');
     });
 };
 // Update quiz
 exports.editQuiz = function (req, res) {
     req.quiz.store(req.body, function (err) { 
-        if (err) {
+        if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
-        } else {
+        else
             req.flash('success', '<b>%s</b> has been updated.', req.quiz.name);
-        }
         res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/edit');
     });
 };
 // Delete quiz
 exports.deleteQuiz = function (req, res) {
     req.quiz.remove(function (err) {
-        if (err) {
+        if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
-        } else {
+        else
             req.flash('success', '<b>%s</b> has been deleted.', req.quiz.name);
-        }
-        res.json({ status: !!err });
+        res.json({ status: !err });
     });
 };

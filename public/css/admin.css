@@ -11,13 +11,32 @@ textarea.form-control {
     display: inline-block;
 }
 
-.stretch {
-    overflow-x: auto;
-}
-.container > .table,
-.container > .stretch .table {
+
+.container > .table {
     width: auto;
     min-width: 700px;
+}
+
+.stretch-wrap {
+    overflow-x: auto;
+}
+.dim-wrap {
+    position: relative;
+}
+.dim-wrap .dimmer {
+    background: rgba(0,0,0,0.2);
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    z-index: 10; 
+}
+.dim-wrap.on .dimmer {
+    width: 100%;
+}
+
+.nav-actions {
+    margin-bottom: 5px;
 }
 
 /* Find users styles */

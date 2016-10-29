@@ -16,6 +16,7 @@ var FileSchema = new mongoose.Schema({
     models.Question.update(conditions, doc, options).exec();
     next();
 });*/
+
 // Check if file is an audio
 FileSchema.methods.isAudio = function () {
     return this.type.indexOf('audio') !== -1;

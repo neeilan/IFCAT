@@ -29,7 +29,7 @@
 <%- include ./flash %>
 
 <% if (!_.isEmpty(students)) { %>
-<p>
+<div class="nav-actions">
     <button type="button" class="btn btn-default btn-sm" id="btn-refresh-groups"><span 
         class="glyphicon glyphicon-refresh"></span> Refresh</button>
     <button type="button" class="btn btn-default btn-sm" id="btn-add-group"><span 
@@ -38,7 +38,7 @@
         class="glyphicon glyphicon-random"></span> Randomize groups</button>
     <button type="button" class="btn btn-default btn-sm btn-primary" id="btn-save-groups"><span 
         class="glyphicon glyphicon-ok"></span> Save groups</button>
-</p>
+</div>
 <% } %>
 
 <table id="table-quiz-groups">
@@ -72,7 +72,7 @@
                 </td>
                 <% _.each(groups, function (group) { %>
                     <td class="g"><input type="radio" name="groups[<%= student.id %>]" value="<%= group.id %>"<%=
-                        _.find(group.members, { '_id' : student._id }) ? ' checked' : '' %>></td>
+                        group.hasMember(student._id) ? ' checked' : '' %>></td>
                 <% }) %>
             </tr>
         <% }) %>
@@ -143,9 +143,7 @@ $(function () {
             type: 'put',
             data: $('#table-quiz-groups :radio').serialize(), 
             success: function (res) {
-                if (res.status) {
-                    window.location.reload(true);
-                }
+                window.location.reload(true); // TO-FIX
             }
         });
     });

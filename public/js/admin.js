@@ -1,7 +1,22 @@
 $(function () {
-
     // turn off caching
     $.ajaxSetup({ cache: false });
+
+    // wrap tables with  special container 
+    $('.dim, .stretch').each(function() {
+        var $elem = $(this), $div = $('<div/>');
+        if ($elem.hasClass('stretch')) {
+            $div.addClass('stretch-wrap');
+        }
+        if ($elem.hasClass('dim')) {
+            $div.addClass('dim-wrap');
+        }
+        $elem.wrap($div);
+
+        if ($elem.hasClass('dim')) {
+            $elem.after('<div class="dimmer"></div>'); // overlay
+        }
+    });
 
     // checked/unchecked all table-body checkboxes when table-header checkbox is checked/unchecked
     $('th :checkbox').change(function () {
@@ -93,4 +108,14 @@ $(function () {
         size: 'small',
     });
 
+    // simple plugin for creating alerts on the fly e.g. $.bootstrapAlert(type, msg).after(...)
+    $.bootstrapAlert = function () {
+        if (arguments[0] === 'close') {
+            return $('.alert').remove();
+        }
+        return $('<div/>', {
+            class: 'alert alert-' + arguments[0] + ' alert-dismissible',
+            html: '<a href="#" class="close" data-dismiss="alert">&times;</a>' + arguments[1]
+        });
+    }; 
 });

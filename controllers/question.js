@@ -31,12 +31,10 @@ exports.sortQuestionList = function (req, res) {
         return newOrder.indexOf(a) < newOrder.indexOf(b) ? -1 : 1;
     });
     req.quiz.save(function (err) {
-        if (err) {
-            req.flash('error', 'An error occurred while trying to perform operation.');
-        } else {
-            req.flash('success', 'The list of questions have been sorted.');
-        }
-        res.json({ status: !!err });       
+        if (err)
+            res.status(500).send('An error has occurred while trying to perform operation.');
+        else
+            res.status(200).send('List of questions have been updated.');
     });
 };
 // Retrieve specific question for quiz
@@ -57,29 +55,27 @@ exports.getQuestionForm = function (req, res) {
 exports.addQuestion = function (req, res) {
     var question = new models.Question();
     async.series([
-        function addQuestion(done) {
+        function add(done) {
             question.store(req.body, done);
         },
         function addRef(done) {
             req.quiz.update({ $addToSet: { questions: question.id }}, done);
         }
     ], function (err) {
-        if (err) {
+        if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
-        } else {
+        else
             req.flash('success', 'Question <b>%s</b> has been created.', question.number);
-        }
         res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/questions');
     });
 };
 // Update specific question for quiz
 exports.editQuestion = function (req, res) {
     req.question.store(req.body, function (err) {
-        if (err) {
+        if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
-        } else {
+        else
             req.flash('success', 'Question <b>%s</b> has been updated.', req.question.number);
-        }
         res.redirect(
             '/admin/courses/' + req.course.id + 
             '/quizzes/' + req.quiz.id + 
@@ -91,11 +87,10 @@ exports.editQuestion = function (req, res) {
 // Delete specific question for quiz
 exports.deleteQuestion = function (req, res) {
     req.question.remove(function (err) {
-        if (err) {
+        if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
-        } else {
+        else
             req.flash('success', 'Question <b>%s</b> has been deleted.', req.question.number);
-        }
-        res.json({ status: !!err });
+        res.json({ status: !err });
     });
 };

@@ -27,9 +27,9 @@ exports.addInstructor = function (req, res) {
         if (err) {
             req.flash('error', 'An error occurred while trying to perform operation.');
         } else {
-            req.flash('success', 'The instructor <b>%s</b> has been added to the course.', req.us3r.name.full);
+            req.flash('success', 'Instructor <b>%s</b> has been added to the course.', req.us3r.name.full);
         }
-        res.json({ status: !!err });
+        res.json({ status: !err });
     });
 };
 // Delete instructor from course
@@ -38,8 +38,8 @@ exports.deleteInstructor = function (req, res) {
         if (err) {
             req.flash('error', 'An error occurred while trying to perform operation.');
         } else {
-            req.flash('success', 'The instructor <b>%s</b> has been deleted from the course.', req.us3r.name.full);
+            req.flash('success', 'Instructor <b>%s</b> has been deleted from the course.', req.us3r.name.full);
         }
-        res.json({ status: !!err });
+        res.json({ status: !err });
     }); 
 };
