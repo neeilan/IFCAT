@@ -41,17 +41,6 @@ $(function () {
             window.location.reload(true); // TO-FIX
         });
     });
-    // update user in tutorials when button is clicked
-    $('.btn-update-user').click(function (e) {
-        e.preventDefault();
-        $.ajax(this.href, {
-            type: 'put',
-            data: $(this).closest('tr').find(':input').serialize(),
-            success: function (res) {
-                window.location.reload(true); // TO-FIX
-            }
-        });
-    });
     // delete user from course when button is clicked
     $('.btn-delete-user').click(function (e) {
         e.preventDefault();
@@ -63,18 +52,34 @@ $(function () {
         });
     });
 
-    $('.btn-delete').click(function (e) {
-        e.preventDefault();
-        var url = this.href, data = null;
-        if (this.id === 'btn-delete-files') {
-            data = $('#table-files :checkbox:checked').serialize();
+    // style checkboxes with switch control
+    $(":checkbox.bootstrap-switch").bootstrapSwitch({  
+        inverse: true,
+        offText: 'No',
+        onText: 'Yes',
+        size: 'small',
+    });
+
+    // small plugin for creating alerts on the fly
+    // @usage: $.bootstrapAlert(type, msg).after(...)
+    $.bootstrapAlert = function () {
+        if (arguments[0] === 'close') {
+            return $('.alert').remove();
         }
-        // open confirmation dialog before performing deletion
+        return $('<div/>', {
+            class: 'alert alert-' + arguments[0] + ' alert-dismissible',
+            html: '<a href="#" class="close" data-dismiss="alert">&times;</a>' + arguments[1]
+        });
+    };
+
+    // small plugin for creating confirm dialogs on the fly
+    // @usage: $.deletebox(options)
+    $.deletebox = function (options) {
         bootbox.dialog({
             onEscape: true,
             size: 'small',
-            title: 'Confirm deletion',
-            message: $('#btn-delete-message-template').text(),
+            title: options.title,
+            message: options.message,
             buttons: {
                 cancel: {
                     label: 'Cancel',
@@ -85,37 +90,11 @@ $(function () {
                     className: 'btn-danger',
                     callback: function (res) {
                         if (res) {
-                            // perform deletion
-                            $.ajax(url, {
-                                type: 'delete',
-                                data: data,
-                                success: function (res) {
-                                    window.location.reload(true); // TO-FIX     
-                                }
-                            });
+                            options.callback();
                         }
                     }
                 }
-            } // end of buttons
-        }); // end of bootbox
-    });
-
-    // style checkboxes with switch control
-    $(":checkbox.bootstrap-switch").bootstrapSwitch({  
-        inverse: true,
-        offText: 'No',
-        onText: 'Yes',
-        size: 'small',
-    });
-
-    // simple plugin for creating alerts on the fly e.g. $.bootstrapAlert(type, msg).after(...)
-    $.bootstrapAlert = function () {
-        if (arguments[0] === 'close') {
-            return $('.alert').remove();
-        }
-        return $('<div/>', {
-            class: 'alert alert-' + arguments[0] + ' alert-dismissible',
-            html: '<a href="#" class="close" data-dismiss="alert">&times;</a>' + arguments[1]
+            }
         });
-    }; 
+    };
 });

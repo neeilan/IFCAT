@@ -17,9 +17,7 @@ router.param('group', controllers.Group.getGroup);
 
 // non-authenticated routes
 router.get('/install', controllers.User.install);
-
 router.get('/login', controllers.User.getAdminLoginForm);
-
 router.post('/login', passport.authenticate('local-login', {
     successRedirect: '/admin/courses',
     failureRedirect: '/admin/login',
@@ -46,7 +44,7 @@ router.use(function (req, res, next) {
         ];
         var fragments = req.url.split('/');
         res.locals.breadcrumbs = [];
-        fragments.forEach(function (fragment, f) {
+        _.each(fragments, function (fragment, f) {
             // check if fragment is one of the keywords
             if (keywords.indexOf(fragment) !== -1) {
                 res.locals.breadcrumbs.push({
@@ -60,10 +58,7 @@ router.use(function (req, res, next) {
 });
 
 // authenticated routes
-// @TODO: model validation
-
 router.get('/logout', controllers.User.logout);
-
 //router.get('/courses/generate', controllers.Course.generateData);
 
 router.get('/courses', controllers.Course.getCourseList);

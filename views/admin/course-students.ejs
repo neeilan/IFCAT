@@ -15,56 +15,54 @@
 
 <!-- Show current student. -->
 
-<div class="stretch">
-    <table class="table table-striped">
-        <thead>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th rowspan="2">Name</th>
+            <th rowspan="2">UTORid</th>
+            <% if (!_.isEmpty(course.tutorials)) { %>
+                <th colspan="<%= course.tutorials.length %>">Tutorials</th>
+            <% } %>
+            <th rowspan="2" style="width: 100px"></th>
+        </tr>
+        <tr>
+        <% _.each(course.tutorials, function (tutorial) { %>
+            <th class="text-center"><%= tutorial.number %></th>
+        <% }) %>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th colspan="<%= 3 + course.tutorials.length %>">
+                <%= course.students.length + ' student' + (course.students.length !== 1 ? 's' : '') %>
+            </th>
+        </tr>
+    </tfoot>
+    <tbody>
+    <% if (_.isEmpty(course.students)) { %>
+        <tr>
+            <td colspan="<%= 3 + course.tutorials.length %>">
+                No students have been added to the course yet. Click <a 
+                href="#" data-toggle="modal" data-target="#modal-find">here</a> to add students to the course.
+            </td>
+        </tr>
+    <% } else { %>
+        <% _.each(course.students, function (student) { %>
             <tr>
-                <th rowspan="2">Name</th>
-                <th rowspan="2">UTORid</th>
-                <% if (!_.isEmpty(course.tutorials)) { %>
-                    <th colspan="<%= course.tutorials.length %>">Tutorials</th>
-                <% } %>
-                <th rowspan="2" style="width: 100px"></th>
+                <td><%= student.name.full %></td>
+                <td><%= student.student.UTORid %></td>
+                <% _.each(course.tutorials, function (tutorial) { %>
+                    <td class="text-center"><input type="radio" name="tutorials[<%= student.id %>]" 
+                        value="<%= tutorial.id %>"<%= tutorial.hasStudent(student.id) ? ' checked' : '' %>></td>
+                <% }) %>
+                <td><a href="/admin/courses/<%= course.id %>/students/<%= student.id %>" 
+                        class="btn btn-danger btn-sm btn-delete-user"><span 
+                        class="glyphicon glyphicon-remove"></span> Remove</a></td>
             </tr>
-            <tr>
-            <% _.each(course.tutorials, function (tutorial) { %>
-                <th class="text-center"><%= tutorial.number %></th>
-            <% }) %>
-            </tr>
-        </thead>
-        <tfoot>
-            <tr>
-                <th colspan="<%= 3 + course.tutorials.length %>">
-                    <%= course.students.length + ' student' + (course.students.length !== 1 ? 's' : '') %>
-                </th>
-            </tr>
-        </tfoot>
-        <tbody>
-        <% if (_.isEmpty(course.students)) { %>
-            <tr>
-                <td colspan="<%= 3 + course.tutorials.length %>">
-                    No students have been added to the course yet. Click <a 
-                    href="#" data-toggle="modal" data-target="#modal-find">here</a> to add students to the course.
-                </td>
-            </tr>
-        <% } else { %>
-            <% _.each(course.students, function (student) { %>
-                <tr>
-                    <td><%= student.name.full %></td>
-                    <td><%= student.UTORid %></td>
-                    <% _.each(course.tutorials, function (tutorial) { %>
-                        <td class="text-center"><input type="radio" name="tutorials[<%= student.id %>]" 
-                            value="<%= tutorial.id %>"<%= tutorial.hasStudent(student.id) ? ' checked' : '' %>></td>
-                    <% }) %>
-                    <td><a href="/admin/courses/<%= course.id %>/students/<%= student.id %>" 
-                            class="btn btn-danger btn-sm btn-delete-user"><span 
-                            class="glyphicon glyphicon-remove"></span> Remove</a></td>
-                </tr>
-            <% }) %>
-        <% } %>
-        </tbody>
-    </table>
-</div>
+        <% }) %>
+    <% } %>
+    </tbody>
+</table>
 
 <%- include ./modals/import-students %>
 <%- include ./modals/find-students %>

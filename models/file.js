@@ -1,4 +1,6 @@
-var mongoose = require('mongoose');
+var async = require('async'),
+    mongoose = require('mongoose');
+
 var models = require('.');
 
 var FileSchema = new mongoose.Schema({
@@ -8,15 +10,19 @@ var FileSchema = new mongoose.Schema({
     timestamps: true
 });
 // Delete cascade
-/*FileSchema.pre('remove', function (next) {
+FileSchema.pre('remove', function (next) {
     var conditions = { files: { $in: [this._id] }},
         doc = { $pull: { files: this._id }},
         options = { multi: true };
-    models.Course.update(conditions, doc, options).exec();
-    models.Question.update(conditions, doc, options).exec();
-    next();
-});*/
-
+    async.parallel([
+        function delRef1(done) {
+            models.Course.update(conditions, doc, options).exec(done);
+        },
+        function delRef2(done) {
+            models.Question.update(conditions, doc, options).exec(done);     
+        }
+    ], next);
+});
 // Check if file is an audio
 FileSchema.methods.isAudio = function () {
     return this.type.indexOf('audio') !== -1;

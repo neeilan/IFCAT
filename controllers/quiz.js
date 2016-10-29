@@ -71,6 +71,6 @@ exports.deleteQuiz = function (req, res) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', '<b>%s</b> has been deleted.', req.quiz.name);
-        res.json({ status: !err });
+        res.sendStatus(200);
     });
 };

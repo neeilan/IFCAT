@@ -110,26 +110,6 @@ CourseSchema.methods.withFiles = function () {
         }
     });
 };
-// Find courses
-CourseSchema.statics.findCourses = function () {
-    return this.find().sort('code').populate([{
-        path: 'instructors',
-        options: {
-            sort: { 'name.first': 1, 'name.last': 1 }
-        }
-    }, {
-        path: 'tutorials',
-        options: {
-            sort: 'number'
-        },
-        populate: {
-            path: 'teachingAssistants',
-            options: {
-                sort: { 'name.first': 1, 'name.last': 1 }
-            }
-        }
-    }]);
-};
 // Find courses taught by instructor
 CourseSchema.statics.findCoursesByInstructor = function (user) {
     return this.find({

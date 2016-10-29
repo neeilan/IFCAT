@@ -83,6 +83,6 @@ exports.deleteTutorial = function (req, res) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', 'Tutorial <b>%s</b> has been deleted.', req.tutorial.number);
-        res.json({ status: !err });
+        res.sendStatus(200);
     });
 };

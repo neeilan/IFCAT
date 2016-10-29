@@ -89,7 +89,7 @@ exports.deleteUser = function (req, res) {
             req.flash('error', 'An error occurred while trying to perform action.');
         else
             req.flash('success', 'User <b>%s</b> has been deleted.', req.us3r.name.full);
-        res.json({ status: !err });
+        res.sendStatus(200);
     });
 };
 // Add administrator

@@ -18,10 +18,14 @@ exports.getCourse = function (req, res, next, course) {
 };
 // Retrieve many courses
 exports.getCourseList = function (req, res) {
-    models.Course.findCourses().exec(function (err, courses) { 
+    models.Course.find().sort('code').exec(function (err, courses) {
         res.render('admin/courses', { 
-            title: 'Courses', 
-            courses: courses 
+            title: 'Courses',
+            courses: _.filter(courses, function (course) {
+                return req.user.hasRole('admin')
+                    || course.instructors.indexOf(req.user.id) !== -1 
+                    || course.teachingAssistants.indexOf(req.user.id) !== -1; 
+            }) 
         });
     });
 };
@@ -60,7 +64,7 @@ exports.deleteCourse = function (req, res) {
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
             req.flash('success', 'Course <b>%s</b> has been deleted.', req.course.name);
-        res.json({ status: !err });
+        res.sendStatus(200);
     });
 };
 

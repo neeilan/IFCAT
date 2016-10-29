@@ -12,7 +12,9 @@ textarea.form-control {
 }
 
 
-.container > .table {
+.container > .table,
+.container > .stretch-wrap .table,
+.container > .dim-wrap .table {
     width: auto;
     min-width: 700px;
 }
@@ -66,29 +68,30 @@ textarea.form-control {
 
 /* File listing styles */
 
-.modal-upload-files .modal-body {
+#modal-upload-files .modal-body {
     padding: 0;
 }
-.modal-upload-files .modal-body .btn {
+#modal-upload-files .modal-body .btn {
     margin: 15px auto;
     width: 95%;
 }
-.modal-upload-files .modal-body .list-group {
+#modal-upload-files .modal-body .list-group {
     margin: 0;
 }
-.modal-upload-files .modal-body .list-group-item {
+#modal-upload-files .modal-body .list-group-item {
     border-radius: 0;
     border-top: 1px solid #ddd;
     border-right: 0;
     border-bottom: 0;
     border-left: 0;
 }
-.modal-upload-files .modal-body .btn-remove-file {
+#modal-upload-files .modal-body .btn-remove-file {
     padding: 8px 20px 0 0;
     position: absolute;
     right: 0px;
     top: 0;
 }
+
 .modal-preview-file .bootbox-body > * {
     display: block;
     margin: 0 auto;

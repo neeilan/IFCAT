@@ -34,14 +34,14 @@ exports.addFiles = function (req, res) {
         file.store(obj, function (err) {
             if (err)
                 return done(err);
-            req.course.update({ $push: { files: file.id }}, done);
+            req.course.update({ $push: { files: file._id }}, done);
         });
     }, function (err) {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
             req.flash('success', 'The files have been added.');
-        res.json({ status: !err });
+        res.redirect(req.originalUrl);
     });
 };
 // Delete specific files from course
@@ -50,12 +50,18 @@ exports.deleteFiles = function (req, res) {
     async.each(req.body.files, function (id, done) {
         async.waterfall([
             function find(done) {
-                models.File.findById(id, done);
+                models.File.findById(id, function (err, file) {
+                    if (err)
+                        return done(err);
+                    if (!file)
+                        return done(new Error('no file'));
+                    done(null, file);
+                });
             },
             function del(file, done) {
                 file.remove(function (err) {
                     if (err)
-                        done(err);
+                        return done(err);
                     done(null, file);
                 });
             },
@@ -63,22 +69,22 @@ exports.deleteFiles = function (req, res) {
                 var path = dir + '/' + file.name;
                 fs.stat(path, function (err, stats) {
                     if (err && err.code === 'ENOENT')
-                        done();
+                        return done();
                     else if (err)
-                        done(err);
+                        return done(err);
                     else if (stats.isFile())
                         fs.remove(path, done);
                     else
-                        done();
+                        return done();
                 });
             }
         ], done);
     }, function (err) {
-        if (err)
+        if (err) 
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
             req.flash('success', 'The files have been deleted.');
-        res.json({ status: !err });
+        res.sendStatus(200);
     });
 };
 

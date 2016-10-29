@@ -1,5 +1,7 @@
 var _ = require('lodash'),
+    async = require('async'),
     mongoose = require('mongoose');
+
 var models = require('.');
 
 var TutorialSchema = new mongoose.Schema({
@@ -10,14 +12,20 @@ var TutorialSchema = new mongoose.Schema({
     timestamps: true
 });
 // Delete cascade
-/*TutorialSchema.pre('remove', function (next) {
-    var conditions = { tutorials: { $in: [this._id] }},
-        doc = { $pull: { tutorials: this._id }},
+TutorialSchema.pre('remove', function (next) {
+    var tutorial = this;
+    var conditions = { tutorials: { $in: [tutorial._id] }},
+        doc = { $pull: { tutorials: tutorial._id }},
         options = { multi: true };
-    models.Tutorial.update(conditions, doc, options).exec();
-    models.TutorialQuiz.remove({ tutorial: this._id }).exec();
-    next();
-});*/
+    async.parallel([
+        function delRef1(done) {
+            models.Tutorial.update(conditions, doc, options).exec(done);
+        },
+        function delRef2(done) {
+            models.TutorialQuiz.remove({ tutorial: tutorial._id }).exec(done);
+        }
+    ], next);
+});
 // Populate students
 TutorialSchema.methods.withStudents = function () {
     return this.populate({ 

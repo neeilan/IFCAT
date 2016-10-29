@@ -79,33 +79,37 @@ exports.importStudentList = function (req, res) {
             row.name = {};
             row.local = {};
             // normalize properties
-            _.each(_.keys(row), function (key) {
+            _.forOwn(row, function (val, key) {
                 if (/^utorid/i.test(key))
-                    row.student.UTORid = row[key];
-                else if (/^student/i.test(key))
-                    row.student.number = row[key];
+                    row.student.UTORid = val;
+                else if (/^student(.+)/i.test(key))
+                    row.student.number = val;
                 else if (/^first/i.test(key))
-                    row.name.first = row[key];
+                    row.name.first = val;
                 else if (/^last/i.test(key))
-                    row.name.last = row[key];
+                    row.name.last = val;
                 else if (/^e\-?mail/i.test(key))
-                    row.local.email = row[key];
+                    row.local.email = val;
                 else if (/^password/i.test(key))
-                    row.local.password = row[key];
+                    row.local.password = val;
                 else if (/^tutorial/i.test(key))
-                    row.tutorial = row[key];
+                    row.tutorial = val;
             });
 
-            async.waterfall([    
+            async.waterfall([
                 function add(done) {
-                    models.User.findOne({ 'student.UTORid': update.student.UTORid }, function (err, user) {
+                    models.User.findOne({ 'student.UTORid': row.student.UTORid }, function (err, user) {
                         if (err)
                             return done(err);
                         if (!user)
                             user = new models.User();
-                        user.set(update);
+                        user.set(row);
                         user.roles.addToSet('student');
-                        user.save(done);
+                        user.save(function (err) {
+                            if (err)
+                                return done(err);
+                            done(null, user);
+                        });
                     });
                 },
                 function addRef1(user, done) {
@@ -128,6 +132,7 @@ exports.importStudentList = function (req, res) {
                 }
             ], done);
         }, function (err) {
+            console.log(err)
             if (err)
                 req.flash('error', 'An error has occurred while trying to perform operation.');
             else

@@ -21,13 +21,12 @@ var QuestionSchema = new mongoose.Schema({
     timestamps: true 
 });
 // Delete cascade
-/*QuestionSchema.pre('remove', function (next) {
+QuestionSchema.pre('remove', function (next) {
     var conditions = { questions: { $in: [this._id] }},
         doc = { $pull: { questions: this._id }},
         options = { multi: true };
-    models.Quiz.update(conditions, doc, options).exec();
-    next();
-});*/
+    models.Quiz.update(conditions, doc, options).exec(next);
+});
 // Populate files
 QuestionSchema.methods.withFiles = function () {
     return this.populate({ 

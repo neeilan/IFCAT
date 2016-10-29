@@ -1,6 +1,8 @@
 var _ = require('lodash'),
+    async = require('async'),
     bcrypt = require('bcryptjs'),
     mongoose = require('mongoose');
+    
 var models = require('.');
 
 var UserSchema = new mongoose.Schema({
@@ -65,11 +67,11 @@ UserSchema.pre('save', function (next) {
 // hook: delete cascade
 UserSchema.pre('remove', function (next) {
     var conditions = {
-        $or: {
-            instructors: { $in: [this._id] },
-            teachingAssistants: { $in: [this._id] }, 
-            students: { $in: [this._id] }
-        }
+        $or: [
+            { instructors: { $in: [this._id] }},
+            { teachingAssistants: { $in: [this._id] }}, 
+            { students: { $in: [this._id] }}
+        ]
     },  doc = { 
         $pull: {
             instructors: this._id,
@@ -79,9 +81,14 @@ UserSchema.pre('remove', function (next) {
     }, options = {
         multi: true
     };
-    models.Course.update(conditions, doc, options).exec();
-    models.Tutorial.update(conditions, doc, options).exec();
-    next();
+    async.parallel([
+        function delRef1(done) {
+            models.Course.update(conditions, doc, options).exec(done);
+        },
+        function delRef2(done) {
+            models.Tutorial.update(conditions, doc, options).exec(done);
+        }
+    ], next);
 });
 // check password given is valid
 UserSchema.methods.checkPassword = function (password, callback) {

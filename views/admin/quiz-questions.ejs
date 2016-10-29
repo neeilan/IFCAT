@@ -53,21 +53,31 @@
     <% } %>
 </table>
 
-<script type="text/template" id="btn-delete-message-template">
-    <p>You are about to delete question and all of its associated information.</p>
-    <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>
-</script>
-
 <%- include ./body-js -%>
 
 <script>
 $(function () {
+    $('.btn-delete').click(function (e) {
+        e.preventDefault();
+        var btn = this;
+        $.deletebox({
+            title: 'Delete question',
+            message: '<p>You are about to delete question and all of its associated information.</p>\
+                <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
+            callback: function () {
+                $.ajax(btn.href, {
+                    type: 'delete',
+                    complete: function () {
+                        window.location.reload(true);
+                    }
+                });
+            }
+        });
+    });
+
     $('.sortable').sortable({ 
         axis: 'y', 
         cancel: false,
-        start: function () {
-            $.bootstrapAlert('close');
-        },
         update: function (e, ui) {
             var $dim = $(e.target).closest('.dim').addClass('on');
             $.bootstrapAlert('close');
