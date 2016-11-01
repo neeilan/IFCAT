@@ -84,9 +84,6 @@ $(function () {
             $.ajax(window.location.href + '/sort', {
                 type: 'put',
                 data: $(':hidden').serialize(),
-                success: function (res) {
-                    $.bootstrapAlert('success', res).insertAfter($('.container > h1'));
-                },
                 error: function (xhr) {
                     $.bootstrapAlert('danger', xhr.responseText).insertAfter($('.container > h1'));
                 },
