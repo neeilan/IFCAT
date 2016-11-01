@@ -77,34 +77,30 @@ exports.editQuiz = function (req, res) {
 };
 // Publish quiz for tutorial
 exports.publishQuiz = function (req, res) {
+    req.body.state = (req.body.state === 'true');
     req.tutorialQuiz.update({ $set: { published: req.body.state }}, function (err) {
-        if (err) {
-            req.flash('error', 'An error occurred while trying to perform action.');
-        } else {
-            req.flash('success', 'Quiz is now <b>%s</b>.', req.body.state ? 'published' : 'unpublished');
-        }
-        res.json({ status: !err });
+        if (err) 
+            return res.status(500).send('An error occurred while trying to perform action.');
+        res.send('Quiz is now <b>' + (req.body.state ? 'published' : 'unpublished') + '</b>.');
     });
 };
 // Activate quiz for tutorial
 exports.activateQuiz = function (req, res) {
+    req.body.state = (req.body.state === 'true');
     req.tutorialQuiz.update({ $set: { active: req.body.state }}, function (err) {
         if (err)
-            req.flash('error', 'An error occurred while trying to perform action.');
-        else
-            req.flash('success', 'Quiz is now <b>%s</b>.', req.body.state ? 'active' : 'inactive');
+            return res.status(500).send('An error occurred while trying to perform action.');
         req.app.locals.io.in('tutorialQuiz:' + req.tutorialQuiz.id).emit('quizActivated', req.tutorialQuiz);
-        res.json({ status: !err, message: msg });
+        res.send('Quiz is now <b>' + (req.body.state ? 'active' : 'inactive') + '</b>.');
     });
 };
 // Archive quiz for tutorial
 exports.archiveQuiz = function (req, res) {
+    req.body.state = (req.body.state === 'true');
     req.tutorialQuiz.update({ $set: { archived: req.body.state }}, function (err) {
         if (err)
-            req.flash('error', 'An error occurred while trying to perform action.');
-        else
-            req.flash('success', 'Quiz is now <b>%s</b>.', req.body.state ? 'archive' : 'inactive');
-        res.sendStatus({ status: !err });
+            return res.status(500).send('An error occurred while trying to perform action.');
+        res.send('Quiz is now <b>' + (req.body.state ? 'archived' : 'unarchived') + '</b>.');
     });
 };
 

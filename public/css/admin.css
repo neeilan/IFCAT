@@ -26,11 +26,18 @@ textarea.form-control {
     position: relative;
 }
 .dim-wrap .dimmer {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     background: rgba(0,0,0,0.2);
+    cursor: default;
     height: 100%;
     left: 0;
     position: absolute;
     top: 0;
+    user-select: none;
     z-index: 10; 
 }
 .dim-wrap.on .dimmer {
@@ -38,7 +45,8 @@ textarea.form-control {
 }
 
 .nav-actions {
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+    padding: 10px 0;
 }
 
 /* Find users styles */
@@ -164,7 +172,6 @@ a.counter {
 #table-quiz-groups {
     border-top: 1px solid #ddd;
     border-left: 1px solid #ddd;
-    margin-top: 10px;
 }
 #table-quiz-groups th, #table-quiz-groups td {
     border-bottom: 1px solid #ddd;

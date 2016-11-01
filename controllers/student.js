@@ -132,7 +132,6 @@ exports.importStudentList = function (req, res) {
                 }
             ], done);
         }, function (err) {
-            console.log(err)
             if (err)
                 req.flash('error', 'An error has occurred while trying to perform operation.');
             else

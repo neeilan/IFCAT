@@ -79,7 +79,7 @@ $(function () {
         axis: 'y', 
         cancel: false,
         update: function (e, ui) {
-            var $dim = $(e.target).closest('.dim').addClass('on');
+            var $dim = $(e.target).closest('.dim-wrap').addClass('on');
             $.bootstrapAlert('close');
             $.ajax(window.location.href + '/sort', {
                 type: 'put',
@@ -91,9 +91,7 @@ $(function () {
                     $.bootstrapAlert('danger', xhr.responseText).insertAfter($('.container > h1'));
                 },
                 complete: function () {
-                    setTimeout(function() { 
-                        $dim.removeClass('on');
-                    }, 1500);
+                    $dim.removeClass('on');
                 }
             });
         }

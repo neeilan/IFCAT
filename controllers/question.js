@@ -32,9 +32,8 @@ exports.sortQuestionList = function (req, res) {
     });
     req.quiz.save(function (err) {
         if (err)
-            res.status(500).send('An error has occurred while trying to perform operation.');
-        else
-            res.status(200).send('List of questions have been updated.');
+            return res.status(500).send('An error has occurred while trying to perform operation.');
+        res.send('List of questions have been updated.');
     });
 };
 // Retrieve specific question for quiz

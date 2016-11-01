@@ -16,8 +16,8 @@ var TutorialQuizSchema = new mongoose.Schema({
     },
     // max # of groups OR members per group
     max: {
-        groups: { type : Number },
-        membersPerGroup: { type : Number } 
+        groups: { type : Number, default: 7 },
+        membersPerGroup: { type : Number, default: 3 } 
     },
     // make quiz visible to students
     published: Boolean,
@@ -30,12 +30,20 @@ var TutorialQuizSchema = new mongoose.Schema({
 });
 // Set index
 TutorialQuizSchema.index({ tutorial: 1, quiz: 1 }, { unique: true });
+// Get students within groups
+TutorialQuizSchema.virtual('assignedStudents').get(function () {
+    return _.reduce(this.groups, function (accum, group) {
+        return _.concat(accum, group.members);
+    }, []);
+});
 // Get students not within groups
 TutorialQuizSchema.virtual('unassignedStudents').get(function () {
-    return _.reduce(this.groups, function (students, group) {
-        return _.differenceWith(students, group.members, function (a, b) { return a.id === b.id; });
-    }, this.tutorial.students);
+    return _.differenceBy(this.tutorial.students, this.assignedStudents, 'id');
 });
+//
+TutorialQuizSchema.methods.isUnassigned = function (userId) {
+    return !!_.find(this.unassignedStudents, { id: userId });
+};
 // Populate students
 TutorialQuizSchema.methods.withStudents = function () {
     return this.populate({
@@ -63,8 +71,8 @@ TutorialQuizSchema.methods.withGroups = function () {
     });
 };
 // Populate responses
-TutorialQuizSchema.methods.withResponses = function (group) {
-    var obj = {
+TutorialQuizSchema.methods.withResponses = function () {
+    return this.populate({
         path: 'responses',
         model: models.Response,
         populate: [{
@@ -74,8 +82,7 @@ TutorialQuizSchema.methods.withResponses = function (group) {
             path: 'question',
             models: models.Question
         }]
-    };
-    return this.populate(obj);
+    });
 };
 
 // Save tutorial-quiz
@@ -83,17 +90,11 @@ TutorialQuizSchema.methods.store = function (obj, callback) {
     this.allocateMembers = obj.allocateMembers;
     this.max = {};
     this.max[obj.max.key] = obj.max.value;
-    this.archived = obj.archived;
     return this.save(callback);
 };
 // Find quizzes within tutorial
 TutorialQuizSchema.statics.findQuizzesByTutorial = function (tutorial) {
     return this.find({ tutorial: tutorial }).populate('tutorial quiz');
-};
-
-// find quizzes within tutorial
-TutorialQuizSchema.statics.findQuizzesByStudent = function (tutorial, user) {
-    
 };
 
 module.exports = mongoose.model('TutorialQuiz', TutorialQuizSchema);

@@ -11,7 +11,7 @@ var GroupSchema = new mongoose.Schema({
 });
 
 GroupSchema.methods.hasMember = function (userId) {
-    return !!_.find(this.members, { _id: userId });
+    return !!_.find(this.members, { id: userId });
 };
 
 module.exports = mongoose.model('Group', GroupSchema);

@@ -27,7 +27,8 @@ exports.getGroupList = function (req, res) {
             tutorial: req.tutorialQuiz.tutorial,
             quiz: req.tutorialQuiz.quiz,
             groups: req.tutorialQuiz.groups,
-            students: req.tutorialQuiz.tutorial.students
+            students: req.tutorialQuiz.tutorial.students,
+            unassignedStudents: req.tutorialQuiz.unassignedStudents
         });
     });
 };
@@ -44,7 +45,7 @@ exports.generateGroupList = function (req, res) {
         }
         // split into chunks of size
         var chunks = _.chunk(students, size);
-        // map chunks to groups
+        // map chunks to groups (TO-FIX)
         var groups = _.map(chunks, function (chunk, i) {
             return { id: i + 1, name: i + 1, members: chunk };
         });

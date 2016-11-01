@@ -41,6 +41,17 @@ $(function () {
             window.location.reload(true); // TO-FIX
         });
     });
+    // update user in tutorials when button is clicked      
+    $('.btn-update-user').click(function (e) {        
+         e.preventDefault();       
+         $.ajax(this.href, {       
+             type: 'put',      
+             data: $(this).closest('tr').find(':input').serialize(),       
+             success: function (res) {     
+                 window.location.reload(true); // TO-FIX       
+             }     
+         });       
+    });
     // delete user from course when button is clicked
     $('.btn-delete-user').click(function (e) {
         e.preventDefault();
@@ -64,7 +75,7 @@ $(function () {
     // @usage: $.bootstrapAlert(type, msg).after(...)
     $.bootstrapAlert = function () {
         if (arguments[0] === 'close') {
-            return $('.alert').remove();
+            return $('.alert-dismissible').remove();
         }
         return $('<div/>', {
             class: 'alert alert-' + arguments[0] + ' alert-dismissible',
