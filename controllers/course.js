@@ -36,8 +36,7 @@ exports.getCourseList = function (req, res) {
             }
         ], function (err, results) {
             res.render('admin/courses', { 
-                'instructor.courses': results[0],
-                'teachingAssistant.courses': results[1] 
+                'courses': results[0]
             });
         });
     }
