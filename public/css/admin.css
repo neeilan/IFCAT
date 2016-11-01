@@ -7,14 +7,46 @@ body > .navbar {
 textarea.form-control {
     max-width: 100%;
 }
-
-.stretch {
-    overflow-x: auto;
+.alert {
+    display: inline-block;
 }
+
+
 .container > .table,
-.container > .stretch .table {
+.container > .stretch-wrap .table,
+.container > .dim-wrap .table {
     width: auto;
     min-width: 700px;
+}
+
+.stretch-wrap {
+    overflow-x: auto;
+}
+.dim-wrap {
+    position: relative;
+}
+.dim-wrap .dimmer {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    background: rgba(0,0,0,0.2);
+    cursor: default;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    user-select: none;
+    z-index: 10; 
+}
+.dim-wrap.on .dimmer {
+    width: 100%;
+}
+
+.nav-actions {
+    margin-bottom: 10px;
+    padding: 10px 0;
 }
 
 /* Find users styles */
@@ -44,29 +76,30 @@ textarea.form-control {
 
 /* File listing styles */
 
-.modal-upload-files .modal-body {
+#modal-upload-files .modal-body {
     padding: 0;
 }
-.modal-upload-files .modal-body .btn {
+#modal-upload-files .modal-body .btn {
     margin: 15px auto;
     width: 95%;
 }
-.modal-upload-files .modal-body .list-group {
+#modal-upload-files .modal-body .list-group {
     margin: 0;
 }
-.modal-upload-files .modal-body .list-group-item {
+#modal-upload-files .modal-body .list-group-item {
     border-radius: 0;
     border-top: 1px solid #ddd;
     border-right: 0;
     border-bottom: 0;
     border-left: 0;
 }
-.modal-upload-files .modal-body .btn-remove-file {
+#modal-upload-files .modal-body .btn-remove-file {
     padding: 8px 20px 0 0;
     position: absolute;
     right: 0px;
     top: 0;
 }
+
 .modal-preview-file .bootbox-body > * {
     display: block;
     margin: 0 auto;
@@ -139,7 +172,6 @@ a.counter {
 #table-quiz-groups {
     border-top: 1px solid #ddd;
     border-left: 1px solid #ddd;
-    margin-top: 10px;
 }
 #table-quiz-groups th, #table-quiz-groups td {
     border-bottom: 1px solid #ddd;

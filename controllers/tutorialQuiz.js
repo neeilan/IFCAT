@@ -1,5 +1,3 @@
-var _ = require('lodash');
-
 var models = require('../models');
 
 // Retrieve course
@@ -11,7 +9,6 @@ exports.getQuiz = function (req, res, next, tutorialQuiz) {
         if (!tutorialQuiz) {
             return next(new Error('No tutorial quiz is found.'));
         }
-        console.log('got tutorial quiz');
         req.tutorialQuiz = tutorialQuiz;
         next();
     });
@@ -67,11 +64,10 @@ exports.getQuizForm = function (req, res) {
 // Edit quiz for tutorial
 exports.editQuiz = function (req, res) {
     req.tutorialQuiz.store(req.body, function (err) {
-        if (err) {
-            req.flash('failure', 'Unable to save quiz at this time.');
-        } else {
-            req.flash('success', 'The quiz has been updated successfully.');
-        }
+        if (err)
+            req.flash('error', 'An error occurred while trying to perform action.');
+        else
+            req.flash('success', 'Quiz has been updated successfully.');
         res.redirect(
             '/admin/courses/' + req.course.id + 
             '/tutorial-quizzes/' + req.tutorialQuiz.id +
@@ -81,24 +77,30 @@ exports.editQuiz = function (req, res) {
 };
 // Publish quiz for tutorial
 exports.publishQuiz = function (req, res) {
-    req.tutorialQuiz.published = req.body.state;
-    req.tutorialQuiz.save(function (err) {
-        res.json({ status: true });
+    req.body.state = (req.body.state === 'true');
+    req.tutorialQuiz.update({ $set: { published: req.body.state }}, function (err) {
+        if (err) 
+            return res.status(500).send('An error occurred while trying to perform action.');
+        res.send('Quiz is now <b>' + (req.body.state ? 'published' : 'unpublished') + '</b>.');
     });
 };
 // Activate quiz for tutorial
 exports.activateQuiz = function (req, res) {
-    req.tutorialQuiz.active = req.body.state;
-    req.tutorialQuiz.save(function (err) {
+    req.body.state = (req.body.state === 'true');
+    req.tutorialQuiz.update({ $set: { active: req.body.state }}, function (err) {
+        if (err)
+            return res.status(500).send('An error occurred while trying to perform action.');
         req.app.locals.io.in('tutorialQuiz:' + req.tutorialQuiz.id).emit('quizActivated', req.tutorialQuiz);
-        res.json({ status: true });
+        res.send('Quiz is now <b>' + (req.body.state ? 'active' : 'inactive') + '</b>.');
     });
 };
 // Archive quiz for tutorial
 exports.archiveQuiz = function (req, res) {
-    req.tutorialQuiz.archived = req.body.state;
-    req.tutorialQuiz.save(function (err) {
-        res.json({ status: true });
+    req.body.state = (req.body.state === 'true');
+    req.tutorialQuiz.update({ $set: { archived: req.body.state }}, function (err) {
+        if (err)
+            return res.status(500).send('An error occurred while trying to perform action.');
+        res.send('Quiz is now <b>' + (req.body.state ? 'archived' : 'unarchived') + '</b>.');
     });
 };
 

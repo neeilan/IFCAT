@@ -2,10 +2,12 @@
 
 <h1><%= course.code + ' - ' + course.name %><br><small>Quizzes</small></h1>
 
-<%- include ./messages %>
+<%- include ./flash %>
 
-<a href="/admin/courses/<%= course.id %>/quizzes/new" class="btn btn-default btn-sm"><span 
-    class="glyphicon glyphicon-plus"></span> Add New Quiz</a>
+<div class="nav-actions">
+    <a href="/admin/courses/<%= course.id %>/quizzes/new" class="btn btn-default btn-sm"><span 
+        class="glyphicon glyphicon-plus"></span> Add New Quiz</a>
+</div>
 
 <table class="table table-striped sortable">
     <thead>
@@ -48,10 +50,28 @@
     </tbody>
 </table>
 
-<script type="text/template" id="btn-delete-message-template">
-    <p>You are about to delete quiz and all of its associated information.</p>
-    <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>    
+<%- include ./body-js -%>
+
+<script>
+$(function () {
+    $('.btn-delete').click(function (e) {
+        e.preventDefault();
+        var btn = this;
+        $.deletebox({
+            title: 'Delete quiz',
+            message: '<p>You are about to delete quiz and all of its associated information.</p>\
+                <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
+            callback: function () {
+                $.ajax(btn.href, {
+                    type: 'delete',
+                    complete: function () {
+                        window.location.reload(true);
+                    }
+                });
+            }
+        });
+    });
+});
 </script>
 
-<%- include ./body-js -%>
 <%- include ./footer -%>

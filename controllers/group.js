@@ -13,14 +13,13 @@ exports.getGroup = function (req, res, next, group) {
         if (!group) {
             return next(new Error('No group is found.'));
         }
-        //console.log('got group');
         req.group = group;
         next();
     });
 };
 // Retrieve list of groups for tutorial
 exports.getGroupList = function (req, res) { 
-    req.tutorialQuiz.withStudents().withGroups().execPopulate().then(function (err) {
+    req.tutorialQuiz.withStudents().withGroups().execPopulate().then(function () {
         res.render('admin/quiz-groups', {
             title: 'Groups',
             course: req.course, 
@@ -28,7 +27,8 @@ exports.getGroupList = function (req, res) {
             tutorial: req.tutorialQuiz.tutorial,
             quiz: req.tutorialQuiz.quiz,
             groups: req.tutorialQuiz.groups,
-            students: req.tutorialQuiz.tutorial.students
+            students: req.tutorialQuiz.tutorial.students,
+            unassignedStudents: req.tutorialQuiz.unassignedStudents
         });
     });
 };
@@ -39,19 +39,15 @@ exports.generateGroupList = function (req, res) {
         // randomize students
         var students = _.shuffle(req.tutorialQuiz.tutorial.students);
         // determine number of members per group
-        var size = req.tutorialQuiz.max.membersPerGroup;
-        if (req.tutorialQuiz.max.groups) {
+        var size = _.toInteger(req.tutorialQuiz.max.membersPerGroup);
+        if (_.isInteger(req.tutorialQuiz.max.groups)) {
             size = Math.ceil(students.length / req.tutorialQuiz.max.groups); 
         }
         // split into chunks of size
         var chunks = _.chunk(students, size);
-        // map chunks to groups
+        // map chunks to groups (TO-FIX)
         var groups = _.map(chunks, function (chunk, i) {
-            return {
-                id: i + 1,
-                name: i + 1,
-                members: chunk
-            };
+            return { id: i + 1, name: i + 1, members: chunk };
         });
 
         res.render('admin/quiz-groups', {
@@ -66,7 +62,7 @@ exports.generateGroupList = function (req, res) {
     });
 };
 // Create new group for tutorial
-exports.saveGroupList = function (req, res) { 
+exports.saveGroupList = function (req, res, next) { 
     // sort groups
     var newGroups = {};
     _.each(req.body.groups, function (idName, studentId) {
@@ -81,35 +77,45 @@ exports.saveGroupList = function (req, res) {
     //console.log('new',newGroups);
 
     req.tutorialQuiz.withGroups().execPopulate().then(function () {
-        async.each(req.tutorialQuiz.groups, function (group, done) {
-            //console.log(req.tutorialQuiz.groups.length);
-            // update existing groups
-            if (newGroups.hasOwnProperty(group._id)) {
-                //console.log('updating', group._id);
-                group.members = newGroups[group._id];
-                delete newGroups[group._id];
-                group.save(done);
-            // delete existing groups
-            } else {
-                //console.log('deleting', group._id);
-                group.remove(function (err) {
-                    req.tutorialQuiz.groups.pull({ _id: group._id });
-                    req.tutorialQuiz.save(done);
-                });
+        async.series([
+            function updOldGrps(done) {
+                async.each(req.tutorialQuiz.groups, function (group, done) {
+                    if (newGroups.hasOwnProperty(group._id)) {
+                        group.update({ $set: { members: newGroups[group._id] }}, function (err) {
+                            if (err) {
+                                return done(err);
+                            }
+                            delete newGroups[group._id]; // mark as processed
+                            done();
+                        });
+                    } else {
+                        group.remove(function (err) {
+                            if (err) {
+                                return done(err);
+                            }
+                            req.tutorialQuiz.update({ $pull: { groups: group.id }}, done);
+                        });
+                    }
+                }, done);
+            },
+            function addNewGrps(done) {
+                async.eachOfSeries(newGroups, function (members, name, done) {
+                    models.Group.create({ name: name, members: members }, function (err, group) {
+                        if (err) {
+                            return done(err);
+                        }
+                        req.tutorialQuiz.update({ $addToSet: { groups: group._id }}, done);
+                    });
+                }, done);
             }
-        }, function (err) {
-            //console.log('err1', err);
-            // add new groups
-            async.eachOfSeries(newGroups, function (members, name, done) {
-                //console.log('adding', name);
-                models.Group.create({ name: name, members: members }, function (err, group) {
-                    req.tutorialQuiz.groups.push(group);
-                    req.tutorialQuiz.save(done);
-                });
-            }, function (err) {
-                //console.log('err2', err);
-                res.json({ status: true });
-            });
+        ], function (err) {
+            if (err) {
+                console.error(err);
+                req.flash('error', 'An error occurred while trying to perform operation.');
+            } else {
+                req.flash('success', 'The list of groups have been updated.');
+            }
+            res.json({ status: !err });
         });
     });
 };

@@ -1,95 +1,90 @@
-var fs = require('fs');
+var async = require('async'),
+    fs = require('fs-extra'),
+    mongoose = require('mongoose');
 
-var _ = require('lodash'),
-    async = require('async');
-
-var models = require('../models');
+var config = require('../lib/config'),
+    models = require('../models');
 
 // Retrieve file
-exports.getFile = function (req, res, next, fil3) {
-    models.File.findById(fil3, function (err, fil3) {
+exports.getFile = function (req, res, next, file) {
+    models.File.findById(file, function (err, file) {
         if (err) {
             return next(err);
         }
-        if (!fil3) {
+        if (!file) {
             return next(new Error('No file is found.'));
         }
-        console.log('got fil3');
-        req.fil3 = fil3; // careful: req.file is used by multer
+        req.fil3 = file; // careful: req.file is used by multer
         next();
     });
 };
 // Retrieve all files in the course
 exports.getFileList = function (req, res) {
-    req.course.withFiles().execPopulate().then(function (err) {
-        /*if (err) {
-            return res.status(500).send("Unable to retrieve any files at this time (" + err.message + ").");
-        }*/
-        res.render('admin/course-files', { course: req.course });
-    });
-};
-// Retrieve specific file
-exports.getFileForm = function (req, res) {
-    if (!req.fil3) {
-        req.fil3 = new models.File();
-    }
-    res.render('admin/course-file', {
-        title: req.fil3.isNew ? 'Add new file' : 'Edit file',
-        course: req.course, 
-        fil3: req.fil3
+    req.course.withFiles().execPopulate().then(function () {
+        res.render('admin/course-files', { 
+            title: 'Files',
+            course: req.course
+        });
     });
 };
 // Add new files
 exports.addFiles = function (req, res) {
     async.eachSeries(req.files, function (obj, done) {
-        var fil3 = new models.File();
-        fil3.store(obj, function (err) {
-            req.course.files.push(fil3);
-            req.course.save(done); 
+        var file = new models.File();
+        file.store(obj, function (err) {
+            if (err)
+                return done(err);
+            req.course.update({ $push: { files: file._id }}, done);
         });
     }, function (err) {
-        if (err) {
-            req.flash('failure', 'Unable to save files at this time.');
-        } else {
-            req.flash('success', 'The files have been saved successfully.');
-        }
-        res.json({ status: true });
+        if (err)
+            req.flash('error', 'An error occurred while trying to perform operation.');
+        else
+            req.flash('success', 'The files have been added.');
+        res.redirect(req.originalUrl);
     });
 };
-// Update specific file for course
-exports.editFile = function (req, res) {
-    req.fil3.store(req, function (err) {
-        if (err) {
-            req.flash('failure', 'Unable to update file at this time.');
-        } else {
-            req.flash('success', 'The file has been updated successfully.');
-        }
-        res.redirect('/admin/courses/' + req.course.id + '/files/' + req.fil3.id + '/edit');
-    });
-};
-// Delete specific file for course
-exports.deleteFiles = function (req, res, next) {
-    async.eachSeries(req.body.files, function (id, done) {
-        // remove file from collection
-        models.File.findByIdAndRemove(id, function (err, fil3) {
-            if (err) {
-                return next(err);
+// Delete specific files from course
+exports.deleteFiles = function (req, res) {
+    var dir = config.uploadPath + '/' + req.course.id;
+    async.each(req.body.files, function (id, done) {
+        async.waterfall([
+            function find(done) {
+                models.File.findById(id, function (err, file) {
+                    if (err)
+                        return done(err);
+                    if (!file)
+                        return done(new Error('no file'));
+                    done(null, file);
+                });
+            },
+            function del(file, done) {
+                file.remove(function (err) {
+                    if (err)
+                        return done(err);
+                    done(null, file);
+                });
+            },
+            function unlink(file, done) {
+                var path = dir + '/' + file.name;
+                fs.stat(path, function (err, stats) {
+                    if (err && err.code === 'ENOENT')
+                        return done();
+                    else if (err)
+                        return done(err);
+                    else if (stats.isFile())
+                        fs.remove(path, done);
+                    else
+                        return done();
+                });
             }
-            var path = __dirname + '/../public/upl/' + req.course.id + '/' + fil3.name;
-            // remove file from filesystem
-            fs.stat(path, function (err, stats) {
-                if (err && err.code === 'ENOENT') {
-                    return done();
-                } else if (err) {
-                    return next(err);
-                }
-                if (stats.isFile()) {
-                    fs.unlink(path, done);
-                }
-            });
-        });
+        ], done);
     }, function (err) {
-        res.json({ status: true });
+        if (err) 
+            req.flash('error', 'An error occurred while trying to perform operation.');
+        else
+            req.flash('success', 'The files have been deleted.');
+        res.sendStatus(200);
     });
 };
 

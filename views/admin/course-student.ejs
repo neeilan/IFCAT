@@ -2,7 +2,7 @@
 
 <h1><%= us3r.isNew ? 'Add new student' : 'Edit student' %></h1>
 
-<%- include ./messages %>
+<%- include ./flash %>
 
 <form action="/admin/courses/<%= course.id %>/students/<%= us3r.isNew ? 
     '' : us3r.id + '?_method=put' %>" method="post" class="form-horizontal">

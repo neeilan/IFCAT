@@ -12,34 +12,22 @@ exports.getCourse = function (req, res, next, course) {
         if (!course) {
             return next(new Error('No course is found.'));
         }
-        console.log('got course');
         req.course = course;
         next();
     });
 };
 // Retrieve many courses
 exports.getCourseList = function (req, res) {
-    if (req.user.hasRole('admin')) {
-        models.Course.findCourses().exec(function (err, courses) { 
-            res.render('admin/courses', { 
-                title: 'Courses', 
-                courses: courses 
-            });
+    models.Course.find().sort('code').exec(function (err, courses) {
+        res.render('admin/courses', { 
+            title: 'Courses',
+            courses: _.filter(courses, function (course) {
+                return req.user.hasRole('admin')
+                    || course.instructors.indexOf(req.user.id) !== -1 
+                    || course.teachingAssistants.indexOf(req.user.id) !== -1; 
+            }) 
         });
-    } else {
-        async.series([
-            function (done) {
-                models.Course.findCoursesByInstructor(req.user.id).exec(done);
-            },
-            function (done) {
-                models.Course.findCoursesByTeachingAssistant(req.user.id).exec(done);
-            }
-        ], function (err, results) {
-            res.render('admin/courses', { 
-                'courses': results[0]
-            });
-        });
-    }
+    });
 };
 // Get form for course
 exports.getCourseForm = function (req, res) {
@@ -52,29 +40,31 @@ exports.getCourseForm = function (req, res) {
 // Add course
 exports.addCourse = function (req, res) {
     models.Course.create(req.body, function (err, course) {
-        if (err) {
-            req.flash('failure', 'Unable to create course at this time.');
-        } else {
-            req.flash('success', 'The course has been created successfully.');
-        }
+        if (err)
+            req.flash('error', 'An error occurred while trying to perform operation.');
+        else
+            req.flash('success', 'Course <b>%s</b> has been created.', course.name);
         res.redirect('/admin/courses');
     });
 };
 // Update course
 exports.editCourse = function (req, res) {
-    _.extend(req.course, req.body).save(function (err) {  
-        if (err) {
-            req.flash('failure', 'Unable to update course at this time.');
-        } else {
-            req.flash('success', 'The course has been updated successfully.');
-        }
+    req.course.set(req.body).save(function (err) {  
+        if (err)
+            req.flash('error', 'An error occurred while trying to perform operation.');
+        else
+            req.flash('success', 'Course <b>%s</b> has been updated.', req.course.name);
         res.redirect('/admin/courses/' + req.course.id + '/edit');
     });
 };
 // Delete course
 exports.deleteCourse = function (req, res) {
     req.course.remove(function (err) {
-        res.json({ status: true });
+        if (err)
+            req.flash('error', 'An error occurred while trying to perform operation.');
+        else
+            req.flash('success', 'Course <b>%s</b> has been deleted.', req.course.name);
+        res.sendStatus(200);
     });
 };
 
@@ -83,16 +73,14 @@ exports.deleteCourse = function (req, res) {
 
 // FOR TEST PURPOSES ONLY
 
-exports.generateData = function (req, res) {
+/*exports.generateData = function (req, res) {
     var course, 
         tutorial, 
         quiz,
         tutorialQuiz;
-
     var quizSize = 10,
         tutorialSize = 10,
         groupSize = Math.floor(Math.random() * tutorialSize - 2) + 1;
-
     async.series([
         // create course
         function (done) {
@@ -139,7 +127,6 @@ exports.generateData = function (req, res) {
                     'roles': ['student']
                 });
             }
-
             async.eachSeries(arr, function (item, done) {
                 models.User.create(item, function (err, doc) {
                     // add to course
@@ -218,4 +205,4 @@ exports.generateData = function (req, res) {
     ], function (done) {
         res.redirect('/admin/courses');
     });
-};
+};*/

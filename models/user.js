@@ -1,22 +1,33 @@
 var _ = require('lodash'),
+    async = require('async'),
     bcrypt = require('bcryptjs'),
     mongoose = require('mongoose');
     
+var models = require('.');
+
 var UserSchema = new mongoose.Schema({
     local: {
         email: { 
             type: String,
             lowercase: true
         },
-        password: String
+        password: {
+            type: String,
+            set: function (password) {
+                return password || this.local.password;
+            }
+        }
     },
     oauth: {
         id: String,
         token: String,
     },
-    UTORid: {
-        type: String,
-        lowercase: true
+    student: {
+        UTORid: {
+            type: String,
+            lowercase: true
+        },
+        number: String
     },
     teachingPoints: {
         type: Number,
@@ -28,43 +39,64 @@ var UserSchema = new mongoose.Schema({
     },
     roles: [{
         type: String,
-        enum: ['admin', 'instructor', 'teachingAssistant', 'student'],
-        default: 'student'
+        enum: ['admin', 'instructor', 'teachingAssistant', 'student']
     }]
 });
+
 // get full name
 UserSchema.virtual('name.full').get(function () {
     return this.name.first + ' ' + this.name.last;
 });
-// generate salt
-UserSchema.methods.generateHash = function (s) {
-    return bcrypt.hashSync(s, bcrypt.genSaltSync(10), null);
-};
-// check password is valid
-UserSchema.methods.isValidPassword = function (password) {
-    return bcrypt.compareSync(password, this.local.password);
-};
-// generate salt
-UserSchema.methods.addRole = function (role) {
-    if (this.hasRole(role) === false) {
-        this.roles.push(role);
-    }
+// hook: hash password if one is given
+UserSchema.pre('save', function (next) {
+    var user = this;
+    if (!user.isModified('local.password')) 
+        return next();
+    bcrypt.genSalt(function (err, salt) {
+        if (err) 
+            return next(err);
+        bcrypt.hash(user.local.password, salt, function (err, hash) {
+            if (err) 
+                return next(err);
+            user.local.password = hash;
+            next();
+        });
+    });
+});
+
+// hook: delete cascade
+UserSchema.pre('remove', function (next) {
+    var conditions = {
+        $or: [
+            { instructors: { $in: [this._id] }},
+            { teachingAssistants: { $in: [this._id] }}, 
+            { students: { $in: [this._id] }}
+        ]
+    },  doc = { 
+        $pull: {
+            instructors: this._id,
+            teachingAssistants: this._id,
+            students: this._id
+        }
+    }, options = {
+        multi: true
+    };
+    async.parallel([
+        function delRef1(done) {
+            models.Course.update(conditions, doc, options).exec(done);
+        },
+        function delRef2(done) {
+            models.Tutorial.update(conditions, doc, options).exec(done);
+        }
+    ], next);
+});
+// check password given is valid
+UserSchema.methods.checkPassword = function (password, callback) {
+    bcrypt.compare(password, this.local.password, callback);
 };
 // check user's role
 UserSchema.methods.hasRole = function (role) {
     return this.roles.indexOf(role) !== -1;
-};
-// Save user
-UserSchema.methods.store = function (obj, callback) {
-    this.name.first = obj.name.first;
-    this.name.last = obj.name.last;
-    this.roles = obj.roles;
-    this.UTORid = obj.UTORid;
-    this.local.email = obj.local.email;
-    if (obj.local.password) {
-        this.local.password = this.generateHash(obj.local.password);
-    }
-    return this.save(callback);
 };
 // sort users by roles, first name, and last name
 UserSchema.statics.sortByRole = function (users) {
@@ -101,9 +133,10 @@ UserSchema.statics.findUsersBySearchQuery = function (query, role) {
         }, 
         {
             $or: [
-                { 'UTORid': regexp },
+                { 'student.UTORid': regexp },
+                { 'student.number': regexp },
                 { 'name.first': regexp },
-                { 'last.first': regexp },
+                { 'name.last': regexp },
                 { 'local.email': regexp }
             ]
         }
@@ -111,14 +144,6 @@ UserSchema.statics.findUsersBySearchQuery = function (query, role) {
         'name.first': 1,
         'name.last': 1
     });
-};
-// find user by UTORid
-UserSchema.statics.findUserByUTOR = function (UTORid) {
-    return this.findOne({ UTORid: UTORid });
-};
-// find user by email address
-UserSchema.statics.findUserByEmail = function (email) {
-    return this.findOne({ 'local.email': email });
 };
 
 module.exports = mongoose.model('User', UserSchema);

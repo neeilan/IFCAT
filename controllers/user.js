@@ -1,21 +1,20 @@
 var _ = require('lodash'),
     async = require('async'),
     csv = require('csv');
-
-var models = require('../models');
+    
+var config = require('../lib/config'),
+    models = require('../models');
 
 // 
-exports.getUser = function (req, res, next, us3r) {
-    models.User.findById(us3r, function (err, us3r) {
+exports.getUser = function (req, res, next, user) {
+    models.User.findById(user, function (err, user) {
         if (err) {
-            console.log(err);
             return next(err);
         }
-        if (!us3r) {
-            return next(new Error('No us3r is found.'));
+        if (!user) {
+            return next(new Error('No user is found.'));
         }
-        console.log('got us3r');
-        req.us3r = us3r; // careful: req.user is used by passport
+        req.us3r = user; // careful: req.user is used by passport
         next();
     });
 };
@@ -24,7 +23,7 @@ exports.getUser = function (req, res, next, us3r) {
 
 // Retrieve student login form
 exports.getLoginForm = function (req, res) {
-    var auth0Config =  require('../config/common').auth0;
+    var auth0Config = config.auth0;
     res.render('login', {
         domain : auth0Config.domain,
         clientId : auth0Config.clientId,
@@ -34,14 +33,14 @@ exports.getLoginForm = function (req, res) {
 };
 // Retrieve admin login form
 exports.getAdminLoginForm = function (req, res) {
-    res.render('admin/login', { 
+    res.render('admin/login', {
         title: 'Login'
     }); 
 };
 // Logout user
 exports.logout = function (req, res) {
     req.logout();
-    res.redirect('/login');
+    res.redirect(req.baseUrl === '/admin' ? '/admin/login' : '/login');
 };
 // Retrieve list of users
 exports.getUserList = function (req, res) {
@@ -64,30 +63,47 @@ exports.getUserForm = function (req, res) {
 };
 // Add new user
 exports.addUser = function (req, res) {
-    var user = new models.User();
-    user.store(req.body, function (err) {
-        if (err) {
-            req.flash('failure', 'Unable to create user at this time.');
-        } else {
-            req.flash('success', 'The user has been created successfully.');
-        }
+    var user = new models.User(req.body);
+    user.save(function (err) {
+        if (err)
+            req.flash('error', 'An error occurred while trying to perform action.');
+        else
+            req.flash('success', 'User <b>%s</b> has been created.', user.name.full);
         res.redirect('/admin/users');
     });
 };
 // Update specific user
 exports.editUser = function (req, res) {
-    req.us3r.store(req.body, function (err) {
-        if (err) {
-            req.flash('failure', 'Unable to update user at this time.');
-        } else {
-            req.flash('success', 'The user has been updated successfully.');
-        }
+    req.us3r.set(req.body).save(function (err) {
+        if (err)
+            req.flash('error', 'An error occurred while trying to perform action.');
+        else
+            req.flash('success', 'User <b>%s</b> has been updated.', req.us3r.name.full);
         res.redirect('/admin/users/' + req.us3r.id + '/edit');
     });
 };
 // Delete specific user
 exports.deleteUser = function (req, res) {
     req.us3r.remove(function (err) {
-        res.json({ status: true });
+        if (err)
+            req.flash('error', 'An error occurred while trying to perform action.');
+        else
+            req.flash('success', 'User <b>%s</b> has been deleted.', req.us3r.name.full);
+        res.sendStatus(200);
+    });
+};
+// Add administrator
+exports.install = function (req, res, next) {
+    var user = new models.User({
+        local: {
+            email: 'admin',
+            password: 'admin'
+        },
+        roles: ['admin']
+    });
+    user.save(function (err) {
+        if (err)
+            return next(err);
+        res.send('Sweet Christmas.');
     });
 };

@@ -2,9 +2,9 @@
 
 <h1><%= course.code + ' - ' + course.name %><br><small>Teaching assistants</small></h1>
 
-<%- include ./messages %>
+<%- include ./flash %>
 
-<div class="actions">
+<div class="nav-actions">
     <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-find">
         <span class="glyphicon glyphicon-search"></span> Find teaching assistants</button>
     <button type="button" class="btn btn-primary btn-sm" id="btn-update">
@@ -67,9 +67,7 @@ $(function () {
             type: 'put',
             data: $(':checkbox').serialize(),
             success: function (res) {
-                if (res.status) {
-                    window.location.reload(true);
-                }
+                window.location.reload(true); // TO-FIX
             }
         })
     });

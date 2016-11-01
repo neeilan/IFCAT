@@ -8,7 +8,7 @@ var QuizSchema = new mongoose.Schema({
     name: { type: String, required: true },
     // questions are sorted in the order that they are placed 
     // i.e. [0] => 1st question, [1] => 2nd question, etc
-    questions: [{ type: mongoose.Schema.Types.ObjectId, ref : 'Question' }],
+    questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
     shuffleChoices: Boolean,
     useLaTeX: Boolean,
     points: { type: Number, default : 4 },
@@ -17,7 +17,25 @@ var QuizSchema = new mongoose.Schema({
 }, { 
     timestamps: true
 });
+// Delete cascade
+QuizSchema.pre('remove', function (next) {
+    var quiz = this;
+    var conditions = { quizzes: { $in: [quiz._id] }},
+        doc = { $pull: { quizzes: quiz._id }},
+        options = { multi: true };
+    async.parallel([
+        function delRef1(done) {
+            models.Tutorial.update(conditions, doc, options).exec(done);
+        },
+        function delRef2(done) {
 
+            models.Question.remove({ _id: { $in: quiz.questions }}).exec(done);
+        },
+        function delRef3(done) {
+            models.TutorialQuiz.remove({ quiz: quiz._id }).exec(done);
+        }
+    ], next);
+});
 // populate questions
 QuizSchema.methods.withQuestions = function () {
     return this.populate('questions');

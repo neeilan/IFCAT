@@ -1,14 +1,14 @@
 <%- include ./header -%>
 
 
-<div class="alert alert-info center-block" style="max-width: 90%">
+<div class="alert alert-info center-block">
     A <b>published</b> quiz is available for students in the tutorial to open and be assigned to a group automatically (you can assign/change groups manually at any time).
     An <b>active</b> quiz is one currently in progress: the questions are visible to students and they can submit responses while a quiz is active.
     Note that students will not be automatically assigned to groups while a quiz is active - you will have to do it manually.
 </div>
 
 <% if (!_.isEmpty(students)) { %>
-<p>
+<div class="nav-actions dim">
     <label class="col control-label">
         <span>Publish?</span>
         <input type="checkbox" value="1" class="bootstrap-switch" id="publish"<%= tutorialQuiz.published ? ' checked' : '' %>>
@@ -21,64 +21,66 @@
         <span>Archive?</span>
         <input type="checkbox" value="1" class="bootstrap-switch" id="archive"<%= tutorialQuiz.archived ? ' checked' : '' %>>
     </label>
-</p>
+</div>
 <% } %>
 
 <h1>Groups</h1>
 
-<%- include ./messages %>
+<%- include ./flash %>
 
-<% if (!_.isEmpty(students)) { %>
-<p>
-    <button type="button" class="btn btn-default btn-sm" id="btn-refresh-groups"><span 
-        class="glyphicon glyphicon-refresh"></span> Refresh</button>
-    <button type="button" class="btn btn-default btn-sm" id="btn-add-group"><span 
-        class="glyphicon glyphicon-plus"></span> Add group</button>
-    <button type="button" class="btn btn-default btn-sm" id="btn-randomize-groups"><span 
-        class="glyphicon glyphicon-random"></span> Randomize groups</button>
-    <button type="button" class="btn btn-default btn-sm btn-primary" id="btn-save-groups"><span 
-        class="glyphicon glyphicon-ok"></span> Save groups</button>
-</p>
-<% } %>
-
-<table id="table-quiz-groups">
-    <thead>
-        <tr>
-            <th rowspan="2" class="s">&nbsp;</th>
-            <th colspan="<%= 1 + groups.length %>">Groups</th>
-        </tr>
-        <% if (!_.isEmpty(students)) { %>
-            <tr>
-                <th class="u">Unassigned</th>
-                <% _.each(groups, function (group) { %>
-                    <th class="g"><%= group.name %></th>
-                <% }) %>
-            </tr>
-        <% } %>
-    </thead>
-    <tbody>
-    <% if (_.isEmpty(students)) { %>
-        <tr>
-            <td colspan="2">No students have been added into the tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students into tutorial.</td>
-        </tr>
-    <% } else { %>
-        <% _.each(students, function (student) { %>
-            <tr>
-                <td class="s">
-                    <a href="/admin/courses/<%= course.id %>/students/<%= student.id %>/marks"><%= student.name.full %></a>
-                </td>
-                <td class="u">
-                    <input type="radio" name="groups[<%= student.id %>]" value="unassigned">
-                </td>
-                <% _.each(groups, function (group) { %>
-                    <td class="g"><input type="radio" name="groups[<%= student.id %>]" value="<%= group.id %>"<%=
-                        _.find(group.members, { '_id' : student._id }) ? ' checked' : '' %>></td>
-                <% }) %>
-            </tr>
-        <% }) %>
+<div class="dim">
+    <% if (!_.isEmpty(students)) { %>
+    <div class="nav-actions">
+        <button type="button" class="btn btn-default btn-sm" id="btn-refresh"><span 
+            class="glyphicon glyphicon-refresh"></span> Refresh</button>
+        <button type="button" class="btn btn-default btn-sm" id="btn-add"><span 
+            class="glyphicon glyphicon-plus"></span> Add group</button>
+        <button type="button" class="btn btn-default btn-sm" id="btn-randomize"><span 
+            class="glyphicon glyphicon-random"></span> Randomize groups</button>
+        <button type="button" class="btn btn-default btn-sm btn-primary" id="btn-save"><span 
+            class="glyphicon glyphicon-ok"></span> Save groups</button>
+    </div>
     <% } %>
-    </tbody>
-</table>
+    <table id="table-quiz-groups" class="stretch">
+        <thead>
+            <tr>
+                <th rowspan="2" class="s">&nbsp;</th>
+                <th colspan="<%= 1 + groups.length %>">Groups</th>
+            </tr>
+            <% if (!_.isEmpty(students)) { %>
+                <tr>
+                    <th class="u">Unassigned</th>
+                    <% _.each(groups, function (group) { %>
+                        <th class="g"><%= group.name %></th>
+                    <% }) %>
+                </tr>
+            <% } %>
+        </thead>
+        <tbody>
+        <% if (_.isEmpty(students)) { %>
+            <tr>
+                <td colspan="2">No students have been added into the tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students into tutorial.</td>
+            </tr>
+        <% } else { %>
+            <% _.each(students, function (student) { %>
+                <tr>
+                    <td class="s">
+                        <a href="/admin/courses/<%= course.id %>/students/<%= student.id %>/marks"><%= student.name.full %></a>
+                    </td>
+                    <td class="u">
+                        <input type="radio" name="groups[<%= student.id %>]" value="unassigned"<%= 
+                            tutorialQuiz.isUnassigned(student.id) ? ' checked' : '' %>>
+                    </td>
+                    <% _.each(groups, function (group) { %>
+                        <td class="g"><input type="radio" name="groups[<%= student.id %>]" value="<%= group.id %>"<%=
+                            !!_.find(group.members, { id: student.id }) ? ' checked' : '' %>></td>
+                    <% }) %>
+                </tr>
+            <% }) %>
+        <% } %>
+        </tbody>
+    </table>
+</div>
 
 <%- include ./body-js -%>
 
@@ -93,26 +95,40 @@ $(function () {
     };
     // set option on quiz in tutorial
     $(':checkbox').on('switchChange.bootstrapSwitch', function (e, state) {
+        var $dim = $(this).closest('.dim-wrap').addClass('on');
+            $.bootstrapAlert('close');
         $.ajax(url[this.id], {
             type: 'put',
             data: { state: state }, 
             success: function (res) {
-                console.log(res.status);
+                $.bootstrapAlert('success', res).insertBefore($('.container > h1'));
+            },
+            error: function (xhr) {
+                $.bootstrapAlert('danger', xhr.responseText).insertBefore($('.container > h1'));
+            },
+            complete: function () {
+                $dim.removeClass('on');
             }
         });
     });
     // refresh table
-    $('#btn-refresh-groups').click(function () {
+    $('#btn-refresh').click(function () {
+        var $dim = $(this).closest('.dim-wrap').addClass('on');
         var $table = $('#table-quiz-groups');
-        $table.load(window.location.href + ' #' + $table[0].id + ' > *');
+        $table.load(window.location.href + ' #' + $table[0].id + ' > *', function () {
+            $dim.removeClass('on');
+        });
     });
     // ramdomize table
-    $('#btn-randomize-groups').click(function () {
+    $('#btn-randomize').click(function () {
+        var $dim = $(this).closest('.dim-wrap').addClass('on');
         var $table = $('#table-quiz-groups');
-        $table.load(url.generate + ' #' + $table[0].id + ' > *');
+        $table.load(url.generate + ' #' + $table[0].id + ' > *', function () {
+            $dim.removeClass('on');
+        });
     });
     // add new group to table
-    $('#btn-add-group').click(function () {
+    $('#btn-add').click(function () {
         var $table = $('#table-quiz-groups'),
             $thead = $table.find('thead'),
             $tbody = $table.find('tbody');
@@ -138,14 +154,12 @@ $(function () {
         });
     });
     // save changes
-    $('#btn-save-groups').click(function () {
+    $('#btn-save').click(function () {
         $.ajax(url.save, {
             type: 'put',
             data: $('#table-quiz-groups :radio').serialize(), 
             success: function (res) {
-                if (res.status) {
-                    window.location.reload(true);
-                }
+                window.location.reload(true); // TO-FIX
             }
         });
     });
