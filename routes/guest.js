@@ -18,4 +18,16 @@ router.get('/login/callback', passport.authenticate('auth0', {
     res.redirect(req.session.returnTo || '/student/courses');
 });
 
+router.get('/', function(req,res){
+    if (!req.user){
+        res.redirect('/login');
+    }
+    else if (req.user.roles.indexOf('admin') > -1){
+        res.redirect('/admin/courses');
+    }
+    else{
+        res.redirect('/student/courses');
+    }
+})
+
 module.exports = router;
