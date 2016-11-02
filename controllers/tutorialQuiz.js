@@ -77,42 +77,33 @@ exports.editQuiz = function (req, res) {
 };
 // Publish quiz for tutorial
 exports.publishQuiz = function (req, res) {
-    req.body.state = (req.body.state === 'true');
-    req.tutorialQuiz.update({ $set: { published: req.body.state }}, function (err) {
+    req.tutorialQuiz.set('published', req.body.state).save(function (err) {
         if (err) 
             return res.status(500).send('An error occurred while trying to perform action.');
-        res.send('Quiz is now <b>' + (req.body.state ? 'published' : 'unpublished') + '</b>.');
+        res.send('Quiz is now <b>' + (req.tutorialQuiz.published ? 'published' : 'unpublished') + '</b>.');
     });
 };
 // Activate quiz for tutorial
 exports.activateQuiz = function (req, res) {
-    req.body.state = (req.body.state === 'true');
-    req.tutorialQuiz.update({ $set: { active: req.body.state }}, function (err) {
+    req.tutorialQuiz.set('active', req.body.state).save(function (err) {
         if (err)
             return res.status(500).send('An error occurred while trying to perform action.');
-            req.tutorialQuiz.active = req.body.state;
+        req.tutorialQuiz.active = req.body.state;
         req.app.locals.io.in('tutorialQuiz:' + req.tutorialQuiz.id).emit('quizActivated', req.tutorialQuiz);
-        res.send('Quiz is now <b>' + (req.body.state ? 'active' : 'inactive') + '</b>.');
+        res.send('Quiz is now <b>' + (req.tutorialQuiz.active ? 'active' : 'inactive') + '</b>.');
     });
 };
 // Archive quiz for tutorial
 exports.archiveQuiz = function (req, res) {
-    req.body.state = (req.body.state === 'true');
-    req.tutorialQuiz.update({ $set: { archived: req.body.state }}, function (err) {
+    req.tutorialQuiz.set('archived', req.body.state).save(function (err) {
         if (err)
             return res.status(500).send('An error occurred while trying to perform action.');
-        res.send('Quiz is now <b>' + (req.body.state ? 'archived' : 'unarchived') + '</b>.');
+        res.send('Quiz is now <b>' + (req.tutorialQuiz.archived ? 'archived' : 'unarchived') + '</b>.');
     });
 };
-
-// --------------------------------------------------------------------------------------------------
-
-//
+// Start quiz
 exports.startQuiz = function (req, res) {
-    if (req.tutorialQuiz.archived){
-        
-        
-        
+    if (req.tutorialQuiz.archived){    
         req.tutorialQuiz.quiz.withQuestions().execPopulate()
         .then((quiz)=>{
             return models.Group.findOne({ _id : { $in : req.tutorialQuiz.groups }, members :  req.user._id })

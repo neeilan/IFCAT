@@ -31,10 +31,13 @@
 <div class="dim">
     <% if (!_.isEmpty(students)) { %>
     <div class="nav-actions">
-        <button type="button" class="btn btn-default btn-sm" id="btn-refresh"><span 
+        <button type="button" class="btn btn-default btn-sm" id="btn-refresh" 
+            onclick="window.location.reload(true)"><span 
             class="glyphicon glyphicon-refresh"></span> Refresh</button>
         <button type="button" class="btn btn-default btn-sm" id="btn-add"><span 
             class="glyphicon glyphicon-plus"></span> Add group</button>
+        <button type="button" class="btn btn-default btn-sm" id="btn-remove"><span 
+            class="glyphicon glyphicon-remove"></span> Remove groups</button>
         <button type="button" class="btn btn-default btn-sm" id="btn-randomize"><span 
             class="glyphicon glyphicon-random"></span> Randomize groups</button>
         <button type="button" class="btn btn-default btn-sm btn-primary" id="btn-save"><span 
@@ -51,7 +54,7 @@
                 <tr>
                     <th class="u">Unassigned</th>
                     <% _.each(groups, function (group) { %>
-                        <th class="g"><%= group.name %></th>
+                        <th class="g" data-group="<%= group.id %>"><%= group.name %></th>
                     <% }) %>
                 </tr>
             <% } %>
@@ -93,6 +96,8 @@ $(function () {
         generate: '/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups/generate',
         save: '/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups'
     };
+    var trash = [];
+
     // set option on quiz in tutorial
     $(':checkbox').on('switchChange.bootstrapSwitch', function (e, state) {
         var $dim = $(this).closest('.dim-wrap').addClass('on');
@@ -111,55 +116,91 @@ $(function () {
             }
         });
     });
-    // refresh table
-    $('#btn-refresh').click(function () {
-        var $dim = $(this).closest('.dim-wrap').addClass('on');
-        var $table = $('#table-quiz-groups');
-        $table.load(window.location.href + ' #' + $table[0].id + ' > *', function () {
-            $dim.removeClass('on');
+
+    var $table = $('#table-quiz-groups'); 
+    // select/unselect column
+    $table.on('click', 'th.g', function () {
+        var $th = $(this);
+        $th.toggleClass('selected');
+        $table.find('td.g:has([value=' + $th.data('group') + '])').toggleClass('selected');
+    });
+    // add new group to table
+    $('#btn-add').click(function () {
+        var $thead = $table.find('thead'), $tbody = $table.find('tbody');
+        // get next group #
+        var value = _.toInteger($thead.find('tr:eq(1) th:last-child').text()) + 1;
+        // add header column
+        $thead.find('tr:eq(1)').append(function () {
+            return '<th class="g" data-group="' + value + '">' + value + '</th>';
+        });
+        // add body column
+        $tbody.find('tr').append(function () {
+            var name = $(this).find('td.u > :radio')[0].name; // groups[userId]
+            return '<td class="g"><input type="radio" name="' + name + '" value="' + value + '"></td>';
+        });
+        // set colspan
+        $thead.find('tr:eq(0) th:eq(1)').attr('colspan', function () { 
+            return $tbody.find('tr:eq(0) td.u, tr:eq(0) td.g').length; 
+        });
+    });
+    // ramdomize table
+    $('#btn-remove').click(function () {
+        $table.find('th.selected, td.selected').each(function () {
+            var $elem = $(this);
+            // mark selected group as trash
+            if ($elem.is('[data-group]')) {
+                trash.push($elem.data('group'));
+            }
+            $elem.remove();
+        });
+        // set colspan
+        $table.find('thead tr:eq(0) th:eq(1)').attr('colspan', function () { 
+            return $table.find('tbody tr:eq(0) td.u, tbody tr:eq(0) td.g').length; 
         });
     });
     // ramdomize table
     $('#btn-randomize').click(function () {
         var $dim = $(this).closest('.dim-wrap').addClass('on');
-        var $table = $('#table-quiz-groups');
+            $.bootstrapAlert('close');
+        // mark all groups as trash
+        $table.find('th[data-group]').each(function () { 
+            var id = $(this).data('group');
+            if (isNaN(id)) {
+                trash.push(id); 
+            }
+        });
+        // load new table
         $table.load(url.generate + ' #' + $table[0].id + ' > *', function () {
             $dim.removeClass('on');
         });
     });
-    // add new group to table
-    $('#btn-add').click(function () {
-        var $table = $('#table-quiz-groups'),
-            $thead = $table.find('thead'),
-            $tbody = $table.find('tbody');
-        // get next group #
-        var numbers = [];
-        $thead.find('tr:eq(1) th').each(function () {
-            if (!isNaN(this.innerText)) {
-                numbers.push(parseInt(this.innerText, 10));
-            }
-        });
-        var value = _.toInteger(_.max(numbers)) + 1;
-        // increment colspan
-        $thead.find('tr:eq(0) th:eq(1)').attr('colspan', function (i, attr) { 
-            return parseInt(attr, 10) + 1; 
-        });
-        // add header column
-        $thead.find('tr:eq(1)').append('<th class="g">' + value + '</th>');
-        // add body column
-        $tbody.find('tr').each(function () { 
-            var $tr = $(this);
-            var name = $tr.find(':radio:eq(0)').attr('name');
-            $tr.append('<th class="g"><input type="radio" name="' + name + '" value="' + value + '"></th>');
-        });
-    });
     // save changes
     $('#btn-save').click(function () {
+        var $dim = $(this).closest('.dim-wrap').addClass('on');
+            $.bootstrapAlert('close');
+        // push selected student-group ids
+        var data = $table.find(':radio').serializeArray();
+        // push group ids (to keep empty groups)
+        $table.find('th[data-group]').each(function (i) {
+            data.push({ name: 'groups[' + i + ']', value: $(this).data('group') });
+        });
+        // push trash data (to remove groups)
+        $.each(trash, function () {
+            data.push({ name: 'trash[]', value: this });
+        });
+        // send request
         $.ajax(url.save, {
             type: 'put',
-            data: $('#table-quiz-groups :radio').serialize(), 
+            data: data,
             success: function (res) {
-                window.location.reload(true); // TO-FIX
+                $.bootstrapAlert('success', res).insertAfter($('.container > h1'));
+                $table.load(window.location.href + ' #' + $table[0].id + ' > *');
+            },
+            error: function (xhr) {
+                $.bootstrapAlert('danger', xhr.responseText).insertAfter($('.container > h1'));
+            },
+            complete: function () {
+                $dim.removeClass('on');
             }
         });
     });

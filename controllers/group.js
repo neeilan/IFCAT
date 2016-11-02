@@ -61,39 +61,45 @@ exports.generateGroupList = function (req, res) {
         });
     });
 };
-// Create new group for tutorial
+// Save groups for tutorial
 exports.saveGroupList = function (req, res, next) { 
-    // sort groups
-    var newGroups = {};
-    _.each(req.body.groups, function (idName, studentId) {
+    var newGroups = {},
+        trash = req.body.trash || [];
+    // idName = groupId (update), number (new), or 'unassigned' (ignored)
+    // sort groups keyed on idName, value is array of userIds
+    _.each(req.body.groups || {}, function (idName, userId) {
         if (idName !== 'unassigned') {
             if (!newGroups.hasOwnProperty(idName)) {
                 newGroups[idName] = [];
             }
-            newGroups[idName].push(studentId);
+            if (mongoose.Types.ObjectId.isValid(userId)) {
+                newGroups[idName].push(userId);   
+            }
         }
     });
-
-    //console.log('new',newGroups);
 
     req.tutorialQuiz.withGroups().execPopulate().then(function () {
         async.series([
             function updOldGrps(done) {
                 async.each(req.tutorialQuiz.groups, function (group, done) {
-                    if (newGroups.hasOwnProperty(group._id)) {
-                        group.update({ $set: { members: newGroups[group._id] }}, function (err) {
-                            if (err) {
-                                return done(err);
-                            }
-                            delete newGroups[group._id]; // mark as processed
-                            done();
-                        });
-                    } else {
+                    // delete group if it was marked as trash
+                    if (trash.indexOf(group.id) !== -1) {
                         group.remove(function (err) {
-                            if (err) {
+                            if (err)
                                 return done(err);
-                            }
                             req.tutorialQuiz.update({ $pull: { groups: group.id }}, done);
+                        });
+                    // otherwise update group members
+                    } else {
+                        group.update({ 
+                            $set: {
+                                members: newGroups[group.id] || [] 
+                            }
+                        }, function (err) {
+                            if (err)
+                                return done(err);
+                            delete newGroups[group.id]; // done!
+                            done();
                         });
                     }
                 }, done);
@@ -101,21 +107,18 @@ exports.saveGroupList = function (req, res, next) {
             function addNewGrps(done) {
                 async.eachOfSeries(newGroups, function (members, name, done) {
                     models.Group.create({ name: name, members: members }, function (err, group) {
-                        if (err) {
+                        if (err)
                             return done(err);
-                        }
                         req.tutorialQuiz.update({ $addToSet: { groups: group._id }}, done);
                     });
                 }, done);
             }
         ], function (err) {
             if (err) {
-                console.error(err);
-                req.flash('error', 'An error occurred while trying to perform operation.');
-            } else {
-                req.flash('success', 'The list of groups have been updated.');
+                console.log(err)
+                return res.status(500).send('An error occurred while trying to perform action.');
             }
-            res.json({ status: !err });
+            res.status(200).send('List of groups has been updated.');
         });
     });
 };
