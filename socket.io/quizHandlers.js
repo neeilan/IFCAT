@@ -119,7 +119,8 @@ module.exports = function(io){
             .then(function(responses){
                 emitters.emitToGroup(groupId, 'updateScores', {
                     quizId: tutQuizId,
-                    responses: responses
+                    responses: responses,
+                    groupId : groupId
                 })
             })
         })
@@ -135,7 +136,7 @@ module.exports = function(io){
                 .exec()
         })
         .then(function(){
-            emitters.emitToGroup(data.groupId, 'resetDriver', {});
+            emitters.emitToGroup(data.groupId, 'resetDriver', { groupId : data.groupId });
             socket.emit('assignedAsDriver', { groupId : data.groupId } );
             emitters.emitToGroup(data.groupId, 'startQuiz', {});
         })
@@ -203,7 +204,8 @@ module.exports = function(io){
             .then(function(response){
                 emitters.emitToGroup(data.groupId, 'groupAttempt', {
                     response: response,
-                    questionNumber: data.questionNumber
+                    questionNumber: data.questionNumber,
+                    groupId : data.groupId
                 })
             })           
             
@@ -221,7 +223,8 @@ module.exports = function(io){
             .then(function(score){
                 emitters.emitToGroup(data.groupId, 'postQuiz',{
                     members : group.members,
-                    score : score
+                    score : score,
+                    groupId : data.groupId
                 })
             })
         })
