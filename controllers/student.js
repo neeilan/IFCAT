@@ -225,25 +225,30 @@ exports.getMarks = function (req, res) {
             }]).exec(function (err, tutorialQuizzes) {
                 // ugly: find marks by student
                 var marks = _.map(tutorialQuizzes, function (tutorialQuiz) {
-                    // teaching points
                     var result = {
                         tutorialQuiz: tutorialQuiz,
                         group: _.find(tutorialQuiz.groups, function (group) {
                             return group.members.indexOf(req.us3r.id) !== -1;
                         }),
-                        points: _.reduce(tutorialQuiz.responses, function (sum, response) {
+                        points: tutorialQuiz.responses ? _.reduce(tutorialQuiz.responses, function (sum, response) {
                             if (response.group.members.indexOf(req.us3r.id) !== -1) {
                                 return sum + response.points;
                             }
                             return sum;
-                        }, 0)
+                        }, 0) : 0,
                     };
                     
+                    if (result.group){
                     result.teachingPoints = (result.group.teachingPoints.reduce(function(sum, recipient){
                         if (recipient === req.us3r.id)
                             sum ++;
                         return sum;
                     }, 0))/2
+                    }
+                    else{
+                        result.points = 0;
+                        result.teachingPoints = 0;
+                    }
                     
                     return result;
                 });
@@ -254,7 +259,12 @@ exports.getMarks = function (req, res) {
                  var totalTeachingPoints = _.reduce(marks, function (sum, mark) {
                     return sum + mark.teachingPoints;
                 }, 0);
-
+                
+                
+                if (!marks[0].group){
+                    res.end('No marks are currently available for this student');
+                }
+                else{
                 res.render('admin/student-marks', {
                     student: req.us3r,
                     course: req.course,
@@ -263,6 +273,7 @@ exports.getMarks = function (req, res) {
                     totalPoints: totalPoints,
                     totalTeachingPoints : totalTeachingPoints
                 });
+                }
             });
         }
     });

@@ -90,6 +90,7 @@ exports.activateQuiz = function (req, res) {
     req.tutorialQuiz.update({ $set: { active: req.body.state }}, function (err) {
         if (err)
             return res.status(500).send('An error occurred while trying to perform action.');
+            req.tutorialQuiz.active = req.body.state;
         req.app.locals.io.in('tutorialQuiz:' + req.tutorialQuiz.id).emit('quizActivated', req.tutorialQuiz);
         res.send('Quiz is now <b>' + (req.body.state ? 'active' : 'inactive') + '</b>.');
     });
