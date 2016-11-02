@@ -26,17 +26,17 @@ textarea.form-control {
     position: relative;
 }
 .dim-wrap .dimmer {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     background: rgba(0,0,0,0.2);
     cursor: default;
     height: 100%;
     left: 0;
     position: absolute;
     top: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
     z-index: 10; 
 }
@@ -161,14 +161,14 @@ a.counter {
 
 /* Group listing styles */
 
-.col {
-    width: 180px;
-}
-.col > span {
+#btn-randomize > .glyphicon-random:before {
     display: inline-block;
-    width: 75px;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
 }
-
 #table-quiz-groups {
     border-top: 1px solid #ddd;
     border-left: 1px solid #ddd;
@@ -184,13 +184,25 @@ a.counter {
     white-space: nowrap;
 }
 #table-quiz-groups th.s, #table-quiz-groups td.s {
-   width: 200px; 
+    width: 200px; 
 }
 #table-quiz-groups th.u, #table-quiz-groups td.u {
-   width: 110px; 
+    width: 110px; 
 }
 #table-quiz-groups th.g, #table-quiz-groups td.g {
-   width: 55px; 
+    width: 55px; 
+}
+#table-quiz-groups th.g {
+    cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+#table-quiz-groups th.selected, #table-quiz-groups td.selected {
+    background-color: beige;
 }
 #table-quiz-groups tr td:first-child {
     text-align: left;
