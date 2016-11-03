@@ -25,7 +25,7 @@ exports.getQuestionList = function (req, res) {
 };
 // Sort list of questions
 exports.sortQuestionList = function (req, res) {
-    var newOrder = req.body.questions;
+    var newOrder = req.body.questions || [];
     // sort questions based off order given
     req.quiz.questions.sort(function (a, b) {
         return newOrder.indexOf(a) < newOrder.indexOf(b) ? -1 : 1;
