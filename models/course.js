@@ -111,10 +111,10 @@ CourseSchema.methods.withFiles = function () {
     });
 };
 // Find courses enrolled by student
-CourseSchema.statics.findCoursesByStudent = function (user) {
+CourseSchema.statics.findByStudent = function (userId) {
     return this.find({ 
         'students': { 
-            $in: [user] 
+            $in: [userId] 
         } 
     }).sort('code');
 };

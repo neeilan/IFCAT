@@ -1,4 +1,4 @@
-$(function () {
+$(function () { 
     // turn off caching
     $.ajaxSetup({ cache: false });
 
@@ -29,20 +29,33 @@ $(function () {
     });
 
     // search users when form is submitted
-    $('#modal-find form').submit(function (e) {
+    $('#modal-find-users form').submit(function (e) {
         e.preventDefault();
         var $form = $(this);
             $form.next('div').load(this.action, $form.serialize());
     });
+
     // add user to course when button is clicked
-    $('#modal-find').on('click', 'a', function (e) {
+    $('#modal-find-users').on('click', 'td > a', function (e) {
         e.preventDefault();
-        $.post(this.href, function (res) {
-            window.location.reload(true); // TO-FIX
+        $.bootstrapAlert('close');
+        var $heading = $('.container > h1'),
+            $table = $('#table-users'), 
+            $tr = $(this).closest('tr');
+        $.ajax(this.href, {
+            type: 'post',
+            success: function (res) {
+                $heading.after($.bootstrapAlert('success', res));
+                $table.loadInner(window.location.href);
+                $tr.remove();
+            },
+            error: function (xhr) {
+                $heading.after($.bootstrapAlert('error', xhr.responseText));
+            }
         });
     });
     // update user in tutorials when button is clicked      
-    $('.btn-update-user').click(function (e) {        
+    $('#table-users').on('click', '.btn-update-user').click(function (e) {        
          e.preventDefault();       
          $.ajax(this.href, {       
              type: 'put',      
@@ -53,7 +66,7 @@ $(function () {
          });       
     });
     // delete user from course when button is clicked
-    $('.btn-delete-user').click(function (e) {
+    $('#table-users').on('click', '.btn-delete-user', function (e) {
         e.preventDefault();
         $.ajax(this.href, {
             type: 'delete',
@@ -70,6 +83,16 @@ $(function () {
         onText: 'Yes',
         size: 'small',
     });
+
+    // small plugin for loading inner html from url + selector
+    // @usage: $(selector).loadInner(url, data, callback)
+    $.fn.loadInner = function () {
+        if (arguments.length) {
+            arguments[0] += ' ' + $(this).selector + ' > *';
+        }
+        console.log('args', arguments)
+        return this.load.apply(this, arguments);
+    };
 
     // small plugin for creating alerts on the fly
     // @usage: $.bootstrapAlert(type, msg).after(...)

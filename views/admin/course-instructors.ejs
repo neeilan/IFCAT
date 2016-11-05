@@ -5,13 +5,13 @@
 <%- include ./flash %>
 
 <div class="nav-actions">
-    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-find">
+    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-find-users">
         <span class="glyphicon glyphicon-search"></span> Find instructors</button>
 </div>
 
 <!-- Current instructors -->
 
-<table class="table table-striped">
+<table class="table table-striped" id="table-users">
     <thead>
         <tr>
             <th>Name</th>
@@ -23,7 +23,7 @@
     <% if (_.isEmpty(course.instructors)) { %>
         <tr>
             <td colspan="3">No instructors have been added to the course yet. Click <a 
-                href="#" data-toggle="modal" data-target="#modal-find">here</a> to add instructors to the course.</td>
+                href="#" data-toggle="modal" data-target="#modal-find-users">here</a> to add instructors to the course.</td>
         </tr>
     <% } else { %>
         <% _.each(course.instructors, function (instructor) { %>
@@ -31,7 +31,8 @@
                 <td><%= instructor.name.full %></td>
                 <td><%= instructor.local.email %></td>
                 <td><a href="/admin/courses/<%= course.id %>/instructors/<%= instructor.id %>"
-                        class="btn btn-danger btn-sm btn-delete-user">Delete</a></td>
+                        class="btn btn-danger btn-sm btn-delete-user"><span 
+                        class="glyphicon glyphicon-remove"></span> Remove</a></td>
             </tr>
         <% }) %>
     <% } %>

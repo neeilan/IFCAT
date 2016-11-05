@@ -4,7 +4,7 @@
         <div class="modal-content">
             <form action="/admin/courses/<%= course.id %>/students/import" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
-                    <h4 class="modal-title">Import students using CSV file</h4>
+                    <h4 class="modal-title"><span class="glyphicon glyphicon-save"></span> Import students using CSV file</h4>
                 </div>
                 <div class="modal-body">
                     <p>This import will add new students into the course and their tutorials.</p>
@@ -12,9 +12,10 @@
                         <b>UTORid</b>, <b>First Name</b>, <b>Last Name</b>, and optionally, <b>Email</b>, <b>Password</b>, <b>Tutorial</b>.</p>
                     <p>If there are no tutorials matching the cell data, the student will not be added into a tutorial. Therefore, it is a good idea to <a href="/admin/courses/<%= course.id %>/tutorials" target="_blank">create the tutorials</a> before importing.</p>
                     <br>
-                    <label class="control-label">Select the file (.csv)</label>&nbsp;&nbsp;
+                    <label class="control-label">Select the file <span style="color: #A00">(.csv)</span></label>&nbsp;&nbsp;
                     <label class="btn btn-default">
-                        <input type="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display:none;">Browse
+                        <input type="file" name="file" 
+                            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display:none;">Browse
                     </label>
                     <span class="label label-info"></span>
                 </div>

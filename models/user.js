@@ -45,7 +45,7 @@ var UserSchema = new mongoose.Schema({
 
 // get full name
 UserSchema.virtual('name.full').get(function () {
-    return this.name.first + ' ' + this.name.last;
+    return _.defaultTo(this.name.first, '') + ' ' + _.defaultTo(this.name.last, '');
 });
 // hook: hash password if one is given
 UserSchema.pre('save', function (next) {
@@ -103,14 +103,11 @@ UserSchema.statics.sortByRole = function (users) {
     var roles = this.schema.path('roles').caster.enumValues;
     return _.sortBy(users, function (user) {
         var index = roles.indexOf(user.roles[0]);
-        if (index > -1) {
-            return index;
-        }
-        return roles.length; // highest number
+        return index > -1 ? index : roles.length; // highest number
     }, 'name.first', 'name.last');
 };
 // find instructors
-UserSchema.statics.findUsersByRole = function (role) {
+UserSchema.statics.findByRole = function (role) {
     return this.find({ 
         roles: { 
             $in: [role] 
@@ -121,9 +118,9 @@ UserSchema.statics.findUsersByRole = function (role) {
     });
 };
 // find teaching assistants by search query
-UserSchema.statics.findUsersBySearchQuery = function (query, role) {
+UserSchema.statics.findBySearchQuery = function (query, role) {
     // build regular expression e.g. 'first last' => /(first|last)/i
-    var regexp = new RegExp('(' + query.replace(/\s/, '|').trim() + ')', 'i');
+    var re = new RegExp('(' + query.replace(/\s/, '|').trim() + ')', 'i');
     // query based on UTORid, name, or email
     return this.find().and([
         {
@@ -133,11 +130,11 @@ UserSchema.statics.findUsersBySearchQuery = function (query, role) {
         }, 
         {
             $or: [
-                { 'student.UTORid': regexp },
-                { 'student.number': regexp },
-                { 'name.first': regexp },
-                { 'name.last': regexp },
-                { 'local.email': regexp }
+                { 'name.first': re },
+                { 'name.last': re },
+                { 'student.UTORid': re },
+                { 'student.number': re },
+                { 'local.email': re }
             ]
         }
     ]).sort({

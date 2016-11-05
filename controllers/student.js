@@ -1,3 +1,5 @@
+var util = require('util');
+
 var _ = require('lodash'),
     async = require('async'),
     csv = require('csv');
@@ -6,7 +8,7 @@ var models = require('../models');
 
 // Retrieve list of students for course
 exports.getStudentListByCourse = function (req, res) { 
-    req.course.withTutorials().withStudents().execPopulate().then(function (err) {
+    req.course.withTutorials().withStudents().execPopulate().then(function () {
         res.render('admin/course-students', {
             course: req.course
         });
@@ -14,10 +16,12 @@ exports.getStudentListByCourse = function (req, res) {
 };
 // Retrieve list of students matching search query
 exports.getStudentListBySearchQuery = function (req, res) {
-    models.User.findUsersBySearchQuery(req.query.q, 'student').exec(function (err, users) {
+    models.User.findBySearchQuery(req.query.q, 'student').exec(function (err, students) {
         res.render('admin/tables/course-students-search-results', { 
             course: req.course, 
-            students: users
+            students: _.filter(students, function (student) {
+                return req.course.students.indexOf(student.id) === -1;
+            })
         });
     });
 };
@@ -34,10 +38,8 @@ exports.getStudentsByTutorial = function (req, res) {
 exports.addStudent = function (req, res) {
     req.course.update({ $addToSet: { students: req.us3r.id }}, function (err) {
         if (err)
-            req.flash('error', 'An error has occurred while trying perform operation.');
-        else
-            req.flash('success', 'Student <b>%s</b> has been added into the course.', req.us3r.name.full);
-        res.json({ status: !err });
+            return res.status(500).send('An error has occurred while trying perform operation.');
+        res.send(util.format('Student <b>%s</b> has been added into the course.', req.us3r.name.full));
     });
 };
 // Delete student from course and associated tutorial
@@ -157,7 +159,7 @@ exports.editStudentList = function (req, res) {
                 newStudents = tutorials[tutorial.id]; 
             // check if changes were made
             if (_.difference(tutorial.students, newStudents))
-                tutorial.update({ $set: { students: newStudents }}, done);
+                tutorial.set('students', newStudents).save(done);
             else
                 done();
         }, function (err) {
@@ -169,12 +171,9 @@ exports.editStudentList = function (req, res) {
         });
     });
 };
-
-// TO-FIX!
-
 // Retrieve courses enrolled for student
 exports.getCourseList = function (req, res) {
-    models.Course.findCoursesByStudent(req.user.id).exec(function (err, courses) { 
+    models.Course.findByStudent(req.user.id).exec(function (err, courses) { 
         res.render('student/courses', { courses: courses });
     });
 };
@@ -199,8 +198,7 @@ exports.getQuizList = function (req, res) {
         }
     });
 };
-// 
-
+// Retrieve marks
 exports.getMarks = function (req, res) {
     req.course.withTutorials().execPopulate().then(function () {
         // find tutorials that student is in

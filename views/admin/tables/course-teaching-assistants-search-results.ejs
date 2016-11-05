@@ -2,8 +2,8 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th>Email</th>
-            <th></th>
+            <th style="width: 50%">Email</th>
+            <th style="width: 85px"></th>
         </tr>
     </thead>
     <tbody>
@@ -16,8 +16,11 @@
             <tr>
                 <td><%= teachingAssistant.name.full %></td>
                 <td><%= teachingAssistant.local.email %></td>
-                <td><a href="/admin/courses/<%= course.id %>/teaching-assistants/<%= teachingAssistant.id %>" 
-                    class="btn btn-default btn-sm btn-add-user">Add</a></td>
+                <td>
+                    <a href="/admin/courses/<%= course.id %>/teaching-assistants/<%= teachingAssistant.id %>" 
+                        class="btn btn-primary btn-sm"><span 
+                        class="glyphicon glyphicon-plus"></span> Add</a>
+                </td>
             </tr>
         <% }) %>
     <% } %>

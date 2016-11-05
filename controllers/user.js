@@ -23,16 +23,16 @@ exports.getUser = function (req, res, next, user) {
 
 // Retrieve student login form
 exports.getLoginForm = function (req, res) {
-    var auth0Config = config.auth0;
     res.render('login', {
-        domain : auth0Config.domain,
-        clientId : auth0Config.clientId,
-        callbackUrl : auth0Config.callbackUrl,
+        domain: config.auth0.domain,
+        clientId: config.auth0.clientId,
+        callbackUrl: config.auth0.callbackUrl,
         title: 'Login'
     }); 
 };
 // Retrieve admin login form
 exports.getAdminLoginForm = function (req, res) {
+    console.log(req);
     res.render('admin/login', {
         title: 'Login'
     }); 
@@ -95,9 +95,12 @@ exports.deleteUser = function (req, res) {
 // Add administrator
 exports.install = function (req, res, next) {
     var user = new models.User({
+        name: {
+            first: 'Admin'
+        },
         local: {
             email: 'admin',
-            password: 'admin'
+            password: '@dm1n'
         },
         roles: ['admin']
     });
