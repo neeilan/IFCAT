@@ -2,6 +2,15 @@ $(function () {
     // turn off caching
     $.ajaxSetup({ cache: false });
 
+    // activate current navbar item
+    $('#navbar-collapse li > [href!="#"]').each(function () {
+        console.log( location.href, this.href, location.href.indexOf(this.href) );
+        if (window.location.href.indexOf(this.href) !== -1) {
+            $(this).parent().addClass('active');
+            return false;
+        }
+    });
+
     // wrap tables with  special container 
     $('.dim, .stretch').each(function() {
         var $elem = $(this), $div = $('<div/>');
@@ -90,8 +99,15 @@ $(function () {
         if (arguments.length) {
             arguments[0] += ' ' + $(this).selector + ' > *';
         }
-        console.log('args', arguments)
         return this.load.apply(this, arguments);
+    };
+
+    // small plugin for showing/hiding selector and enabling/disabling its children
+    // @usage: $(selector).enableToggle([display])
+    $.fn.enableToggle = function () {
+        return this.toggle.apply(this, arguments).promise().done(function () {
+            this.find(':input').prop('disabled', this.is(':hidden'));
+        });
     };
 
     // small plugin for creating alerts on the fly

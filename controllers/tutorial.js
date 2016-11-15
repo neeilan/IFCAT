@@ -3,7 +3,7 @@ var _ = require('lodash'),
 
 var models = require('../models');
 
-// Retrieve course
+// Retrieve tutorial
 exports.getTutorial = function (req, res, next, tutorial) {
     models.Tutorial.findById(tutorial, function (err, tutorial) {
         if (err) {

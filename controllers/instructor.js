@@ -29,7 +29,7 @@ exports.getInstructorListBySearchQuery = function (req, res) {
 exports.addInstructor = function (req, res) {
     req.course.update({ $addToSet: { instructors: req.us3r.id }}, function (err) {
         if (err)
-            res.status(500).send('An error occurred while trying to perform operation.');
+            return res.status(500).send('An error occurred while trying to perform operation.');
         res.send(util.format('Instructor <b>%s</b> has been added to the course.', req.us3r.name.full));
     });
 };

@@ -16,8 +16,9 @@ router.param('tutorialQuiz', controllers.TutorialQuiz.getQuiz);
 router.param('group', controllers.Group.getGroup);
 
 // non-authenticated routes
+// router.get('/help', controllers.User.getHelpGuide);
 router.get('/install', controllers.User.install);
-router.get('/login', controllers.User.getAdminLoginForm);
+router.get('/login', controllers.User.getLoginForm);
 router.post('/login', passport.authenticate('local-login', {
     successRedirect: '/admin/courses',
     failureRedirect: '/admin/login',
@@ -26,9 +27,8 @@ router.post('/login', passport.authenticate('local-login', {
 
 // check if user is authenticated
 router.use(function (req, res, next) {
-    if (req.isAuthenticated()) {
+    if (req.isAuthenticated())
         return next();
-    }
     res.redirect('/admin/login');
 });
 

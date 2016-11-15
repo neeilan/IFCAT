@@ -8,12 +8,10 @@ var config = require('../lib/config'),
 // 
 exports.getUser = function (req, res, next, user) {
     models.User.findById(user, function (err, user) {
-        if (err) {
+        if (err)
             return next(err);
-        }
-        if (!user) {
+        if (!user)
             return next(new Error('No user is found.'));
-        }
         req.us3r = user; // careful: req.user is used by passport
         next();
     });
@@ -23,17 +21,12 @@ exports.getUser = function (req, res, next, user) {
 
 // Retrieve student login form
 exports.getLoginForm = function (req, res) {
+    if (req.baseUrl === '/admin')
+        return res.render('admin/login', { title: 'Login' });
     res.render('login', {
         domain: config.auth0.domain,
         clientId: config.auth0.clientId,
         callbackUrl: config.auth0.callbackUrl,
-        title: 'Login'
-    }); 
-};
-// Retrieve admin login form
-exports.getAdminLoginForm = function (req, res) {
-    console.log(req);
-    res.render('admin/login', {
         title: 'Login'
     }); 
 };
@@ -92,21 +85,26 @@ exports.deleteUser = function (req, res) {
         res.sendStatus(200);
     });
 };
-// Add administrator
+// Reset administrator
 exports.install = function (req, res, next) {
-    var user = new models.User({
-        name: {
-            first: 'Admin'
-        },
-        local: {
-            email: 'admin',
-            password: '@dm1n'
-        },
-        roles: ['admin']
-    });
-    user.save(function (err) {
+    models.User.findOne({ 'local.email': 'admin' }, function (err, user) {
         if (err)
             return next(err);
-        res.send('Sweet Christmas.');
+        if (!user)
+            user = new models.User();
+        user.set({
+            name: {
+                first: 'Admin'
+            },
+            local: {
+                email: 'admin',
+                password: '@dm1n'
+            },
+            roles: ['admin']
+        }).save(function (err) {
+            if (err)
+                return next(err);
+            res.send('Sweet Christmas.');
+        });
     });
 };

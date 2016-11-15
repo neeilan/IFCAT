@@ -268,8 +268,7 @@ $(function () {
         // show related items for type; hide otherwise
         $('div[data-type]').each(function () {
             var $col = $(this);
-            var display = $col.data('type') === type;
-            $col.toggle(display).find(':input').prop('disabled', !display);
+            $col.enableToggle($col.data('type') === type);
         });
     }).change();
     // toggle checkboxes for selecting/unselecting files
@@ -346,6 +345,7 @@ $(function () {
         $calc.html(
             $('<table/>', {
                 class: 'table table-striped table-bordered',
+                style: 'min-width: auto; width: 200px',
                 html: $.map(attempts, function (points, i) {
                     return '<tr><td>Attempt ' + (i + 1) + '</td><td>' + points + '</td></tr>';
                 })

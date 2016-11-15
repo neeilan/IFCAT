@@ -28,12 +28,12 @@ exports.sortQuestionList = function (req, res) {
     var newOrder = req.body.questions || [];
     // sort questions based off order given
     req.quiz.questions.sort(function (a, b) {
-        return newOrder.indexOf(a) < newOrder.indexOf(b) ? -1 : 1;
+        return newOrder.indexOf(a.toString()) < newOrder.indexOf(b.toString()) ? -1 : 1;
     });
     req.quiz.save(function (err) {
         if (err)
             return res.status(500).send('An error has occurred while trying to perform operation.');
-        res.send('List of questions have been updated.');
+        res.sendStatus(200);
     });
 };
 // Retrieve specific question for quiz

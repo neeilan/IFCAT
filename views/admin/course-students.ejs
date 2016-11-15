@@ -15,7 +15,7 @@
 
 <!-- Show current student. -->
 
-<table class="table table-striped" id="table-users">
+<table class="table table-striped stretch" id="table-users">
     <thead>
         <tr>
             <th rowspan="2">Name</th>
@@ -23,7 +23,7 @@
             <% if (!_.isEmpty(course.tutorials)) { %>
                 <th colspan="<%= course.tutorials.length %>">Tutorials</th>
             <% } %>
-            <th rowspan="2" style="width: 100px"></th>
+            <th rowspan="2" class="actions"></th>
         </tr>
         <tr>
         <% _.each(course.tutorials, function (tutorial) { %>
