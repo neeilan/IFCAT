@@ -38,13 +38,26 @@ socket.on('groupsUpdated', function(data){
     renderGroups(data.groups);
 })
 
+function renderGroups(groups, currentGroupId){
+    console.log(userId)
+    $('#groupSelfSelect').show();
+    var html = '';
+    groups.forEach(function(group){
+        
+        var btnClass = group.members.includes(userId) ? 'btn-success' : 'btn-default' ;
+        html+= '<br/><a class="btn '+ btnClass+' joinGroup" id="'+ group._id +'">Group ' + group.name + '\t(Members: '+ group.members.length +')</a>'
+    })
+    $('#groupsList').html(html); 
+    $('.joinGroup').click(function(e){
+        console.log(e.target.id)
+        emit('joinGroup', { newGroup : e.target.id });
+    })
+}
 
 
 // When a question is answered by leader, a 'groupAttempt' event is emitted
 socket.on('groupAttempt', function(data){
   console.log('groupAttempt');
-  if (groupId && data.groupId != groupId) return;
-
   responses[data.response.question] = data.response;
   if (data.response.group != groupId) return;
   var question = quizData.quiz.questions[data.questionNumber-1];
@@ -66,19 +79,19 @@ socket.on('groupAttempt', function(data){
 
   }
   
-  renderQuestion(quizData.quiz, currentQuestionIndex);
-  $('#currentScore').html(score);
-  
-})
 
-socket.on('resetDriver', function(data){
+socket.on('resetDriver', function(){
   console.log('resetDriver');
-  if (groupId != data.groupId) return;
   $('.quizBtn').attr('disabled', true);
   isDriver = false;
   renderQuestion(currentQuestionIndex);
 })
-    
+      
+  
+renderQuestion(quizData.quiz, currentQuestionIndex);
+  $('#currentScore').html(score);
+  
+})
 
 
 // Driver controls
@@ -134,8 +147,6 @@ socket.on('startQuiz', function(data){
 
 socket.on('updateScores', function(data){
   console.log('updateScores');
-  if (groupId && data.groupId != groupId) return;
-
   data.responses.forEach(function(response, i){
     responses[response.question] = response;
   })
@@ -149,9 +160,8 @@ socket.on('updateScores', function(data){
   }
 })
 
-socket.on('assignedAsDriver', function(data){
+socket.on('assignedAsDriver', function(){
   console.log('assignedAsDriver');
-  if (groupId && data.groupId != groupId) return;
   /*
   Emitted to the user assigned as a driver.
   Todo: When previous driver disconnects, assign next driver automatically
@@ -161,22 +171,11 @@ socket.on('assignedAsDriver', function(data){
   $('.quizBtn').attr('disabled', false);
 })
 
-
-function renderGroups(groups, currentGroupId){
-    console.log(userId)
-    $('#groupSelfSelect').show();
-    var html = '';
-    groups.forEach(function(group){
-        
-        var btnClass = group.members.includes(userId) ? 'btn-success' : 'btn-default' ;
-        html+= '<br/><a class="btn '+ btnClass+' joinGroup" id="'+ group._id +'">Group ' + group.name + '\t(Members: '+ group.members.length +')</a>'
-    })
-    $('#groupsList').html(html); 
-    $('.joinGroup').click(function(e){
-        console.log(e.target.id)
-        emit('joinGroup', { newGroup : e.target.id });
-    })
-}
+socket.on('renderQuestion', function(data){
+  console.log(quizData)
+  renderQuestion(quizData.quiz, data.questionNumber);
+  
+})
 
 
 function emit(eventName, data) {
@@ -290,6 +289,9 @@ function renderQuestion(quiz, n){
     $("#activateQuiz").removeClass("tex2jax_process");
   }
   
+  
+
+  
     $("#submitQuestion").click(function(e){
       var currentlyChosen = $('.currentlyChosen');
       var textAnswer = $('#textInput').val();
@@ -396,8 +398,6 @@ function calculateStars(question){
     
 socket.on('postQuiz', function(data){
   console.log('postQuiz');
-  if (groupId && data.groupId != groupId) return;
-  
   $(".preQuiz").hide();
   $('#activeQuiz').hide();
   $("#postQuiz").show();
@@ -416,6 +416,5 @@ socket.on('postQuiz', function(data){
 
 socket.on('info', function(data){
   console.log('info');
-  console.log(data);
   swal('', data.message, 'info');
 })
