@@ -17,14 +17,26 @@
 <!--</form>-->
 <script>
     // Construct an instance of Auth0Lock with your clientId and aut0 domain name
-    var lock = new Auth0Lock('<%=clientId%>', '<%=domain%>',{ auth: {
-          redirectUrl: '<%=callbackUrl%>'
+      var nonEmpty = function(str) {
+      return {
+         valid: str.length > 0,
+         hint: "This field cannot be empty" // optional
+      };
+    }
+    var options = {
+  allowedConnections: ['Username-Password-Authentication'],
+  additionalSignUpFields : [{ name : 'first_name', validator: nonEmpty, placeholder: 'First Name' },
+                            { name : 'last_name', placeholder: 'Last Name', validator: nonEmpty},
+                            { name : 'UTORid', placeholder: 'UTORid', validator: nonEmpty}],
+  auth: {
+          redirectUrl: '<%= callbackUrl %>'
         , responseType: 'code'
         , params: {
-          scope: 'openid profile'
-        }
-      }});
+          scope: 'openid profile',
+      }}
+};
 
+    var lock = new Auth0Lock('<%=clientId%>', '<%=domain%>', options);
     // Show lock's login widget
     lock.show();
 </script>
