@@ -1,6 +1,7 @@
 var async = require('async'),
     fs = require('fs-extra'),
-    mongoose = require('mongoose');
+    mongoose = require('mongoose'),
+    path = require('path');
 
 var config = require('../lib/config'),
     models = require('../models');
@@ -8,12 +9,10 @@ var config = require('../lib/config'),
 // Retrieve file
 exports.getFile = function (req, res, next, file) {
     models.File.findById(file, function (err, file) {
-        if (err) {
+        if (err)
             return next(err);
-        }
-        if (!file) {
+        if (!file)
             return next(new Error('No file is found.'));
-        }
         req.fil3 = file; // careful: req.file is used by multer
         next();
     });
@@ -66,14 +65,14 @@ exports.deleteFiles = function (req, res) {
                 });
             },
             function unlink(file, done) {
-                var path = dir + '/' + file.name;
-                fs.stat(path, function (err, stats) {
+                var filename = path.resolve(dir + '/' + file.name);
+                fs.stat(filename, function (err, stats) {
                     if (err && err.code === 'ENOENT')
                         return done();
                     else if (err)
                         return done(err);
                     else if (stats.isFile())
-                        fs.remove(path, done);
+                        fs.remove(filename, done);
                     else
                         return done();
                 });

@@ -1,3 +1,5 @@
+var util = require('util');
+
 var _ = require('lodash'),
     async = require('async');
 
@@ -14,22 +16,21 @@ exports.getInstructorListByCourse = function (req, res) {
 };
 // Retrieve list of instructors matching search query
 exports.getInstructorListBySearchQuery = function (req, res) {
-    models.User.findUsersBySearchQuery(req.query.q, 'instructor').exec(function (err, users) {
+    models.User.findBySearchQuery(req.query.q, 'instructor').exec(function (err, instructors) {
         res.render('admin/tables/course-instructors-search-results', { 
             course: req.course, 
-            instructors: users 
+            instructors: _.filter(instructors, function (instructor) {
+                return req.course.instructors.indexOf(instructor.id) === -1;
+            })
         });
     });
 };
 // Add instructor to course
 exports.addInstructor = function (req, res) {
     req.course.update({ $addToSet: { instructors: req.us3r.id }}, function (err) {
-        if (err) {
-            req.flash('error', 'An error occurred while trying to perform operation.');
-        } else {
-            req.flash('success', 'Instructor <b>%s</b> has been added to the course.', req.us3r.name.full);
-        }
-        res.json({ status: !err });
+        if (err)
+            return res.status(500).send('An error occurred while trying to perform operation.');
+        res.send(util.format('Instructor <b>%s</b> has been added to the course.', req.us3r.name.full));
     });
 };
 // Delete instructor from course

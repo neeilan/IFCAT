@@ -8,7 +8,7 @@
 </div>
 
 <% if (!_.isEmpty(students)) { %>
-<div class="nav-actions dim">
+<div class="col-md-3 dim">
     <label class="col control-label">
         <span>Publish?</span>
         <input type="checkbox" value="1" class="bootstrap-switch" id="publish"<%= tutorialQuiz.published ? ' checked' : '' %>>
@@ -24,65 +24,64 @@
 </div>
 <% } %>
 
-<h1>Groups</h1>
-
-<%- include ./flash %>
-
-<div class="dim">
-    <% if (!_.isEmpty(students)) { %>
-    <div class="nav-actions">
-        <button type="button" class="btn btn-default btn-sm" id="btn-refresh" 
-            onclick="window.location.reload(true)"><span 
-            class="glyphicon glyphicon-refresh"></span> Refresh</button>
-        <button type="button" class="btn btn-default btn-sm" id="btn-add"><span 
-            class="glyphicon glyphicon-plus"></span> Add group</button>
-        <button type="button" class="btn btn-default btn-sm" id="btn-remove"><span 
-            class="glyphicon glyphicon-remove"></span> Remove groups</button>
-        <button type="button" class="btn btn-default btn-sm" id="btn-randomize"><span 
-            class="glyphicon glyphicon-random"></span> Randomize groups</button>
-        <button type="button" class="btn btn-default btn-sm btn-primary" id="btn-save"><span 
-            class="glyphicon glyphicon-ok"></span> Save groups</button>
-    </div>
-    <% } %>
-    <table id="table-quiz-groups" class="stretch">
-        <thead>
-            <tr>
-                <th rowspan="2" class="s">&nbsp;</th>
-                <th colspan="<%= 1 + groups.length %>">Groups</th>
-            </tr>
-            <% if (!_.isEmpty(students)) { %>
-                <tr>
-                    <th class="u">Unassigned</th>
-                    <% _.each(groups, function (group) { %>
-                        <th class="g" data-group="<%= group.id %>"><%= group.name %></th>
-                    <% }) %>
-                </tr>
-            <% } %>
-        </thead>
-        <tbody>
-        <% if (_.isEmpty(students)) { %>
-            <tr>
-                <td colspan="2">No students have been added into the tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students into tutorial.</td>
-            </tr>
-        <% } else { %>
-            <% _.each(students, function (student) { %>
-                <tr>
-                    <td class="s">
-                        <a href="/admin/courses/<%= course.id %>/students/<%= student.id %>/marks"><%= student.name.full %></a>
-                    </td>
-                    <td class="u">
-                        <input type="radio" name="groups[<%= student.id %>]" value="unassigned"<%= 
-                            tutorialQuiz.isUnassigned(student.id) ? ' checked' : '' %>>
-                    </td>
-                    <% _.each(groups, function (group) { %>
-                        <td class="g"><input type="radio" name="groups[<%= student.id %>]" value="<%= group.id %>"<%=
-                            !!_.find(group.members, { id: student.id }) ? ' checked' : '' %>></td>
-                    <% }) %>
-                </tr>
-            <% }) %>
+<div class="col-md-9">
+    <h1>Groups</h1>
+    <div class="dim">
+        <% if (!_.isEmpty(students)) { %>
+        <div class="nav-actions">
+            <button type="button" class="btn btn-default btn-sm" id="btn-refresh" 
+                onclick="window.location.reload(true)"><span 
+                class="glyphicon glyphicon-refresh"></span> Refresh</button>
+            <button type="button" class="btn btn-default btn-sm" id="btn-add"><span 
+                class="glyphicon glyphicon-plus"></span> Add group</button>
+            <button type="button" class="btn btn-default btn-sm" id="btn-remove"><span 
+                class="glyphicon glyphicon-remove"></span> Remove groups</button>
+            <button type="button" class="btn btn-default btn-sm" id="btn-randomize"><span 
+                class="glyphicon glyphicon-random"></span> Randomize groups</button>
+            <button type="button" class="btn btn-default btn-sm btn-primary" id="btn-save"><span 
+                class="glyphicon glyphicon-ok"></span> Save groups</button>
+        </div>
         <% } %>
-        </tbody>
-    </table>
+        <table id="table-quiz-groups" class="stretch">
+            <thead>
+                <tr>
+                    <th rowspan="2" class="s">&nbsp;</th>
+                    <th colspan="<%= 1 + groups.length %>">Groups</th>
+                </tr>
+                <% if (!_.isEmpty(students)) { %>
+                    <tr>
+                        <th class="u">Unassigned</th>
+                        <% _.each(groups, function (group) { %>
+                            <th class="g" data-group="<%= group.id %>"><%= group.name %></th>
+                        <% }) %>
+                    </tr>
+                <% } %>
+            </thead>
+            <tbody>
+            <% if (_.isEmpty(students)) { %>
+                <tr>
+                    <td colspan="2">No students have been added into the tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students into tutorial.</td>
+                </tr>
+            <% } else { %>
+                <% _.each(students, function (student) { %>
+                    <tr>
+                        <td class="s">
+                            <a href="/admin/courses/<%= course.id %>/students/<%= student.id %>/marks"><%= student.name.full %></a>
+                        </td>
+                        <td class="u">
+                            <input type="radio" name="groups[<%= student.id %>]" value="unassigned"<%= 
+                                tutorialQuiz.isUnassigned(student.id) ? ' checked' : '' %>>
+                        </td>
+                        <% _.each(groups, function (group) { %>
+                            <td class="g"><input type="radio" name="groups[<%= student.id %>]" value="<%= group.id %>"<%=
+                                !!_.find(group.members, { id: student.id }) ? ' checked' : '' %>></td>
+                        <% }) %>
+                    </tr>
+                <% }) %>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <%- include ./body-js -%>
@@ -98,26 +97,32 @@ $(function () {
     };
     var trash = [];
 
+
+    var $heading = $('.container > h1'),
+        $table = $('#table-quiz-groups');
+
     // set option on quiz in tutorial
     $(':checkbox').on('switchChange.bootstrapSwitch', function (e, state) {
         var $dim = $(this).closest('.dim-wrap').addClass('on');
             $.bootstrapAlert('close');
+        // send request
         $.ajax(url[this.id], {
             type: 'put',
             data: { state: state }, 
             success: function (res) {
-                $.bootstrapAlert('success', res).insertBefore($('.container > h1'));
+                $heading.before($.bootstrapAlert('success', res));
             },
             error: function (xhr) {
-                $.bootstrapAlert('danger', xhr.responseText).insertBefore($('.container > h1'));
+                $heading.before($.bootstrapAlert('danger', xhr.responseText));
             },
             complete: function () {
                 $dim.removeClass('on');
             }
         });
     });
+    
+     
 
-    var $table = $('#table-quiz-groups'); 
     // select/unselect column
     $table.on('click', 'th.g', function () {
         var $th = $(this);
@@ -170,8 +175,8 @@ $(function () {
             }
         });
         // load new table
-        $table.load(url.generate + ' #' + $table[0].id + ' > *', function () {
-            $dim.removeClass('on');
+        $table.loadInner(window.location.href, function () { 
+            $dim.removeClass('on'); 
         });
     });
     // save changes
@@ -193,11 +198,11 @@ $(function () {
             type: 'put',
             data: data,
             success: function (res) {
-                $.bootstrapAlert('success', res).insertAfter($('.container > h1'));
-                $table.load(window.location.href + ' #' + $table[0].id + ' > *');
+                $heading.after($.bootstrapAlert('success', res));
+                $table.loadInner(window.location.href);
             },
             error: function (xhr) {
-                $.bootstrapAlert('danger', xhr.responseText).insertAfter($('.container > h1'));
+                $heading.after($.bootstrapAlert('danger', xhr.responseText));
             },
             complete: function () {
                 $dim.removeClass('on');

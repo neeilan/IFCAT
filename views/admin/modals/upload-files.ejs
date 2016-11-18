@@ -1,10 +1,10 @@
 <!-- upload files modal -->
 <div class="modal fade" id="modal-upload-files" tabindex="-1" style="display: none;">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <form action="<%= url %>" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
-                    <h4 class="modal-title">Select files</h4>
+                    <h4 class="modal-title"><span class="glyphicon glyphicon-plus"></span> Upload files</h4>
                 </div>
                 <div class="modal-body">
                     <button type="button" class="btn btn-default btn-block btn-select">Select Files</button>
@@ -13,7 +13,8 @@
                 </div>
                 <div class="modal-footer"> 
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary btn-sm">Upload files</button>
+                    <button type="submit" class="btn btn-primary btn-sm"><span 
+                        class="glyphicon glyphicon-plus"></span> Upload files</button>
                 </div>
             </form>
         </div>

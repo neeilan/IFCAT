@@ -1,23 +1,28 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>UTORid</th>
             <th>Name</th>
-            <th></th>
+            <th style="width: 110px">UTORid</th>
+            <th style="width: 150px">Student Number</th>
+            <th class="actions"></th>
         </tr>
     </thead>
     <tbody>
     <% if (_.isEmpty(students)) { %>
         <tr>
-            <td colspan="3">No students were found matching the given query.</td>
+            <td colspan="4">No students were found matching the given query.</td>
         </tr>
     <% } else { %> 
         <% _.each(students, function (student) { %>
             <tr>
-                <td><%= student.UTORid %></td>
                 <td><%= student.name.full %></td>
-                <td><a href="/admin/courses/<%= course.id %>/students/<%= student.id %>"
-                    class="btn btn-default btn-sm btn-add-user">Add</a></td>
+                <td><%= student.student.UTORid %></td>
+                <td><%= student.student.number %></td>
+                <td>
+                    <a href="/admin/courses/<%= course.id %>/students/<%= student.id %>"
+                        class="btn btn-primary btn-sm"><span 
+                        class="glyphicon glyphicon-plus"></span> Add</a>
+                </td>
             </tr>
         <% }) %>
     <% } %>

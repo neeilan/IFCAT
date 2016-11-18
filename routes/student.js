@@ -30,9 +30,8 @@ router.post('/uteach-login', passport.authenticate('auth0', {
 
 // check if user is authenticated
 router.use(function (req, res, next) {
-    if (req.isAuthenticated()) {
+    if (req.isAuthenticated())
         return next();
-    }
     res.redirect('/login');
 });
 

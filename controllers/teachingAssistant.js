@@ -1,3 +1,5 @@
+var util = require('util');
+
 var _ = require('lodash'),
     async = require('async');
 
@@ -14,10 +16,12 @@ exports.getTeachingAssistantListByCourse = function (req, res) {
 };
 // Retrieve list of teaching assistants matching search query
 exports.getTeachingAssistantListBySearchQuery = function (req, res) {
-    models.User.findUsersBySearchQuery(req.query.q, 'teachingAssistant').exec(function (err, users) {
+    models.User.findBySearchQuery(req.query.q, 'teachingAssistant').exec(function (err, teachingAssistants) {
         res.render('admin/tables/course-teaching-assistants-search-results', { 
             course: req.course, 
-            teachingAssistants: users 
+            teachingAssistants: _.filter(teachingAssistants, function (teachingAssistant) {
+                return req.course.teachingAssistants.indexOf(teachingAssistant.id) === -1;
+            }) 
         });
     });
 };
@@ -47,10 +51,8 @@ exports.editTeachingAssistantList = function (req, res) {
 exports.addTeachingAssistant = function (req, res) {
     req.course.update({ $addToSet: { teachingAssistants: req.us3r.id }}, function (err) {
         if (err)
-            req.flash('error', 'An error occurred while trying to perform operation.');
-        else
-            req.flash('success', 'Teaching assistant <b>%s</b> has been added to the course.', req.us3r.name.full);
-        res.json({ status: !err });
+            return res.status(500).send('An error occurred while trying to perform operation.');
+        res.send(util.format('Teaching assistant <b>%s</b> has been added to the course.', req.us3r.name.full));
     });
 };
 // Delete teaching assistant from course and associated tutorials

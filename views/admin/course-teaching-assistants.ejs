@@ -5,7 +5,7 @@
 <%- include ./flash %>
 
 <div class="nav-actions">
-    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-find">
+    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-find-users">
         <span class="glyphicon glyphicon-search"></span> Find teaching assistants</button>
     <button type="button" class="btn btn-primary btn-sm" id="btn-update">
         <span class="glyphicon glyphicon-ok"></span> Update tutorials</button>
@@ -14,12 +14,12 @@
 <!-- Show current TAs -->
 
 <div class="stretch">
-    <table class="table table-striped">
+    <table class="table table-striped" id="table-users">
         <thead>
             <tr>
                 <th rowspan="2">Name</th>
                 <th colspan="<%= course.tutorials.length ? course.tutorials.length : 1 %>">Tutorials</th>
-                <th rowspan="2" style="width: 100px"></th>
+                <th rowspan="2" class="actions"></th>
             </tr>
             <tr>
             <% _.each(course.tutorials, function (tutorial) { %>
@@ -32,7 +32,7 @@
             <tr>
                 <td colspan="<%= 2 + course.tutorials.length %>">
                     No teaching assistants have been added to the course yet. Click <a 
-                    href="#" data-toggle="modal" data-target="#modal-find">here</a> to add teaching assistants to the course.
+                    href="#" data-toggle="modal" data-target="#modal-find-users">here</a> to add teaching assistants to the course.
                 </td>
             </tr>
         <% } else { %>

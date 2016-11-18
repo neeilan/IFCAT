@@ -22,9 +22,9 @@ exports.getCourseList = function (req, res) {
         res.render('admin/courses', { 
             title: 'Courses',
             courses: _.filter(courses, function (course) {
-                return req.user.hasRole('admin')
-                    || course.instructors.indexOf(req.user.id) !== -1 
-                    || course.teachingAssistants.indexOf(req.user.id) !== -1; 
+                return req.user.hasRole('admin') || 
+                    course.instructors.indexOf(req.user.id) !== -1 || 
+                    course.teachingAssistants.indexOf(req.user.id) !== -1; 
             }) 
         });
     });
