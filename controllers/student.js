@@ -1,5 +1,3 @@
-var util = require('util');
-
 var _ = require('lodash'),
     async = require('async'),
     csv = require('csv');
@@ -8,7 +6,7 @@ var models = require('../models');
 
 // Retrieve list of students for course
 exports.getStudentListByCourse = function (req, res) { 
-    req.course.withTutorials().withStudents().execPopulate().then(function () {
+    req.course.withTutorials().withStudents().execPopulate().then(function (err) {
         res.render('admin/course-students', {
             course: req.course
         });
@@ -16,12 +14,10 @@ exports.getStudentListByCourse = function (req, res) {
 };
 // Retrieve list of students matching search query
 exports.getStudentListBySearchQuery = function (req, res) {
-    models.User.findBySearchQuery(req.query.q, 'student').exec(function (err, students) {
+    models.User.findUsersBySearchQuery(req.query.q, 'student').exec(function (err, users) {
         res.render('admin/tables/course-students-search-results', { 
             course: req.course, 
-            students: _.filter(students, function (student) {
-                return req.course.students.indexOf(student.id) === -1;
-            })
+            students: users
         });
     });
 };
@@ -38,8 +34,10 @@ exports.getStudentsByTutorial = function (req, res) {
 exports.addStudent = function (req, res) {
     req.course.update({ $addToSet: { students: req.us3r.id }}, function (err) {
         if (err)
-            return res.status(500).send('An error has occurred while trying perform operation.');
-        res.send(util.format('Student <b>%s</b> has been added into the course.', req.us3r.name.full));
+            req.flash('error', 'An error has occurred while trying perform operation.');
+        else
+            req.flash('success', 'Student <b>%s</b> has been added into the course.', req.us3r.name.full);
+        res.json({ status: !err });
     });
 };
 // Delete student from course and associated tutorial
@@ -159,7 +157,7 @@ exports.editStudentList = function (req, res) {
                 newStudents = tutorials[tutorial.id]; 
             // check if changes were made
             if (_.difference(tutorial.students, newStudents))
-                tutorial.set('students', newStudents).save(done);
+                tutorial.update({ $set: { students: newStudents }}, done);
             else
                 done();
         }, function (err) {
@@ -171,6 +169,9 @@ exports.editStudentList = function (req, res) {
         });
     });
 };
+
+// TO-FIX!
+
 // Retrieve courses enrolled for student
 exports.getCourseList = function (req, res) {
     models.Course.findByStudent(req.user.id).exec(function (err, courses) { 
@@ -198,7 +199,8 @@ exports.getQuizList = function (req, res) {
         }
     });
 };
-// Retrieve marks
+// 
+
 exports.getMarks = function (req, res) {
     req.course.withTutorials().execPopulate().then(function () {
         // find tutorials that student is in
@@ -222,26 +224,33 @@ exports.getMarks = function (req, res) {
                 }
             }]).exec(function (err, tutorialQuizzes) {
                 // ugly: find marks by student
+                console.log(tutorialQuizzes);
+                tutorialQuizzes = tutorialQuizzes.filter(tq => tq.groups.length > 0);
                 var marks = _.map(tutorialQuizzes, function (tutorialQuiz) {
-                    // teaching points
                     var result = {
                         tutorialQuiz: tutorialQuiz,
                         group: _.find(tutorialQuiz.groups, function (group) {
                             return group.members.indexOf(req.us3r.id) !== -1;
                         }),
-                        points: _.reduce(tutorialQuiz.responses, function (sum, response) {
+                        points: tutorialQuiz.responses ? _.reduce(tutorialQuiz.responses, function (sum, response) {
                             if (response.group.members.indexOf(req.us3r.id) !== -1) {
                                 return sum + response.points;
                             }
                             return sum;
-                        }, 0)
+                        }, 0) : 0,
                     };
                     
+                    if (result.group){
                     result.teachingPoints = (result.group.teachingPoints.reduce(function(sum, recipient){
                         if (recipient === req.us3r.id)
                             sum ++;
                         return sum;
                     }, 0))/2
+                    }
+                    else{
+                        result.points = 0;
+                        result.teachingPoints = 0;
+                    }
                     
                     return result;
                 });
@@ -252,7 +261,13 @@ exports.getMarks = function (req, res) {
                  var totalTeachingPoints = _.reduce(marks, function (sum, mark) {
                     return sum + mark.teachingPoints;
                 }, 0);
-
+                
+                console.log('Marks');
+                console.log(marks)
+                if (!marks[0].group){
+                    res.end('No marks are currently available for this student');
+                }
+                else{
                 res.render('admin/student-marks', {
                     student: req.us3r,
                     course: req.course,
@@ -261,6 +276,7 @@ exports.getMarks = function (req, res) {
                     totalPoints: totalPoints,
                     totalTeachingPoints : totalTeachingPoints
                 });
+                }
             });
         }
     });
