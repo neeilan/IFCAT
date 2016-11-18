@@ -26,6 +26,9 @@ socket.on('quizData', function (tutorialQuiz) {
     }
     if (quizData.allocateMembers === 'self-selection') {
         renderGroups(tutorialQuiz.quiz.groups);
+        if (sessionStorage.getItem('IqcCreatedGroup') == 'true'){
+            $('#createGroupBtn').hide();
+        }
     }
 
     if (quizData.active) {
@@ -92,6 +95,8 @@ $(document).on('click', '#deferDriverBtn', function () {
 // Group creation
 $(document).on('click', '#createGroupBtn', function () {
     emit('createGroup');
+    sessionStorage.setItem('IqcCreatedGroup', 'true');
+    $('#createGroupBtn').hide();
 })
 
 function renderStars (question, empty, full, returnHTML) {
