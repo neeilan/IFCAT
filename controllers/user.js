@@ -8,10 +8,12 @@ var config = require('../lib/config'),
 // 
 exports.getUser = function (req, res, next, user) {
     models.User.findById(user, function (err, user) {
-        if (err)
+        if (err) {
             return next(err);
-        if (!user)
+        }
+        if (!user) {
             return next(new Error('No user is found.'));
+        }
         req.us3r = user; // careful: req.user is used by passport
         next();
     });
@@ -21,12 +23,25 @@ exports.getUser = function (req, res, next, user) {
 
 // Retrieve student login form
 exports.getLoginForm = function (req, res) {
-    if (req.baseUrl === '/admin')
-        return res.render('admin/login', { title: 'Login' });
+    if (req.user){
+        res.redirect('/student/courses');
+        return;
+    }
+    var auth0Config = config.auth0;
     res.render('login', {
-        domain: config.auth0.domain,
-        clientId: config.auth0.clientId,
-        callbackUrl: config.auth0.callbackUrl,
+        domain : auth0Config.domain,
+        clientId : auth0Config.clientId,
+        callbackUrl : auth0Config.callbackUrl,
+        title: 'Login'
+    }); 
+};
+// Retrieve admin login form
+exports.getAdminLoginForm = function (req, res) {
+    if (req.user){
+        res.redirect('/admin/courses');
+        return;
+    }
+    res.render('admin/login', {
         title: 'Login'
     }); 
 };
@@ -85,26 +100,18 @@ exports.deleteUser = function (req, res) {
         res.sendStatus(200);
     });
 };
-// Reset administrator
+// Add administrator
 exports.install = function (req, res, next) {
-    models.User.findOne({ 'local.email': 'admin' }, function (err, user) {
+    var user = new models.User({
+        local: {
+            email: 'admin',
+            password: 'admin'
+        },
+        roles: ['admin']
+    });
+    user.save(function (err) {
         if (err)
             return next(err);
-        if (!user)
-            user = new models.User();
-        user.set({
-            name: {
-                first: 'Admin'
-            },
-            local: {
-                email: 'admin',
-                password: '@dm1n'
-            },
-            roles: ['admin']
-        }).save(function (err) {
-            if (err)
-                return next(err);
-            res.send('Sweet Christmas.');
-        });
+        res.send('Sweet Christmas.');
     });
 };
