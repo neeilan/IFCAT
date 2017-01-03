@@ -50,6 +50,10 @@ exports.generateGroupList = function (req, res) {
             return { id: i + 1, name: i + 1, members: chunk };
         });
 
+        console.log(size, chunks);
+
+
+
         res.render('admin/quiz-groups', {
             title: 'Groups',
             course: req.course, 

@@ -170,7 +170,7 @@ $(function () {
             }
         });
         // load new table
-        $table.loadInner(window.location.href, function () { 
+        $table.loadInner(url.generate, function () { 
             $dim.removeClass('on'); 
         });
     });

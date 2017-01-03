@@ -27,7 +27,7 @@ app.locals.moment = require('moment');
 mongoose.connect(config.db.url);
 
 app.set('env', process.env.NODE_ENV || 'development');
-app.set('port', process.env.PORT || 8000);
+app.set('port', process.env.PORT || 8080);
 
 // view engine setup
 app.set('view engine', 'ejs');
@@ -41,7 +41,8 @@ app.use('/font-awesome', express.static(__dirname + '/node_modules/font-awesome'
 app.use('/lodash', express.static(__dirname + '/node_modules/lodash'));
 app.use('/socketioclient', express.static(__dirname + '/node_modules/socket.io-client'));
 app.use('/sweetalert', express.static(__dirname + '/node_modules/sweetalert'));
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
+
 
 app.use(morgan('dev'));
 app.use(methodOverride('_method'));
