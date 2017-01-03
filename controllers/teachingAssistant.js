@@ -19,14 +19,24 @@ exports.getTeachingAssistantListBySearchQuery = function (req, res) {
     models.User.findBySearchQuery(req.query.q, 'teachingAssistant').exec(function (err, teachingAssistants) {
         res.render('admin/tables/course-teaching-assistants-search-results', { 
             course: req.course, 
-            teachingAssistants: _.filter(teachingAssistants, function (teachingAssistant) {
-                return req.course.teachingAssistants.indexOf(teachingAssistant.id) === -1;
-            }) 
+            teachingAssistants: teachingAssistants
         });
     });
 };
+// Add teaching assistant to course
+exports.addTeachingAssistantList = function (req, res) {
+    async.each(req.body.teachingAssistants || [], function (teachingAssistant, done) {
+        req.course.update({ $addToSet: { teachingAssistants: teachingAssistant }}, done);
+    }, function (err) {
+        if (err)
+            req.flash('error', 'An error occurred while trying to perform operation.');
+        else
+            req.flash('success', 'The teaching assistants has been assigned to the course.');
+        res.redirect('/admin/courses/' + req.course.id + '/teaching-assistants');
+    });
+};
 // Update list of teaching assistants for course
-exports.editTeachingAssistantList = function (req, res) {
+exports.editTeachingAssistantList = function (req, res) { console.log('updatin')
     var tutorials = req.body.tutorials || {};
     req.course.withTutorials().execPopulate().then(function () {
         async.eachSeries(req.course.tutorials, function (tutorial, done) {
@@ -43,26 +53,18 @@ exports.editTeachingAssistantList = function (req, res) {
                 req.flash('error', 'An error occurred while trying to perform operation.');
             else
                 req.flash('success', 'The tutorials have been updated.');
-            res.json({ status: !err });
+            res.redirect('/admin/courses/' + req.course.id + '/teaching-assistants');
         });
-    });
-};
-// Add teaching assistant to course
-exports.addTeachingAssistant = function (req, res) {
-    req.course.update({ $addToSet: { teachingAssistants: req.us3r.id }}, function (err) {
-        if (err)
-            return res.status(500).send('An error occurred while trying to perform operation.');
-        res.send(util.format('Teaching assistant <b>%s</b> has been added to the course.', req.us3r.name.full));
     });
 };
 // Delete teaching assistant from course and associated tutorials
 exports.deleteTeachingAssistant = function (req, res) {
     req.course.withTutorials().execPopulate().then(function () {
         async.waterfall([
-            function delRef1(done) {
+            function deleteFromCourse(done) {
                 req.course.update({ $pull: { teachingAssistants: req.us3r.id }}, done);
             },
-            function delRef2(course, done) {
+            function deleteFromTutorials(course, done) {
                 async.eachSeries(req.course.tutorials, function (tutorial, done) {
                     tutorial.update({ $pull: { teachingAssistants: req.us3r.id }}, done);
                 }, done);
@@ -72,7 +74,7 @@ exports.deleteTeachingAssistant = function (req, res) {
                 req.flash('error', 'An error occurred while trying to perform operation.');
             else
                 req.flash('success', 'Teaching assistant <b>%s</b> has been removed from the course.', req.us3r.name.full);
-            res.json({ status: !err });
+            res.sendStatus(200);
         });
     });  
 };

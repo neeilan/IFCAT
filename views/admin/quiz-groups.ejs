@@ -1,88 +1,84 @@
 <%- include ./header -%>
 
-
-<div class="alert alert-info center-block">
+<!--div class="alert alert-info center-block">
     A <b>published</b> quiz is available for students in the tutorial to open and be assigned to a group automatically (you can assign/change groups manually at any time).
     An <b>active</b> quiz is one currently in progress: the questions are visible to students and they can submit responses while a quiz is active.
-    Note that students will not be automatically assigned to groups while a quiz is active - you will have to do it manually.
-</div>
+    
+</div-->
 
+<h2>Quiz</h2>
 <% if (!_.isEmpty(students)) { %>
-<div class="col-md-3 dim">
-    <label class="col control-label">
-        <span>Publish?</span>
+<div class="nav-actions dim">
+    <div class="col-xs-4">
+        <label class="control-label">Publish?</label>
         <input type="checkbox" value="1" class="bootstrap-switch" id="publish"<%= tutorialQuiz.published ? ' checked' : '' %>>
-    </label>
-    <label class="col control-label">
-        <span>Active?</span> 
+    </div>
+    <div class="col-xs-4">
+        <label class="control-label">Active?</label>
         <input type="checkbox" value="1" class="bootstrap-switch" id="activate"<%= tutorialQuiz.active ? ' checked' : '' %>>
-    </label>
-    <label class="col control-label">
-        <span>Archive?</span>
+    </div>
+    <div class="col-xs-4">
+        <label class="control-label">Archive?</label>
         <input type="checkbox" value="1" class="bootstrap-switch" id="archive"<%= tutorialQuiz.archived ? ' checked' : '' %>>
-    </label>
+    </div>
 </div>
 <% } %>
 
-<div class="col-md-9">
-    <h1>Groups</h1>
-    <div class="dim">
-        <% if (!_.isEmpty(students)) { %>
-        <div class="nav-actions">
-            <button type="button" class="btn btn-default btn-sm" id="btn-refresh" 
-                onclick="window.location.reload(true)"><span 
-                class="glyphicon glyphicon-refresh"></span> Refresh</button>
-            <button type="button" class="btn btn-default btn-sm" id="btn-add"><span 
-                class="glyphicon glyphicon-plus"></span> Add group</button>
-            <button type="button" class="btn btn-default btn-sm" id="btn-remove"><span 
-                class="glyphicon glyphicon-remove"></span> Remove groups</button>
-            <button type="button" class="btn btn-default btn-sm" id="btn-randomize"><span 
-                class="glyphicon glyphicon-random"></span> Randomize groups</button>
-            <button type="button" class="btn btn-default btn-sm btn-primary" id="btn-save"><span 
-                class="glyphicon glyphicon-ok"></span> Save groups</button>
-        </div>
-        <% } %>
-        <table id="table-quiz-groups" class="stretch">
-            <thead>
-                <tr>
-                    <th rowspan="2" class="s">&nbsp;</th>
-                    <th colspan="<%= 1 + groups.length %>">Groups</th>
-                </tr>
-                <% if (!_.isEmpty(students)) { %>
-                    <tr>
-                        <th class="u">Unassigned</th>
-                        <% _.each(groups, function (group) { %>
-                            <th class="g" data-group="<%= group.id %>"><%= group.name %></th>
-                        <% }) %>
-                    </tr>
-                <% } %>
-            </thead>
-            <tbody>
-            <% if (_.isEmpty(students)) { %>
-                <tr>
-                    <td colspan="2">No students have been added into the tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students into tutorial.</td>
-                </tr>
-            <% } else { %>
-                <% _.each(students, function (student) { %>
-                    <tr>
-                        <td class="s">
-                            <a href="/admin/courses/<%= course.id %>/students/<%= student.id %>/marks"><%= student.name.full %></a>
-                        </td>
-                        <td class="u">
-                            <input type="radio" name="groups[<%= student.id %>]" value="unassigned"<%= 
-                                tutorialQuiz.isUnassigned(student.id) ? ' checked' : '' %>>
-                        </td>
-                        <% _.each(groups, function (group) { %>
-                            <td class="g"><input type="radio" name="groups[<%= student.id %>]" value="<%= group.id %>"<%=
-                                !!_.find(group.members, { id: student.id }) ? ' checked' : '' %>></td>
-                        <% }) %>
-                    </tr>
-                <% }) %>
-            <% } %>
-            </tbody>
-        </table>
+<h3>Groups</h3>
+<div class="dim">
+    <% if (!_.isEmpty(students)) { %>
+    <div class="nav-actions">
+        <button type="button" class="btn btn-default btn-sm" id="btn-add"><span 
+            class="glyphicon glyphicon-plus"></span> Add group</button>
+        <button type="button" class="btn btn-default btn-sm" id="btn-remove"><span 
+            class="glyphicon glyphicon-remove"></span> Remove groups</button>
+        <button type="button" class="btn btn-default btn-sm" id="btn-randomize"><span 
+            class="glyphicon glyphicon-random"></span> Randomize groups</button>
+        <button type="button" class="btn btn-default btn-sm btn-primary" id="btn-save"><span 
+            class="glyphicon glyphicon-ok"></span> Save groups</button>
     </div>
+    <% } %>
+    <table id="table-quiz-groups" class="stretch">
+        <thead>
+            <tr>
+                <th rowspan="2" class="s">&nbsp;</th>
+                <th colspan="<%= 1 + groups.length %>">Groups</th>
+            </tr>
+            <% if (!_.isEmpty(students)) { %>
+                <tr>
+                    <th class="u">Unassigned</th>
+                    <% _.each(groups, function (group) { %>
+                        <th class="g" data-group="<%= group.id %>"><%= group.name %></th>
+                    <% }) %>
+                </tr>
+            <% } %>
+        </thead>
+        <tbody>
+        <% if (_.isEmpty(students)) { %>
+            <tr>
+                <td colspan="2">No students have been added into the tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students into tutorial.</td>
+            </tr>
+        <% } else { %>
+            <% _.each(students, function (student) { %>
+                <tr>
+                    <td class="s">
+                        <a href="/admin/courses/<%= course.id %>/students/<%= student.id %>/marks"><%= student.name.full %></a>
+                    </td>
+                    <td class="u">
+                        <input type="radio" name="groups[<%= student.id %>]" value="unassigned"<%= 
+                            tutorialQuiz.isUnassigned(student.id) ? ' checked' : '' %>>
+                    </td>
+                    <% _.each(groups, function (group) { %>
+                        <td class="g"><input type="radio" name="groups[<%= student.id %>]" value="<%= group.id %>"<%=
+                            !!_.find(group.members, { id: student.id }) ? ' checked' : '' %>></td>
+                    <% }) %>
+                </tr>
+            <% }) %>
+        <% } %>
+        </tbody>
+    </table>
 </div>
+
 
 <%- include ./body-js -%>
 
@@ -168,10 +164,9 @@ $(function () {
         var $dim = $(this).closest('.dim-wrap').addClass('on');
             $.bootstrapAlert('close');
         // mark all groups as trash
-        $table.find('th[data-group]').each(function () { 
-            var id = $(this).data('group');
-            if (isNaN(id)) {
-                trash.push(id); 
+        $table.find('th[data-group]').each(function () {
+            if (isNaN(this.dataset.group)) {
+                trash.push(this.dataset.group); 
             }
         });
         // load new table
@@ -187,7 +182,7 @@ $(function () {
         var data = $table.find(':radio').serializeArray();
         // push group ids (to keep empty groups)
         $table.find('th[data-group]').each(function (i) {
-            data.push({ name: 'groups[' + i + ']', value: $(this).data('group') });
+            data.push({ name: 'groups[' + i + ']', value: this.dataset.group });
         });
         // push trash data (to remove groups)
         $.each(trash, function () {

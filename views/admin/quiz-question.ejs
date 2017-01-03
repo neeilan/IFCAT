@@ -34,8 +34,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">Files</label>
         <div class="col-sm-10">
-            <a href="#" class="btn btn-default btn-sm<%= course.files.length ? 
-                '' : ' disabled' %>" data-toggle="modal" data-target="#modal-show-files">
+            <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-show-files">
                 <span class="glyphicon glyphicon-file"></span> Show files</a>
             <%- include ./modals/show-files %>
         </div>
@@ -67,6 +66,7 @@
                     <div class="col-xs-4 radio">
                         <label><input type="radio" name="answer[multiple-choice]" value="<%= i %>" disabled<%= 
                             !i ? ' checked' : '' %>></label>
+                        <span class="glyphicon glyphicon-remove"></span> 
                     </div>
                 </div>
             <% } %>
@@ -82,6 +82,7 @@
                     <div class="col-xs-4 radio">
                         <label><input type="radio" name="answer[multiple-choice]" 
                             value="<%= i %>"<%= question.isAnswer(choice) ? ' checked' : '' %>></label>
+                        <span class="glyphicon glyphicon-remove"></span> 
                     </div>
                 </div>
             <% }) %>
@@ -98,7 +99,10 @@
                         <textarea name="choices[new]" class="form-control" rows="1"></textarea>
                     </div>
                     <div class="col-xs-4 radio">
-                        <label><input type="radio" name="answer[multiple-choice]" value="new"></label>
+                        <label>
+                            <input type="radio" name="answer[multiple-choice]" value="new">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -117,6 +121,7 @@
                     </div>
                     <div class="col-xs-4 checkbox">
                         <label><input type="checkbox" name="answers[multiple-select][]" value="<%= i %>" disabled></label>
+                        <span class="glyphicon glyphicon-remove"></span>
                     </div>
                 </div>
             <% } %>
@@ -132,6 +137,7 @@
                     <div class="col-xs-4 checkbox">
                         <label><input type="checkbox" name="answers[multiple-select][]" value="<%= i %>"<%= 
                             question.isAnswer(choice) ? ' checked' : '' %>></label>
+                        <span class="glyphicon glyphicon-remove"></span>
                     </div>
                 </div>
             <% }) %> 
@@ -149,6 +155,7 @@
                     </div>
                     <div class="col-xs-4 checkbox">
                         <label><input type="checkbox" name="answers[multiple-select][]" value="new"></label>
+                        <span class="glyphicon glyphicon-remove"></span>
                     </div>
                 </div>
             </div>
@@ -165,6 +172,9 @@
                     <div class="col-xs-8"> 
                         <textarea name="choices[<%= i %>]" class="form-control" rows="1" disabled></textarea>
                     </div>
+                    <div class="col-xs-4">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </div>
                 </div>
             <% } %>
         <% } else { %>
@@ -175,6 +185,9 @@
                 <div class="form-group">
                     <div class="col-xs-8"> 
                         <textarea name="choices[<%= i %>]" class="form-control" rows="1"><%= choice %></textarea>
+                    </div>
+                    <div class="col-xs-4">
+                        <span class="glyphicon glyphicon-remove"></span>
                     </div>
                 </div>
             <% }) %> 
@@ -189,6 +202,9 @@
                 <div class="form-group" style="display: none">
                     <div class="col-xs-8"> 
                         <textarea name="choices[new]" class="form-control" rows="1"></textarea>
+                    </div>
+                    <div class="col-xs-4">
+                        <span class="glyphicon glyphicon-remove"></span>
                     </div>
                 </div>
             </div>
@@ -289,11 +305,11 @@ $(function () {
     });
     // add new link input
     $('#btn-add-link').click(function () {
-        var $formGroup = $(this).prev('.form-group');
-        // create new group
-        var $newGroup = $formGroup.clone();
-            $newGroup.find('[name^=links]').val('');
-            $formGroup.after($newGroup);
+        $(this).closest('.form-group').before(function () {
+            var id = _.toNumber(_.uniqueId()) + 999;
+            var $new = $(this).next().clone().toggle(true);
+            return $new;
+        });
     });
     // change link counter
     $('#modal-show-links').on('hidden.bs.modal', function () {
@@ -303,15 +319,21 @@ $(function () {
         $('#link-counter').text(count !== 1 ? count + ' links added' : '1 link added');
     });
     // remove choice input
-    $('div[data-type]').on('click', '.btn-remove-choice', function (e) {
+    $(document).on('click', '.glyphicon-remove', function () {
         $(this).closest('.form-group').remove();
     });
     // add choice input
     $('.btn-add-choice').click(function () {
         $(this).closest('.form-group').before(function () {
-            return $(this).next()[0].outerHTML
-                .replace(/style=\"display: none\"/, '')
-                .replace(/new/, _.toNumber(_.uniqueId()) + 999)
+            var id = _.toNumber(_.uniqueId()) + 999;
+            var $new = $(this).next().clone().toggle(true);
+                $new.find('textarea').attr('name', function () {
+                    return this.name.replace(/new/, id);
+                });
+                $new.find(':radio, :checkbox').val(function () {
+                    return this.value.replace(/new/, id);
+                });
+            return $new;
         });
     });
     //

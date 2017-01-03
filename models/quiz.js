@@ -21,13 +21,13 @@ var QuizSchema = new mongoose.Schema({
 QuizSchema.pre('remove', function (next) {
     var quiz = this;
     async.parallel([
-        function delRef(done) {
+        function deleteFromCourse(done) {
             models.Course.update({ quizzes: { $in: [quiz._id] }}, { $pull: { quizzes: quiz._id }}).exec(done);
         },
-        function delRef2(done) {
+        function deleteQuestions(done) {
             models.Question.remove({ _id: { $in: quiz.questions }}).exec(done);
         },
-        function delRef3(done) {
+        function deleteTutorialQuiz(done) {
             models.TutorialQuiz.remove({ quiz: quiz._id }).exec(done);
         }
     ], next);

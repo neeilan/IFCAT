@@ -9,8 +9,6 @@
         <span class="glyphicon glyphicon-search"></span> Find instructors</button>
 </div>
 
-<!-- Current instructors -->
-
 <table class="table table-striped" id="table-users">
     <thead>
         <tr>
@@ -22,8 +20,7 @@
     <tbody>
     <% if (_.isEmpty(course.instructors)) { %>
         <tr>
-            <td colspan="3">No instructors have been added to the course yet. Click <a 
-                href="#" data-toggle="modal" data-target="#modal-find-users">here</a> to add instructors to the course.</td>
+            <td colspan="3">No instructors have been added to the course yet.</td>
         </tr>
     <% } else { %>
         <% _.each(course.instructors, function (instructor) { %>
@@ -39,6 +36,6 @@
     </tbody>
 </table>
 
-<%- include ./modals/find-instructors %>
+<%- include ./modals/find-instructors -%>
 <%- include ./body-js -%>
 <%- include ./footer -%>

@@ -41,8 +41,11 @@ var UserSchema = new mongoose.Schema({
         type: String,
         enum: ['admin', 'instructor', 'teachingAssistant', 'student']
     }]
+}, {
+    toJSON: {
+        virtuals: true
+    }
 });
-
 // get full name
 UserSchema.virtual('name.full').get(function () {
     return _.defaultTo(this.name.first, '') + ' ' + _.defaultTo(this.name.last, '');
@@ -50,9 +53,9 @@ UserSchema.virtual('name.full').get(function () {
 // hook: hash password if one is given
 UserSchema.pre('save', function (next) {
     var user = this;
-    if (!user.isModified('local.password')) 
+    if (!user.local.password || !user.isModified('local.password')) 
         return next();
-    bcrypt.genSalt(function (err, salt) {
+    bcrypt.genSalt(10, function (err, salt) {
         if (err) 
             return next(err);
         bcrypt.hash(user.local.password, salt, function (err, hash) {
@@ -82,10 +85,10 @@ UserSchema.pre('remove', function (next) {
         multi: true
     };
     async.parallel([
-        function delRef1(done) {
+        function deleteFromCourse(done) {
             models.Course.update(conditions, doc, options).exec(done);
         },
-        function delRef2(done) {
+        function deleteFromTutorial(done) {
             models.Tutorial.update(conditions, doc, options).exec(done);
         }
     ], next);
@@ -96,7 +99,7 @@ UserSchema.methods.checkPassword = function (password, callback) {
 };
 // check user's role
 UserSchema.methods.hasRole = function (role) {
-    return this.roles.indexOf(role) !== -1;
+    return this.roles.indexOf(role) > -1;
 };
 // sort users by roles, first name, and last name
 UserSchema.statics.sortByRole = function (users) {

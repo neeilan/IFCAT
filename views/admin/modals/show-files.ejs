@@ -1,23 +1,21 @@
-<a href="#" class="counter<%= course.files.length ? '' : ' disabled' %>" id="file-counter" 
-    data-toggle="modal" data-target="#modal-show-files"><%= question.files.length !== 1 ? 
-    question.files.length + ' files selected' : '1 file selected' %></a>
+<a href="#" class="counter" id="file-counter" data-toggle="modal" data-target="#modal-show-files"><%= 
+    question.files.length != 1 ? question.files.length + ' files selected' : '1 file selected' %></a>
 
 <!-- add files modal -->
 <div class="modal fade" id="modal-show-files" tabindex="-1" style="display: none;">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Select the checkboxes of the files you want to add.</h4>
+                <h4 class="modal-title">Select files.</h4>
             </div>
             <div class="modal-body">
                 <div class="col-xs-8 col-preview"></div>
                 <div class="col-xs-4 col-files">
                     <ul class="list-group">
                     <% _.each(course.files, function (file) { %>
-                        <li class="list-group-item<%=
-                                question.files.indexOf(file.id) !== -1  ? ' active' : '' %>">
+                        <li class="list-group-item<%= question.files.indexOf(file.id) > -1  ? ' active' : '' %>">
                             <input type="checkbox" name="files[]" value="<%= file.id %>"<%=
-                                question.files.indexOf(file.id) !== -1  ? 'checked' : '' %>> 
+                                question.files.indexOf(file.id) > -1 ? 'checked' : '' %>> 
                             <a href="/upl/<%= course.id %>/<%= file.name %>" target="_preview"><%= file.name %></a>
                         <% if (file.isImage()) { %>
                             <img src="/upl/<%= course.id %>/<%= file.name %>" class="img-responsive preview" style="display: none">

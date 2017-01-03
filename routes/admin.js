@@ -2,8 +2,10 @@ var _ = require('lodash'),
     passport = require('passport'),
     router = require('express').Router();
 
-var upload = require('../lib/upload'),
-    controllers = require('../controllers');
+var breadcrumbs = require('../lib/breadcrumbs'),
+    upload = require('../lib/upload');
+    
+var controllers = require('../controllers');
 
 // query single objects
 router.param('us3r', controllers.User.getUser);
@@ -16,7 +18,6 @@ router.param('tutorialQuiz', controllers.TutorialQuiz.getQuiz);
 router.param('group', controllers.Group.getGroup);
 
 // non-authenticated routes
-// router.get('/help', controllers.User.getHelpGuide);
 router.get('/install', controllers.User.install);
 router.get('/login', controllers.User.getLoginForm);
 router.post('/login', passport.authenticate('local-login', {
@@ -33,32 +34,12 @@ router.use(function (req, res, next) {
 });
 
 // build breadcrumbs
-// @TODO: find a way to add slugs in between keywords 
-// e.g. Courses / Tutorials ----> Courses / CSCC09H3 / Tutorials
-router.use(function (req, res, next) {
-    if (!req.xhr && req.method === 'GET') {
-        var keywords = [
-            'users', 'students', 'teaching-assistants', 'instructors',
-            'courses', 'tutorials', 'quizzes', 'questions', 'files', 
-            'groups'
-        ];
-        var fragments = req.url.split('/');
-        res.locals.breadcrumbs = [];
-        _.each(fragments, function (fragment, f) {
-            // check if fragment is one of the keywords
-            if (keywords.indexOf(fragment) !== -1) {
-                res.locals.breadcrumbs.push({
-                    text: _.upperFirst(_.startCase(fragment)),
-                    href: _.take(fragments, f + 1).join('/') 
-                });
-            }
-        });
-    }
-    next();
-});
+router.use(breadcrumbs);
 
 // authenticated routes
 router.get('/logout', controllers.User.logout);
+router.get('/help', controllers.User.getHelp);
+
 //router.get('/courses/generate', controllers.Course.generateData);
 
 router.get('/courses', controllers.Course.getCourseList);
@@ -118,21 +99,22 @@ router.delete('/users/:us3r', controllers.User.deleteUser);
 
 router.get('/courses/:course/instructors', controllers.Instructor.getInstructorListByCourse);
 router.get('/courses/:course/instructors/search', controllers.Instructor.getInstructorListBySearchQuery);
-router.post('/courses/:course/instructors/:us3r', controllers.Instructor.addInstructor);
+router.post('/courses/:course/instructors', controllers.Instructor.addInstructorList);
 router.delete('/courses/:course/instructors/:us3r', controllers.Instructor.deleteInstructor);
 
 router.get('/courses/:course/teaching-assistants', controllers.TeachingAssistant.getTeachingAssistantListByCourse);
 router.get('/courses/:course/teaching-assistants/search', controllers.TeachingAssistant.getTeachingAssistantListBySearchQuery);
+router.post('/courses/:course/teaching-assistants', controllers.TeachingAssistant.addTeachingAssistantList);
 router.put('/courses/:course/teaching-assistants', controllers.TeachingAssistant.editTeachingAssistantList);
-router.post('/courses/:course/teaching-assistants/:us3r', controllers.TeachingAssistant.addTeachingAssistant);
 router.delete('/courses/:course/teaching-assistants/:us3r', controllers.TeachingAssistant.deleteTeachingAssistant);
 
 router.get('/courses/:course/students', controllers.Student.getStudentListByCourse);
 router.get('/courses/:course/students/search', controllers.Student.getStudentListBySearchQuery);
 router.post('/courses/:course/students/import', upload.csv.single('file'), controllers.Student.importStudentList);
+router.post('/courses/:course/students', controllers.Student.addStudentList);
 router.put('/courses/:course/students', controllers.Student.editStudentList);
-router.post('/courses/:course/students/:us3r', controllers.Student.addStudent);
 router.delete('/courses/:course/students/:us3r', controllers.Student.deleteStudent);
-router.get('/courses/:course/students/:us3r/marks', controllers.Student.getMarks);
+
+router.get('/courses/:course/tutorials/:tutorial/students/:us3r/marks', controllers.Response.getMarks);
 
 module.exports = router;

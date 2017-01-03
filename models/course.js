@@ -22,17 +22,17 @@ CourseSchema.pre('remove', function (next) {
     var course = this,
         path = config.uploadPath + '/' + course._id;
     async.parallel([
-        function deleteRef1(done) {
+        function deleteTutorials(done) {
             models.Tutorial.remove({ _id: { $in: course.tutorials }}, done);
         },
-        function deleteRef2(done) {
+        function deleteQuizzes(done) {
             models.Quiz.remove({ _id: { $in: course.quizzes }}, done);
         },
-        function deleteRef3(done) {
+        function deleteFiles(done) {
             models.File.remove({ _id: { $in: course.files }}, done);
         },
         // delete upload directory & files
-        function rmdir(done) {
+        function deleteFolder(done) {
             fs.stat(path, function (err, stats) {
                 if (err && err.code === 'ENOENT') {
                     done();
@@ -109,6 +109,18 @@ CourseSchema.methods.withFiles = function () {
             sort: { name: 1 }
         }
     });
+};
+// Check if instructor belongs to course
+CourseSchema.methods.hasInstructor = function (userId) {
+    return this.instructors.indexOf(userId) > -1;
+};
+// Check if teaching assistant belongs to course
+CourseSchema.methods.hasTeachingAssistant = function (userId) {
+    return this.teachingAssistants.indexOf(userId) > -1;
+};
+// Check if student belongs to course
+CourseSchema.methods.hasStudent = function (userId) {
+    return this.students.indexOf(userId) > -1;
 };
 // Find courses enrolled by student
 CourseSchema.statics.findByStudent = function (userId) {

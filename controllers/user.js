@@ -1,6 +1,7 @@
 var _ = require('lodash'),
     async = require('async'),
-    csv = require('csv');
+    csv = require('csv'),
+    util = require('util');
     
 var config = require('../lib/config'),
     models = require('../models');
@@ -8,42 +9,31 @@ var config = require('../lib/config'),
 // 
 exports.getUser = function (req, res, next, user) {
     models.User.findById(user, function (err, user) {
-        if (err) {
+        if (err)
             return next(err);
-        }
-        if (!user) {
+        if (!user)
             return next(new Error('No user is found.'));
-        }
         req.us3r = user; // careful: req.user is used by passport
         next();
     });
 };
-
-// route handlers
-
-// Retrieve student login form
+// Retrieve login form
 exports.getLoginForm = function (req, res) {
-    if (req.user){
-        res.redirect('/student/courses');
-        return;
+    if (req.baseUrl === '/admin') {
+        if (req.user)
+            return res.redirect('/admin/courses');
+        res.render('admin/login', { title: 'Login' });
+    } else {
+        if (req.user)
+            return res.redirect('/student/courses');
+        var auth0Config = config.auth0;
+        res.render('login', {
+            domain : auth0Config.domain,
+            clientId : auth0Config.clientId,
+            callbackUrl : auth0Config.callbackUrl,
+            title: 'Login'
+        });
     }
-    var auth0Config = config.auth0;
-    res.render('login', {
-        domain : auth0Config.domain,
-        clientId : auth0Config.clientId,
-        callbackUrl : auth0Config.callbackUrl,
-        title: 'Login'
-    }); 
-};
-// Retrieve admin login form
-exports.getAdminLoginForm = function (req, res) {
-    if (req.user){
-        res.redirect('/admin/courses');
-        return;
-    }
-    res.render('admin/login', {
-        title: 'Login'
-    }); 
 };
 // Logout user
 exports.logout = function (req, res) {
@@ -52,18 +42,46 @@ exports.logout = function (req, res) {
 };
 // Retrieve list of users
 exports.getUserList = function (req, res) {
-    models.User.find({}).exec(function (err, users) {
-        res.render('admin/users', { 
+    var currentPage = parseInt(req.query.page, 10) || 1,
+        perPage = parseInt(req.query.perPage, 10) || 20;
+    async.parallel([
+        function (done) {
+            models.User.count().exec(done);
+        },
+        function (done) {
+            models.User.find(null, null, { 
+                sort: {
+                    'name.first': 1,
+                    'name.last': 1
+                }, 
+                skip: (currentPage - 1) * perPage, 
+                limit: perPage
+            }).exec(done);
+        }
+    ], function (err, results) {
+        var totalPages = _.round(results[0] / perPage), page = 1, pages = [];
+        // build set of pages
+        while (page <= totalPages) {    
+            if ((currentPage <= 2 && page <= 5) || 
+                (currentPage - 2 <= page && page <= currentPage + 2) ||
+                (totalPages - 2 < currentPage && totalPages - 5 < page))
+                pages.push(page);
+            page++;
+        }
+        res.render('admin/users', {
             title: 'Users',
-            users: models.User.sortByRole(users) 
+            users: results[1],
+            currentPage: currentPage,
+            perPage: perPage,
+            totalPages: totalPages,
+            pages: pages
         });
     }); 
 };
 // Retrieve user form
 exports.getUserForm = function (req, res) {
-    if (!req.us3r) {
+    if (!req.us3r)
         req.us3r = new models.User();
-    }
     res.render('admin/user', {
         title: req.us3r.isNew ? 'Add new user' : 'Edit user', 
         us3r: req.us3r 
@@ -100,18 +118,30 @@ exports.deleteUser = function (req, res) {
         res.sendStatus(200);
     });
 };
-// Add administrator
+// Get help guide
+exports.getHelp = function (req, res) {
+    res.render('admin/help');
+};
+// Reset administrator
 exports.install = function (req, res, next) {
-    var user = new models.User({
-        local: {
-            email: 'admin',
-            password: 'admin'
-        },
-        roles: ['admin']
-    });
-    user.save(function (err) {
+    models.User.findOne({ 'local.email': 'admin' }, function (err, user) {
         if (err)
             return next(err);
-        res.send('Sweet Christmas.');
+        if (!user)
+            user = new models.User();
+        user.set({
+            name: {
+                first: 'Admin'
+            },
+            local: {
+                email: 'admin',
+                password: '@dm1n'
+            },
+            roles: ['admin']
+        }).save(function (err) {
+            if (err)
+                return next(err);
+            res.send('Sweet Christmas.');
+        });
     });
 };

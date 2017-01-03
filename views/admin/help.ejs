@@ -2,34 +2,110 @@
 
 <h1>Help</h1>
 
-<div class="toc">
-<% _.each(sections, function (section) { %>
-    <h4><%= section[0] %></h4>
-    <% if (_.isArray(section[1])) { %>
-        <ul>
-        <% _.each(section[1], function (question) { %>
-            <li><a href="#<%= _.kebabCase(question[0]) %>"><%- question[0] %></a></li>
-        <% }) %>
-        </ul>
-    <% } %>
-<% }) %>
-</div>
 
-<% _.each(sections, function (section) { %>
-    <h3><%= section[0] %></h3>
-    <% if (_.isArray(section[1])) { %>
-        <% _.each(section[1], function (question) { %>
-            <h4 id="<%= _.kebabCase(question[0]) %>"><%- question[0] %></h4>
-            <% if (_.isArray(question[1])) { %>
-                <ol>
-                <% _.each(question[1], function (step) { %>
-                    <li><%- step %></li>
-                <% }) %>
-                </ol>
-            <% } %>
-        <% }) %>
-    <% } %>
-<% }) %>
+
+<h4 id="">How do I add files into a course?</h4>
+<ul>
+    <li>Click <b>Courses</b> in the navigation menu.</li>
+    <li>Click <b>Manage Files</b> in the Action dropdown associated with the intended course.</li>
+    <li>Click <b>Upload Files</b>. This will open up a popup.</li>
+    <li>In the popup, click <b>Select Files</b>. This will open up a window for you to find and select your files.</li>
+    <li>Once done, click <b>Upload</b>.</li> 
+</ul>
+
+
+
+
+
+<h4 id="">How do I assign instructors to a course?</h4>
+<ol>
+    <li>Click <b>Courses</b> in the navigation menu.</li>
+    <li>Click <b>Manage Instructors</b> in the Action dropdown associated with the intended course.</li>
+    <li>Select <b>Find Instructors</b>. This will open up a popup.</li>
+    <li>In the popup, enter part or all of the name of the instructor in the text box and select <b>Search</b>. This will produce a table of all instructors matching the query. <br><b>Note:</b> Leaving the text box blank will return all the instructors.</li>
+    <li>Next to each instructor that you want to assign, click the associated checkbox.</li>
+    <li>Once done, click <b>Update</b>.</li>
+</ol>
+
+
+
+
+<h4 id="">How do I assign teaching assistants to one or more tutorials?</h4>
+<p>In order to assign teaching assistants to tutorials, they need to first be assigned to the related course:</p>
+<ol>
+    <li>Click <b>Courses</b> in the navigation menu.</li>
+    <li>Click <b>Manage Teaching Assistants</b> in the Action dropdown associated with the intended course.</li>
+    <li>Select <b>Find Teaching Assistants</b>. This will open up a popup.</li>
+    <li>In the popup, enter part or all of the name of the assistant in the text box and select <b>Search</b>. This will produce a table of all assistants matching the query. <br><b>Note:</b> Leaving the text box blank will return all the assistants.</li>
+    <li>Next to each assistant that you want to assign, click the associated checkbox.</li>
+    <li>Once done, click <b>Update</b>.</li>
+</ol>
+<p>At this point, teaching assistants have been assigned to the course. To assign them to their tutorials:</p>
+<ol>
+    <li>For each teaching assistant, select the tutorials that they will manage.</li>
+    <li>Once done, click <b>Update Tutorials</b>.</li>
+</ol>
+
+
+
+
+<h4 id="">How do I assign students to a tutorial?</h4>
+<p>In order to assign students to a tutorial, they need to first be added into the related course. Depending on whether the students are already in the system, there are two ways to add them in the course: by importing or by finding them.</p>
+<h5>Importing new students:</h5>
+<ol>
+    <li>Click <b>Courses</b> in the navigation menu.</li>
+    <li>Click <b>Manage Students</b> in the Action dropdown associated with the intended course.</li>
+    <li>Select <b>Import Students</b>. This will open up a popup.</li>
+    <li>In the popup, select <b>Choose File</b>.<br><b>Note:</b> The file must be a CSV (e.g. file.csv). The first row of the spreadsheet must have the following cells: UTORid, First Name, Last Name, Student Number, and (optionally) Tutorial. The subsequent rows must be populated data of the students.<br>Download a <a href="/img/samples/roster.csv">sample CSV template</a> to see an example of the format required.</li>
+    <li>Once done, click <b>Upload</b>.</li>
+</ol>
+<h5>Finding existing students:</h5>
+<ol>
+    <li>On the same page, select <b>Find Students</b>. This will open up a popup.</li>
+    <li>In the popup, enter information (e.g. name, UTORid, student number) of the student in the text box and select <b>Search</b>. This will produce a table of all students matching the query. <br><b>Note:</b> Leaving the text box blank will return all the students.</li>
+    <li>Next to each student that you want to assign, click the associated checkbox.</li>
+    <li>Once done, click <b>Update</b>.</li>
+</ol>
+<p>At this point, students have been added into the course. To assign them to their tutorial:</p>
+<ol>
+    <li>For each student, select the tutorial that they will be in.</li>
+    <li>Once done, click <b>Update Tutorials</b>.</li>
+</ol>
+
+
+<h4 id="">How do I shuffle choices?</h4>
+<ul> 
+    <li>Click on <b>Show/hide additional options</b> to show the additional options.</li>
+    <li>Next to <i>Shuffle Choices</i>, turn on the switch so that it says <i>Yes</i>.</li>
+    <li>Click <b>Save</b> at the bottom.</li> 
+</ul>
+
+
+
+<h4 id="">How do I format mathematical formulas?</h4>
+<p>When adding or editing a question, you can format mathematical formulas using LaTeX.</p>
+<p>To enable LaTeX:<p>
+<ul>
+    <li>Click on <b>Show/hide additional options</b> to show the additional options.</li>
+    <li>Next to <i>Format using LaTeX</i>, turn on the switch so that it says <i>Yes</i>.</li>
+    <li>Click <b>Save</b> at the bottom.</li> 
+</ul>
+
+
+
+<h4 id="">How do I sort questions for a quiz?</h4>
+<ol>
+    <li>Hold the handle <span class="glyphicon glyphicon-option-vertical handle"></span> of a question to be moved.</li>
+    <li>Drag and drop the question to its appropriate location.</li>
+    <li>Repeat these steps for each question to be moved.</li>
+</ol>
+
+<h4 id="">What is the difference between publishing, activating, and archiving a quiz?</h4>
+<ul>
+    <li>When you <b>publish</b> a quiz, students will be able to see the quiz in the course. While it is published, students will be assigned to a group. Depending on the settings, students will either create their own groups or be automatically assigned to a group. Until the quiz has been activated, students will not be able to take the quiz.</li>
+    <li>When you <b>activate</b> a quiz, students will be able to take the quiz. Once it has been activated, before starting the quiz, students will decide who their driver (i.e. the person responsible for answering the questions on behalf of the group) will be within their groups. While it is activated, students will go through the list of questions and submit their responses.</li>
+    <li>When you <b>archive</b> a quiz, students will be able to see all their submitted responses and their overall score for the quiz.</li>
+</ul>
 
 <%- include ./body-js -%>
 <%- include ./footer -%>

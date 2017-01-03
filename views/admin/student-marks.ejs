@@ -13,7 +13,11 @@
             <th class="text-center">Teaching points received</th>
         </tr>
     </thead>
-    <% if (!_.isEmpty(marks)) { %>
+    <% if (_.isEmpty(marks)) { %>
+        <tbody>
+            <tr><td colspan="4">No marks have been given yet.</td></tr>
+        </tbody>
+    <% } else { %>
         <tfoot>
             <tr class="total-points">
                 <th colspan="2" style="text-align: right">Total</th>
@@ -33,10 +37,6 @@
 
             </tr>
         <% }) %>
-        </tbody>
-    <% } else { %>
-        <tbody>
-            <tr><td colspan="3">No marks have been given yet.</td></tr>
         </tbody>
     <% } %>
 </table>

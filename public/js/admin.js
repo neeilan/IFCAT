@@ -1,11 +1,12 @@
 $(function () { 
-    // turn off caching
+    var url = window.location.href;
+
+    // set default AJAX options
     $.ajaxSetup({ cache: false });
 
     // activate current navbar item
     $('#navbar-collapse li > [href!="#"]').each(function () {
-        console.log( location.href, this.href, location.href.indexOf(this.href) );
-        if (window.location.href.indexOf(this.href) !== -1) {
+        if (window.location.href.indexOf(this.href) > -1) {
             $(this).parent().addClass('active');
             return false;
         }
@@ -28,61 +29,19 @@ $(function () {
     });
 
     // checked/unchecked all table-body checkboxes when table-header checkbox is checked/unchecked
-    $('th :checkbox').change(function () {
-        $(this).closest('table').find('td :checkbox').prop('checked', this.checked);
-    });
-
-    // 
-    $('.btn [type=file]').change(function () {
-        $(this).parent().next('.label-info').html(this.value);
-    });
-
-    // search users when form is submitted
-    $('#modal-find-users form').submit(function (e) {
-        e.preventDefault();
-        var $form = $(this);
-            $form.next('div').load(this.action, $form.serialize());
+    $(document).on('change', 'th :checkbox', function () {
+        $(this).closest('table').find('td :checkbox:not(:disabled)').prop('checked', this.checked);
     });
 
     // add user to course when button is clicked
-    $('#modal-find-users').on('click', 'td > a', function (e) {
-        e.preventDefault();
-        $.bootstrapAlert('close');
-        var $heading = $('.container > h1'),
-            $table = $('#table-users'), 
-            $tr = $(this).closest('tr');
-        $.ajax(this.href, {
-            type: 'post',
-            success: function (res) {
-                $heading.after($.bootstrapAlert('success', res));
-                $table.loadInner(window.location.href);
-                $tr.remove();
-            },
-            error: function (xhr) {
-                $heading.after($.bootstrapAlert('error', xhr.responseText));
-            }
-        });
+    $('#btn-search').click(function () {
+        $('#search-results').load($(this).closest('form')[0].action + '/search?q=' + q.value);
     });
-    // update user in tutorials when button is clicked      
-    $('#table-users').on('click', '.btn-update-user').click(function (e) {        
-         e.preventDefault();       
-         $.ajax(this.href, {       
-             type: 'put',      
-             data: $(this).closest('tr').find(':input').serialize(),       
-             success: function (res) {     
-                 window.location.reload(true); // TO-FIX       
-             }     
-         });       
-    });
+
     // delete user from course when button is clicked
-    $('#table-users').on('click', '.btn-delete-user', function (e) {
+    $('.btn-delete-user').click(function (e) {
         e.preventDefault();
-        $.ajax(this.href, {
-            type: 'delete',
-            success: function (res) {
-                window.location.reload(true); // TO-FIX
-            }
-        });
+        $.delete(this.href, function () { window.location.reload(true); });
     });
 
     // style checkboxes with switch control
@@ -93,12 +52,30 @@ $(function () {
         size: 'small',
     });
 
+    // small plugins for making PUT and DELETE requests
+    // @usage: $.put(url, data, callback) or $.delete(url, callback)
+    $.each(['put', 'delete'], function (i, method) {
+        $[method] = function (url, data, callback, type) {
+            if ($.isFunction(data)) {
+                type = type || callback;
+                callback = data;
+                data = undefined;
+            }
+            return $.ajax({
+                url: url,
+                type: method,
+                dataType: type,
+                data: data,
+                success: callback
+            });
+        };
+    });
+
     // small plugin for loading inner html from url + selector
     // @usage: $(selector).loadInner(url, data, callback)
     $.fn.loadInner = function () {
-        if (arguments.length) {
+        if (arguments.length)
             arguments[0] += ' ' + $(this).selector + ' > *';
-        }
         return this.load.apply(this, arguments);
     };
 

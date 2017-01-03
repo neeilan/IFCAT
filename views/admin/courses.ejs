@@ -22,11 +22,7 @@
     <tbody>
     <% if (_.isEmpty(courses)) { %>
         <tr>
-            <td colspan="3">No courses have been added yet.
-                <% if (user.hasRole('admin')) { %>
-                    <span>Click <a href="/admin/courses/new">here</a> to add a new course.</span>
-                <% } %>
-            </td>
+            <td colspan="3">No courses have been added yet.</td>
         </tr>
     <% } else { %>
         <% _.each(courses, function (course) { %>
@@ -84,12 +80,7 @@ $(function () {
             message: '<p>You are about to delete course and all of its associated information.</p>\
                 <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
             callback: function () {
-                $.ajax(btn.href, {
-                    type: 'delete',
-                    complete: function () {
-                        window.location.reload(true);
-                    }
-                });
+                $.delete(btn.href, function () { window.location.reload(true); });
             }
         });
     });

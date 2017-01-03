@@ -1,19 +1,20 @@
-<!-- find TAs modal -->
 <div class="modal fade" id="modal-find-users" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title"><span class="glyphicon glyphicon-search"></span> Find teaching assistants</h4>
+                <h4 class="modal-title">Find teaching assistants</h4>
             </div>
-            <div class="modal-body">
-                <form action="/admin/courses/<%= course.id %>/teaching-assistants/search">
-                    <input type="text" name="q" value="" class="form-control input-sm"
-                        placeholder="Name, email, or leave blank">
-                    <input type="submit" value="Search" class="btn btn-default btn-sm">
-                </form>
-                <div></div>
-            </div>
-            <div class="modal-footer"></div>
+            <form action="/admin/courses/<%= course.id %>/teaching-assistants" method="post">
+                <div class="modal-body">
+                    <input type="text" value="" class="form-control input-sm" placeholder="Name, email, or leave blank" id="q">
+                    <input type="button" value="Search" class="btn btn-default btn-sm" id="btn-search">
+                    <div id="search-results"></div>
+                </div>
+                <div class="modal-footer">
+                    <input type="button" value="Cancel" class="btn btn-default btn-sm" data-dismiss="modal">
+                    <input type="submit" value="Update" class="btn btn-primary btn-sm">
+                </div>
+            </form>
         </div>
     </div>
 </div>

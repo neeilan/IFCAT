@@ -10,6 +10,9 @@ textarea.form-control {
 .alert {
     display: inline-block;
 }
+.btn-file {
+    display: inline-block;
+}
 .dim-wrap {
     position: relative;
 }
@@ -34,36 +37,66 @@ textarea.form-control {
 .handle {
     cursor: pointer;
 }
+.pagination > li > a, .pagination > li > span {
+    color: #333;
+    margin-left: 3px;
+    z-index: 0 !important;
+}
+.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover,
+.pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+    background-color: #333;
+    border-color: #333;    
+}
+.pagination > .divider > *, .pagination > .previous > *, .pagination > .next > * {
+    background-color: #fff !important;
+    border: 0 !important;
+}
 .nav-actions {
     margin-bottom: 10px;
     padding: 10px 0;
 }
+.table tfoot th {
+    border-top: 2px solid #ddd;
+}
 .table th.actions, .table td.actions {
     width: 105px;
+}
+.table tfoot .pagination {
+    margin: 0;
 }
 .stretch-wrap {
     overflow-x: auto;
 }
 
-/* Find users styles */
-
+#modal-add-tutorials .modal-body label {
+    font-weight: normal;
+}
+#modal-add-tutorials .modal-body input {
+    display: inline-block; 
+    margin: 0 10px; 
+    width: 70px;
+}
 #modal-find-users .modal-body {
     min-height: 150px;
 }
-#modal-find-users form {
-    overflow: hidden;
-}
-#modal-find-users form * {
+#modal-find-users #q {
     float: left;
-}
-#modal-find-users form input[type=text] {
     margin-right: 10px;
     width: 80%;
 }
-#modal-find-users table {
-    margin: 15px 0 0;
+#modal-find-users #btn-search {
+    float: left;
 }
-#modal-find-users th, #modal-find-users td {
+#modal-find-users #search-results {
+    clear: both;
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+#modal-find-users #search-results table {
+    margin: 0;
+}
+#modal-find-users #search-results th, #modal-find-users #search-results td {
     padding: 8px 0;
 }
 
@@ -71,13 +104,15 @@ textarea.form-control {
 
 #modal-upload-files .modal-body {
     padding: 0;
+    text-align: center;
 }
 #modal-upload-files .modal-body .btn {
     margin: 15px auto;
-    width: 95%;
 }
 #modal-upload-files .modal-body .list-group {
+    overflow-y: auto;
     margin: 0;
+    max-height: 300px;
 }
 #modal-upload-files .modal-body .list-group-item {
     border-radius: 0;
@@ -85,6 +120,10 @@ textarea.form-control {
     border-right: 0;
     border-bottom: 0;
     border-left: 0;
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 #modal-upload-files .modal-body .btn-remove-file {
     padding: 8px 20px 0 0;

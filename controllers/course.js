@@ -6,12 +6,10 @@ var models = require('../models');
 // Retrieve course
 exports.getCourse = function (req, res, next, course) {
     models.Course.findById(course, function (err, course) {
-        if (err) {
+        if (err)
             return next(err);
-        }
-        if (!course) {
+        if (!course)
             return next(new Error('No course is found.'));
-        }
         req.course = course;
         next();
     });

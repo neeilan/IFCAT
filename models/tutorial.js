@@ -14,14 +14,18 @@ var TutorialSchema = new mongoose.Schema({
 // Delete cascade
 TutorialSchema.pre('remove', function (next) {
     var tutorial = this;
-    var conditions = { tutorials: { $in: [tutorial._id] }},
-        doc = { $pull: { tutorials: tutorial._id }},
-        options = { multi: true };
+    var conditions = { 
+        tutorials: { $in: [tutorial._id] }
+    }, doc = { 
+        $pull: { tutorials: tutorial._id }
+    }, options = { 
+        multi: true 
+    };
     async.parallel([
-        function delRef1(done) {
-            models.Tutorial.update(conditions, doc, options).exec(done);
+        function deleteFromCourse(done) {
+            models.Course.update(conditions, doc, options).exec(done);
         },
-        function delRef2(done) {
+        function deleteTutorialQuiz(done) {
             models.TutorialQuiz.remove({ tutorial: tutorial._id }).exec(done);
         }
     ], next);
@@ -37,11 +41,11 @@ TutorialSchema.methods.withStudents = function () {
 };
 // Check if student belongs to tutorial
 TutorialSchema.methods.hasStudent = function (userId) {
-    return this.students.indexOf(userId) !== -1;
+    return this.students.indexOf(userId) > -1;
 };
 // Check if teaching assistant belongs to tutorial
 TutorialSchema.methods.hasTeachingAssistant = function (userId) {
-    return this.teachingAssistants.indexOf(userId) !== -1;
+    return this.teachingAssistants.indexOf(userId) > -1;
 };
 
 module.exports = mongoose.model('Tutorial', TutorialSchema);

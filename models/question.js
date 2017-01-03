@@ -1,5 +1,6 @@
 var _ = require('lodash'),
-    mongoose = require('mongoose');
+    mongoose = require('mongoose'),
+    url = require('url');
     
 var models = require('.');
 
@@ -50,11 +51,11 @@ QuestionSchema.methods.isShortAnswer = function () {
 };
 // Check if question has file with given ID
 QuestionSchema.methods.hasFile = function (id) {
-    return this.files.indexOf(id) !== -1;
+    return this.files.indexOf(id) > -1;
 };
 // Check if given choice is one of the answers
 QuestionSchema.methods.isAnswer = function (choice) {
-    return this.answers.indexOf(choice) !== -1;
+    return this.answers.indexOf(choice) > -1;
 };
 // Save question
 QuestionSchema.methods.store = function (obj, callback) {
@@ -62,53 +63,62 @@ QuestionSchema.methods.store = function (obj, callback) {
     this.question = _.trim(obj.question);
     this.type = obj.type;
     this.files = obj.files;
-    this.links = _.filter(obj.links, Boolean);
+    this.links = [];
+    this.choices = []; 
+    this.answers = [];
     this.caseSensitive = !!obj.caseSensitive;
     this.shuffleChoices = !!obj.shuffleChoices;
     this.useLaTeX = !!obj.useLaTeX;
     this.points = obj.points;
     this.firstTryBonus = obj.firstTryBonus;
     this.penalty = obj.penalty;
-    // clear previous choices and answers
-    this.choices = []; 
-    this.answers = [];
+    
+    var selected, key, matches, question = this;
 
-    var selected, key, matches, value, d;
+    _.each(obj.links, function (value) {
+        value = _.trim(value);
+        // add unique links
+        if (value) {
+            if (!url.parse(value).protocol)
+                value = 'http://' + value;
+            if (question.links.indexOf(value) === -1)
+                question.links.push(value);
+        }
+    });
 
     if (this.isMultipleChoice()) {
         selected = _.isObject(obj.answer) ? obj.answer[_.kebabCase(this.type)] : false;
-        // add choices and selected answer
-        for (d in obj.choices) {
-            value = _.trim(obj.choices[d]);
-            if (value) {
-                this.choices.push(value);
+        _.forOwn(obj.choices, function (value, i) {
+            value = _.trim(value);
+            // add unique choices
+            if (value && question.choices.indexOf(value) === -1) {
+                question.choices.push(value);
                 // mark as the answer if selected
-                if (d === selected) {
-                    this.answers = [value];
-                }
+                if (i === selected)
+                    question.answers = [value];
             }
-        }
+        });
     } else if (this.isMultipleSelect()) {
         selected = _.isObject(obj.answers) ? obj.answers[_.kebabCase(this.type)] : [];
-        // add choices + selected answers
-        for (d in obj.choices) {
-            value = _.trim(obj.choices[d]);
-            if (value) {
-                this.choices.push(value);
+        _.forOwn(obj.choices, function (value, i) {
+            value = _.trim(value);
+            // add unique choices
+            if (value && question.choices.indexOf(value) === -1) {
+                question.choices.push(value);
                 // mark as one of answers if selected
-                if (selected.indexOf(d) !== -1) {
-                    this.answers.push(value);
-                }
+                if (selected.indexOf(i) > -1)
+                    question.answers.push(value);
             }
-        }
+        });
     } else if (this.isShortAnswer()) {
-        for (d in obj.choices) {
-            value = _.trim(obj.choices[d]);
-            if (value) {
-                this.choices.push(value);
-                this.answers.push(value);
+        _.forOwn(obj.choices, function (value) {
+            value = _.trim(value);
+            // add unique choices
+            if (value && question.choices.indexOf(value) === -1) {
+                question.choices.push(value);
+                question.answers.push(value);
             }
-        }
+        });
     }
     return this.save(function (err) {
         callback(err);

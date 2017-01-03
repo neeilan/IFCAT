@@ -15,21 +15,21 @@ FileSchema.pre('remove', function (next) {
         doc = { $pull: { files: this._id }},
         options = { multi: true };
     async.parallel([
-        function delRef1(done) {
+        function deleteFromCourse(done) {
             models.Course.update(conditions, doc, options).exec(done);
         },
-        function delRef2(done) {
+        function deleteFromQuestion(done) {
             models.Question.update(conditions, doc, options).exec(done);     
         }
     ], next);
 });
 // Check if file is an audio
 FileSchema.methods.isAudio = function () {
-    return this.type.indexOf('audio') !== -1;
+    return this.type.indexOf('audio') > -1;
 };
 // Check if file is an image
 FileSchema.methods.isImage = function () {
-    return this.type.indexOf('image') !== -1;
+    return this.type.indexOf('image') > -1;
 };
 // Save file 
 FileSchema.methods.store = function (obj, callback) {

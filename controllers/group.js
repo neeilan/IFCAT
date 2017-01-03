@@ -65,22 +65,20 @@ exports.generateGroupList = function (req, res) {
 exports.saveGroupList = function (req, res, next) { 
     var newGroups = {},
         trash = req.body.trash || [];
-    // idName = groupId (update), number (new), or 'unassigned' (ignored)
+    // idName = group id (update), number (new), or 'unassigned' (ignored)
     // sort groups keyed on idName, value is array of userIds
     _.each(req.body.groups || {}, function (idName, userId) {
         if (idName !== 'unassigned') {
-            if (!newGroups.hasOwnProperty(idName)) {
+            if (!newGroups.hasOwnProperty(idName))
                 newGroups[idName] = [];
-            }
-            if (mongoose.Types.ObjectId.isValid(userId)) {
-                newGroups[idName].push(userId);   
-            }
+            if (mongoose.Types.ObjectId.isValid(userId))
+                newGroups[idName].push(userId);
         }
     });
 
     req.tutorialQuiz.withGroups().execPopulate().then(function () {
         async.series([
-            function updOldGrps(done) {
+            function updateGroups(done) {
                 async.each(req.tutorialQuiz.groups, function (group, done) {
                     // delete group if it was marked as trash
                     if (trash.indexOf(group.id) !== -1) {
@@ -91,11 +89,7 @@ exports.saveGroupList = function (req, res, next) {
                         });
                     // otherwise update group members
                     } else {
-                        group.update({ 
-                            $set: {
-                                members: newGroups[group.id] || [] 
-                            }
-                        }, function (err) {
+                        group.update({ $set: { members: newGroups[group.id] || [] }}, function (err) {
                             if (err)
                                 return done(err);
                             delete newGroups[group.id]; // done!
@@ -104,7 +98,7 @@ exports.saveGroupList = function (req, res, next) {
                     }
                 }, done);
             },
-            function addNewGrps(done) {
+            function addGroups(done) {
                 async.eachOfSeries(newGroups, function (members, name, done) {
                     models.Group.create({ name: name, members: members }, function (err, group) {
                         if (err)
@@ -114,11 +108,9 @@ exports.saveGroupList = function (req, res, next) {
                 }, done);
             }
         ], function (err) {
-            if (err) {
-                console.log(err)
+            if (err)
                 return res.status(500).send('An error occurred while trying to perform action.');
-            }
-            res.status(200).send('List of groups has been updated.');
+            res.send('List of groups has been updated.');
         });
     });
 };

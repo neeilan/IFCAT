@@ -1,27 +1,23 @@
-<!-- import students modal -->
 <div class="modal fade" id="modal-import-students" tabindex="-1" style="display: none;">
-    <div class="modal-dialog" style="max-width: 500px">
+    <div class="modal-dialog modal-sm">
         <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Import students by CSV file</h4>
+            </div>
             <form action="/admin/courses/<%= course.id %>/students/import" method="post" enctype="multipart/form-data">
-                <div class="modal-header">
-                    <h4 class="modal-title"><span class="glyphicon glyphicon-save"></span> Import students using CSV file</h4>
-                </div>
                 <div class="modal-body">
-                    <p>This import will add new students into the course and their tutorials.</p>
-                    <p>The first row of the file <b>must</b> have the following cells (case-sensitive):<br>
-                        <b>UTORid</b>, <b>First Name</b>, <b>Last Name</b>, and optionally, <b>Email</b>, <b>Password</b>, <b>Tutorial</b>.</p>
-                    <p>If there are no tutorials matching the cell data, the student will not be added into a tutorial. Therefore, it is a good idea to <a href="/admin/courses/<%= course.id %>/tutorials" target="_blank">create the tutorials</a> before importing.</p>
-                    <br>
-                    <label class="control-label">Select the file <span style="color: #A00">(.csv)</span></label>&nbsp;&nbsp;
-                    <label class="btn btn-default">
-                        <input type="file" name="file" 
-                            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display:none;">Browse
-                    </label>
-                    <span class="label label-info"></span>
+                    <p>
+                        <span class="btn btn-default btn-file" onclick="file.click()">
+                            <input type="file" name="file" id="file" style="display: none;" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, 
+                            application/vnd.ms-excel" onchange="window['file-label'].innerHTML = this.value">Choose file
+                        </span>
+                        <span class="label label-default" id="file-label">no file selected</span>
+                    </p>
+                    <p>Download a <a href="/img/samples/roster.csv">sample CSV template</a> to see an example of the format required.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary btn-sm">Import</button>
+                    <input type="button" value="Cancel" class="btn btn-default" data-dismiss="modal">
+                    <input type="submit" value="Upload" class="btn btn-primary btn-sm">
                 </div>
             </form>
         </div>

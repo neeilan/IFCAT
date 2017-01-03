@@ -20,8 +20,7 @@
     <tbody>
     <% if (_.isEmpty(course.quizzes)) { %>
         <tr>
-            <td colspan="3">No quizzes have been added yet. Click <a 
-                href="/admin/courses/<%= course.id %>/quizzes/new">here</a> to add a new quiz.</td>
+            <td colspan="3">No quizzes have been added yet.</td>
         </tr>
     <% } else { %>
         <% _.each(course.quizzes, function (quiz) { %>
@@ -62,12 +61,7 @@ $(function () {
             message: '<p>You are about to delete quiz and all of its associated information.</p>\
                 <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
             callback: function () {
-                $.ajax(btn.href, {
-                    type: 'delete',
-                    complete: function () {
-                        window.location.reload(true);
-                    }
-                });
+                $.delete(btn.href, function () { window.location.reload(true); });
             }
         });
     });
