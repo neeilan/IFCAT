@@ -16,16 +16,18 @@
     </thead>
     <tfoot>
         <tr>
-            <th colspan="4"><%= tutorial.students.length + ' student' + (tutorial.students.length !== 1 ?  's' : '') %></th>
+            <td colspan="4" style="text-align: center">
+                <%- include ./pagination %>
+            </td>
         </tr>
     </tfoot>
     <tbody>
-    <% if (_.isEmpty(tutorial.students)) { %>
+    <% if (_.isEmpty(students)) { %>
         <tr>
             <td colspan="4">No students have been added to this tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students</a> into the tutorial.</td>
         </tr>
     <% } else { %>  
-        <% _.each(tutorial.students, function (student, i) { %>
+        <% _.each(students, function (student) { %>
             <tr>
                 <td><%= student.name.full %></td>
                 <td><%= student.student.UTORid %></td>

@@ -43,34 +43,20 @@ exports.logout = function (req, res) {
 // Retrieve list of users
 exports.getUserList = function (req, res) {
     var currentPage = parseInt(req.query.page, 10) || 1,
-        perPage = parseInt(req.query.perPage, 10) || 20;
-    async.parallel([
-        function (done) {
-            models.User.count().exec(done);
-        },
-        function (done) {
-            models.User.find(null, null, { 
-                sort: {
-                    'name.first': 1,
-                    'name.last': 1
-                }, 
-                skip: (currentPage - 1) * perPage, 
-                limit: perPage
-            }).exec(done);
-        }
-    ], function (err, results) {
-        var totalPages = _.round(results[0] / perPage), page = 1, pages = [];
-        // build set of pages
-        while (page <= totalPages) {    
+        perPage = parseInt(req.query.perPage, 10) || 20,
+        start = (currentPage - 1) * perPage, 
+        end = start + perPage;
+    models.User.find().sort({ 'name.first': 1, 'name.last': 1 }).exec(function (err, users) {
+        var totalPages = _.round(users.length / perPage), pages = [];
+        // build pages
+        for (var page = 1; page <= totalPages; page++) {    
             if ((currentPage <= 2 && page <= 5) || 
                 (currentPage - 2 <= page && page <= currentPage + 2) ||
-                (totalPages - 2 < currentPage && totalPages - 5 < page))
-                pages.push(page);
-            page++;
+                (totalPages - 2 < currentPage && totalPages - 5 < page)) pages.push(page);
         }
         res.render('admin/users', {
             title: 'Users',
-            users: results[1],
+            users: _.slice(users, start, end),
             currentPage: currentPage,
             perPage: perPage,
             totalPages: totalPages,
