@@ -16,9 +16,6 @@ textarea.form-control {
 .dim-wrap {
     position: relative;
 }
-.dim-wrap .dim {
-    overflow: hidden;
-}
 .dim-wrap .dimmer {
     background: rgba(0,0,0,0.2);
     cursor: default;
