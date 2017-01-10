@@ -1,17 +1,15 @@
 var _ = require('lodash'),
     async = require('async');
-
-var models = require('../models');
+var config = require('../lib/config'),
+    models = require('../models');
 
 // Retrieve tutorial
 exports.getTutorial = function (req, res, next, tutorial) {
     models.Tutorial.findById(tutorial, function (err, tutorial) {
-        if (err) {
+        if (err)
             return next(err);
-        }
-        if (!tutorial) {
+        if (!tutorial)
             return next(new Error('No tutorial is found.'));
-        }
         req.tutorial = tutorial;
         next();
     });

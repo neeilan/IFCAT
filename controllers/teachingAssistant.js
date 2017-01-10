@@ -1,15 +1,14 @@
 var util = require('util');
-
 var _ = require('lodash'),
     async = require('async');
-
-var models = require('../models');
+var config = require('../lib/config'),
+    models = require('../models');
 
 // Retrieve list of teaching assistants for course
 exports.getTeachingAssistantListByCourse = function (req, res) {
     req.course.withTutorials().withTeachingAssistants().execPopulate().then(function (err) {
         res.render('admin/course-teaching-assistants', {
-            title: 'Teaching assistants',
+            title: 'Teaching Assistants',
             course: req.course
         });
     });

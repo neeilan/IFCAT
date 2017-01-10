@@ -1,10 +1,10 @@
-<% if (typeof pages !== 'undefined' && pages.length) { %>
+<% if (pages.length) { %>
     <ul class="pagination">
     <% if (currentPage <= 1) { %>
         <li class="previous disabled"><span>&laquo;</span></li>
         <li class="previous disabled"><span>&lsaquo;</span></li>
     <% } else { %>
-        <li class="previous"><a href="<% url %>?perPage=<%= perPage %>">&laquo;</a></li>
+        <li class="previous"><a href="<% url %>?page=1&perPage=<%= perPage %>">&laquo;</a></li>
         <li class="previous"><a href="<% url %>?page=<%= currentPage - 1 %>&perPage=<%= perPage %>">&lsaquo;</a></li>
     <% } %>
     <% _.each(pages, function (page) { %>

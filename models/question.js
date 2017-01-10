@@ -1,7 +1,6 @@
+var url = require('url');
 var _ = require('lodash'),
-    mongoose = require('mongoose'),
-    url = require('url');
-    
+    mongoose = require('mongoose');
 var models = require('.');
 
 var QuestionSchema = new mongoose.Schema({
@@ -120,9 +119,7 @@ QuestionSchema.methods.store = function (obj, callback) {
             }
         });
     }
-    return this.save(function (err) {
-        callback(err);
-    });
+    return this.save(callback);
 };
 
 module.exports = mongoose.model('Question', QuestionSchema);

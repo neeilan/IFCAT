@@ -1,6 +1,11 @@
 <%- include ./header -%>
 
-<h1><%= course.code + ' - ' + course.name %><br><small>Teaching assistants</small></h1>
+<ol class="breadcrumb">
+    <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
+    <li class="active">Teaching Assistants</li>
+</ol>
+
+<h1><%- title %></h1>
 
 <%- include ./flash %>
 
@@ -16,7 +21,8 @@
             <thead>
                 <tr>
                     <th rowspan="2">Name</th>
-                    <th colspan="<%= course.tutorials.length ? course.tutorials.length : 1 %>">Tutorials</th>
+                    <th rowspan="2">Email</th>
+                    <th colspan="<%= course.tutorials.length || 1 %>">Tutorials</th>
                     <th rowspan="2" class="actions"></th>
                 </tr>
                 <tr>
@@ -28,13 +34,13 @@
             <tbody>
             <% if (_.isEmpty(course.teachingAssistants)) { %>
                 <tr>
-                    <td>No teaching assistants have been added to the course yet.</td>
-                    <td colspan="<%= 1 + course.tutorials.length %>"></td>
+                    <td colspan="<%= 3 + (course.tutorials.length || 1) %>">No teaching assistants have been added to the course yet.</td>
                 </tr>
             <% } else { %>
                 <% _.each(course.teachingAssistants, function (assistant) { %>
                     <tr>
                         <td><%= assistant.name.full %></td>
+                        <td><%= assistant.local.email %></td>
                         <% if (_.isEmpty(course.tutorials)) { %>
                             <td>&nbsp;</td>
                         <% } else { %>

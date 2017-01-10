@@ -1,13 +1,23 @@
 var _ = require('lodash'),
     async = require('async'),
     csv = require('csv');
-
-var models = require('../models');
+var config = require('../lib/config'),
+    models = require('../models');
 
 // Retrieve responses
 exports.getResponseList = function (req, res) {
-    req.tutorialQuiz.withResponses().execPopulate().then(function () {
-        var responses = _.filter(req.tutorialQuiz.responses, function (response) {
+    models.TutorialQuiz.find({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate({
+        path: 'responses',
+        model: models.Response,
+        populate: [{
+            path: 'group',
+            model: models.Group
+        }, {
+            path: 'question',
+            models: models.Question
+        }]
+    }).exec(function (err, tutorialQuiz) {
+        var responses = _.filter(tutorialQuiz.responses, function (response) {
             return response.group.id === req.group.id;
         });
         // tally the points
@@ -25,9 +35,12 @@ exports.getResponseList = function (req, res) {
         //     }
         // })
         
-        res.render('admin/group-responses', { 
+        res.render('admin/group-responses', {
+            title: 'Responses',
             course: req.course,
-            tutorialQuiz: req.tutorialQuiz,
+            tutorial: req.tutorial,
+            quiz: req.quiz,
+            tutorialQuiz: tutorialQuiz,
             group: req.group,
             responses: responses,
             totalPoints: totalPoints
@@ -37,15 +50,24 @@ exports.getResponseList = function (req, res) {
 // Export responses
 exports.exportResponseList = function (req, res) {
     var data = [];
-    var filename =
-        req.course.code + 
-        '-tut' + req.tutorialQuiz.tutorial.number +
-        '-group' + req.group.name + 
-        '.csv';
 
-    req.tutorialQuiz.withResponses().execPopulate().then(function () {
+    models.TutorialQuiz.find({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate({
+        path: 'responses',
+        model: models.Response,
+        populate: [{
+            path: 'group',
+            model: models.Group
+        }, {
+            path: 'question',
+            models: models.Question
+        }]
+    }).exec(function (err, tutorialQuiz) {
+        var filename = req.course.code + 
+            '-tut' + req.tutorial.number +
+            '-group' + req.group.name + 
+            '.csv';
         // ugly: filter out group responses
-        var responses = _.filter(req.tutorialQuiz.responses, function (response) {
+        var responses = _.filter(tutorialQuiz.responses, function (response) {
             return response.group.id === req.group.id;
         });
         // tally the points
@@ -54,8 +76,8 @@ exports.exportResponseList = function (req, res) {
         }, 0);
         // build information
         data.push(['Course', req.course.code, req.course.name]);
-        data.push(['Tutorial', req.tutorialQuiz.tutorial.number]);
-        data.push(['Quiz', req.tutorialQuiz.quiz.name]);
+        data.push(['Tutorial', req.tutorial.number]);
+        data.push(['Quiz', req.quiz.name]);
         data.push(['Group', req.group.name]);
         data.push([]);
         // build header row
@@ -93,53 +115,45 @@ exports.getMarks = function (req, res) {
         }
     }]).exec(function (err, tutorialQuizzes) {
         // ugly: find marks by student
-        tutorialQuizzes = tutorialQuizzes.filter(tq => tq.groups.length > 0);
         var marks = _.map(tutorialQuizzes, function (tutorialQuiz) {
             var result = {
                 tutorialQuiz: tutorialQuiz,
                 group: _.find(tutorialQuiz.groups, function (group) {
-                    return group.members.indexOf(req.us3r.id) > -1;
+                    return group.hasMember(req.us3r.id);
                 }),
-                points: tutorialQuiz.responses ? _.reduce(tutorialQuiz.responses, function (sum, response) {
-                    if (response.group.members.indexOf(req.us3r.id) > -1) {
-                        return sum + response.points;
-                    }
-                    return sum;
-                }, 0) : 0,
+                points: _.reduce(tutorialQuiz.responses, function (sum, response) {
+                    return response.group.hasMembers(req.us3r.id) ? sum + response.points : sum;
+                }, 0),
+                teachingPoints: 0
             };
-            
-            if (result.group){
-                result.teachingPoints = (result.group.teachingPoints.reduce(function(sum, recipient){
+            // bug!
+            if (result.group) {
+                result.teachingPoints = result.group.teachingPoints.reduce(function(sum, recipient){
                     if (recipient === req.us3r.id)
-                        sum ++;
+                        sum++;
                     return sum;
-                }, 0))/2
-            } else {
-                result.points = 0;
-                result.teachingPoints = 0;
-            }
-            
+                }, 0) / 2
+            } 
             return result;
         });
+        
         // tally the points
         var totalPoints = _.reduce(marks, function (sum, mark) {
             return sum + mark.points;
         }, 0);
+
         var totalTeachingPoints = _.reduce(marks, function (sum, mark) {
             return sum + mark.teachingPoints;
         }, 0);
         
-        if (!marks[0].group){
-            res.end('No marks are currently available for this student');
-        } else {
-            res.render('admin/student-marks', {
-                student: req.us3r,
-                course: req.course,
-                tutorial: req.tutorial,
-                marks: marks,
-                totalPoints: totalPoints,
-                totalTeachingPoints : totalTeachingPoints
-            });
-        }
+        res.render('admin/student-marks', {
+            title: 'Marks',
+            course: req.course,
+            tutorial: req.tutorial,
+            student: req.us3r,
+            marks: marks,
+            totalPoints: totalPoints,
+            totalTeachingPoints : totalTeachingPoints
+        });
     });
 };

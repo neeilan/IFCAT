@@ -1,6 +1,5 @@
 var _ = require('lodash'),
     async = require('async');
-
 var models = require('../models');
 
 // Retrieve course
@@ -31,7 +30,7 @@ exports.getCourseList = function (req, res) {
 exports.getCourseForm = function (req, res) {
     var course = req.course || new models.Course();
     res.render('admin/course', { 
-        title: course.isNew ? 'Add course' : 'Edit course', 
+        title: course.isNew ? 'Add New Course' : 'Edit Course',
         course: course 
     });
 };
@@ -61,7 +60,7 @@ exports.deleteCourse = function (req, res) {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
-            req.flash('success', 'Course <b>%s</b> has been deleted.', req.course.name);
+            req.flash('success', 'Course <b>%s</b> has been deleted.', req.course.name);   
         res.sendStatus(200);
     });
 };

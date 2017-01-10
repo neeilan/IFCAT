@@ -49,8 +49,20 @@ $(function () {
         inverse: true,
         offText: 'No',
         onText: 'Yes',
-        size: 'small',
+        size: 'small'
     });
+
+    // save last opened tab
+    $('a[data-toggle=tab]').on('shown.bs.tab', function () {
+        localStorage.setItem('tab-open', $(this).attr('href'));
+    });
+
+
+    // open last opened tab
+    var tab = localStorage.getItem('tab-open');
+    if (tab) {
+        $('a[href="' + tab + '"]').tab('show');
+    }
 
     // small plugins for making PUT and DELETE requests
     // @usage: $.put(url, data, callback) or $.delete(url, callback)

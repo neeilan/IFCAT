@@ -16,6 +16,9 @@ textarea.form-control {
 .dim-wrap {
     position: relative;
 }
+.dim-wrap .dim {
+    overflow: hidden;
+}
 .dim-wrap .dimmer {
     background: rgba(0,0,0,0.2);
     cursor: default;
@@ -37,6 +40,14 @@ textarea.form-control {
 .handle {
     cursor: pointer;
 }
+.form-group.required .control-label:before {
+    color: red;
+    content: "*";
+    font-size: 120%;
+    position: absolute;
+    margin-left: -12px;
+    top: 5px;
+}
 .pagination > li > a, .pagination > li > span {
     color: #333;
     margin-left: 3px;
@@ -55,8 +66,14 @@ textarea.form-control {
     margin-bottom: 10px;
     padding: 10px 0;
 }
-.table tfoot th {
+.stretch-wrap {
+    overflow-x: auto;
+}
+.table > tfoot > tr > th {
     border-top: 2px solid #ddd;
+}
+.table > tbody > tr > td {
+    vertical-align: middle;
 }
 .table th.actions, .table td.actions {
     width: 105px;
@@ -64,9 +81,7 @@ textarea.form-control {
 .table tfoot .pagination {
     margin: 0;
 }
-.stretch-wrap {
-    overflow-x: auto;
-}
+
 
 #modal-add-tutorials .modal-body label {
     font-weight: normal;
@@ -193,6 +208,10 @@ a.counter {
 
 /* Group listing styles */
 
+.tab-pane {
+    padding: 10px;
+}
+
 #btn-randomize > .glyphicon-random:before {
     display: inline-block;
     -webkit-transform: rotate(90deg);
@@ -201,11 +220,11 @@ a.counter {
     -ms-transform: rotate(90deg);
     transform: rotate(90deg);
 }
-#table-quiz-groups {
+#groups table {
     border-top: 1px solid #ddd;
     border-left: 1px solid #ddd;
 }
-#table-quiz-groups th, #table-quiz-groups td {
+#groups th, #groups td {
     border-bottom: 1px solid #ddd;
     border-right: 1px solid #ddd;
     height: 30px;
@@ -215,16 +234,16 @@ a.counter {
     vertical-align: middle;
     white-space: nowrap;
 }
-#table-quiz-groups th.s, #table-quiz-groups td.s {
+#groups th.s, #groups td.s {
     width: 200px; 
 }
-#table-quiz-groups th.u, #table-quiz-groups td.u {
+#groups th.u, #groups td.u {
     width: 110px; 
 }
-#table-quiz-groups th.g, #table-quiz-groups td.g {
+#groups th.g, #groups td.g {
     width: 55px; 
 }
-#table-quiz-groups th.g {
+#groups th.g {
     cursor: pointer;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -233,13 +252,13 @@ a.counter {
     -ms-user-select: none;
     user-select: none;
 }
-#table-quiz-groups th.selected, #table-quiz-groups td.selected {
-    background-color: beige;
+#groups th.selected, #groups td.selected {
+    background-color: lightcoral;
 }
-#table-quiz-groups tr td:first-child {
+#groups tr td:first-child {
     text-align: left;
 }
-#table-quiz-groups tbody td {
+#groups tbody td {
     padding: 0 5px;
 }
 
@@ -255,20 +274,4 @@ a.counter {
         min-width: auto;
         width: 100%;
     }
-}
-
-.help .toc {
-    columns: 3 180px;
-    column-gap: 2em;
-}
-.help .toc ul {
-    margin: 0;
-    padding: 0;
-}
-.help .toc li {
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
-    break-inside: avoid;
-    list-style-type: none;
-    overflow: hidden;
 }

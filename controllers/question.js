@@ -1,18 +1,15 @@
 var _ = require('lodash'),
-    async = require('async'),
-    mongoose = require('mongoose');
-
-var models = require('../models');
+    async = require('async');
+var config = require('../lib/config'),
+    models = require('../models');
 
 // Retrieve course
 exports.getQuestion = function (req, res, next, question) {
     models.Question.findById(question, function (err, question) {
-        if (err) {
+        if (err)
             return next(err);
-        }
-        if (!question) {
+        if (!question)
             return next(new Error('No question is found.'));
-        }
         req.question = question;         
         next();
     });
@@ -20,7 +17,11 @@ exports.getQuestion = function (req, res, next, question) {
 // Retrieve list of questions for quiz
 exports.getQuestionList = function (req, res) { 
     req.quiz.withQuestions().execPopulate().then(function (err) {
-        res.render('admin/quiz-questions', { course: req.course, quiz: req.quiz });
+        res.render('admin/quiz-questions', {
+            title: 'Questions', 
+            course: req.course, 
+            quiz: req.quiz 
+        });
     });
 };
 // Sort list of questions
@@ -38,15 +39,13 @@ exports.sortQuestionList = function (req, res) {
 };
 // Retrieve specific question for quiz
 exports.getQuestionForm = function (req, res) {
-    if (!req.question) {
-        req.question = new models.Question();
-    }
+    var question = req.question || new models.Question();
     req.course.withFiles().execPopulate().then(function () {
         res.render('admin/quiz-question', {
-            title: req.question.isNew ? 'Add new question' : 'Edit question',
+            title: question.isNew ? 'Add New Question' : 'Edit Question',
             course: req.course, 
             quiz: req.quiz, 
-            question: req.question
+            question: question
         });
     });
 };
@@ -57,7 +56,7 @@ exports.addQuestion = function (req, res) {
         function add(done) {
             question.store(req.body, done);
         },
-        function addRef(done) {
+        function addIntoQuiz(done) {
             req.quiz.update({ $addToSet: { questions: question.id }}, done);
         }
     ], function (err) {
@@ -65,7 +64,11 @@ exports.addQuestion = function (req, res) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', 'Question <b>%s</b> has been created.', question.number);
-        res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/questions');
+
+        if (req.body.back === '1')
+            res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/questions');
+        else
+            res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/questions/new');
     });
 };
 // Update specific question for quiz
@@ -75,12 +78,8 @@ exports.editQuestion = function (req, res) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', 'Question <b>%s</b> has been updated.', req.question.number);
-        res.redirect(
-            '/admin/courses/' + req.course.id + 
-            '/quizzes/' + req.quiz.id + 
-            '/questions/' + req.question.id + 
-            '/edit'
-        );
+
+        res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/questions/' + req.question.id + '/edit');
     });      
 };
 // Delete specific question for quiz
@@ -90,6 +89,7 @@ exports.deleteQuestion = function (req, res) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', 'Question <b>%s</b> has been deleted.', req.question.number);
+
         res.sendStatus(200);
     });
 };

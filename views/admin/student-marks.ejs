@@ -1,21 +1,27 @@
 <%- include ./header -%>
 
-<h1><%= course.code + ' - ' + course.name %><br>
-<small><%= student.name.full %> - Marks</small></h1>
-<small><%= totalTeachingPoints %> total teaching points received</small>
+<ol class="breadcrumb">
+    <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
+    <li><a href="/admin/courses/<%= course.id %>/tutorials">Tutorials</a> ‐ TUT <%= tutorial.number %></li>
+    <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/students">Students</a> ‐ <%- student.name.full %></li>
+    <li class="active">Marks</li>
+</ol>
+
+<h1><%- title %></h1>
+<h3><%= student.name.full %> - <%= student.student.number %></h3>
 
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Quiz</th>
             <th>Group</th>
-            <th class="text-center">Points awarded</th>
-            <th class="text-center">Teaching points received</th>
+            <th class="text-center" style="width: 200px">Points Awarded</th>
+            <th class="text-center" style="width: 200px">Teaching Points Awarded</th>
         </tr>
     </thead>
     <% if (_.isEmpty(marks)) { %>
         <tbody>
-            <tr><td colspan="4">No marks have been given yet.</td></tr>
+            <tr><td colspan="4">No marks have been given yet for this student.</td></tr>
         </tbody>
     <% } else { %>
         <tfoot>
@@ -30,7 +36,11 @@
             <tr>
                 <td><%= mark.tutorialQuiz.quiz.name %>.</td>
                 <td>
-                    <a href="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= mark.tutorialQuiz.id %>/groups/<%= mark.group.id %>/responses">Group <%= mark.group.name %></a>       
+                <% if (mark.group) { %>
+                    <a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= mark.tutorialQuiz.quiz.id %>/groups/<%= mark.group.id %>/responses" target="_blank">Group <%= mark.group.name %></a>
+                <% } else { %>
+                    N/A
+                <% } %>      
                 </td>
                 <td class="text-center"><%= mark.points %></td>
                 <td class="text-center"><%= mark.teachingPoints %></td>

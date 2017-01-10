@@ -1,0 +1,46 @@
+<%- include ./header -%>
+
+<ol class="breadcrumb">
+    <li><a href="/admin/courses">Courses</a> ‐ <%- course.code %></li>
+    <li><a href="/admin/courses/<%- course.id %>/tutorials">Tutorials</a> ‐ TUT <%- tutorial.number %></li>
+    <li><a href="/admin/courses/<%- course.id %>/tutorials/<%- tutorial.id %>/quizzes">Quizzes</a> ‐ <%- quiz.name %></li>
+    <li class="active">Groups</li>
+</ol>
+
+<h1><%- title %></h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Group</th>
+            <th>Members</th>
+            <th class="actions"></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% if (_.isEmpty(groups)) { %>
+        <tr>
+            <td colspan="3">No groups have been added yet.</td>
+        </tr>
+    <% } else { %>
+        <% _.each(groups, function (group) { %>
+            <tr>
+                <td style="vertical-align: top">Group <%= group.name %></td>
+                <td>
+                <% _.each(group.members, function (member) { %>
+                    <a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/students/<%= member.id %>/marks"><%= 
+                        member.name.full %></a><br>
+                <% }) %>  
+                </td>
+                <td style="vertical-align: top">
+                    <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= quiz.id %>/groups/<%= group.id %>/responses"><span 
+                        class="glyphicon glyphicon-signal"></span> View Responses</a>
+                </td>
+            </tr>
+        <% }) %>
+    <% } %>
+    </tbody>
+</table>
+
+<%- include ./body-js -%>
+<%- include ./footer -%>

@@ -1,7 +1,12 @@
 <%- include ./header -%>
 
-<h1><%= course.code + ' - ' + course.name %><br>
-<small>TUT <%= tutorial.number %> - Students</small></h1>
+<ol class="breadcrumb">
+    <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
+    <li><a href="/admin/courses/<%= course.id %>/tutorials">Tutorials</a> ‐ TUT <%= tutorial.number %></li>
+    <li class="active">Students</li>
+</ol>
+
+<h1><%- title %></h1>
 
 <%- include ./flash %>
 
@@ -24,7 +29,7 @@
     <tbody>
     <% if (_.isEmpty(students)) { %>
         <tr>
-            <td colspan="4">No students have been added to this tutorial yet. Click <a href="/admin/courses/<%= course.id %>/students">here</a> to add students</a> into the tutorial.</td>
+            <td colspan="4">No students have been added to this tutorial yet.</td>
         </tr>
     <% } else { %>  
         <% _.each(students, function (student) { %>
@@ -33,14 +38,7 @@
                 <td><%= student.student.UTORid %></td>
                 <td><%= student.student.number %></td>
                 <th>
-                    <div class="dropdown">
-                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                            Actions<span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/students/<%= student.id %>/marks">View Marks</a></li>
-                        </ul>
-                    </div>
+                    <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/students/<%= student.id %>/marks"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> View Marks</a>
                 </th>
             </tr>
         <% }) %>

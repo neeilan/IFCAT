@@ -34,8 +34,18 @@ var UserSchema = new mongoose.Schema({
         default: 0
     },
     name: {
-        first: String,
-        last: String
+        first: {
+            type: String,
+            set: function (first) {
+                return _.startCase(first);
+            }
+        },
+        last: {
+            type: String,
+            set: function (last) {
+                return _.startCase(last);
+            }
+        }
     },
     roles: [{
         type: String,
@@ -50,21 +60,24 @@ var UserSchema = new mongoose.Schema({
 UserSchema.virtual('name.full').get(function () {
     return _.defaultTo(this.name.first, '') + ' ' + _.defaultTo(this.name.last, '');
 });
-// hook: hash password if one is given
+// pre-save hook
 UserSchema.pre('save', function (next) {
     var user = this;
-    if (!user.local.password || !user.isModified('local.password')) 
-        return next();
-    bcrypt.genSalt(10, function (err, salt) {
-        if (err) 
-            return next(err);
-        bcrypt.hash(user.local.password, salt, function (err, hash) {
+    // hash password if it is present and has changed
+    if (user.local.password && user.isModified('local.password')) {
+        bcrypt.genSalt(10, function (err, salt) {
             if (err) 
                 return next(err);
-            user.local.password = hash;
-            next();
+            bcrypt.hash(user.local.password, salt, function (err, hash) {
+                if (err) 
+                    return next(err);
+                user.local.password = hash;
+                next();
+            });
         });
-    });
+    } else {
+        return next();
+    }
 });
 
 // hook: delete cascade

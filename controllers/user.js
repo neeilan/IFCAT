@@ -2,7 +2,6 @@ var _ = require('lodash'),
     async = require('async'),
     csv = require('csv'),
     util = require('util');
-    
 var config = require('../lib/config'),
     models = require('../models');
 
@@ -69,7 +68,7 @@ exports.getUserForm = function (req, res) {
     if (!req.us3r)
         req.us3r = new models.User();
     res.render('admin/user', {
-        title: req.us3r.isNew ? 'Add new user' : 'Edit user', 
+        title: req.us3r.isNew ? 'Add New User' : 'Edit User', 
         us3r: req.us3r 
     });
 };
@@ -103,10 +102,6 @@ exports.deleteUser = function (req, res) {
             req.flash('success', 'User <b>%s</b> has been deleted.', req.us3r.name.full);
         res.sendStatus(200);
     });
-};
-// Get help guide
-exports.getHelp = function (req, res) {
-    res.render('admin/help');
 };
 // Reset administrator
 exports.install = function (req, res, next) {

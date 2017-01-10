@@ -1,9 +1,8 @@
 var util = require('util');
-
 var _ = require('lodash'),
     async = require('async');
-
-var models = require('../models');
+var config = require('../lib/config'),
+    models = require('../models');
 
 // Retrieve list of instructors for course
 exports.getInstructorListByCourse = function (req, res) {

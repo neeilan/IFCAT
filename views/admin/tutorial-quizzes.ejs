@@ -1,8 +1,12 @@
 <%- include ./header -%>
 
-<h1><%= course.code + ' - ' + course.name %><br>
-<small>TUT <%= tutorial.number %> - Quizzes</small></h1>
+<ol class="breadcrumb">
+    <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
+    <li><a href="/admin/courses/<%= course.id %>/tutorials">Tutorials</a> ‐ TUT <%= tutorial.number %></li>
+    <li class="active">Quizzes</li>
+</ol>
 
+<h1><%- title %></h1>
 
 <table class="table table-striped">
     <thead>
@@ -14,7 +18,7 @@
     <tbody>
     <% if (_.isEmpty(tutorialQuizzes)) { %>
         <tr>
-            <td colspan="2">No quizzes have been added for this tutorial yet. Click <a href="/admin/courses/<%= course.id %>/quizzes/">here</a> to add  quizzes</a> into the tutorial.</td>
+            <td colspan="2">No quizzes have been added for this tutorial yet.</td>
         </tr>
     <% } else { %>
         <% _.each(tutorialQuizzes, function (tutorialQuiz) { %>
@@ -26,9 +30,8 @@
                             Actions<span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/edit"><span 
-                                class="glyphicon glyphicon-pencil"></span> Edit quiz</a></li>
-                            <li><a href="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups"><span class="glyphicon glyphicon-play-circle"></span> Conduct quiz</a></li>
+                            <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= tutorialQuiz.quiz.id %>/conduct"><span class="glyphicon glyphicon-play-circle"></span> Conduct quiz</a></li>
+                            <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= tutorialQuiz.quiz.id %>/groups"><span class="glyphicon glyphicon-signal"></span> View Results</a></li>
                         </ul>
                     </div>
                 </td>

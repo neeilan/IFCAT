@@ -1,8 +1,8 @@
 var _ = require('lodash'),
     async = require('async'),
     csv = require('csv');
-
-var models = require('../models');
+var config = require('../lib/config'),
+    models = require('../models');
 
 // Retrieve list of students for course
 exports.getStudentListByCourse = function (req, res) {
@@ -19,6 +19,7 @@ exports.getStudentListByCourse = function (req, res) {
                 (totalPages - 2 < currentPage && totalPages - 5 < page)) pages.push(page);
         }
         res.render('admin/course-students', {
+            title: 'Students',
             course: req.course,
             students: _.slice(req.course.students, start, end),
             currentPage: currentPage,
@@ -51,7 +52,8 @@ exports.getStudentsByTutorial = function (req, res) {
                 (currentPage - 2 <= page && page <= currentPage + 2) ||
                 (totalPages - 2 < currentPage && totalPages - 5 < page)) pages.push(page);
         }
-        res.render('admin/tutorial-students', { 
+        res.render('admin/tutorial-students', {
+            title: 'Students', 
             course: req.course, 
             tutorial: req.tutorial,
             students: _.slice(req.tutorial.students, start, end),

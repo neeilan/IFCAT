@@ -1,25 +1,32 @@
 <%- include ./header -%>
 
-<h1><%= course.code + ' - ' + course.name %><br>
-<small>Quiz <%= quiz.number %> - <%= question.isNew ? 'Add new question' : 'Edit question' %></small></h1>
+<ol class="breadcrumb">
+    <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
+    <li><a href="/admin/courses/<%= course.id %>/quizzes">Quizzes</a> ‐ <%= quiz.name %></li>
+    <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions">Questions</a></li>
+    <li class="active"><%- question.isNew ? 'New' : 'Edit' %></li>
+</ol>
+
+<h1><%= title %></h1>
 
 <%- include ./flash %>
 
 <form id="form-question" action="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= 
     question.isNew ? '' : question.id + '?_method=put' %>" method="post" class="form-horizontal">
-    <div class="form-group">
+    <div class="form-group required">
         <label class="col-sm-2 control-label">Number</label>
         <div class="col-sm-2">
-            <input name="number" value="<%= question.number %>" maxlength="6" class="form-control" placeholder="e.g. 1, A or 1a">
+            <input name="number" value="<%= question.number %>" maxlength="6" class="form-control">
+            <p class="help-block"><span class="glyphicon glyphicon-info-sign"></span> Ex: 1, A or 1a</p>
         </div>
     </div>
-    <div class="form-group">
+    <div class="form-group required">
         <label class="col-sm-2 control-label">Question</label>
         <div class="col-sm-10">
             <textarea name="question" class="form-control" rows="3"><%= question.question %></textarea>
         </div>
     </div>
-    <div class="form-group">
+    <div class="form-group required">
         <label class="col-sm-2 control-label">Type</label>
         <div class="col-sm-10">
             <select name="type" class="form-control">
@@ -50,7 +57,7 @@
     </div>
 
     <!-- choices -->
-    <div class="form-group">
+    <div class="form-group required">
 
 
         <!-- for multiple choice -->
@@ -246,7 +253,6 @@
                 <input type="number" name="points" value="<%= 
                     _.defaultTo(question.points, quiz.points) %>" min="0" max="7" class="form-control">
             </div>
-            
         </div>
         <div class="form-group">
             <label class="col-sm-2 control-label">First-try bonus</label>
@@ -269,7 +275,13 @@
     <div class="form-group" style="margin-top: 30px;">
         <div class="col-sm-offset-2 col-sm-10">
             <a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions" class="btn btn-default btn-sm">Cancel</a>
-            <button type="submit" class="btn btn-primary btn-sm">Save</button>
+            <% if (question.isNew) { %>
+                <input type="hidden" id="back" name="back" value="1">
+                <button type="submit" class="btn btn-primary btn-sm" onclick="back.value=0">Save &amp; Add Another New Question</button>
+                <button type="submit" class="btn btn-primary btn-sm">Save &amp; Go Back To Previous Page</button>
+            <% } else { %>
+                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+            <% } %>
         </div>
     </div>
 </form>
@@ -313,10 +325,11 @@ $(function () {
     });
     // change link counter
     $('#modal-show-links').on('hidden.bs.modal', function () {
-        var count = $(this).find('[name^=links]').filter(function() { 
-            return this.value !== '';
-        }).length;
-        $('#link-counter').text(count !== 1 ? count + ' links added' : '1 link added');
+        var count = 0;
+        $(this).find('[name^=links]').each(function() { 
+            count += $.trim(this.value) !== '' ? 1 : 0;
+        });
+        $('#link-counter').text(count + ' link' + (count !== 1 ? 's' : '') + ' added');
     });
     // remove choice input
     $(document).on('click', '.glyphicon-remove', function () {

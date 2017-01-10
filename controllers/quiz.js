@@ -1,17 +1,15 @@
 var _ = require('lodash'),
     async = require('async');
-
-var models = require('../models');
+var config = require('../lib/config'),
+    models = require('../models');
 
 // Retrieve course
 exports.getQuiz = function (req, res, next, quiz) {
     models.Quiz.findById(quiz, function (err, quiz) {
-        if (err) {
+        if (err)
             return next(err);
-        }
-        if (!quiz) {
+        if (!quiz)
             return next(new Error('No quiz is found.'));
-        }
         req.quiz = quiz;
         next();
     });
@@ -19,19 +17,21 @@ exports.getQuiz = function (req, res, next, quiz) {
 // Retrieve quizzes within course
 exports.getQuizList = function (req, res) {
     req.course.withQuizzes().execPopulate().then(function() {
-        res.render('admin/course-quizzes', { course: req.course });
+        res.render('admin/course-quizzes', { 
+            title: 'Quizzes',
+            course: req.course 
+        });
     });
 };
 // Retrieve quiz form
 exports.getQuizForm = function (req, res) {
-    if (!req.quiz)
-        req.quiz = new models.Quiz();
+    var quiz = req.quiz || new models.Quiz();
     req.course.withTutorials().execPopulate().then(function () {
-        req.quiz.loadTutorials().then(function () {
+        quiz.loadTutorials().then(function () {
             res.render('admin/course-quiz', {
-                title: req.quiz.isNew ? 'Add new quiz' : 'Edit quiz',
+                title: quiz.isNew ? 'Add New Quiz' : 'Edit Quiz',
                 course: req.course, 
-                quiz: req.quiz 
+                quiz: quiz 
             });
         });
     });
@@ -51,6 +51,7 @@ exports.addQuiz = function (req, res) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', '<b>%s</b> has been created.', quiz.name);
+
         res.redirect('/admin/courses/' + req.course.id + '/quizzes');
     });
 };
@@ -61,6 +62,7 @@ exports.editQuiz = function (req, res) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', '<b>%s</b> has been updated.', req.quiz.name);
+
         res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/edit');
     });
 };
@@ -71,6 +73,7 @@ exports.deleteQuiz = function (req, res) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', '<b>%s</b> has been deleted.', req.quiz.name);
+        
         res.sendStatus(200);
     });
 };
