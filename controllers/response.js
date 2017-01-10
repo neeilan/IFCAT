@@ -6,7 +6,7 @@ var config = require('../lib/config'),
 
 // Retrieve responses
 exports.getResponseList = function (req, res) {
-    models.TutorialQuiz.find({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate({
+    models.TutorialQuiz.findOne({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate({
         path: 'responses',
         model: models.Response,
         populate: [{
@@ -51,7 +51,7 @@ exports.getResponseList = function (req, res) {
 exports.exportResponseList = function (req, res) {
     var data = [];
 
-    models.TutorialQuiz.find({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate({
+    models.TutorialQuiz.findOne({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate({
         path: 'responses',
         model: models.Response,
         populate: [{
@@ -122,7 +122,7 @@ exports.getMarks = function (req, res) {
                     return group.hasMember(req.us3r.id);
                 }),
                 points: _.reduce(tutorialQuiz.responses, function (sum, response) {
-                    return response.group.hasMembers(req.us3r.id) ? sum + response.points : sum;
+                    return response.group.hasMember(req.us3r.id) ? sum + response.points : sum;
                 }, 0),
                 teachingPoints: 0
             };

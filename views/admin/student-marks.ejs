@@ -37,7 +37,7 @@
                 <td><%= mark.tutorialQuiz.quiz.name %>.</td>
                 <td>
                 <% if (mark.group) { %>
-                    <a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= mark.tutorialQuiz.quiz.id %>/groups/<%= mark.group.id %>/responses" target="_blank">Group <%= mark.group.name %></a>
+                    <a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= mark.tutorialQuiz.quiz.id %>/groups/<%= mark.group.id %>/responses">Group <%= mark.group.name %></a>
                 <% } else { %>
                     N/A
                 <% } %>      
