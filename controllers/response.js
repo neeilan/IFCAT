@@ -18,7 +18,7 @@ exports.getResponseList = function (req, res) {
         }]
     }).exec(function (err, tutorialQuiz) {
         var responses = _.filter(tutorialQuiz.responses, function (response) {
-            return response.group.id === req.group.id;
+            return response.group && response.group.id === req.group.id;
         });
         // tally the points
         var totalPoints = _.reduce(responses, function (sum, response) {
@@ -68,7 +68,7 @@ exports.exportResponseList = function (req, res) {
             '.csv';
         // ugly: filter out group responses
         var responses = _.filter(tutorialQuiz.responses, function (response) {
-            return response.group.id === req.group.id;
+            return response.group && response.group.id === req.group.id;
         });
         // tally the points
         var totalPoints = _.reduce(responses, function (sum, response) {
@@ -122,7 +122,7 @@ exports.getMarks = function (req, res) {
                     return group.hasMember(req.us3r.id);
                 }),
                 points: _.reduce(tutorialQuiz.responses, function (sum, response) {
-                    return response.group.hasMember(req.us3r.id) ? sum + response.points : sum;
+                    return response.group && response.group.hasMember(req.us3r.id) ? sum + response.points : sum;
                 }, 0),
                 teachingPoints: 0
             };
