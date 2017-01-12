@@ -27,11 +27,17 @@ exports.getQuizList = function (req, res) {
 exports.getQuizForm = function (req, res) {
     var quiz = req.quiz || new models.Quiz();
     req.course.withTutorials().execPopulate().then(function () {
-        quiz.loadTutorials().then(function () {
+        models.TutorialQuiz.find({ quiz: req.quiz.id }).exec(function (err, tutorialQuizzes) {
+            quiz.tutorials = _.map(tutorialQuizzes, function (tutorialQuiz) {
+                return tutorialQuiz.tutorial.toString();
+            });
+
+            console.log(quiz.tutorials)
+            
             res.render('admin/course-quiz', {
                 title: quiz.isNew ? 'Add New Quiz' : 'Edit Quiz',
                 course: req.course, 
-                quiz: quiz 
+                quiz: quiz
             });
         });
     });
@@ -51,7 +57,6 @@ exports.addQuiz = function (req, res) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', '<b>%s</b> has been created.', quiz.name);
-
         res.redirect('/admin/courses/' + req.course.id + '/quizzes');
     });
 };
@@ -62,7 +67,6 @@ exports.editQuiz = function (req, res) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', '<b>%s</b> has been updated.', req.quiz.name);
-
         res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/edit');
     });
 };
@@ -73,7 +77,6 @@ exports.deleteQuiz = function (req, res) {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', '<b>%s</b> has been deleted.', req.quiz.name);
-        
         res.sendStatus(200);
     });
 };

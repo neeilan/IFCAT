@@ -3,7 +3,7 @@ var _ = require('lodash'),
 var config = require('../lib/config'),
     models = require('../models');
 
-// Retrieve course
+// Retrieve course (deprecated)
 exports.getQuiz = function (req, res, next, tutorialQuiz) {
     models.TutorialQuiz.findById(tutorialQuiz).populate('tutorial quiz').exec(function (err, tutorialQuiz) {
         if (err)
