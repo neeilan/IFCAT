@@ -31,9 +31,6 @@ exports.getQuizForm = function (req, res) {
             quiz.tutorials = _.map(tutorialQuizzes, function (tutorialQuiz) {
                 return tutorialQuiz.tutorial.toString();
             });
-
-            console.log(quiz.tutorials)
-            
             res.render('admin/course-quiz', {
                 title: quiz.isNew ? 'Add New Quiz' : 'Edit Quiz',
                 course: req.course, 
@@ -49,7 +46,7 @@ exports.addQuiz = function (req, res) {
         function add(done) {
             quiz.store(req.body, done);
         },
-        function addRef(done) {
+        function addIntoCourse(done) {
             req.course.update({ $push: { quizzes: quiz.id }}, done);
         }
     ], function (err) {
