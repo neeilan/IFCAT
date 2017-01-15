@@ -74,48 +74,47 @@ QuestionSchema.methods.store = function (obj, callback) {
     
     var selected, key, matches, question = this;
 
-    _.each(obj.links, function (value) {
-        value = _.trim(value);
-        // add unique links
-        if (value) {
-            if (!url.parse(value).protocol)
-                value = 'http://' + value;
-            if (question.links.indexOf(value) === -1)
-                question.links.push(value);
+    _.each(obj.links, function (link) {
+        link = _.trim(link);
+        if (link) {
+            if (!url.parse(link).protocol)
+                link = 'http://' + link;
+            if (question.links.indexOf(link) === -1)
+                question.links.push(link);
         }
     });
 
     if (this.isMultipleChoice()) {
         selected = _.isObject(obj.answer) ? obj.answer[_.kebabCase(this.type)] : false;
-        _.forOwn(obj.choices, function (value, i) {
-            value = _.trim(value);
+        _.forOwn(obj.choices, function (choice, i) {
+            choice = _.trim(choice);
             // add unique choices
-            if (value && question.choices.indexOf(value) === -1) {
-                question.choices.push(value);
+            if (choice && question.choices.indexOf(choice) === -1) {
+                question.choices.push(choice);
                 // mark as the answer if selected
                 if (i === selected)
-                    question.answers = [value];
+                    question.answers = [choice];
             }
         });
     } else if (this.isMultipleSelect()) {
         selected = _.isObject(obj.answers) ? obj.answers[_.kebabCase(this.type)] : [];
-        _.forOwn(obj.choices, function (value, i) {
-            value = _.trim(value);
+        _.forOwn(obj.choices, function (choice, i) {
+            choice = _.trim(choice);
             // add unique choices
-            if (value && question.choices.indexOf(value) === -1) {
-                question.choices.push(value);
+            if (choice && question.choices.indexOf(choice) === -1) {
+                question.choices.push(choice);
                 // mark as one of answers if selected
                 if (selected.indexOf(i) > -1)
-                    question.answers.push(value);
+                    question.answers.push(choice);
             }
         });
     } else if (this.isShortAnswer()) {
-        _.forOwn(obj.choices, function (value) {
-            value = _.trim(value);
+        _.forOwn(obj.choices, function (choice) {
+            choice = _.trim(choice);
             // add unique choices
-            if (value && question.choices.indexOf(value) === -1) {
-                question.choices.push(value);
-                question.answers.push(value);
+            if (choice && question.choices.indexOf(choice) === -1) {
+                question.choices.push(choice);
+                question.answers.push(choice);
             }
         });
     }

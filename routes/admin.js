@@ -62,6 +62,7 @@ router.put('/courses/:course/quizzes/:quiz/questions/sort', controllers.Question
 router.get('/courses/:course/quizzes/:quiz/questions/new', controllers.Question.getQuestionForm);
 router.get('/courses/:course/quizzes/:quiz/questions/:question/edit', controllers.Question.getQuestionForm);
 router.post('/courses/:course/quizzes/:quiz/questions', controllers.Question.addQuestion);
+router.post('/courses/:course/quizzes/:quiz/questions/preview', controllers.Question.previewQuestion);
 router.put('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.editQuestion);
 router.delete('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.deleteQuestion);
 

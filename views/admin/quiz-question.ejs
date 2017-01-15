@@ -275,6 +275,7 @@
     <div class="form-group" style="margin-top: 30px;">
         <div class="col-sm-offset-2 col-sm-10">
             <a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions" class="btn btn-default btn-sm">Cancel</a>
+            <button type="button" class="btn btn-default btn-sm" id="btn-preview">Preview</button>
             <% if (question.isNew) { %>
                 <input type="hidden" id="back" name="back" value="1">
                 <button type="submit" class="btn btn-primary btn-sm" onclick="back.value=0">Save &amp; Add Another New Question</button>
@@ -290,6 +291,7 @@
 
 <script>
 $(function () {
+    var win;
     // show choices based on question type
     $('#form-question [name=type]').change(function () {
         var type = _.kebabCase(this.value);
@@ -377,6 +379,24 @@ $(function () {
         }
         // add table
         $('#points-calculator').html(table);
+    });
+    // preview question
+    $('#btn-preview').click(function () {
+        // close previous window
+        if (win) {
+            win.close();
+        }
+        $.ajax('/admin/courses/<%- course.id %>/quizzes/<%- quiz.id %>/questions/preview', {
+            type: 'post',
+            data: $(this).closest('form').serialize(),
+            dataType: 'html',
+            success: function (res) {
+                // open new window
+                win = window.open('', '_preview', 'width=800, height=600');
+                win.document.write(res);
+                win.document.close();
+            }
+        });
     });
 });    
 </script>
