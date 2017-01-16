@@ -27,7 +27,7 @@ exports.getQuizList = function (req, res) {
 exports.getQuizForm = function (req, res) {
     var quiz = req.quiz || new models.Quiz();
     req.course.withTutorials().execPopulate().then(function () {
-        models.TutorialQuiz.find({ quiz: req.quiz.id }).exec(function (err, tutorialQuizzes) {
+        models.TutorialQuiz.find({ quiz: quiz.id }).exec(function (err, tutorialQuizzes) {
             quiz.tutorials = _.map(tutorialQuizzes, function (tutorialQuiz) {
                 return tutorialQuiz.tutorial.toString();
             });
