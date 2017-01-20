@@ -35,18 +35,15 @@ exports.addTeachingAssistantList = function (req, res) {
     });
 };
 // Update list of teaching assistants for course
-exports.editTeachingAssistantList = function (req, res) { console.log('updatin')
+exports.editTeachingAssistantList = function (req, res) {
     var tutorials = req.body.tutorials || {};
     req.course.withTutorials().execPopulate().then(function () {
         async.eachSeries(req.course.tutorials, function (tutorial, done) {
-            var newAssistants = [];
-            if (tutorials.hasOwnProperty(tutorial.id))
-                newAssistants = tutorials[tutorial.id]; 
-            // check if changes were made
-            if (_.difference(tutorial.teachingAssistants, newAssistants))
-                tutorial.update({ $set: { teachingAssistants: newAssistants }}, done);
-            else
-                done();
+            tutorial.update({ 
+                $set: { 
+                    teachingAssistants: _.map(tutorials[tutorial.id], function (i, userId) { return userId; })
+                }
+            }, done);
         }, function (err) {
             if (err)
                 req.flash('error', 'An error occurred while trying to perform operation.');

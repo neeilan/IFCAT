@@ -14,7 +14,7 @@
         <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-find-users">
             <span class="glyphicon glyphicon-search"></span> Find teaching assistants</button>
         <button type="submit" class="btn btn-primary btn-sm" id="btn-update">
-            <span class="glyphicon glyphicon-ok"></span> Update tutorials</button>
+            <span class="glyphicon glyphicon-ok"></span> Update Tutorials</button>
     </div>
     <div class="stretch">
         <table class="table table-striped" id="table-users">
@@ -45,8 +45,9 @@
                             <td>&nbsp;</td>
                         <% } else { %>
                             <% _.each(course.tutorials, function (tutorial) { %>
-                                <td class="text-center"><input type="checkbox" name="tutorials[<%= tutorial.id %>]" 
-                                    value="<%= assistant.id %>"<%= tutorial.hasTeachingAssistant(assistant.id) ? ' checked' : '' %>></td>
+                                <td class="text-center"><input type="checkbox" 
+                                    name="tutorials[<%= tutorial.id %>][<%= assistant.id %>]"
+                                    value="1"<%= tutorial.hasTeachingAssistant(assistant.id) ? ' checked' : '' %>></td>
                             <% }) %>
                         <% } %>
                         <td><a href="/admin/courses/<%= course.id %>/teaching-assistants/<%= assistant.id %>" 

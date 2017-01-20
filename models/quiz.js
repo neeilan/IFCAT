@@ -19,16 +19,16 @@ var QuizSchema = new mongoose.Schema({
 });
 // Delete cascade
 QuizSchema.pre('remove', function (next) {
-    var quiz = this;
+    var self = this;
     async.parallel([
         function deleteFromCourse(done) {
-            models.Course.update({ quizzes: { $in: [quiz._id] }}, { $pull: { quizzes: quiz._id }}).exec(done);
+            models.Course.update({ quizzes: { $in: [self._id] }}, { $pull: { quizzes: self._id }}).exec(done);
         },
         function deleteQuestions(done) {
-            models.Question.remove({ _id: { $in: quiz.questions }}).exec(done);
+            models.Question.remove({ _id: { $in: self.questions }}).exec(done);
         },
         function deleteTutorialQuiz(done) {
-            models.TutorialQuiz.remove({ quiz: quiz._id }).exec(done);
+            models.TutorialQuiz.remove({ quiz: self._id }).exec(done);
         }
     ], next);
 });

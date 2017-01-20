@@ -11,15 +11,13 @@ var FileSchema = new mongoose.Schema({
 });
 // Delete cascade
 FileSchema.pre('remove', function (next) {
-    var conditions = { files: { $in: [this._id] }},
-        doc = { $pull: { files: this._id }},
-        options = { multi: true };
+    var self = this;
     async.parallel([
         function deleteFromCourse(done) {
-            models.Course.update(conditions, doc, options).exec(done);
+            models.Course.update({ files: { $in: [self._id] }}, { $pull: { files: self._id }}).exec(done);
         },
-        function deleteFromQuestion(done) {
-            models.Question.update(conditions, doc, options).exec(done);     
+        function deleteFromQuestions(done) {
+            models.Question.update({ files: { $in: [self._id] }}, { $pull: { files: self._id }}, { multi: true }).exec(done);     
         }
     ], next);
 });

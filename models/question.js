@@ -22,10 +22,15 @@ var QuestionSchema = new mongoose.Schema({
 });
 // Delete cascade
 QuestionSchema.pre('remove', function (next) {
-    var conditions = { questions: { $in: [this._id] }},
-        doc = { $pull: { questions: this._id }},
-        options = { multi: true };
-    models.Quiz.update(conditions, doc, options).exec(next);
+    var self = this;
+    async.parallel([
+        function deleteFromQuiz(done) {
+            models.Quiz.update({ questions: { $in: [self._id] }}, { $pull: { questions: self._id }}, { multi: true }).exec(done);
+        },
+        function deleteResponses(done) {
+            models.Response.remove({ question: self._id }).exec(done);
+        }
+    ], next);
 });
 // Populate files
 QuestionSchema.methods.withFiles = function () {
@@ -72,15 +77,15 @@ QuestionSchema.methods.store = function (obj, callback) {
     this.firstTryBonus = obj.firstTryBonus;
     this.penalty = obj.penalty;
     
-    var selected, key, matches, question = this;
+    var selected, key, matches, self = this;
 
     _.each(obj.links, function (link) {
         link = _.trim(link);
         if (link) {
             if (!url.parse(link).protocol)
                 link = 'http://' + link;
-            if (question.links.indexOf(link) === -1)
-                question.links.push(link);
+            if (self.links.indexOf(link) === -1)
+                self.links.push(link);
         }
     });
 
@@ -89,11 +94,11 @@ QuestionSchema.methods.store = function (obj, callback) {
         _.forOwn(obj.choices, function (choice, i) {
             choice = _.trim(choice);
             // add unique choices
-            if (choice && question.choices.indexOf(choice) === -1) {
-                question.choices.push(choice);
+            if (choice && self.choices.indexOf(choice) === -1) {
+                self.choices.push(choice);
                 // mark as the answer if selected
                 if (i === selected)
-                    question.answers = [choice];
+                    self.answers = [choice];
             }
         });
     } else if (this.isMultipleSelect()) {
@@ -101,20 +106,20 @@ QuestionSchema.methods.store = function (obj, callback) {
         _.forOwn(obj.choices, function (choice, i) {
             choice = _.trim(choice);
             // add unique choices
-            if (choice && question.choices.indexOf(choice) === -1) {
-                question.choices.push(choice);
+            if (choice && self.choices.indexOf(choice) === -1) {
+                self.choices.push(choice);
                 // mark as one of answers if selected
                 if (selected.indexOf(i) > -1)
-                    question.answers.push(choice);
+                    self.answers.push(choice);
             }
         });
     } else if (this.isShortAnswer()) {
         _.forOwn(obj.choices, function (choice) {
             choice = _.trim(choice);
             // add unique choices
-            if (choice && question.choices.indexOf(choice) === -1) {
-                question.choices.push(choice);
-                question.answers.push(choice);
+            if (choice && self.choices.indexOf(choice) === -1) {
+                self.choices.push(choice);
+                self.answers.push(choice);
             }
         });
     }

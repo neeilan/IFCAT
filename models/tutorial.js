@@ -13,20 +13,19 @@ var TutorialSchema = new mongoose.Schema({
 });
 // Delete cascade
 TutorialSchema.pre('remove', function (next) {
-    var tutorial = this;
-    var conditions = { 
-        tutorials: { $in: [tutorial._id] }
-    }, doc = { 
-        $pull: { tutorials: tutorial._id }
-    }, options = { 
-        multi: true 
-    };
+    var self = this;
     async.parallel([
         function deleteFromCourse(done) {
-            models.Course.update(conditions, doc, options).exec(done);
+            models.Course.update({ 
+                tutorials: { $in: [self._id] }
+            }, { 
+                $pull: { tutorials: self._id }
+            }, { 
+                multi: true 
+            }).exec(done);
         },
         function deleteTutorialQuiz(done) {
-            models.TutorialQuiz.remove({ tutorial: tutorial._id }).exec(done);
+            models.TutorialQuiz.remove({ tutorial: self._id }).exec(done);
         }
     ], next);
 });

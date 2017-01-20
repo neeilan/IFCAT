@@ -62,16 +62,16 @@ UserSchema.virtual('name.full').get(function () {
 });
 // pre-save hook
 UserSchema.pre('save', function (next) {
-    var user = this;
+    var self = this;
     // hash password if it is present and has changed
-    if (user.local.password && user.isModified('local.password')) {
+    if (self.local.password && self.isModified('local.password')) {
         bcrypt.genSalt(10, function (err, salt) {
             if (err) 
                 return next(err);
-            bcrypt.hash(user.local.password, salt, function (err, hash) {
+            bcrypt.hash(self.local.password, salt, function (err, hash) {
                 if (err) 
                     return next(err);
-                user.local.password = hash;
+                self.local.password = hash;
                 next();
             });
         });
@@ -82,27 +82,45 @@ UserSchema.pre('save', function (next) {
 
 // hook: delete cascade
 UserSchema.pre('remove', function (next) {
-    var conditions = {
-        $or: [
-            { instructors: { $in: [this._id] }},
-            { teachingAssistants: { $in: [this._id] }}, 
-            { students: { $in: [this._id] }}
-        ]
-    },  doc = { 
-        $pull: {
-            instructors: this._id,
-            teachingAssistants: this._id,
-            students: this._id
-        }
-    }, options = {
-        multi: true
-    };
+    var self = this;
     async.parallel([
         function deleteFromCourse(done) {
-            models.Course.update(conditions, doc, options).exec(done);
+            models.Course.update({
+                $or: [
+                    { instructors: { $in: [self._id] }},
+                    { teachingAssistants: { $in: [self._id] }}, 
+                    { students: { $in: [self._id] }}
+                ]
+            }, { 
+                $pull: { instructors: self._id, teachingAssistants: self._id, students: self._id }
+            }, {
+                multi: true
+            }).exec(done);
         },
-        function deleteFromTutorial(done) {
-            models.Tutorial.update(conditions, doc, options).exec(done);
+        function deleteFromTutorials(done) {
+            models.Tutorial.update({
+                $or: [{ teachingAssistants: { $in: [self._id] }}, { students: { $in: [self._id] }}]
+            }, { 
+                $pull: { teachingAssistants: self._id, students: self._id }
+            }, {
+                multi: true
+            }).exec(done);
+        },
+        function deleteFromGroups(done) {
+            models.Group.find().or([{
+                members: { $in: [self._id] }
+            }, {
+                driver: self._id
+            }]).exec(function (err, groups) {
+                if (err) 
+                    return done(err);
+                async.eachSeries(groups, function (group, done) {
+                    group.members.pull(self.id);
+                    if (group.driver && group.driver.toString() === self.id)
+                        group.driver = undefined; // unset
+                    group.save(done);
+                }, done);
+            });
         }
     ], next);
 });

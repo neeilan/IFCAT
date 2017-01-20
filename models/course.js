@@ -1,7 +1,6 @@
 var async = require('async'),
     fs = require('fs-extra'),
     mongoose = require('mongoose');
-
 var config = require('../lib/config'),
     models = require('.');
 
@@ -19,30 +18,46 @@ var CourseSchema = new mongoose.Schema({
 });
 // Delete cascade
 CourseSchema.pre('remove', function (next) {
-    var course = this,
-        path = config.uploadPath + '/' + course._id;
-    async.parallel([
+    var self = this, path = config.uploadPath + '/' + this.id;
+    async.series([
         function deleteTutorials(done) {
-            models.Tutorial.remove({ _id: { $in: course.tutorials }}, done);
+            models.Tutorial.find({ _id: { $in: self.tutorials }}, function (err, tutorials) {
+                if (err)
+                    return done(err);
+                async.eachSeries(tutorials, function (tutorial, done) { 
+                    tutorial.remove(done); 
+                }, done);
+            });
         },
         function deleteQuizzes(done) {
-            models.Quiz.remove({ _id: { $in: course.quizzes }}, done);
+            models.Quiz.find({ _id: { $in: self.quizzes }}, function (err, quizzes) {
+                if (err)
+                    return done(err);
+                async.eachSeries(quizzes, function (quiz, done) { 
+                    quiz.remove(done); 
+                }, done);
+            });
         },
         function deleteFiles(done) {
-            models.File.remove({ _id: { $in: course.files }}, done);
+            models.File.find({ _id: { $in: self.files }}, function (err, files) {
+                if (err)
+                    return done(err);
+                async.eachSeries(files, function (file, done) { 
+                    file.remove(done); 
+                }, done);
+            });
         },
         // delete upload directory & files
         function deleteFolder(done) {
             fs.stat(path, function (err, stats) {
-                if (err && err.code === 'ENOENT') {
+                if (err && err.code === 'ENOENT')
                     done();
-                } else if (err) {
+                else if (err)
                     done(err);
-                } else if (stats.isDirectory()) {
+                else if (stats.isDirectory())
                     fs.remove(path, done);  
-                } else {
+                else
                     done();
-                }
             });
         }
     ], next);
