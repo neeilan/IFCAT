@@ -1,6 +1,4 @@
-$(function () { 
-    var url = window.location.href;
-
+$(function () {
     // set default AJAX options
     $.ajaxSetup({ cache: false });
 
@@ -56,13 +54,28 @@ $(function () {
     $('a[data-toggle=tab]').on('shown.bs.tab', function () {
         localStorage.setItem('tab-open', $(this).attr('href'));
     });
-
-
     // open last opened tab
     var tab = localStorage.getItem('tab-open');
     if (tab) {
         $('a[href="' + tab + '"]').tab('show');
     }
+
+    // toggle checkbox-radios
+    $(document).on('click', '.btn-circle', function (e) {
+        var $btn = $(this).toggleClass('active'), 
+            $input = $btn.find('input').prop('checked', $btn.hasClass('active'));
+        // inactivate other checkbox-radios if they belong to the same group
+        if ($input.data('group')) {
+            $(e.delegateTarget).find('.btn-circle').has('[data-group=' + $input.data('group') + ']').not($btn).each(function () {
+                $(this).removeClass('active').find('input').prop('checked', false);
+            });
+        }
+    // create checkbox-radios
+    }).find(':checkbox[data-label]').each(function() {
+        $(this)
+            .wrap('<div class="btn-circle' + (this.checked ? ' active' : '') + '"></div>')
+            .before('<label>' + this.dataset.label + '</label>');
+    });
 
     // small plugins for making PUT and DELETE requests
     // @usage: $.put(url, data, callback) or $.delete(url, callback)
@@ -82,14 +95,6 @@ $(function () {
             });
         };
     });
-
-    // small plugin for loading inner html from url + selector
-    // @usage: $(selector).loadInner(url, data, callback)
-    $.fn.loadInner = function () {
-        if (arguments.length)
-            arguments[0] += ' ' + $(this).selector + ' > *';
-        return this.load.apply(this, arguments);
-    };
 
     // small plugin for showing/hiding selector and enabling/disabling its children
     // @usage: $(selector).enableToggle([display])

@@ -16,7 +16,7 @@ exports.getQuiz = function (req, res, next, tutorialQuiz) {
 };
 // Retrieve quizzes within tutorial
 exports.getTutorialQuizList = function (req, res) {
-    models.TutorialQuiz.find({ tutorial: req.tutorial.id }).populate('quiz').exec(function (err, tutorialQuizzes) {
+    models.TutorialQuiz.find({ tutorial: req.tutorial }).populate('quiz').exec(function (err, tutorialQuizzes) {
         res.render('admin/tutorial-quizzes', {
             title: 'Quizzes',
             course: req.course, 
@@ -27,7 +27,7 @@ exports.getTutorialQuizList = function (req, res) {
 };
 // Retrieve quiz for tutorial
 exports.conductTutorialQuiz = function (req, res) {
-    models.TutorialQuiz.findOne({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate([{
+    models.TutorialQuiz.findOne({ tutorial: req.tutorial, quiz: req.quiz }).populate([{
         path: 'tutorial',
         populate: {
             path: 'students',
@@ -48,6 +48,38 @@ exports.conductTutorialQuiz = function (req, res) {
             students: tutorialQuiz.tutorial.students,
             groups: tutorialQuiz.groups
         });
+    });
+};
+// Publish quiz for tutorial
+exports.editTutorialQuiz = function (req, res) {
+    models.TutorialQuiz.findOneAndUpdate({ 
+        tutorial: req.tutorial, 
+        quiz: req.quiz 
+    }, { 
+        $set: {
+            allocateMembers: req.body.allocateMembers,
+            max: {
+                membersPerGroup: req.body.max.membersPerGroup
+            },
+            published: req.body.published,
+            active: req.body.active,
+            archived: req.body.archived
+        }
+    }, {
+        new: true
+    }, function (err, tutorialQuiz) {
+        if (err)
+            req.flash('error', 'An error occurred while trying to perform operation.');
+        else {
+            req.app.locals.io.in('tutorialQuiz:' + tutorialQuiz.id).emit('quizActivated', tutorialQuiz);
+            req.flash('success', '<b>%s</b> settings have been updated for <b>TUT %s</b>.', req.quiz.name, req.tutorial.number);
+        }
+        res.redirect(
+            '/admin/courses/' + req.course.id + 
+            '/tutorials/' + req.tutorial.id + 
+            '/quizzes/' + req.quiz.id + 
+            '/conduct'
+        );
     });
 };
 // Publish quiz for tutorial

@@ -68,33 +68,18 @@
     </div>
     <div class="tab-pane" id="groups">
         <form action="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= quiz.id %>/groups?_method=put" 
-            method="post">
+            method="post" autocomplete="off">
             <div class="nav-actions">
                 <a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= quiz.id %>/conduct" 
                     class="btn btn-default btn-sm btn-primary"><span class="glyphicon glyphicon-triangle-left"></span> Revert</a>
                 <a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= quiz.id %>/groups/generate" 
                     class="btn btn-default btn-sm"><span class="glyphicon glyphicon-random"></span> Randomize Groups</a>
-                <button type="button" class="btn btn-default btn-sm" id="btn-add"><span 
+                <button type="button" class="btn btn-default btn-sm btn-add"><span 
                     class="glyphicon glyphicon-plus"></span> Add New Group</button>
-                <button type="button" class="btn btn-default btn-sm" id="btn-remove"><span 
-                    class="glyphicon glyphicon-remove"></span> Remove Selected Groups</button>
-                <button type="submit" class="btn btn-default btn-sm btn-primary" id="btn-save"><span 
+                <button type="submit" class="btn btn-default btn-sm btn-primary btn-save"><span 
                     class="glyphicon glyphicon-ok"></span> Save Groups</button>
             </div>
-            <p class="help-block"><span class="glyphicon glyphicon-info-sign"></span> All changes must be saved.</p>
             <table class="stretch">
-                <thead>
-                    <tr>
-                        <th rowspan="2" class="s">&nbsp;</th>
-                        <th colspan="<%= 1 + groups.length %>" id="thgroup">Groups</th>
-                    </tr>
-                    <tr>
-                        <th class="u">Unassigned</th>
-                        <% _.each(groups, function (group) { %>
-                            <th class="g" data-group="<%= group.id %>"><%= group.name %></th>
-                        <% }) %>
-                    </tr>
-                </thead>
                 <tbody>
                 <% if (_.isEmpty(students)) { %>
                     <tr>
@@ -103,17 +88,31 @@
                 <% } else { %>
                     <% _.each(students, function (student) { %>
                         <tr>
-                            <td class="s"><%= student.name.full %></td>
-                            <td class="u"><input type="radio" name="groups[<%= student.id %>]" value="unassigned"></td>
+                            <td class="student"><%= student.name.full %></td>
                             <% _.each(groups, function (group) { %>
-                                <td class="g" data-group="<%= group.id %>"><input type="radio" name="groups[<%= student.id %>]" 
-                                    value="<%= group.id %>"<%= group.members.indexOf(student.id) > -1 ? ' checked' : '' %>></td>
+                                <td class="group"><input type="checkbox" 
+                                    name="groups[<%= group.id %>][<%= student.id %>]" 
+                                    value="1" data-label="<%= group.name %>" data-group="<%= student.id %>"<%= 
+                                    group.members.indexOf(student.id) > -1 ? ' checked' : '' %>></td>
                             <% }) %>
+                            <td class="group"><input type="checkbox" 
+                                name="groups[<new>][<%= student.id %>]" 
+                                value="1" data-label="new" data-group="<%= student.id %>"></td>
                         </tr>
                     <% }) %>
                 <% } %>
                 </tbody>
             </table>
+            <div class="nav-actions">
+                <a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= quiz.id %>/conduct" 
+                    class="btn btn-default btn-sm btn-primary"><span class="glyphicon glyphicon-triangle-left"></span> Revert</a>
+                <a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= quiz.id %>/groups/generate" 
+                    class="btn btn-default btn-sm"><span class="glyphicon glyphicon-random"></span> Randomize Groups</a>
+                <button type="button" class="btn btn-default btn-sm btn-add"><span 
+                    class="glyphicon glyphicon-plus"></span> Add New Group</button>
+                <button type="submit" class="btn btn-default btn-sm btn-primary btn-save"><span 
+                    class="glyphicon glyphicon-ok"></span> Save Groups</button>
+            </div>
         </form>
     </div>
 </div>
@@ -124,41 +123,20 @@
 $(function () {
     var $tab = $('#groups'), 
         $table = $tab.find('table'),
-        $thead = $table.find('thead'),
-        $tbody = $table.find('tbody'),
-        $thgroup = $table.find('#thgroup');
+        $tr = $table.find('tbody > tr:first-child');
+    var nextNumber = function () {
+        var num = 1, used = $tr.find('td').map(function () { return parseInt($(this).text(), 10) || -1 }).get().sort();
+        // find first unused number
+        while (used.indexOf(num) > -1) { num++ }
+        return num;
+    };
     // add new group to table
-    $('#btn-add').click(function () {
-        // get next group #
-        var number = _.toInteger($thead.find('tr:eq(1) th:last-child').text()) + 1;
-        // add header column
-        $thead.find('tr:eq(1)').append('<th class="g" data-group="' + number + '">' + number + '</th>');
-        // add body column
-        $tbody.find('tr').append(function () {
-            var name = $(this).find('td.u > :radio')[0].name;
-            return '<td class="g" data-group="' + number + '"><input type="radio" name="' + name + '" value="' + number + '"></td>';
+    $tab.find('.btn-add').click(function () {
+        var n = nextNumber();
+        $table.find('td:last-child').each(function () {
+            $(this).before(this.outerHTML.replace(/new/g, n)); 
         });
-
-        $thgroup.attr('colspan', $table.find('tbody tr:eq(0) td:gt(0)').length);
-    });
-    // check unassigned
-    $table.find('tr').each(function () {
-        $(':radio:eq(0)', this).prop('checked', !$(':checked', this).length);
-    });
-    // select/unselect column
-    $table.on('click', 'th.g', function () {
-        $table.find('[data-group=' + this.dataset.group + ']').toggleClass('selected');
-    });
-    // remove selected
-    $('#btn-remove').click(function () {
-        $table.find('.selected').each(function () {
-            if (this.tagName === 'TH' && this.dataset.group && isNaN(this.dataset.group)) {
-                $table.after('<input type="hidden" name="trash[]" value="' + this.dataset.group + '">');
-            }
-            $(this).remove();
-        });
-        $thgroup.attr('colspan', $table.find('tbody tr:eq(0) td:gt(0)').length);
-    });
+    }); 
 });
 </script>
 

@@ -9,7 +9,7 @@
 
 <%- include ./flash %>
 
-<form action="/admin/users/<%= us3r.isNew ? '' : us3r.id + '?_method=put' %>" method="post" class="form-horizontal">
+<form action="/admin/users/<%= us3r.isNew ? '' : us3r.id + '?_method=put' %>" method="post" autocomplete="off" class="form-horizontal">
     <div class="form-group required">
         <label class="col-sm-2 control-label">Name</label>
         <div class="col-sm-2" style="margin-bottom: 15px;"> 

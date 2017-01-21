@@ -57,7 +57,7 @@ exports.generateGroupList = function (req, res) {
         // map chunks to groups
         var groups = _.map(chunks, function (chunk, i) {
             return {
-                id: i + 1,
+                id: '<' + (i + 1) + '>',
                 name: i + 1,
                 members: chunk
             };
@@ -79,48 +79,46 @@ exports.generateGroupList = function (req, res) {
 };
 // Save groups for tutorial
 exports.saveGroupList = function (req, res, next) { 
-    var stack = {}, trash = req.body.trash || [];
-    // key might be group ID (for updating), number (adding), or a string (to be ignored)
-    // value is set of user IDs
-    _.each(req.body.groups || {}, function (key, userId) {
-        if ((mongoose.Types.ObjectId.isValid(key) || (key && !isNaN(key))) && mongoose.Types.ObjectId.isValid(userId)) {
-            if (!stack.hasOwnProperty(key))
-                stack[key] = [];
-            stack[key].push(userId);
-        }
+    var oldStack = {}, newStack = {};
+    // key might be group ID (for updating) or <number> (for adding)
+    _.forOwn(req.body.groups || {}, function (users, groupId) {
+        if (mongoose.Types.ObjectId.isValid(groupId))
+            oldStack[groupId] = _.keys(users).sort();
+        else
+            newStack[groupId.replace(/[^\d]/g, '')] = _.keys(users).sort();
     });
+    //console.log(req.body, oldStack, newStack)
 
-    models.TutorialQuiz
-        .findOne({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate('groups')
-        .exec(function (err, tutorialQuiz) {
+    models.TutorialQuiz.findOne({  tutorial: req.tutorial.id,  quiz: req.quiz.id }).populate('groups').exec(function (err, tutorialQuiz) {
         async.series([
             function updateGroups(done) {
                 async.each(tutorialQuiz.groups, function (group, done) {
-                    var members = stack[group.id];
-                    // delete group if it was marked as trash or empty
-                    if (trash.indexOf(group.id) > -1 || !members) {
+                    // update non-empty groups
+                    if (oldStack.hasOwnProperty(group.id) && oldStack[group.id]) {
+                        group.update({ $set: { members: oldStack[group.id] }}, function (err) {
+                            if (err)
+                                return done(err);
+                            delete oldStack[group.id]; // processed
+                            done();
+                        });
+                    // otherwise delete group
+                    } else {
                         group.remove(function (err) {
                             if (err)
                                 return done(err);
+                            delete oldStack[group.id]; // processed
                             tutorialQuiz.update({ $pull: { groups: group.id }}, done);
-                        });
-                    // otherwise update group members
-                    } else {
-                        group.update({ $set: { members: members }}, function (err) {
-                            if (err)
-                                return done(err);
-                            delete stack[group.id];
-                            done();
                         });
                     }
                 }, done);
             },
             function addGroups(done) {
                 // what's left: add group
-                async.eachOfSeries(stack, function (members, name, done) {
+                async.eachOfSeries(newStack, function (members, name, done) {
                     models.Group.create({ name: name, members: members }, function (err, group) {
                         if (err)
                             return done(err);
+                        delete newStack[name]; // processed
                         tutorialQuiz.update({ $addToSet: { groups: group.id }}, done);
                     });
                 }, done);

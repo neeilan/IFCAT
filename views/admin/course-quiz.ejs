@@ -11,7 +11,7 @@
 <%- include ./flash %>
 
 <form action="/admin/courses/<%= course.id %>/quizzes/<%= quiz.isNew ? '' : quiz.id + '?_method=put' %>" 
-    method="post" class="form-horizontal">
+    method="post" autocomplete="off" class="form-horizontal">
 
     <div class="form-group required">
         <label class="col-sm-2 control-label">Name</label>

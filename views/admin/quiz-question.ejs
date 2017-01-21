@@ -12,7 +12,7 @@
 <%- include ./flash %>
 
 <form id="form-question" action="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= 
-    question.isNew ? '' : question.id + '?_method=put' %>" method="post" class="form-horizontal">
+    question.isNew ? '' : question.id + '?_method=put' %>" method="post" autocomplete="off" class="form-horizontal">
     <div class="form-group required">
         <label class="col-sm-2 control-label">Number</label>
         <div class="col-sm-2">
