@@ -12,18 +12,36 @@
     <thead>
         <tr>
             <th>Name</th>
+            <th class="text-center">Published</th>
+            <th class="text-center">Active</th>
+            <th class="text-center">Archived</th>
             <th class="actions"></th>
         </tr>
     </thead>
     <tbody>
     <% if (_.isEmpty(tutorialQuizzes)) { %>
         <tr>
-            <td colspan="2">No quizzes have been added for this tutorial yet.</td>
+            <td colspan="5">No quizzes have been added for this tutorial yet.</td>
         </tr>
     <% } else { %>
         <% _.each(tutorialQuizzes, function (tutorialQuiz) { %>
             <tr>
                 <td><%= tutorialQuiz.quiz.name %></td>
+                <td class="text-center">
+                <% if (tutorialQuiz.published) { %>
+                    <span class="glyphicon glyphicon-ok"></span>
+                <% } %>
+                </td>
+                <td class="text-center">
+                <% if (tutorialQuiz.active) { %>
+                    <span class="glyphicon glyphicon-ok"></span>
+                <% } %>
+                </td>
+                <td class="text-center">
+                <% if (tutorialQuiz.archived) { %>
+                    <span class="glyphicon glyphicon-ok"></span>
+                <% } %>
+                </td>
                 <td>
                     <div class="dropdown">
                         <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">

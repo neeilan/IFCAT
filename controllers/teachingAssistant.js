@@ -1,6 +1,7 @@
 var util = require('util');
 var _ = require('lodash'),
-    async = require('async');
+    async = require('async'),
+    mongoose = require('mongoose');
 var config = require('../lib/config'),
     models = require('../models');
 
@@ -30,46 +31,45 @@ exports.addTeachingAssistantList = function (req, res) {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
-            req.flash('success', 'The teaching assistants has been assigned to the course.');
+            req.flash('success', 'List of teaching assistants has been updated.');
         res.redirect('/admin/courses/' + req.course.id + '/teaching-assistants');
     });
 };
 // Update list of teaching assistants for course
 exports.editTeachingAssistantList = function (req, res) {
-    var tutorials = req.body.tutorials || {};
+    var stack = _.mapValues(req.body.tutorials, function (users) { 
+        return _.keys(users).sort();
+    });
     req.course.withTutorials().execPopulate().then(function () {
         async.eachSeries(req.course.tutorials, function (tutorial, done) {
-            tutorial.update({ 
-                $set: { 
-                    teachingAssistants: _.map(tutorials[tutorial.id], function (i, userId) { return userId; })
-                }
-            }, done);
+            tutorial.update({ $set: { teachingAssistants: stack[tutorial.id] || [] }}, done);
         }, function (err) {
             if (err)
                 req.flash('error', 'An error occurred while trying to perform operation.');
             else
-                req.flash('success', 'The tutorials have been updated.');
+                req.flash('success', 'The list of tutorials has been updated.');
             res.redirect('/admin/courses/' + req.course.id + '/teaching-assistants');
         });
     });
 };
-// Delete teaching assistant from course and associated tutorials
-exports.deleteTeachingAssistant = function (req, res) {
+// Delete list of teaching assistants from course and associated tutorials
+exports.deleteTeachingAssistantList = function (req, res) {
+    var teachingAssistants = req.body.teachingAssistants || [];    
     req.course.withTutorials().execPopulate().then(function () {
-        async.waterfall([
+        async.series([
             function deleteFromCourse(done) {
-                req.course.update({ $pull: { teachingAssistants: req.us3r.id }}, done);
+                req.course.update({ $pull: { teachingAssistants: { $in: teachingAssistants }}}, done);
             },
-            function deleteFromTutorials(course, done) {
+            function deleteFromTutorials(done) {
                 async.eachSeries(req.course.tutorials, function (tutorial, done) {
-                    tutorial.update({ $pull: { teachingAssistants: req.us3r.id }}, done);
+                    tutorial.update({ $pull: { teachingAssistants: { $in: teachingAssistants }}}, done);;
                 }, done);
             }
         ], function (err) {
             if (err)
                 req.flash('error', 'An error occurred while trying to perform operation.');
             else
-                req.flash('success', 'Teaching assistant <b>%s</b> has been removed from the course.', req.us3r.name.full);
+                req.flash('success', 'List of teaching assistants has been updated.');
             res.sendStatus(200);
         });
     });  

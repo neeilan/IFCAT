@@ -80,24 +80,30 @@
                     class="glyphicon glyphicon-ok"></span> Save Groups</button>
             </div>
             <table class="stretch">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Groups</th>
+                    </tr>
+                </thead>
                 <tbody>
                 <% if (_.isEmpty(students)) { %>
-                    <tr>
-                        <td colspan="2">No students have been added into the tutorial yet.</td>
-                    </tr>
+                    <tr><td colspan="2">No students have been added into the tutorial yet.</td></tr>
                 <% } else { %>
                     <% _.each(students, function (student) { %>
                         <tr>
                             <td class="student"><%= student.name.full %></td>
+                            <td class="groups">
                             <% _.each(groups, function (group) { %>
-                                <td class="group"><input type="checkbox" 
+                                <input type="checkbox" 
                                     name="groups[<%= group.id %>][<%= student.id %>]" 
                                     value="1" data-label="<%= group.name %>" data-group="<%= student.id %>"<%= 
-                                    group.members.indexOf(student.id) > -1 ? ' checked' : '' %>></td>
+                                    group.members.indexOf(student.id) > -1 ? ' checked' : '' %>>
                             <% }) %>
-                            <td class="group"><input type="checkbox" 
-                                name="groups[<new>][<%= student.id %>]" 
-                                value="1" data-label="new" data-group="<%= student.id %>"></td>
+                                <input type="checkbox" 
+                                    name="groups[<new>][<%= student.id %>]" 
+                                    value="1" data-label="new" data-group="<%= student.id %>">
+                            </td>
                         </tr>
                     <% }) %>
                 <% } %>
@@ -125,7 +131,7 @@ $(function () {
         $table = $tab.find('table'),
         $tr = $table.find('tbody > tr:first-child');
     var nextNumber = function () {
-        var num = 1, used = $tr.find('td').map(function () { return parseInt($(this).text(), 10) || -1 }).get().sort();
+        var num = 1, used = $tr.find('.btn-circle').map(function () { return parseInt($(this).text(), 10) || -1 }).get().sort();
         // find first unused number
         while (used.indexOf(num) > -1) { num++ }
         return num;
@@ -133,7 +139,7 @@ $(function () {
     // add new group to table
     $tab.find('.btn-add').click(function () {
         var n = nextNumber();
-        $table.find('td:last-child').each(function () {
+        $table.find('.btn-circle:last-child').each(function () {
             $(this).before(this.outerHTML.replace(/new/g, n)); 
         });
     }); 

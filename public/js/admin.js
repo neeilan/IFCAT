@@ -27,8 +27,12 @@ $(function () {
     });
 
     // checked/unchecked all table-body checkboxes when table-header checkbox is checked/unchecked
-    $(document).on('change', 'th :checkbox', function () {
-        $(this).closest('table').find('td :checkbox:not(:disabled)').prop('checked', this.checked);
+    $(document).on('change', 'th > :checkbox', function () {
+        var $box = $(this);
+        var index = $box.parent().index();
+        $box.closest('table').find('tr').each(function () {
+            $(this).find('td:eq(' + index + ') > :checkbox:not(:disabled)').prop('checked', $box[0].checked);
+        });
     });
 
     // add user to course when button is clicked

@@ -72,57 +72,46 @@ exports.addStudentList = function (req, res) {
         if (err)
             req.flash('error', 'An error has occurred while trying perform operation.');
         else
-            req.flash('success', 'The students have been added into the course.');
+            req.flash('success', 'The list of students has been updated.');
         res.redirect('/admin/courses/' + req.course.id + '/students');
     });
 };
-// Delete student from course and associated tutorial
-exports.deleteStudent = function (req, res) {
+// Update students' tutorials
+exports.editStudentList = function (req, res) {
+    var stack = _.mapValues(req.body.tutorials, function (users) { 
+        return _.keys(users).sort();
+    });
     req.course.withTutorials().execPopulate().then(function () {
-        async.waterfall([
+        async.eachSeries(req.course.tutorials, function (tutorial, done) {
+            tutorial.update({ $set: { students: stack[tutorial.id] || [] }}, done);
+        }, function (err) {
+            if (err)
+                req.flash('error', 'An error occurred while trying to perform operation.');
+            else
+                req.flash('success', 'The list of tutorials has been updated.');
+            res.redirect('/admin/courses/' + req.course.id + '/students');
+        });
+    });
+};
+// Delete student from course and associated tutorial
+exports.deleteStudentList = function (req, res) {
+    var students = req.body.students || [];
+    req.course.withTutorials().execPopulate().then(function () {
+        async.series([
             function deleteFromCourse(done) {
-                req.course.update({ $pull: { students: req.us3r.id }}, done);
+                req.course.update({ $pull: { students: { $in: students }}}, done);
             },
-            function deleleFromTutorials(course, done) {
+            function deleleFromTutorials(done) {
                 async.eachSeries(req.course.tutorials, function (tutorial, done) {
-                    tutorial.update({ $pull: { students: req.us3r.id }}, done);
+                    tutorial.update({ $pull: { students: { $in: students }}}, done);
                 }, done);
             }
         ], function (err) {
             if (err)
                 req.flash('error', 'An error has occurred while trying perform operation.');
             else
-                req.flash('success', 'Student <b>%s</b> has been removed from the course.', req.us3r.name.full);
+                req.flash('success', 'The list of students has been updated.');
             res.sendStatus(200);
-        });
-    });
-};
-// Update students' tutorials
-exports.editStudentList = function (req, res) {
-    var tutorials = {};
-    // group user IDs by tutorial IDs
-    _.each(req.body.tutorials, function (id, userId) {
-        if (!tutorials.hasOwnProperty(id))
-            tutorials[id] = [];
-        tutorials[id].push(userId);
-    });
-    // save
-    req.course.withTutorials().execPopulate().then(function () {
-        async.eachSeries(req.course.tutorials, function (tutorial, done) {
-            var newStudents = [];
-            if (tutorials.hasOwnProperty(tutorial.id))
-                newStudents = tutorials[tutorial.id]; 
-            // check if changes were made
-            if (_.difference(tutorial.students, newStudents))
-                tutorial.update({ $set: { students: newStudents }}, done);
-            else
-                done();
-        }, function (err) {
-            if (err)
-                req.flash('error', 'An error occurred while trying to perform operation.');
-            else
-                req.flash('success', 'The students have been updated.');
-            res.redirect('/admin/courses/' + req.course.id + '/students');
         });
     });
 };

@@ -34,10 +34,7 @@ exports.conductTutorialQuiz = function (req, res) {
             sort: { 'name.first': 1, 'name.last': 1 }
         }
     }, {
-        path: 'groups',
-        options: {
-            sort: { 'name': 1 }
-        }
+        path: 'groups'
     }]).exec(function (err, tutorialQuiz) {
         res.render('admin/tutorial-quiz', {
             title: 'Conduct ' + req.quiz.name + ' in TUT ' + req.tutorial.number,

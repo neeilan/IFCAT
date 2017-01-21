@@ -17,50 +17,37 @@
             <span class="glyphicon glyphicon-search"></span> Find students</button>
         <button type="submit" class="btn btn-primary btn-sm" id="btn-update">
             <span class="glyphicon glyphicon-ok"></span> Update tutorials</button>
+        <button type="button" class="btn btn-danger btn-sm" id="btn-delete">
+            <span class="glyphicon glyphicon-remove"></span> Delete students</button>
     </div>
-    <table class="table table-striped stretch" id="table-users">
+    <table class="table table-striped stretch">
         <thead>
             <tr>
-                <th rowspan="2">Name (First Last)</th>
-                <th rowspan="2">UTORid</th>
-                <th rowspan="2">Student No.</th>
-                <% if (course.tutorials.length) { %>
-                    <th colspan="<%= course.tutorials.length %>">Tutorials</th>
-                <% } %>
-                <th rowspan="2" class="actions"></th>
-            </tr>
-            <tr>
-            <% _.each(course.tutorials, function (tutorial) { %>
-                <th class="text-center"><%= tutorial.number %></th>
-            <% }) %>
+                <th style="width: 10px;"><input type="checkbox" value="1"></th>
+                <th>Name (First Last)</th>
+                <th>UTORid</th>
+                <th>Student No.</th>
+                <th>Tutorials</th>
             </tr>
         </thead>
-        <!--tfoot>
-            <tr>
-                <td colspan="<%= 4 + course.tutorials.length %>" style="text-align: center">
-                    
-                </td>
-            </tr>
-        </tfoot-->
         <tbody>
         <% if (_.isEmpty(students)) { %>
-            <tr>
-                <td colspan="3">No students have been added to the course yet.</td>
-                <td colspan="<%= 1 + course.tutorials.length %>"></td>
-            </tr>
+            <tr><td colspan="5">No students have been added to the course yet.</td></tr>
         <% } else { %>
             <% _.each(students, function (student) { %>
                 <tr>
+                    <td><input type="checkbox" name="students[]" value="<%= student.id %>"></td>
                     <td><%= student.name.full %></td>
                     <td><%= student.student.UTORid %></td>
                     <td><%= student.student.number %></td>
+                    <td>
                     <% _.each(course.tutorials, function (tutorial) { %>
-                        <td class="text-center"><input type="radio" name="tutorials[<%= student.id %>]" 
-                            value="<%= tutorial.id %>"<%= tutorial.hasStudent(student.id) ? ' checked' : '' %>></td>
+                        <input type="checkbox" 
+                            name="tutorials[<%= tutorial.id %>][<%= student.id %>]" 
+                            value="1" data-label="<%= tutorial.number %>" data-group="<%= student.id %>"<%= 
+                            tutorial.hasStudent(student.id) ? ' checked' : '' %>>
                     <% }) %>
-                    <td><a href="/admin/courses/<%= course.id %>/students/<%= student.id %>" 
-                            class="btn btn-danger btn-sm btn-delete-user"><span 
-                            class="glyphicon glyphicon-remove"></span> Remove</a></td>
+                    </td>
                 </tr>
             <% }) %>
         <% } %>
@@ -71,4 +58,18 @@
 <%- include ./modals/import-students -%>
 <%- include ./modals/find-students -%>
 <%- include ./body-js %>
+
+<script>
+$(function () {
+    $('#btn-delete').click(function () {
+        var $boxes = $('tbody [name^=students]:checked');
+        if ($boxes.length) {
+            $.delete('/admin/courses/<%= course.id %>/students', $boxes.serialize(), function () { 
+                window.location.reload(true);
+            });
+        }
+    });
+});
+</script>
+
 <%- include ./footer %>

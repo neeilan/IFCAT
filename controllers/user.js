@@ -65,11 +65,10 @@ exports.getUserList = function (req, res) {
 };
 // Retrieve user form
 exports.getUserForm = function (req, res) {
-    if (!req.us3r)
-        req.us3r = new models.User();
+    var user = req.us3r || new models.User();
     res.render('admin/user', {
-        title: req.us3r.isNew ? 'Add New User' : 'Edit User', 
-        us3r: req.us3r 
+        title: user.isNew ? 'Add New User' : 'Edit User', 
+        us3r: user 
     });
 };
 // Add new user

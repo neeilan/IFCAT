@@ -7,6 +7,9 @@ body > .navbar {
 textarea.form-control {
     max-width: 100%;
 }
+input[type=checkbox][data-label] {
+    display: none;
+}
 .alert {
     display: inline-block;
 }
@@ -20,6 +23,9 @@ textarea.form-control {
     display: inline-block;
     height: 35px;
     line-height: 35px;
+    max-height: 35px;
+    max-width: 35px;
+    overflow: hidden;
     width: 35px;
 }
 .btn-circle:hover {
@@ -265,7 +271,7 @@ a.counter {
     text-align: center;
     width: 50px; 
 }
-#groups td:last-child, #groups input {
+#groups .btn-circle:last-child {
     display: none;
 }
 

@@ -97,13 +97,13 @@ router.get('/courses/:course/teaching-assistants', controllers.TeachingAssistant
 router.get('/courses/:course/teaching-assistants/search', controllers.TeachingAssistant.getTeachingAssistantListBySearchQuery);
 router.post('/courses/:course/teaching-assistants', controllers.TeachingAssistant.addTeachingAssistantList);
 router.put('/courses/:course/teaching-assistants', controllers.TeachingAssistant.editTeachingAssistantList);
-router.delete('/courses/:course/teaching-assistants/:us3r', controllers.TeachingAssistant.deleteTeachingAssistant);
+router.delete('/courses/:course/teaching-assistants', controllers.TeachingAssistant.deleteTeachingAssistantList);
 
 router.get('/courses/:course/students', controllers.Student.getStudentListByCourse);
 router.get('/courses/:course/students/search', controllers.Student.getStudentListBySearchQuery);
 router.post('/courses/:course/students/import', upload.csv.single('file'), controllers.Student.importStudentList);
 router.post('/courses/:course/students', controllers.Student.addStudentList);
 router.put('/courses/:course/students', controllers.Student.editStudentList);
-router.delete('/courses/:course/students/:us3r', controllers.Student.deleteStudent);
+router.delete('/courses/:course/students', controllers.Student.deleteStudentList);
 
 module.exports = router;
