@@ -15,30 +15,6 @@ exports.getGroup = function (req, res, next, group) {
         next();
     });
 };
-// Get groups
-exports.getGroupList = function (req, res) {
-    models.TutorialQuiz.findOne({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate({
-        path: 'groups',
-        options: {
-            sort: { 'name': 1 }
-        },
-        populate: {
-            path: 'members',
-            options: {
-                sort: { 'name.first': 1, 'name.last': 1 }
-            }
-        }
-    }).exec(function (err, tutorialQuiz) {
-        res.render('admin/groups', {
-            title: 'Groups',
-            course: req.course, 
-            tutorial: req.tutorial,
-            quiz: req.quiz,
-            tutorialQuiz: tutorialQuiz,
-            groups: tutorialQuiz.groups
-        });
-    });
-};
 // Temporarily generate groups
 exports.generateGroupList = function (req, res) {
     models.TutorialQuiz.findOne({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate({

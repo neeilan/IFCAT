@@ -48,7 +48,7 @@ router.put('/courses/:course/tutorials/:tutorial', controllers.Tutorial.editTuto
 router.delete('/courses/:course/tutorials/:tutorial', controllers.Tutorial.deleteTutorial);
 
 router.get('/courses/:course/tutorials/:tutorial/students', controllers.Student.getStudentsByTutorial);
-router.get('/courses/:course/tutorials/:tutorial/students/:us3r/marks', controllers.Response.getMarks);
+router.get('/courses/:course/tutorials/:tutorial/students/:us3r/marks', controllers.Response.getMarkListByStudent);
 
 router.get('/courses/:course/quizzes', controllers.Quiz.getQuizList);
 router.get('/courses/:course/quizzes/new', controllers.Quiz.getQuizForm);
@@ -69,13 +69,11 @@ router.delete('/courses/:course/quizzes/:quiz/questions/:question', controllers.
 router.get('/courses/:course/tutorials/:tutorial/quizzes', controllers.TutorialQuiz.getTutorialQuizList);
 router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/conduct', controllers.TutorialQuiz.conductTutorialQuiz);
 router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz', controllers.TutorialQuiz.editTutorialQuiz);
+router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/marks', controllers.Response.getMarkListByTutorialQuiz);
 
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups', controllers.Group.getGroupList);
 router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/generate', controllers.Group.generateGroupList);
 router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups', controllers.Group.saveGroupList);
-
 router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/:group/responses', controllers.Response.getResponseList);
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/:group/responses/export', controllers.Response.exportResponseList);
 
 router.get('/courses/:course/files', controllers.File.getFileList);
 router.post('/courses/:course/files', upload.any.array('files'), controllers.File.addFiles);

@@ -4,15 +4,11 @@
     <li><a href="/admin/courses">Courses</a> ‐ <%- course.code %></li>
     <li><a href="/admin/courses/<%= course.id %>/tutorials">Tutorials</a> ‐ TUT <%- tutorial.number %></li>
     <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes">Quizzes</a> ‐ <%- quiz.name %></li>
-    <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= quiz.id %>/groups">Groups</a> ‐ Group <%- group.name %></li>
+    <li>Groups ‐ Group <%- group.name %></li>
     <li class="active">Responses</li>
 </ol>
 
 <h1><%- title %></h1>
-
-<%- include ./flash %>
-
-<a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= quiz.id %>/groups/<%= group.id %>/responses/export" class="btn btn-default"><span class="glyphicon glyphicon-save"></span> Export</a>
 
 <table class="table table-striped">
     <thead>

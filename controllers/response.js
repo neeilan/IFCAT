@@ -4,7 +4,7 @@ var _ = require('lodash'),
 var config = require('../lib/config'),
     models = require('../models');
 
-// Retrieve responses
+// Retrieve group responses
 exports.getResponseList = function (req, res) {
     models.TutorialQuiz.findOne({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate({
         path: 'responses',
@@ -47,59 +47,8 @@ exports.getResponseList = function (req, res) {
         });
     });
 };
-// Export responses
-exports.exportResponseList = function (req, res) {
-    var data = [];
-
-    models.TutorialQuiz.findOne({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate({
-        path: 'responses',
-        model: models.Response,
-        populate: [{
-            path: 'group',
-            model: models.Group
-        }, {
-            path: 'question',
-            models: models.Question
-        }]
-    }).exec(function (err, tutorialQuiz) {
-        var filename = req.course.code + 
-            '-tut' + req.tutorial.number +
-            '-group' + req.group.name + 
-            '.csv';
-        // ugly: filter out group responses
-        var responses = _.filter(tutorialQuiz.responses, function (response) {
-            return response.group && response.group.id === req.group.id;
-        });
-        // tally the points
-        var totalPoints = _.reduce(responses, function (sum, response) {
-            return sum + response.points;
-        }, 0);
-        // build information
-        data.push(['Course', req.course.code, req.course.name]);
-        data.push(['Tutorial', req.tutorial.number]);
-        data.push(['Quiz', req.quiz.name]);
-        data.push(['Group', req.group.name]);
-        data.push([]);
-        // build header row
-        data.push(['No.', 'Question', '# of attempts', 'Points awarded']);
-        // build rows
-        _.each(responses, function (res) {
-            data.push([res.question.number, res.question.question, res.attempts, res.points]);
-        });
-        // build footer row
-        data.push(['', '', 'Total Points', totalPoints]);
-        // send CSV
-        res.setHeader('Content-disposition', 'attachment; filename=' + filename); 
-        res.set('Content-Type', 'text/csv'); 
-        res.status(200).send(
-            _.reduce(data, function (lines, row) { 
-                return lines + row.join() + "\n"; 
-            }, '')
-        );
-    });
-};
-// Retrieve marks
-exports.getMarks = function (req, res) {
+// Retrieve marks by student
+exports.getMarkListByStudent = function (req, res) {
     models.TutorialQuiz.find({ tutorial: req.tutorial.id }).populate([{
         path: 'quiz',
         model: models.Quiz
@@ -154,6 +103,67 @@ exports.getMarks = function (req, res) {
             marks: marks,
             totalPoints: totalPoints,
             totalTeachingPoints : totalTeachingPoints
+        });
+    });
+};
+// Retrieve marks by tutorial quiz
+exports.getMarkListByTutorialQuiz = function (req, res) {
+    models.TutorialQuiz.findOne({ tutorial: req.tutorial, quiz: req.quiz }).exec(function (err, tutorialQuiz) {
+        models.Response.find({ _id: { $in: tutorialQuiz.responses }}).populate({
+            path: 'group',
+            model: models.Group,
+            populate: {
+                path: 'members',
+                model: models.User
+            }
+        }).exec(function (err, responses) {
+            var students = {};
+            // tally points per student
+            _.each(responses, function (response) {
+                if (response.group) {
+                    _.each(response.group.members, function (member) {
+                        if (!students.hasOwnProperty(member.id)) {
+                            member.tutorial = req.tutorial;
+                            member.quiz = req.quiz;
+                            member.group = response.group;
+                            member.points = 0;
+                            students[member.id] = member;
+                        }
+                        students[member.id].points += response.points; 
+                    });
+                }
+            });
+            // sort by UTORid
+            students = _.sortBy(_.values(students), function (student) { return student.student.UTORid });
+            // either export CSV
+            if (req.query.export === '1') {
+                var filename = 'marks.csv',
+                    data = _.map(students, function (student) {
+                        return [
+                            student.student.UTORid, 
+                            student.student.number, 
+                            student.name.full,
+                            'TUT ' + student.tutorial.number,
+                            student.quiz.name,
+                            'Group ' + student.group.name,
+                            student.points
+                        ];
+                    });
+                data.unshift(['UTORid', 'Student No.', 'Name', 'Tutorial', 'Quiz', 'Group', 'Mark']);
+                // send CSV
+                res.setHeader('Content-disposition', 'attachment; filename=' + filename); 
+                res.set('Content-Type', 'text/csv'); 
+                res.status(200).send(_.reduce(data, function (l, r) { return l + r.join() + "\n" }, ''));
+            // or load page
+            } else {
+                res.render('admin/tutorial-quiz-marks', {
+                    title: 'Marks',
+                    course: req.course,
+                    tutorial: req.tutorial,
+                    quiz: req.quiz,
+                    students: students
+                });
+            }
         });
     });
 };
