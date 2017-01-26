@@ -9,6 +9,7 @@ var UserSchema = new mongoose.Schema({
     local: {
         email: { 
             type: String,
+            trim: true,
             lowercase: true
         },
         password: {
@@ -25,9 +26,13 @@ var UserSchema = new mongoose.Schema({
     student: {
         UTORid: {
             type: String,
+            trim: true,
             lowercase: true
         },
-        number: String
+        number: {
+            type: String,
+            trim: true
+        }
     },
     teachingPoints: {
         type: Number,
@@ -36,12 +41,14 @@ var UserSchema = new mongoose.Schema({
     name: {
         first: {
             type: String,
+            trim: true,
             set: function (first) {
                 return _.startCase(first);
             }
         },
         last: {
             type: String,
+            trim: true,
             set: function (last) {
                 return _.startCase(last);
             }

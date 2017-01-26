@@ -40,6 +40,8 @@
                         <ul class="dropdown-menu">
                             <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/edit"><span 
                                 class="glyphicon glyphicon-pencil"></span> Edit Quiz</a></li>
+                            <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/copy"
+                                class="btn-copy"><span class="glyphicon glyphicon-pencil"></span> Copy Quiz</a></li>
                             <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions"><span 
                                 class="glyphicon glyphicon-question-sign"></span> Manage Questions</a></li>
                             <li class="divider"></li>
@@ -58,6 +60,11 @@
 
 <script>
 $(function () {
+    $('.btn-copy').click(function (e) {
+        e.preventDefault();
+        $.post(this.href, function () { window.location.reload(true); });
+    });
+
     $('.btn-delete').click(function (e) {
         e.preventDefault();
         var btn = this;

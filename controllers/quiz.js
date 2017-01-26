@@ -1,5 +1,6 @@
 var _ = require('lodash'),
-    async = require('async');
+    async = require('async'),
+    mongoose = require('mongoose');
 var config = require('../lib/config'),
     models = require('../models');
 
@@ -65,6 +66,40 @@ exports.editQuiz = function (req, res) {
         else
             req.flash('success', '<b>%s</b> has been updated.', req.quiz.name);
         res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/edit');
+    });
+};
+// Copy quiz
+exports.copyQuiz = function (req, res) {
+    async.waterfall([
+        function cloneQuestions(done) {
+            req.quiz.withQuestions().execPopulate().then(function () {
+                async.mapSeries(req.quiz.questions, function (question, done) {
+                    question._id = mongoose.Types.ObjectId();
+                    question.isNew = true;
+                    question.save(function (err) {
+                        if (err) 
+                            return done(err);
+                        done(null, question._id);
+                    });
+                }, done);
+            });
+        },
+        function cloneQuiz(questions, done) {
+            req.quiz._id = mongoose.Types.ObjectId();
+            req.quiz.isNew = true;
+            req.quiz.name += ' (copy)';
+            req.quiz.questions = questions;
+            req.quiz.save(done);
+        },
+        function addQuiz(quiz, numAffected, done) {
+            req.course.update({ $addToSet: { quizzes: quiz }}, done)
+        }
+    ], function (err) {
+        if (err)
+            req.flash('error', 'An error has occurred while trying to perform operation.');
+        else
+            req.flash('success', '<b>%s</b> has been added.', req.quiz.name);
+        res.sendStatus(200);
     });
 };
 // Delete quiz

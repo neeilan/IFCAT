@@ -54,6 +54,7 @@ router.get('/courses/:course/quizzes', controllers.Quiz.getQuizList);
 router.get('/courses/:course/quizzes/new', controllers.Quiz.getQuizForm);
 router.get('/courses/:course/quizzes/:quiz/edit', controllers.Quiz.getQuizForm);
 router.post('/courses/:course/quizzes', controllers.Quiz.addQuiz);
+router.post('/courses/:course/quizzes/:quiz/copy', controllers.Quiz.copyQuiz);
 router.put('/courses/:course/quizzes/:quiz', controllers.Quiz.editQuiz);
 router.delete('/courses/:course/quizzes/:quiz', controllers.Quiz.deleteQuiz);
 
