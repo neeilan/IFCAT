@@ -42,14 +42,14 @@ var UserSchema = new mongoose.Schema({
             type: String,
             trim: true,
             set: function (first) {
-                return _.startCase(first);
+                return _.startCase(_.toLower(first));
             }
         },
         last: {
             type: String,
             trim: true,
             set: function (last) {
-                return _.startCase(last);
+                return _.startCase(_.toLower(last));
             }
         }
     },
