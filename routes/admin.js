@@ -24,7 +24,7 @@ router.post('/login', passport.authenticate('local-login', {
 
 // check if user is authenticated
 router.use(function (req, res, next) {
-    if (req.isAuthenticated() && req.user.hasAnyRole(['admin', 'instructor', 'teaching-assistant']))
+    if (req.isAuthenticated() && req.user.hasAnyRole(['admin', 'instructor', 'teachingAssistant']))
         return next();
     req.logout();
     res.redirect('/admin/login');
