@@ -24,16 +24,16 @@ router.post('/login', passport.authenticate('local-login', {
 
 // check if user is authenticated
 router.use(function (req, res, next) {
-    if (req.isAuthenticated())
+    if (req.isAuthenticated() && req.user.hasAnyRole(['admin', 'instructor', 'teaching-assistant']))
         return next();
+    req.logout();
     res.redirect('/admin/login');
 });
 
 // authenticated routes
 router.get('/logout', controllers.User.logout);
 
-//router.get('/courses/generate', controllers.Course.generateData);
-
+router.get('/', controllers.Course.getCourseList);
 router.get('/courses', controllers.Course.getCourseList);
 router.get('/courses/new', controllers.Course.getCourseForm);
 router.get('/courses/:course/edit', controllers.Course.getCourseForm);

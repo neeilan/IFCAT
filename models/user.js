@@ -1,8 +1,7 @@
 var _ = require('lodash'),
     async = require('async'),
     bcrypt = require('bcryptjs'),
-    mongoose = require('mongoose');
-    
+    mongoose = require('mongoose');  
 var models = require('.');
 
 var UserSchema = new mongoose.Schema({
@@ -138,6 +137,10 @@ UserSchema.methods.checkPassword = function (password, callback) {
 // check user's role
 UserSchema.methods.hasRole = function (role) {
     return this.roles.indexOf(role) > -1;
+};
+//
+UserSchema.methods.hasAnyRole = function (roles) {
+    return !!_.intersection(this.roles, roles).length;
 };
 // sort users by roles, first name, and last name
 UserSchema.statics.sortByRole = function (users) {
