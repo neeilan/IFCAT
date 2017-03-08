@@ -12,26 +12,26 @@ $(function () {
 
     // wrap tables with  special container 
     $('.dim, .stretch').each(function() {
-        var $elem = $(this), $div = $('<div/>');
-        if ($elem.hasClass('stretch')) {
-            $div.addClass('stretch-wrap');
+        var elem = $(this), div = $('<div/>');
+        if (elem.hasClass('stretch')) {
+            div.addClass('stretch-wrap');
         }
-        if ($elem.hasClass('dim')) {
-            $div.addClass('dim-wrap');
+        if (elem.hasClass('dim')) {
+            div.addClass('dim-wrap');
         }
-        $elem.wrap($div);
+        elem.wrap(div);
 
-        if ($elem.hasClass('dim')) {
-            $elem.after('<div class="dimmer"></div>'); // overlay
+        if (elem.hasClass('dim')) {
+            elem.after('<div class="dimmer"></div>'); // overlay
         }
     });
 
     // checked/unchecked all table-body checkboxes when table-header checkbox is checked/unchecked
     $(document).on('change', 'th > :checkbox', function () {
-        var $box = $(this);
-        var index = $box.parent().index();
-        $box.closest('table').find('tr').each(function () {
-            $(this).find('td:eq(' + index + ') > :checkbox:not(:disabled)').prop('checked', $box[0].checked);
+        var checkbox = $(this), 
+            index = checkbox.parent().index();
+        checkbox.closest('table').find('tr').each(function () {
+            $('td:eq(' + index + ') > :checkbox:not(:disabled)', this).prop('checked', checkbox[0].checked);
         });
     });
 
@@ -66,11 +66,11 @@ $(function () {
 
     // toggle checkbox-radios
     $(document).on('click', '.btn-circle', function (e) {
-        var $btn = $(this).toggleClass('active'), 
-            $input = $btn.find('input').prop('checked', $btn.hasClass('active'));
+        var btn = $(this).toggleClass('active'), 
+            input = btn.find('input').prop('checked', btn.hasClass('active'));
         // inactivate other checkbox-radios if they belong to the same group
-        if ($input.data('group')) {
-            $(e.delegateTarget).find('.btn-circle').has('[data-group=' + $input.data('group') + ']').not($btn).each(function () {
+        if (input.data('group')) {
+            $(e.delegateTarget).find('.btn-circle').has('[data-group=' + input.data('group') + ']').not(btn).each(function () {
                 $(this).removeClass('active').find('input').prop('checked', false);
             });
         }

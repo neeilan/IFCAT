@@ -14,13 +14,16 @@ exports.getQuiz = function (req, res, next, tutorialQuiz) {
         next();
     });
 };
-// Retrieve quizzes within tutorial
-exports.getTutorialQuizList = function (req, res) {
-    models.TutorialQuiz.find({ tutorial: req.tutorial }).populate('quiz').exec(function (err, tutorialQuizzes) {
+// Retrieve quizzes within course
+exports.conductTutorialQuizList = function (req, res) {
+    models.TutorialQuiz.find({ 
+        quiz: { 
+            $in: req.course.quizzes 
+        } 
+    }).populate('tutorial quiz').exec(function (err, tutorialQuizzes) {
         res.render('admin/tutorial-quizzes', {
-            title: 'Quizzes',
-            course: req.course, 
-            tutorial: req.tutorial,
+            title: 'Conduct Quizzes',
+            course: req.course,
             tutorialQuizzes: tutorialQuizzes
         });
     });
@@ -47,36 +50,28 @@ exports.conductTutorialQuiz = function (req, res) {
         });
     });
 };
-// Publish quiz for tutorial
-exports.editTutorialQuiz = function (req, res) {
-    models.TutorialQuiz.findOneAndUpdate({ 
-        tutorial: req.tutorial, 
-        quiz: req.quiz 
+// Edit quizzes 
+exports.editTutorialQuizListByCourse = function (req, res) {
+    // find property to update
+    var property = _.find(['published', 'active', 'archived'], function (p) {
+        return req.body && _.has(req.body, p);
+    });
+    // nothing to update
+    if (!property)
+        return res.redirect('/admin/courses/' + req.course.id + '/conduct');
+    // update property
+    models.TutorialQuiz.update({ 
+        _id: { $in: req.body.tutorialQuizzes || [] }
     }, { 
-        $set: {
-            allocateMembers: req.body.allocateMembers,
-            max: {
-                membersPerGroup: req.body.max.membersPerGroup
-            },
-            published: req.body.published,
-            active: req.body.active,
-            archived: req.body.archived
-        }
+        $set: { [property]: req.body[property] }
     }, {
-        new: true
-    }, function (err, tutorialQuiz) {
+        multi: true
+    }, function (err) {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
-        else {
-            req.app.locals.io.in('tutorialQuiz:' + tutorialQuiz.id).emit('quizActivated', tutorialQuiz);
-            req.flash('success', '<b>%s</b> settings have been updated for <b>TUT %s</b>.', req.quiz.name, req.tutorial.number);
-        }
-        res.redirect(
-            '/admin/courses/' + req.course.id + 
-            '/tutorials/' + req.tutorial.id + 
-            '/quizzes/' + req.quiz.id + 
-            '/conduct'
-        );
+        else
+            req.flash('success', 'Quizzes have been updated.');
+        return res.redirect('/admin/courses/' + req.course.id + '/conduct');
     });
 };
 // Publish quiz for tutorial

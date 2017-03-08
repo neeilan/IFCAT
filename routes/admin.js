@@ -67,7 +67,14 @@ router.post('/courses/:course/quizzes/:quiz/questions/preview', controllers.Ques
 router.put('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.editQuestion);
 router.delete('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.deleteQuestion);
 
-router.get('/courses/:course/tutorials/:tutorial/quizzes', controllers.TutorialQuiz.getTutorialQuizList);
+router.get('/courses/:course/files', controllers.File.getFileList);
+router.post('/courses/:course/files', upload.any.array('files'), controllers.File.addFiles);
+router.delete('/courses/:course/files', controllers.File.deleteFiles);
+
+// ugly routes begin here...
+router.get('/courses/:course/conduct', controllers.TutorialQuiz.conductTutorialQuizList);
+router.post('/courses/:course/conduct/marks', controllers.Response.getMarkListByCourse);
+router.put('/courses/:course/conduct/edit', controllers.TutorialQuiz.editTutorialQuizListByCourse);
 router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/conduct', controllers.TutorialQuiz.conductTutorialQuiz);
 router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz', controllers.TutorialQuiz.editTutorialQuiz);
 router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/marks', controllers.Response.getMarkListByTutorialQuiz);
@@ -75,10 +82,6 @@ router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/marks', controlle
 router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/generate', controllers.Group.generateGroupList);
 router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups', controllers.Group.saveGroupList);
 router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/:group/responses', controllers.Response.getResponseList);
-
-router.get('/courses/:course/files', controllers.File.getFileList);
-router.post('/courses/:course/files', upload.any.array('files'), controllers.File.addFiles);
-router.delete('/courses/:course/files', controllers.File.deleteFiles);
 
 router.get('/users', controllers.User.getUserList);
 router.get('/users/new', controllers.User.getUserForm);

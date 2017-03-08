@@ -14,7 +14,7 @@
         class="glyphicon glyphicon-plus"></span> Add New Quiz</a>
 </div>
 
-<table class="table table-striped sortable">
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Name</th>
@@ -24,9 +24,7 @@
     </thead>
     <tbody>
     <% if (_.isEmpty(course.quizzes)) { %>
-        <tr>
-            <td colspan="3">No quizzes have been added yet.</td>
-        </tr>
+        <tr><td colspan="3">No quizzes have been added yet.</td></tr>
     <% } else { %>
         <% _.each(course.quizzes, function (quiz) { %>
             <tr>

@@ -1,6 +1,5 @@
 var _ = require('lodash'),
-    async = require('async'),
-    csv = require('csv');
+    async = require('async');
 var config = require('../lib/config'),
     models = require('../models');
 
@@ -137,8 +136,7 @@ exports.getMarkListByTutorialQuiz = function (req, res) {
             students = _.sortBy(_.values(students), function (student) { return student.student.UTORid });
             // either export CSV
             if (req.query.export === '1') {
-                var filename = 'marks.csv',
-                    data = _.map(students, function (student) {
+                var data = _.map(students, function (student) {
                         return [
                             student.student.UTORid, 
                             student.student.number, 
@@ -149,9 +147,10 @@ exports.getMarkListByTutorialQuiz = function (req, res) {
                             student.points
                         ];
                     });
+                // set headings
                 data.unshift(['UTORid', 'Student No.', 'Name', 'Tutorial', 'Quiz', 'Group', 'Mark']);
                 // send CSV
-                res.setHeader('Content-disposition', 'attachment; filename=' + filename); 
+                res.setHeader('Content-disposition', 'attachment; filename=marks.csv'); 
                 res.set('Content-Type', 'text/csv'); 
                 res.status(200).send(_.reduce(data, function (l, r) { return l + r.join() + "\n" }, ''));
             // or load page
@@ -163,6 +162,74 @@ exports.getMarkListByTutorialQuiz = function (req, res) {
                     quiz: req.quiz,
                     students: students
                 });
+            }
+        });
+    });
+};
+// Retrieve marks by course
+exports.getMarkListByCourse = function (req, res) {
+
+
+    models.TutorialQuiz.find({ 
+        _id: {
+            $in: req.body.tutorialQuizzes || [] 
+        }
+    }).exec(function (err, tutorialQuizzes) {
+        async.mapSeries(tutorialQuizzes, function (tutorialQuiz, done) {
+            models.Response.find({ _id: { $in: tutorialQuiz.responses }}).populate({
+                path: 'group',
+                model: models.Group,
+                populate: {
+                    path: 'members',
+                    model: models.User
+                }
+            }).exec(function (err, responses) {
+                if (err)
+                    return done(err);
+                var students = {};
+                // tally points per student
+                _.each(responses, function (response) {
+                    if (response.group) {
+                        _.each(response.group.members, function (member) {
+                            if (!students.hasOwnProperty(member.id)) {
+                                member.tutorial = tutorialQuiz.tutorial;
+                                member.quiz = tutorialQuiz.quiz;
+                                member.group = response.group;
+                                member.points = 0;
+                                students[member.id] = member;
+                            }
+                            students[member.id].points += response.points; 
+                        });
+                    }
+                });
+                // sort by UTORid
+                students = _.sortBy(_.values(students), function (student) { return student.student.UTORid });
+                done(null, students);
+            });
+        }, function (err, students) {
+            students = _.flatten(students); 
+            // export CSV
+            if (req.query.export === '1' && students.length) {
+                data = _.map(students, function (student) {
+                    return [
+                        student.student.UTORid, 
+                        student.student.number, 
+                        student.name.full,
+                        'TUT ' + student.tutorial.number,
+                        student.quiz.name,
+                        'Group ' + student.group.name,
+                        student.points
+                    ];
+                });
+                // set headings
+                data.unshift(['UTORid', 'Student No.', 'Name', 'Tutorial', 'Quiz', 'Group', 'Mark']);
+                // send CSV
+                res.setHeader('Content-disposition', 'attachment; filename=marks.csv'); 
+                res.set('Content-Type', 'text/csv'); 
+                res.status(200).send(_.reduce(data, function (l, r) { return l + r.join() + "\n" }, ''));
+            } else {
+                // better to have a page to show all marks but...
+                res.redirect('/admin/courses/' + req.course.id + '/conduct');
             }
         });
     });

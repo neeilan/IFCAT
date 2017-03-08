@@ -49,6 +49,8 @@
                                 class="glyphicon glyphicon-list-alt"></span> Manage Quizzes</a></li>
                             <li><a href="/admin/courses/<%= course.id %>/files"><span 
                                 class="glyphicon glyphicon-picture"></span> Manage Files</a></li>
+                            <li><a href="/admin/courses/<%= course.id %>/conduct"><span 
+                                class="glyphicon glyphicon-play-circle"></span> Conduct Quizzes</a></li>
                         <% if (user.hasRole('admin')) { %>
                             <li><a href="/admin/courses/<%= course.id %>/instructors"><span 
                                 class="glyphicon glyphicon-user"></span> Manage Instructors</a></li>

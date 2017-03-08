@@ -1,6 +1,5 @@
 var _ = require('lodash'),
     async = require('async'),
-    csv = require('csv'),
     util = require('util');
 var config = require('../lib/config'),
     models = require('../models');
