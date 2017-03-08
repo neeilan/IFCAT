@@ -168,8 +168,6 @@ exports.getMarkListByTutorialQuiz = function (req, res) {
 };
 // Retrieve marks by course
 exports.getMarkListByCourse = function (req, res) {
-
-
     models.TutorialQuiz.find({ 
         _id: {
             $in: req.body.tutorialQuizzes || [] 
