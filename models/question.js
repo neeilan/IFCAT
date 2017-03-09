@@ -1,5 +1,6 @@
 var url = require('url');
 var _ = require('lodash'),
+    async = require('async'),
     mongoose = require('mongoose');
 var models = require('.');
 

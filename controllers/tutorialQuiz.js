@@ -14,17 +14,19 @@ exports.getQuiz = function (req, res, next, tutorialQuiz) {
         next();
     });
 };
-// Retrieve quizzes within course
+// Retrieve quizzes within course OR by tutorial
 exports.conductTutorialQuizList = function (req, res) {
-    models.TutorialQuiz.find({ 
-        quiz: { 
-            $in: req.course.quizzes 
-        } 
-    }).populate('tutorial quiz').exec(function (err, tutorialQuizzes) {
+    var query = { quiz: { $in: req.course.quizzes }};
+    if (req.tutorial)
+        query = { tutorial: req.tutorial };
+    models.TutorialQuiz.find(query).populate('tutorial quiz').exec(function (err, tutorialQuizzes) {
         res.render('admin/tutorial-quizzes', {
             title: 'Conduct Quizzes',
             course: req.course,
-            tutorialQuizzes: tutorialQuizzes
+            tutorial: req.tutorial,
+            tutorialQuizzes: _.sortBy(tutorialQuizzes, function (tutorialQuiz) {
+                return tutorialQuiz.quiz.name
+            })
         });
     });
 };

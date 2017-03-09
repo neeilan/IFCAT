@@ -75,6 +75,7 @@ router.delete('/courses/:course/files', controllers.File.deleteFiles);
 router.get('/courses/:course/conduct', controllers.TutorialQuiz.conductTutorialQuizList);
 router.post('/courses/:course/conduct/marks', controllers.Response.getMarkListByCourse);
 router.put('/courses/:course/conduct/edit', controllers.TutorialQuiz.editTutorialQuizListByCourse);
+router.get('/courses/:course/tutorials/:tutorial/quizzes', controllers.TutorialQuiz.conductTutorialQuizList);
 router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/conduct', controllers.TutorialQuiz.conductTutorialQuiz);
 router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz', controllers.TutorialQuiz.editTutorialQuiz);
 router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/marks', controllers.Response.getMarkListByTutorialQuiz);

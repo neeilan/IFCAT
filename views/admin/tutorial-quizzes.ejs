@@ -2,7 +2,10 @@
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
-    <li class="active">Conduct Quizzes</li>
+<% if (tutorial) { %>
+    <li><a href="/admin/courses/<%= course.id %>/tutorials">Tutorials</a> ‐ TUT <%= tutorial.number %></li>
+<% } %>
+    <li class="active">Quizzes</li>
 </ol>
 
 <h1><%- title %></h1>
@@ -38,9 +41,7 @@
         </thead>
         <tbody>
         <% if (_.isEmpty(tutorialQuizzes)) { %>
-            <tr>
-                <td colspan="6">No quizzes have been added for this tutorial yet.</td>
-            </tr>
+            <tr><td colspan="6">No quizzes have been added for this tutorial yet.</td></tr>
         <% } else { %>
             <% _.each(tutorialQuizzes, function (tutorialQuiz) { %>
                 <tr>
