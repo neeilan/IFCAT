@@ -24,8 +24,12 @@ exports.conductTutorialQuizList = function (req, res) {
             title: 'Conduct Quizzes',
             course: req.course,
             tutorial: req.tutorial,
-            tutorialQuizzes: _.sortBy(tutorialQuizzes, function (tutorialQuiz) {
-                return tutorialQuiz.quiz.name
+            tutorialQuizzes: tutorialQuizzes.sort(function (a, b) {
+                var m = a.quiz.name.toLowerCase(),
+                    n = b.quiz.name.toLowerCase(),
+                    s = a.tutorial.number.toLowerCase(),
+                    t = b.tutorial.number.toLowerCase();
+                return m.localeCompare(n) || s.localeCompare(t);
             })
         });
     });

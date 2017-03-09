@@ -48,7 +48,7 @@
                 <tr>
                     <td><input type="checkbox" name="tutorialQuizzes[]" value="<%= tutorialQuiz.id %>"></td>
                     <td><%= tutorialQuiz.quiz.name %></td>
-                    <td><%= 'TUT' + tutorialQuiz.tutorial.number %></td>
+                    <td><%= 'TUT ' + tutorialQuiz.tutorial.number %></td>
                     <td class="text-center">
                     <% if (tutorialQuiz.published) { %>
                         <span class="glyphicon glyphicon-ok"></span>
