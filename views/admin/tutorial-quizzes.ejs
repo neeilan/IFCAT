@@ -32,7 +32,8 @@
         <thead>
             <tr>
                 <th style="width: 10px;"><input type="checkbox"></th>
-                <th>Name</th>
+                <th>Quiz</th>
+                <th>Tutorial</th>
                 <th class="text-center">Published</th>
                 <th class="text-center">Active</th>
                 <th class="text-center">Archived</th>
@@ -41,12 +42,13 @@
         </thead>
         <tbody>
         <% if (_.isEmpty(tutorialQuizzes)) { %>
-            <tr><td colspan="6">No quizzes have been added for this tutorial yet.</td></tr>
+            <tr><td colspan="7">No quizzes have been added for this tutorial yet.</td></tr>
         <% } else { %>
             <% _.each(tutorialQuizzes, function (tutorialQuiz) { %>
                 <tr>
                     <td><input type="checkbox" name="tutorialQuizzes[]" value="<%= tutorialQuiz.id %>"></td>
                     <td><%= tutorialQuiz.quiz.name %></td>
+                    <td><%= 'TUT' + tutorialQuiz.tutorial.number %></td>
                     <td class="text-center">
                     <% if (tutorialQuiz.published) { %>
                         <span class="glyphicon glyphicon-ok"></span>
