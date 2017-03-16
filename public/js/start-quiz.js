@@ -361,7 +361,6 @@ function quizCompleted() {
     if (quizData.active) {
         $('#activeQuiz').html('Your responses have been submitted. You can change answers (penalties may apply) until your TA inactivates this quiz.');
     } else {
-        $('#postQuiz').show();
         socket.emit('quizComplete', { groupId: groupId, quizId: quizData._id });
     }
 }
