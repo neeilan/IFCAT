@@ -38,6 +38,11 @@ socket.on('quizData', function (tutorialQuiz) {
         $('#groupSelfSelect').hide();
         $('#driverSelect').show();
     }
+    
+    
+
+ 
+    
 })
 
 socket.on('groupsUpdated', function (data) {
@@ -140,7 +145,10 @@ socket.on('updateScores', function(data) {
     if (groupId && data.groupId != groupId) return;
 
     data.responses.forEach(function(response, i) {
-        responses[response.question] = response;
+    responses[response.question] = response;
+    if (response.correct){
+        numCorrect++;
+    }
     })
     if (data.responses.length) {
         score = data.responses.reduce(function(prev, curr) {
@@ -148,7 +156,7 @@ socket.on('updateScores', function(data) {
                 return prev.points + curr.points;
             }
             return prev + curr.points;
-        })
+        }, 0);
     }
 })
 
