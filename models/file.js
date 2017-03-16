@@ -11,25 +11,23 @@ var FileSchema = new mongoose.Schema({
 });
 // Delete cascade
 FileSchema.pre('remove', function (next) {
-    var conditions = { files: { $in: [this._id] }},
-        doc = { $pull: { files: this._id }},
-        options = { multi: true };
+    var self = this;
     async.parallel([
-        function delRef1(done) {
-            models.Course.update(conditions, doc, options).exec(done);
+        function deleteFromCourse(done) {
+            models.Course.update({ files: { $in: [self._id] }}, { $pull: { files: self._id }}).exec(done);
         },
-        function delRef2(done) {
-            models.Question.update(conditions, doc, options).exec(done);     
+        function deleteFromQuestions(done) {
+            models.Question.update({ files: { $in: [self._id] }}, { $pull: { files: self._id }}, { multi: true }).exec(done);     
         }
     ], next);
 });
 // Check if file is an audio
 FileSchema.methods.isAudio = function () {
-    return this.type.indexOf('audio') !== -1;
+    return this.type.indexOf('audio') > -1;
 };
 // Check if file is an image
 FileSchema.methods.isImage = function () {
-    return this.type.indexOf('image') !== -1;
+    return this.type.indexOf('image') > -1;
 };
 // Save file 
 FileSchema.methods.store = function (obj, callback) {

@@ -1,6 +1,5 @@
 var _ = require('lodash'),
     mongoose = require('mongoose');
-
 var models = require('.');
 
 var GroupSchema = new mongoose.Schema({
@@ -11,7 +10,7 @@ var GroupSchema = new mongoose.Schema({
 });
 
 GroupSchema.methods.hasMember = function (userId) {
-    return !!_.find(this.members, { id: userId });
+    return this.members.indexOf(userId) > -1;
 };
 
 module.exports = mongoose.model('Group', GroupSchema);

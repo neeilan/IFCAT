@@ -1,0 +1,25 @@
+<% if (pages.length) { %>
+    <ul class="pagination">
+    <% if (currentPage <= 1) { %>
+        <li class="previous disabled"><span>&laquo;</span></li>
+        <li class="previous disabled"><span>&lsaquo;</span></li>
+    <% } else { %>
+        <li class="previous"><a href="<% url %>?page=1&perPage=<%= perPage %>">&laquo;</a></li>
+        <li class="previous"><a href="<% url %>?page=<%= currentPage - 1 %>&perPage=<%= perPage %>">&lsaquo;</a></li>
+    <% } %>
+    <% _.each(pages, function (page) { %>
+        <% if (currentPage == page) { %>
+            <li class="active"><span><%= page %></span></li>
+        <% } else { %>
+            <li><a href="<% url %>?page=<%= page %>&perPage=<%= perPage %>"><%= page %></a></li>
+        <% } %>
+    <% }) %>
+    <% if (currentPage >= totalPages) { %>
+        <li class="next disabled"><span>&rsaquo;</span></li>
+        <li class="next disabled"><span>&raquo;</span></li>
+    <% } else { %>
+        <li class="next"><a href="<% url %>?page=<%= currentPage + 1 %>&perPage=<%= perPage %>">&rsaquo;</a></li>
+        <li class="next"><a href="<% url %>?page=<%= totalPages %>&perPage=<%= perPage %>">&raquo;</a></li>
+    <% } %>
+    </ul>
+<% } %>

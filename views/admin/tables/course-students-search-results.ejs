@@ -1,10 +1,10 @@
 <table class="table table-striped">
     <thead>
         <tr>
+            <th class="text-center" style="width: 50px"><input type="checkbox" value="1"></th>
             <th>Name</th>
-            <th style="width: 110px">UTORid</th>
-            <th style="width: 150px">Student Number</th>
-            <th class="actions"></th>
+            <th>UTORid</th>
+            <th>Student Number</th>
         </tr>
     </thead>
     <tbody>
@@ -15,14 +15,11 @@
     <% } else { %> 
         <% _.each(students, function (student) { %>
             <tr>
+                <td class="text-center"><input type="checkbox" name="students[]" value="<%= 
+                    student.id %>"<%= course.hasStudent(student.id) ? ' checked disabled' : '' %>></td>
                 <td><%= student.name.full %></td>
                 <td><%= student.student.UTORid %></td>
                 <td><%= student.student.number %></td>
-                <td>
-                    <a href="/admin/courses/<%= course.id %>/students/<%= student.id %>"
-                        class="btn btn-primary btn-sm"><span 
-                        class="glyphicon glyphicon-plus"></span> Add</a>
-                </td>
             </tr>
         <% }) %>
     <% } %>

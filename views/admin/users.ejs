@@ -1,14 +1,18 @@
 <%- include ./header -%>
 
-<h1>Users</h1>
+<ol class="breadcrumb">
+    <li class="active">Users</li>
+</ol>
+
+<h1><%- title %></h1>
 
 <%- include ./flash %>
 
 <div class="nav-actions">
-    <a href="/admin/users/new" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add new user</a>
+    <a href="/admin/users/new" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add New User</a>
 </div>
 
-<table class="table table-striped">
+<table class="table table-striped" style="width: 700px">
     <thead>
         <tr>
             <th>Name</th>
@@ -18,12 +22,17 @@
             <th class="actions"></th>
         </tr>
     </thead>
-    <tbody>
     <% if (_.isEmpty(users)) { %>
-        <tr>
-            <td colspan="6">No users have been added yet.</td>
-        </tr>
+        <tbody><tr><td colspan="6">No users have been added yet.</td></tr></tbody>
     <% } else { %>
+        <tfoot>
+            <tr>
+                <td colspan="6" style="text-align: center">
+                    <%- include ./pagination %>
+                </td>
+            </tr>
+        </tfoot>
+        <tbody>
         <% _.each(users, function (user) { %>
             <tr>
                 <td><%= user.name.full %></td>
@@ -41,15 +50,15 @@
                         </button>
                         <ul class="dropdown-menu">
                             <li><a href="/admin/users/<%= user.id %>/edit"><span class="glyphicon glyphicon-pencil"></span> Edit user</a></li>
-                            <li class="divider">
+                            <li class="divider"></li>
                             <li><a href="/admin/users/<%= user.id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete user</a></li>
                         </ul>
                     </div>
                 </td>
             </tr>
         <% }) %>
+        </tbody>
     <% } %>
-    </tbody>
 </table>
 
 <%- include ./body-js -%>
@@ -64,12 +73,7 @@ $(function () {
             message: '<p>You are about to delete user and all of its associated information.</p>\
                 <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
             callback: function () {
-                $.ajax(btn.href, {
-                    type: 'delete',
-                    complete: function () {
-                        window.location.reload(true);
-                    }
-                });
+                $.delete(btn.href, function () { window.location.reload(true); });
             }
         });
     });

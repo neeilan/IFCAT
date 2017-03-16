@@ -5,7 +5,6 @@ var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn();
 
 var controllers = require('../controllers');
 
-// lifesaver: query single objects
 router.param('course', controllers.Course.getCourse);
 router.param('tutorial', controllers.Tutorial.getTutorial);
 router.param('group', controllers.Group.getGroup);

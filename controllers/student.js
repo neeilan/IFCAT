@@ -1,63 +1,116 @@
 var _ = require('lodash'),
-    async = require('async'),
-    csv = require('csv');
-
-var models = require('../models');
+    async = require('async');
+var config = require('../lib/config'),
+    models = require('../models');
 
 // Retrieve list of students for course
-exports.getStudentListByCourse = function (req, res) { 
+exports.getStudentListByCourse = function (req, res) {
+    /*var currentPage = parseInt(req.query.page, 10) || 1,
+        perPage = parseInt(req.query.perPage, 10) || 20,
+        start = (currentPage - 1) * perPage, 
+        end = start + perPage;*/
     req.course.withTutorials().withStudents().execPopulate().then(function (err) {
+        /*var totalPages = _.round(req.course.students.length / perPage), pages = [];
+        // build pages
+        for (var page = 1; page <= totalPages; page++) {    
+            if ((currentPage <= 2 && page <= 5) || 
+                (currentPage - 2 <= page && page <= currentPage + 2) ||
+                (totalPages - 2 < currentPage && totalPages - 5 < page)) pages.push(page);
+        }*/
         res.render('admin/course-students', {
-            course: req.course
+            title: 'Students',
+            course: req.course,
+            students: req.course.students/*,
+            currentPage: currentPage,
+            perPage: perPage,
+            totalPages: totalPages,
+            pages: pages*/
         });
     }); 
 };
 // Retrieve list of students matching search query
 exports.getStudentListBySearchQuery = function (req, res) {
-    models.User.findUsersBySearchQuery(req.query.q, 'student').exec(function (err, users) {
+    models.User.findBySearchQuery(req.query.q, 'student').exec(function (err, students) {
         res.render('admin/tables/course-students-search-results', { 
             course: req.course, 
-            students: users
+            students: students 
         });
     });
 };
 // Retrieve list of students for tutorial
-exports.getStudentsByTutorial = function (req, res) { 
+exports.getStudentsByTutorial = function (req, res) {
+    var currentPage = parseInt(req.query.page, 10) || 1,
+        perPage = parseInt(req.query.perPage, 10) || 20,
+        start = (currentPage - 1) * perPage, 
+        end = start + perPage;
     req.tutorial.withStudents().execPopulate().then(function () {
-        res.render('admin/tutorial-students', { 
+        var totalPages = _.round(req.tutorial.students.length / perPage), pages = [];
+        // build pages
+        for (var page = 1; page <= totalPages; page++) {    
+            if ((currentPage <= 2 && page <= 5) || 
+                (currentPage - 2 <= page && page <= currentPage + 2) ||
+                (totalPages - 2 < currentPage && totalPages - 5 < page)) pages.push(page);
+        }
+        res.render('admin/tutorial-students', {
+            title: 'Students', 
             course: req.course, 
-            tutorial: req.tutorial
+            tutorial: req.tutorial,
+            students: _.slice(req.tutorial.students, start, end),
+            currentPage: currentPage,
+            perPage: perPage,
+            totalPages: totalPages,
+            pages: pages
         });
     });
 };
 // Add student to course
-exports.addStudent = function (req, res) {
-    req.course.update({ $addToSet: { students: req.us3r.id }}, function (err) {
+exports.addStudentList = function (req, res) {
+    async.each(req.body.students || [], function (student, done) {
+        req.course.update({ $addToSet: { students: student }}, done);
+    }, function (err) {
         if (err)
             req.flash('error', 'An error has occurred while trying perform operation.');
         else
-            req.flash('success', 'Student <b>%s</b> has been added into the course.', req.us3r.name.full);
-        res.json({ status: !err });
+            req.flash('success', 'The list of students has been updated.');
+        res.redirect('/admin/courses/' + req.course.id + '/students');
+    });
+};
+// Update students' tutorials
+exports.editStudentList = function (req, res) {
+    var stack = _.mapValues(req.body.tutorials, function (users) { 
+        return _.keys(users).sort();
+    });
+    req.course.withTutorials().execPopulate().then(function () {
+        async.eachSeries(req.course.tutorials, function (tutorial, done) {
+            tutorial.update({ $set: { students: stack[tutorial.id] || [] }}, done);
+        }, function (err) {
+            if (err)
+                req.flash('error', 'An error occurred while trying to perform operation.');
+            else
+                req.flash('success', 'The list of tutorials has been updated.');
+            res.redirect('/admin/courses/' + req.course.id + '/students');
+        });
     });
 };
 // Delete student from course and associated tutorial
-exports.deleteStudent = function (req, res) {
+exports.deleteStudentList = function (req, res) {
+    var students = req.body.students || [];
     req.course.withTutorials().execPopulate().then(function () {
-        async.waterfall([
-            function delRef1(done) {
-                req.course.update({ $pull: { students: req.us3r.id }}, done);
+        async.series([
+            function deleteFromCourse(done) {
+                req.course.update({ $pull: { students: { $in: students }}}, done);
             },
-            function delRef2(course, done) {
+            function deleleFromTutorials(done) {
                 async.eachSeries(req.course.tutorials, function (tutorial, done) {
-                    tutorial.update({ $pull: { students: req.us3r.id }}, done);
+                    tutorial.update({ $pull: { students: { $in: students }}}, done);
                 }, done);
             }
         ], function (err) {
             if (err)
                 req.flash('error', 'An error has occurred while trying perform operation.');
             else
-                req.flash('success', 'Student <b>%s</b> has been removed from the course.', req.us3r.name.full);
-            res.json({ status: !err });
+                req.flash('success', 'The list of students has been updated.');
+            res.sendStatus(200);
         });
     });
 };
@@ -95,9 +148,9 @@ exports.importStudentList = function (req, res) {
                 else if (/^tutorial/i.test(key))
                     row.tutorial = val;
             });
-
+            // save
             async.waterfall([
-                function add(done) {
+                function saveStudent(done) {
                     models.User.findOne({ 'student.UTORid': row.student.UTORid }, function (err, user) {
                         if (err)
                             return done(err);
@@ -112,14 +165,14 @@ exports.importStudentList = function (req, res) {
                         });
                     });
                 },
-                function addRef1(user, done) {
+                function addIntoCourse(user, done) {
                     req.course.withTutorials().execPopulate().then(function () {
                         req.course.update({ $addToSet: { students: user.id }}, function (err) {
                             done(err, user);
                         });
                     });
                 },
-                function addRef2(user, done) {
+                function addIntoTutorial(user, done) {
                     // skip if no tutorial is given
                     if (!row.tutorial)
                         return done();
@@ -137,35 +190,6 @@ exports.importStudentList = function (req, res) {
             else
                 req.flash('success', 'The students have been imported.');
             res.redirect('/admin/courses/' + req.course.id + '/students');
-        });
-    });
-};
-
-exports.editStudentList = function (req, res) {
-    var tutorials = {};
-    // group user IDs by tutorial IDs
-    _.each(req.body.tutorials, function (id, userId) {
-        if (!tutorials.hasOwnProperty(id))
-            tutorials[id] = [];
-        tutorials[id].push(userId);
-    });
-    // save
-    req.course.withTutorials().execPopulate().then(function () {
-        async.eachSeries(req.course.tutorials, function (tutorial, done) {
-            var newStudents = [];
-            if (tutorials.hasOwnProperty(tutorial.id))
-                newStudents = tutorials[tutorial.id]; 
-            // check if changes were made
-            if (_.difference(tutorial.students, newStudents))
-                tutorial.update({ $set: { students: newStudents }}, done);
-            else
-                done();
-        }, function (err) {
-            if (err)
-                req.flash('error', 'An error occurred while trying to perform operation.');
-            else
-                req.flash('success', 'The students have been updated.');
-            res.json({ status: !err });
         });
     });
 };
@@ -195,88 +219,6 @@ exports.getQuizList = function (req, res) {
                     tutorial: tutorials[0],
                     tutorialQuizzes: tutorialQuizzes 
                 });
-            });
-        }
-    });
-};
-// 
-
-exports.getMarks = function (req, res) {
-    req.course.withTutorials().execPopulate().then(function () {
-        // find tutorials that student is in
-        var tutorial = _.find(req.course.tutorials, function (tutorial) {
-            return tutorial.students.indexOf(req.us3r.id) !== -1;
-        });
-        // find tutorial quizzes
-        if (tutorial) {
-            models.TutorialQuiz.find({ tutorial: tutorial.id }).populate([{
-                path: 'quiz',
-                model: models.Quiz
-            }, {
-                path: 'groups',
-                model: models.Group
-            }, {
-                path: 'responses',
-                model: models.Response,
-                populate: {
-                    path: 'group',
-                    model: models.Group
-                }
-            }]).exec(function (err, tutorialQuizzes) {
-                // ugly: find marks by student
-                console.log(tutorialQuizzes);
-                tutorialQuizzes = tutorialQuizzes.filter(tq => tq.groups.length > 0);
-                var marks = _.map(tutorialQuizzes, function (tutorialQuiz) {
-                    var result = {
-                        tutorialQuiz: tutorialQuiz,
-                        group: _.find(tutorialQuiz.groups, function (group) {
-                            return group.members.indexOf(req.us3r.id) !== -1;
-                        }),
-                        points: tutorialQuiz.responses ? _.reduce(tutorialQuiz.responses, function (sum, response) {
-                            if (response.group.members.indexOf(req.us3r.id) !== -1) {
-                                return sum + response.points;
-                            }
-                            return sum;
-                        }, 0) : 0,
-                    };
-                    
-                    if (result.group){
-                    result.teachingPoints = (result.group.teachingPoints.reduce(function(sum, recipient){
-                        if (recipient === req.us3r.id)
-                            sum ++;
-                        return sum;
-                    }, 0))/2
-                    }
-                    else{
-                        result.points = 0;
-                        result.teachingPoints = 0;
-                    }
-                    
-                    return result;
-                });
-                // tally the points
-                var totalPoints = _.reduce(marks, function (sum, mark) {
-                    return sum + mark.points;
-                }, 0);
-                 var totalTeachingPoints = _.reduce(marks, function (sum, mark) {
-                    return sum + mark.teachingPoints;
-                }, 0);
-                
-                console.log('Marks');
-                console.log(marks)
-                if (!marks[0].group){
-                    res.end('No marks are currently available for this student');
-                }
-                else{
-                res.render('admin/student-marks', {
-                    student: req.us3r,
-                    course: req.course,
-                    tutorial: tutorial,
-                    marks: marks,
-                    totalPoints: totalPoints,
-                    totalTeachingPoints : totalTeachingPoints
-                });
-                }
             });
         }
     });

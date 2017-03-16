@@ -19,16 +19,16 @@ var QuizSchema = new mongoose.Schema({
 });
 // Delete cascade
 QuizSchema.pre('remove', function (next) {
-    var quiz = this;
+    var self = this;
     async.parallel([
-        function delRef(done) {
-            models.Course.update({ quizzes: { $in: [quiz._id] }}, { $pull: { quizzes: quiz._id }}).exec(done);
+        function deleteFromCourse(done) {
+            models.Course.update({ quizzes: { $in: [self._id] }}, { $pull: { quizzes: self._id }}).exec(done);
         },
-        function delRef2(done) {
-            models.Question.remove({ _id: { $in: quiz.questions }}).exec(done);
+        function deleteQuestions(done) {
+            models.Question.remove({ _id: { $in: self.questions }}).exec(done);
         },
-        function delRef3(done) {
-            models.TutorialQuiz.remove({ quiz: quiz._id }).exec(done);
+        function deleteTutorialQuiz(done) {
+            models.TutorialQuiz.remove({ quiz: self._id }).exec(done);
         }
     ], next);
 });
@@ -36,10 +36,10 @@ QuizSchema.pre('remove', function (next) {
 QuizSchema.methods.withQuestions = function () {
     return this.populate('questions');
 };
-// Load quiz' tutorials
+// Load quiz' tutorials (deprecated)
 QuizSchema.methods.loadTutorials = function () {
     var quiz = this;
-    return models.TutorialQuiz.find({ quiz: quiz }, 'tutorial').populate('tutorial').exec(function (err, tutorialQuizzes) {
+    return models.TutorialQuiz.find({ quiz: quiz }).populate('tutorial').exec(function (err, tutorialQuizzes) {
         quiz.tutorials = tutorialQuizzes.map(function (tutorialQuiz) { 
             return tutorialQuiz.tutorial.id;
         });
@@ -55,31 +55,47 @@ QuizSchema.methods.store = function (obj, callback) {
     this.firstTryBonus = obj.firstTryBonus;
     this.penalty = obj.penalty;
 
-    var quiz = this;
+    var quiz = this, newTutorials = obj.tutorials || [];
+
+    // console.log('new', newTutorials)
 
     async.series([
-        // save quiz
-        function (done) {
+        function save(done) {
             quiz.save(done);
         },
-        // get quiz' tutorials
-        function (done) {
-            quiz.loadTutorials().then(function () { done(); });
+        // bug: deleting tutorial quiz is unrecoverable; so to ensure data integrity, 
+        // tutorial-quizzes that have been started i.e. have groups or responses cannot be deleted
+        function deleteTutorialQuizzes(done) {
+            models.TutorialQuiz.find({ 
+                $and: [
+                    { 'quiz': quiz.id }, 
+                    { 'groups.0': { '$exists': false } },
+                    { 'responses.0': { '$exists': false } }
+                ]
+            }).exec(function (err, tutorialQuizzes) {
+                async.eachSeries(tutorialQuizzes, function (tutorialQuiz, done) {
+                    if (newTutorials.indexOf(tutorialQuiz.tutorial.toString()) === -1)
+                        tutorialQuiz.remove(done);
+                    else
+                        done();
+                }, done);
+            });
         },
-        // delete old tutorials
-        function (done) {
-            async.eachSeries(_.difference(quiz.tutorials, obj.tutorials), function (tutorial, done) {
-                models.TutorialQuiz.findOneAndRemove({ tutorial: tutorial, quiz: quiz }, done);
-            }, done);
-        },
-        // insert new tutorials
-        function (done) {
-            async.eachSeries(_.difference(obj.tutorials, quiz.tutorials), function (tutorial, done) {
-                models.TutorialQuiz.create({ tutorial: tutorial, quiz: quiz }, done);
-            }, done);
+        function addTutorialQuizzes(done) {
+            models.TutorialQuiz.find({ 'quiz': quiz.id }).exec(function (err, tutorialQuizzes) {
+                var oldTutorials = _.map(tutorialQuizzes, function (tutorialQuiz) {
+                    return tutorialQuiz.tutorial.toString();
+                });
+
+                // console.log('old', oldTutorials)
+
+                async.eachSeries(_.difference(newTutorials, oldTutorials), function (id, done) {
+                    models.TutorialQuiz.create({ tutorial: id, quiz: quiz.id }, done);
+                }, done);
+            });
         }
     ], function (err) {
-        callback(null, quiz);
+        callback(err, quiz);
     });
 };
 

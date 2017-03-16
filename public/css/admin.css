@@ -7,7 +7,50 @@ body > .navbar {
 textarea.form-control {
     max-width: 100%;
 }
+input[type=checkbox][data-label] {
+    display: none;
+}
 .alert {
+    display: inline-block;
+}
+.btn-circle {
+    background: #fff;
+    border-color: #ddd;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 50%;
+    box-sizing: content-box;
+    display: inline-block;
+    height: 35px;
+    line-height: 35px;
+    max-height: 35px;
+    max-width: 35px;
+    overflow: hidden;
+    width: 35px;
+}
+.btn-circle:hover {
+    border-color: #428bca;
+}
+.btn-circle.active {
+    background: #428bca;
+    border-color: #ddd;
+}
+.btn-circle label {
+    cursor: pointer;
+    display: block;
+    font-weight: normal;
+    text-align: center;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.btn-circle.active label {
+    color: white;
+}
+.btn-file {
     display: inline-block;
 }
 .dim-wrap {
@@ -34,36 +77,79 @@ textarea.form-control {
 .handle {
     cursor: pointer;
 }
-.nav-actions {
-    margin-bottom: 10px;
-    padding: 10px 0;
+.form-group.required .control-label:before {
+    color: red;
+    content: "*";
+    font-size: 120%;
+    position: absolute;
+    margin-left: -12px;
+    top: 5px;
 }
-.table th.actions, .table td.actions {
-    width: 105px;
+.pagination > li > a, .pagination > li > span {
+    color: #333;
+    margin-left: 3px;
+    z-index: 0 !important;
+}
+.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover,
+.pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+    background-color: #333;
+    border-color: #333;    
+}
+.pagination > .divider > *, .pagination > .previous > *, .pagination > .next > * {
+    background-color: #fff !important;
+    border: 0 !important;
+}
+.nav-actions {
+    padding: 10px 0;
 }
 .stretch-wrap {
     overflow-x: auto;
 }
+.table > tfoot > tr > th {
+    border-top: 2px solid #ddd;
+}
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
+.table th.actions, .table td.actions {
+    width: 105px;
+}
+.table tfoot .pagination {
+    margin: 0;
+}
+.tab-pane {
+    padding: 10px;
+}
 
-/* Find users styles */
-
+#modal-add-tutorials .modal-body label {
+    font-weight: normal;
+}
+#modal-add-tutorials .modal-body input {
+    display: inline-block; 
+    margin: 0 10px; 
+    width: 70px;
+}
 #modal-find-users .modal-body {
     min-height: 150px;
 }
-#modal-find-users form {
-    overflow: hidden;
-}
-#modal-find-users form * {
+#modal-find-users #q {
     float: left;
-}
-#modal-find-users form input[type=text] {
     margin-right: 10px;
     width: 80%;
 }
-#modal-find-users table {
-    margin: 15px 0 0;
+#modal-find-users #btn-search {
+    float: left;
 }
-#modal-find-users th, #modal-find-users td {
+#modal-find-users #search-results {
+    clear: both;
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+#modal-find-users #search-results table {
+    margin: 0;
+}
+#modal-find-users #search-results th, #modal-find-users #search-results td {
     padding: 8px 0;
 }
 
@@ -71,13 +157,15 @@ textarea.form-control {
 
 #modal-upload-files .modal-body {
     padding: 0;
+    text-align: center;
 }
 #modal-upload-files .modal-body .btn {
     margin: 15px auto;
-    width: 95%;
 }
 #modal-upload-files .modal-body .list-group {
+    overflow-y: auto;
     margin: 0;
+    max-height: 300px;
 }
 #modal-upload-files .modal-body .list-group-item {
     border-radius: 0;
@@ -85,6 +173,10 @@ textarea.form-control {
     border-right: 0;
     border-bottom: 0;
     border-left: 0;
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 #modal-upload-files .modal-body .btn-remove-file {
     padding: 8px 20px 0 0;
@@ -154,54 +246,33 @@ a.counter {
 
 /* Group listing styles */
 
-#btn-randomize > .glyphicon-random:before {
-    display: inline-block;
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    transform: rotate(90deg);
-}
-#table-quiz-groups {
-    border-top: 1px solid #ddd;
-    border-left: 1px solid #ddd;
-}
-#table-quiz-groups th, #table-quiz-groups td {
+#groups table {
     border-bottom: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    height: 30px;
+}
+#groups th {
+    padding: 5px 0;
+}
+#groups td {
+    border-top: 1px solid #ddd;
+    height: 50px;
+}
+#groups tr:nth-child(even) td {
+    background: #f0f0f0;
+}
+#groups td.student {
+    padding-left: 10px;
     overflow: hidden;
-    text-align: center;
     text-overflow: ellipsis;
     vertical-align: middle;
     white-space: nowrap;
-}
-#table-quiz-groups th.s, #table-quiz-groups td.s {
     width: 200px; 
 }
-#table-quiz-groups th.u, #table-quiz-groups td.u {
-    width: 110px; 
+#groups td.group {
+    text-align: center;
+    width: 50px; 
 }
-#table-quiz-groups th.g, #table-quiz-groups td.g {
-    width: 55px; 
-}
-#table-quiz-groups th.g {
-    cursor: pointer;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-#table-quiz-groups th.selected, #table-quiz-groups td.selected {
-    background-color: beige;
-}
-#table-quiz-groups tr td:first-child {
-    text-align: left;
-}
-#table-quiz-groups tbody td {
-    padding: 0 5px;
+#groups .btn-circle:last-child {
+    display: none;
 }
 
 @media (min-width: 768px) {
@@ -216,20 +287,4 @@ a.counter {
         min-width: auto;
         width: 100%;
     }
-}
-
-.help .toc {
-    columns: 3 180px;
-    column-gap: 2em;
-}
-.help .toc ul {
-    margin: 0;
-    padding: 0;
-}
-.help .toc li {
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
-    break-inside: avoid;
-    list-style-type: none;
-    overflow: hidden;
 }

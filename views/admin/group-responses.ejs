@@ -1,13 +1,14 @@
 <%- include ./header -%>
 
-<h1><%= course.code + ' - ' + course.name %><br>
-<small>Tutorial <%= tutorialQuiz.tutorial.number %> - <%= tutorialQuiz.quiz.name %> - Group <%= group.name %> - Responses</h1>
+<ol class="breadcrumb">
+    <li><a href="/admin/courses">Courses</a> ‐ <%- course.code %></li>
+    <li><a href="/admin/courses/<%= course.id %>/tutorials">Tutorials</a> ‐ TUT <%- tutorial.number %></li>
+    <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes">Quizzes</a> ‐ <%- quiz.name %></li>
+    <li>Groups ‐ Group <%- group.name %></li>
+    <li class="active">Responses</li>
+</ol>
 
-<%- include ./flash %>
-
-<a href="/admin/courses/<%= course.id %>/tutorial-quizzes/<%= tutorialQuiz.id %>/groups/<%= group.id %>/responses/export" class="btn btn-default"><span class="glyphicon glyphicon-save"></span> Export</a>
-
-<br><br>
+<h1><%- title %></h1>
 
 <table class="table table-striped">
     <thead>
@@ -18,28 +19,28 @@
             <th class="text-center">Points awarded</th>
         </tr>
     </thead>
-    <% if (!_.isEmpty(responses)) { %>
-        <tfoot>
-            <tr class="total-points">
-                <th colspan="3" style="text-align: right">Total Points</th>
-                <th class="text-center"><%= totalPoints %></th>
-            </tr>
-        </tfoot>
-        <tbody>
-        <% _.each(responses, function (response) { %>
-            <tr>
-                <td style="width: 10px;"><%= response.question.number %>.</td>
-                <td style="max-width: 250px;"><%= response.question.question %></td>
-                <td class="text-center"><%= response.attempts %></td>
-                <td class="text-center"><%= response.points %></td>
-            </tr>
-        <% }) %>
-        </tbody>
-    <% } else { %>
-        <tbody>
-            <tr><td colspan="4">No responses have been given yet.</td></tr>
-        </tbody>
-    <% } %>
+<% if (_.isEmpty(responses)) { %>
+    <tbody>
+        <tr><td colspan="4">No responses have been given yet.</td></tr>
+    </tbody>
+<% } else { %>
+    <tfoot>
+        <tr class="total-points">
+            <th colspan="3" style="text-align: right">Total Points</th>
+            <th class="text-center"><%= totalPoints %></th>
+        </tr>
+    </tfoot>
+    <tbody>
+    <% _.each(responses, function (response) { %>
+        <tr>
+            <td style="width: 10px;"><%= response.question.number %>.</td>
+            <td style="max-width: 250px;"><%= response.question.question %></td>
+            <td class="text-center"><%= response.attempts %></td>
+            <td class="text-center"><%= response.points %></td>
+        </tr>
+    <% }) %>
+    </tbody>
+<% } %>
 </table>
 
 <%- include ./body-js -%>

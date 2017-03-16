@@ -1,6 +1,12 @@
 <%- include ./header -%>
 
-<h1><%= course.code + ' - ' + course.name %><br><small>Quiz <%= quiz.name %> - Questions</small></h1>
+<ol class="breadcrumb">
+    <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
+    <li><a href="/admin/courses/<%= course.id %>/quizzes">Quizzes</a> ‐ <%= quiz.name %></li>
+    <li class="active">Questions</li>
+</ol>
+
+<h1><%- title %></h1>
 
 <%- include ./flash %>
 
@@ -26,7 +32,7 @@
         <% _.each(quiz.questions, function (question, i) { %>
             <tr>
                 <td style="width: 10px;">
-                    <span class="glyphicon glyphicon-option-vertical handle"></span>
+                    <span class="glyphicon glyphicon-option-vertical handle" title="Hold and drag to new location"></span>
                     <input type="hidden" name="questions[]" value="<%= question.id %>">
                 </td>
                 <td style="width: 10px;"><%= question.number %>.</td>
@@ -66,12 +72,7 @@ $(function () {
             message: '<p>You are about to delete question and all of its associated information.</p>\
                 <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
             callback: function () {
-                $.ajax(btn.href, {
-                    type: 'delete',
-                    complete: function () {
-                        window.location.reload(true);
-                    }
-                });
+                $.delete(btn.href, function () { window.location.reload(true); });
             }
         });
     });

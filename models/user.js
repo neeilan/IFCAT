@@ -1,14 +1,14 @@
 var _ = require('lodash'),
     async = require('async'),
     bcrypt = require('bcryptjs'),
-    mongoose = require('mongoose');
-    
+    mongoose = require('mongoose');  
 var models = require('.');
 
 var UserSchema = new mongoose.Schema({
     local: {
         email: { 
             type: String,
+            trim: true,
             lowercase: true
         },
         password: {
@@ -25,68 +25,108 @@ var UserSchema = new mongoose.Schema({
     student: {
         UTORid: {
             type: String,
+            trim: true,
             lowercase: true
         },
-        number: String
+        number: {
+            type: String,
+            trim: true
+        }
     },
     teachingPoints: {
         type: Number,
         default: 0
     },
     name: {
-        first: String,
-        last: String
+        first: {
+            type: String,
+            trim: true,
+            set: function (first) {
+                return _.startCase(_.toLower(first));
+            }
+        },
+        last: {
+            type: String,
+            trim: true,
+            set: function (last) {
+                return _.startCase(_.toLower(last));
+            }
+        }
     },
     roles: [{
         type: String,
         enum: ['admin', 'instructor', 'teachingAssistant', 'student']
     }]
+}, {
+    toJSON: {
+        virtuals: true
+    }
 });
-
 // get full name
 UserSchema.virtual('name.full').get(function () {
     return _.defaultTo(this.name.first, '') + ' ' + _.defaultTo(this.name.last, '');
 });
-// hook: hash password if one is given
+// pre-save hook
 UserSchema.pre('save', function (next) {
-    var user = this;
-    if (!user.isModified('local.password')) 
-        return next();
-    bcrypt.genSalt(function (err, salt) {
-        if (err) 
-            return next(err);
-        bcrypt.hash(user.local.password, salt, function (err, hash) {
+    var self = this;
+    // hash password if it is present and has changed
+    if (self.local.password && self.isModified('local.password')) {
+        bcrypt.genSalt(10, function (err, salt) {
             if (err) 
                 return next(err);
-            user.local.password = hash;
-            next();
+            bcrypt.hash(self.local.password, salt, function (err, hash) {
+                if (err) 
+                    return next(err);
+                self.local.password = hash;
+                next();
+            });
         });
-    });
+    } else {
+        return next();
+    }
 });
 
 // hook: delete cascade
 UserSchema.pre('remove', function (next) {
-    var conditions = {
-        $or: [
-            { instructors: { $in: [this._id] }},
-            { teachingAssistants: { $in: [this._id] }}, 
-            { students: { $in: [this._id] }}
-        ]
-    },  doc = { 
-        $pull: {
-            instructors: this._id,
-            teachingAssistants: this._id,
-            students: this._id
-        }
-    }, options = {
-        multi: true
-    };
+    var self = this;
     async.parallel([
-        function delRef1(done) {
-            models.Course.update(conditions, doc, options).exec(done);
+        function deleteFromCourse(done) {
+            models.Course.update({
+                $or: [
+                    { instructors: { $in: [self._id] }},
+                    { teachingAssistants: { $in: [self._id] }}, 
+                    { students: { $in: [self._id] }}
+                ]
+            }, { 
+                $pull: { instructors: self._id, teachingAssistants: self._id, students: self._id }
+            }, {
+                multi: true
+            }).exec(done);
         },
-        function delRef2(done) {
-            models.Tutorial.update(conditions, doc, options).exec(done);
+        function deleteFromTutorials(done) {
+            models.Tutorial.update({
+                $or: [{ teachingAssistants: { $in: [self._id] }}, { students: { $in: [self._id] }}]
+            }, { 
+                $pull: { teachingAssistants: self._id, students: self._id }
+            }, {
+                multi: true
+            }).exec(done);
+        },
+        function deleteFromGroups(done) {
+            models.Group.find().or([{
+                members: { $in: [self._id] }
+            }, {
+                driver: self._id
+            }]).exec(function (err, groups) {
+                if (err) 
+                    return done(err);
+                async.eachSeries(groups, function (group, done) {
+                    group.members.pull(self.id);
+                    if (group.driver && group.driver.toString() === self.id)
+                        group.driver = undefined; // unset
+                    group.save(done);
+                }, done);
+            });
         }
     ], next);
 });
@@ -96,7 +136,11 @@ UserSchema.methods.checkPassword = function (password, callback) {
 };
 // check user's role
 UserSchema.methods.hasRole = function (role) {
-    return this.roles.indexOf(role) !== -1;
+    return this.roles.indexOf(role) > -1;
+};
+//
+UserSchema.methods.hasAnyRole = function (roles) {
+    return !!_.intersection(this.roles, roles).length;
 };
 // sort users by roles, first name, and last name
 UserSchema.statics.sortByRole = function (users) {

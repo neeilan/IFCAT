@@ -36,21 +36,9 @@
                     <% if (user.hasRole('admin')) { %>
                         <li><a href="/admin/users">Users</a></li>
                     <% } %>
-                    <li><a href="/admin/help">Help</a></li>
                     <li><a href="/admin/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                 </ul>
             </div>
         <% } %>
         </nav>
-        <div class="container">
-        <% if (typeof breadcrumbs !== 'undefined') { %>
-            <ol class="breadcrumb">
-            <% _.each(breadcrumbs, function (breadcrumb) { %>
-                <% if (breadcrumb.href) { %>
-                    <li><a href="/admin/<%= breadcrumb.href %>"><%= breadcrumb.text %></a></li>
-                <% } else { %>
-                    <li class="active"><%= breadcrumb.text %></li>
-                <% } %>
-            <% }) %>
-            </ol>
-        <% } %>
+        <main class="container">

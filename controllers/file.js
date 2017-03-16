@@ -2,7 +2,6 @@ var async = require('async'),
     fs = require('fs-extra'),
     mongoose = require('mongoose'),
     path = require('path');
-
 var config = require('../lib/config'),
     models = require('../models');
 
@@ -48,7 +47,7 @@ exports.deleteFiles = function (req, res) {
     var dir = config.uploadPath + '/' + req.course.id;
     async.each(req.body.files, function (id, done) {
         async.waterfall([
-            function find(done) {
+            function findFile(done) {
                 models.File.findById(id, function (err, file) {
                     if (err)
                         return done(err);
@@ -57,14 +56,14 @@ exports.deleteFiles = function (req, res) {
                     done(null, file);
                 });
             },
-            function del(file, done) {
+            function removeFile(file, done) {
                 file.remove(function (err) {
                     if (err)
                         return done(err);
                     done(null, file);
                 });
             },
-            function unlink(file, done) {
+            function unlinkFile(file, done) {
                 var filename = path.resolve(dir + '/' + file.name);
                 fs.stat(filename, function (err, stats) {
                     if (err && err.code === 'ENOENT')

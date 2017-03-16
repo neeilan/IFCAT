@@ -1,17 +1,15 @@
 var _ = require('lodash'),
     async = require('async');
-
-var models = require('../models');
+var config = require('../lib/config'),
+    models = require('../models');
 
 // Retrieve tutorial
 exports.getTutorial = function (req, res, next, tutorial) {
     models.Tutorial.findById(tutorial, function (err, tutorial) {
-        if (err) {
+        if (err)
             return next(err);
-        }
-        if (!tutorial) {
+        if (!tutorial)
             return next(new Error('No tutorial is found.'));
-        }
         req.tutorial = tutorial;
         next();
     });
@@ -30,7 +28,6 @@ exports.addTutorialList = function (req, res) {
     var len = Math.abs(_.toInteger(req.body.len)),
         start = Math.abs(_.toInteger(req.body.start)),
         range = _.range(start, len + start);
-
     req.course.withTutorials().execPopulate().then(function () {
         // get list of tutorial numbers
         var numbers = _.map(req.course.tutorials, function (tutorial) {
@@ -38,8 +35,6 @@ exports.addTutorialList = function (req, res) {
         });
         // add new tutorials
         async.eachSeries(range, function (n, done) {
-            // format number e.g. 13 => 0013  
-            n = _.padStart(n, 4, '0');
             // check whether number has not already been processed
             if (numbers.indexOf(n) !== -1)
                 return done();

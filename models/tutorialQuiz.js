@@ -11,12 +11,12 @@ var TutorialQuizSchema = new mongoose.Schema({
     // or will manually be placed into groups by the admins
     allocateMembers: { 
         type: String, 
-        enum: ['unaided', 'automatically', 'self-selection'],
+        enum: ['unaided', 'automatically', 'self-selection'], // incorrect!
         default: 'automatically'
     },
     // max # of groups OR members per group
     max: {
-        groups: { type : Number, default: 7 },
+        groups: { type : Number, default: 4 },
         membersPerGroup: { type : Number, default: 3 } 
     },
     // make quiz visible to students
@@ -30,20 +30,6 @@ var TutorialQuizSchema = new mongoose.Schema({
 });
 // Set index
 TutorialQuizSchema.index({ tutorial: 1, quiz: 1 }, { unique: true });
-// Get students within groups
-TutorialQuizSchema.virtual('assignedStudents').get(function () {
-    return _.reduce(this.groups, function (accum, group) {
-        return _.concat(accum, group.members);
-    }, []);
-});
-// Get students not within groups
-TutorialQuizSchema.virtual('unassignedStudents').get(function () {
-    return _.differenceBy(this.tutorial.students, this.assignedStudents, 'id');
-});
-//
-TutorialQuizSchema.methods.isUnassigned = function (userId) {
-    return !!_.find(this.unassignedStudents, { id: userId });
-};
 // Populate students
 TutorialQuizSchema.methods.withStudents = function () {
     return this.populate({
@@ -84,7 +70,6 @@ TutorialQuizSchema.methods.withResponses = function () {
         }]
     });
 };
-
 // Save tutorial-quiz
 TutorialQuizSchema.methods.store = function (obj, callback) {
     this.allocateMembers = obj.allocateMembers;

@@ -1,6 +1,11 @@
 <%- include ./header -%>
 
-<h1><%= course.code + ' - ' + course.name %><br><small>Tutorials</small></h1>
+<ol class="breadcrumb">
+    <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
+    <li class="active">Tutorials</li>
+</ol>
+
+<h1><%- title %></h1>
 
 <%- include ./flash %>
 
@@ -14,7 +19,7 @@
         <tr>
             <th style="width: 100px">Tutorial</th>
             <th>TA</th>
-            <th class="text-center" style="width: 115px"># of students</th>
+            <th class="text-center"># of students</th>
             <th class="actions"></th>
         </tr>
     </thead>
@@ -27,7 +32,7 @@
         <% _.each(course.tutorials, function (tutorial) { %>
             <tr>
                 <td>TUT <%= tutorial.number %></td>
-                <td><%- tutorial.teachingAssistants.map(function (ta) { return ta.name.full; }).join('<br>') %></td>
+                <td><%- tutorial.teachingAssistants.map(function (ta) { return ta.name.full }).join('<br>') %></td>
                 <td class="text-center"><%= tutorial.students.length %></td>
                 <td>
                     <div class="dropdown">
@@ -38,11 +43,11 @@
                             <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/edit"><span 
                                 class="glyphicon glyphicon-pencil"></span> Edit Tutorial</a></li>
                             <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes"><span 
-                                class="glyphicon glyphicon-list-alt"></span> Manage Quizzes</a></li>
+                                class="glyphicon glyphicon-play-circle"></span> Conduct Quizzes</a></li>
                             <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/students"><span 
                                 class="glyphicon glyphicon-user"></span> Manage Students</a></li>
                             <li class="divider"></li>
-                            <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete Tutorial</a></li>
+                            <li><a href="#/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete Tutorial</a></li>
                         </ul>
                     </div>
                 </td>
@@ -65,12 +70,7 @@ $(function () {
             message: '<p>You are about to delete tutorial and all of its associated information.</p>\
                 <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
             callback: function () {
-                $.ajax(btn.href, {
-                    type: 'delete',
-                    complete: function () {
-                        window.location.reload(true);
-                    }
-                });
+                $.delete(btn.href.substring(1), function () { window.location.reload(true); });
             }
         });
     });

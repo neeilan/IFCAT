@@ -1,11 +1,10 @@
-$(function () { 
-    // turn off caching
+$(function () {
+    // set default AJAX options
     $.ajaxSetup({ cache: false });
 
     // activate current navbar item
     $('#navbar-collapse li > [href!="#"]').each(function () {
-        console.log( location.href, this.href, location.href.indexOf(this.href) );
-        if (window.location.href.indexOf(this.href) !== -1) {
+        if (window.location.href.indexOf(this.href) > -1) {
             $(this).parent().addClass('active');
             return false;
         }
@@ -13,76 +12,38 @@ $(function () {
 
     // wrap tables with  special container 
     $('.dim, .stretch').each(function() {
-        var $elem = $(this), $div = $('<div/>');
-        if ($elem.hasClass('stretch')) {
-            $div.addClass('stretch-wrap');
+        var elem = $(this), div = $('<div/>');
+        if (elem.hasClass('stretch')) {
+            div.addClass('stretch-wrap');
         }
-        if ($elem.hasClass('dim')) {
-            $div.addClass('dim-wrap');
+        if (elem.hasClass('dim')) {
+            div.addClass('dim-wrap');
         }
-        $elem.wrap($div);
+        elem.wrap(div);
 
-        if ($elem.hasClass('dim')) {
-            $elem.after('<div class="dimmer"></div>'); // overlay
+        if (elem.hasClass('dim')) {
+            elem.after('<div class="dimmer"></div>'); // overlay
         }
     });
 
     // checked/unchecked all table-body checkboxes when table-header checkbox is checked/unchecked
-    $('th :checkbox').change(function () {
-        $(this).closest('table').find('td :checkbox').prop('checked', this.checked);
-    });
-
-    // 
-    $('.btn [type=file]').change(function () {
-        $(this).parent().next('.label-info').html(this.value);
-    });
-
-    // search users when form is submitted
-    $('#modal-find-users form').submit(function (e) {
-        e.preventDefault();
-        var $form = $(this);
-            $form.next('div').load(this.action, $form.serialize());
+    $(document).on('change', 'th > :checkbox', function () {
+        var checkbox = $(this), 
+            index = checkbox.parent().index();
+        checkbox.closest('table').find('tr').each(function () {
+            $('td:eq(' + index + ') > :checkbox:not(:disabled)', this).prop('checked', checkbox[0].checked);
+        });
     });
 
     // add user to course when button is clicked
-    $('#modal-find-users').on('click', 'td > a', function (e) {
-        e.preventDefault();
-        $.bootstrapAlert('close');
-        var $heading = $('.container > h1'),
-            $table = $('#table-users'), 
-            $tr = $(this).closest('tr');
-        $.ajax(this.href, {
-            type: 'post',
-            success: function (res) {
-                $heading.after($.bootstrapAlert('success', res));
-                $table.loadInner(window.location.href);
-                $tr.remove();
-            },
-            error: function (xhr) {
-                $heading.after($.bootstrapAlert('error', xhr.responseText));
-            }
-        });
+    $('#btn-search').click(function () {
+        $('#search-results').load($(this).closest('form')[0].action + '/search?q=' + q.value);
     });
-    // update user in tutorials when button is clicked      
-    $('#table-users').on('click', '.btn-update-user').click(function (e) {        
-         e.preventDefault();       
-         $.ajax(this.href, {       
-             type: 'put',      
-             data: $(this).closest('tr').find(':input').serialize(),       
-             success: function (res) {     
-                 window.location.reload(true); // TO-FIX       
-             }     
-         });       
-    });
+
     // delete user from course when button is clicked
-    $('#table-users').on('click', '.btn-delete-user', function (e) {
+    $('.btn-delete-user').click(function (e) {
         e.preventDefault();
-        $.ajax(this.href, {
-            type: 'delete',
-            success: function (res) {
-                window.location.reload(true); // TO-FIX
-            }
-        });
+        $.delete(this.href, function () { window.location.reload(true); });
     });
 
     // style checkboxes with switch control
@@ -90,17 +51,54 @@ $(function () {
         inverse: true,
         offText: 'No',
         onText: 'Yes',
-        size: 'small',
+        size: 'small'
     });
 
-    // small plugin for loading inner html from url + selector
-    // @usage: $(selector).loadInner(url, data, callback)
-    $.fn.loadInner = function () {
-        if (arguments.length) {
-            arguments[0] += ' ' + $(this).selector + ' > *';
+    // save last opened tab
+    $('a[data-toggle=tab]').on('shown.bs.tab', function () {
+        localStorage.setItem('tab-open', $(this).attr('href'));
+    });
+    // open last opened tab
+    var tab = localStorage.getItem('tab-open');
+    if (tab) {
+        $('a[href="' + tab + '"]').tab('show');
+    }
+
+    // toggle checkbox-radios
+    $(document).on('click', '.btn-circle', function (e) {
+        var btn = $(this).toggleClass('active'), 
+            input = btn.find('input').prop('checked', btn.hasClass('active'));
+        // inactivate other checkbox-radios if they belong to the same group
+        if (input.data('group')) {
+            $(e.delegateTarget).find('.btn-circle').has('[data-group=' + input.data('group') + ']').not(btn).each(function () {
+                $(this).removeClass('active').find('input').prop('checked', false);
+            });
         }
-        return this.load.apply(this, arguments);
-    };
+    // create checkbox-radios
+    }).find(':checkbox[data-label]').each(function() {
+        $(this)
+            .wrap('<div class="btn-circle' + (this.checked ? ' active' : '') + '"></div>')
+            .before('<label>' + this.dataset.label + '</label>');
+    });
+
+    // small plugins for making PUT and DELETE requests
+    // @usage: $.put(url, data, callback) or $.delete(url, callback)
+    $.each(['put', 'delete'], function (i, method) {
+        $[method] = function (url, data, callback, type) {
+            if ($.isFunction(data)) {
+                type = type || callback;
+                callback = data;
+                data = undefined;
+            }
+            return $.ajax({
+                url: url,
+                type: method,
+                dataType: type,
+                data: data,
+                success: callback
+            });
+        };
+    });
 
     // small plugin for showing/hiding selector and enabling/disabling its children
     // @usage: $(selector).enableToggle([display])

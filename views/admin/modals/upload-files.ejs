@@ -1,20 +1,19 @@
-<!-- upload files modal -->
 <div class="modal fade" id="modal-upload-files" tabindex="-1" style="display: none;">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
-            <form action="<%= url %>" method="post" enctype="multipart/form-data">
+            <form action="" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
-                    <h4 class="modal-title"><span class="glyphicon glyphicon-plus"></span> Upload files</h4>
+                    <h4 class="modal-title">Upload files</h4>
                 </div>
                 <div class="modal-body">
-                    <button type="button" class="btn btn-default btn-block btn-select">Select Files</button>
-                    <input type="file" name="files" multiple style="display: none">
+                    <span class="btn btn-default btn-file" onclick="files.click()">
+                        <input type="file" name="files" id="files" multiple style="display: none;">Select Files
+                    </span>
                     <ul class="list-group"></ul>
                 </div>
                 <div class="modal-footer"> 
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary btn-sm"><span 
-                        class="glyphicon glyphicon-plus"></span> Upload files</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Upload</button>
                 </div>
             </form>
         </div>
@@ -23,17 +22,12 @@
 
 <script>
 $(function () {
-    // open file input
-    $('#modal-upload-files .btn-select').click(function () {
-        $(this).next(':file').click();
-    });
-    // list files selected by file input
-    $('#modal-upload-files :file').change(function () {
-        $(this).next('.list-group').html(
-            _.reduce(this.files, function (html, file) {
-                return html + '<li class="list-group-item">' + file.name + '</li>';
-            }, '')
-        );
+    $('#files').change(function () {
+        var options  = '';
+        $.each(this.files, function (i, file) {
+            options += '<li class="list-group-item">' + file.name + '</li>';
+        });
+        $(this).closest('.modal-body').find('.list-group').html(options);
     });
 });
 </script>
