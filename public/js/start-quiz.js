@@ -1,3 +1,5 @@
+(function(){
+
 $('.quizBtn').attr('disabled', true); // Disable quiz buttons (enable if assigned as driver)
 
 //
@@ -5,17 +7,18 @@ var url = window.location.href;
 var quizId = url.slice(url.indexOf('/quizzes/') + 9, url.indexOf('/start'));
 var socket = io();
 var quizData, userId, groupId, isDriver, responses = {},
-    currentQuestionId, currentQuestionIndex, score = 0;
+    currentQuestionId, currentQuestionIndex, currentQuizId = null, score = 0, numCorrect = 0;
 
 socket.emit('requestQuiz', quizId);
+
+
 socket.on('setGroup', function(id) {
     console.log('setGroup');
     groupId = id;
 })
 
 socket.on('quizData', function (tutorialQuiz) {
-    console.log('quizData');
-    console.log(tutorialQuiz);
+    
     quizData = quizData || tutorialQuiz.quiz;
     groupId = tutorialQuiz.groupId;
     userId = userId || tutorialQuiz.userId;
@@ -38,13 +41,11 @@ socket.on('quizData', function (tutorialQuiz) {
 })
 
 socket.on('groupsUpdated', function (data) {
-    console.log('groupsUpdated');
     renderGroups(data.groups);
 })
 
 // When a question is answered by leader, a 'groupAttempt' event is emitted
 socket.on('groupAttempt', function(data) {
-    console.log('groupAttempt');
     if (groupId && data.groupId != groupId) return;
 
     responses[data.response.question] = data.response;
@@ -57,6 +58,13 @@ socket.on('groupAttempt', function(data) {
      Received " + data.response.points + " of " + maxScore + " points ", "success");
         score += parseInt(data.response.points, 10);
         $('#' + (data.questionNumber - 1)).addClass('btn-success');
+        
+     // workaround to give teaching points early
+     numCorrect++;
+     if (quizData.quiz.questions.length == numCorrect){
+        socket.emit('quizComplete', { groupId: groupId, quizId: quizData._id })
+     }        
+        
     } else {
         swal("Yikes!", "Question " + data.questionNumber + " was answered incorrectly!", "error");
 
@@ -99,20 +107,14 @@ $(document).on('click', '#createGroupBtn', function () {
     $('#createGroupBtn').hide();
 })
 
-function renderStars (question, empty, full, returnHTML) {
-    var fullStars = '<i class="fa fa-star" />&nbsp;' . repeat(full),
-        emptyStars = '<i class="fa fa-star-o" />&nbsp;' . repeat(empty);
-    var html = emptyStars + fullStars;
 
-    if (parseInt(empty, 10) + parseInt(full, 10) > 6) {
-        html = "Stars: " + (full) + "/" + (empty + full);
-    }
-    if (returnHTML) return html;
-    $('#points-' + question).html(html);
-}
+$(document).on('click', '.goToQuestion', function () {
+       renderQuestion(quizData.quiz, this.id);
+})
 
 socket.on('quizActivated', function (tutQuiz) { // active = start questions]
     console.log('quizActivated');
+    console.log(tutQuiz);
     quizData.active = tutQuiz.active;
     $('#groupSelfSelect').hide();
     console.log(tutQuiz.active)
@@ -179,6 +181,19 @@ function renderGroups(groups, currentGroupId) {
 }
 
 
+function renderStars (question, empty, full, returnHTML) {
+    var fullStars = '<i class="fa fa-star" />&nbsp;' . repeat(full),
+        emptyStars = '<i class="fa fa-star-o" />&nbsp;' . repeat(empty);
+    var html = emptyStars + fullStars;
+
+    if (parseInt(empty, 10) + parseInt(full, 10) > 6) {
+        html = "Stars: " + (full) + "/" + (empty + full);
+    }
+    if (returnHTML) return html;
+    $('#points-' + question).html(html);
+}
+
+
 function emit(eventName, data) {
     /* Acts as wrapper for emitting events, attaching
      useful "header" properties */
@@ -190,10 +205,6 @@ function emit(eventName, data) {
     socket.emit(eventName, data);
 }
 
-var score = 0,
-    currentQuizId = null;
-
-// console.log(sessionStorage.getItem('currentQuiz'));
 
 function renderQuestion(quiz, n) {
     $('.quizBtn').attr('disabled', !isDriver);
@@ -294,7 +305,7 @@ function renderQuestion(quiz, n) {
         var chosenAnswer = currentlyChosen.map(function () {
             var chosenAnswerIndex = this.id.substring(7);
             return quizData.quiz.questions[n].choices[chosenAnswerIndex];
-        }).get()
+        }).get();
 
         $('.currentlyChosen').removeClass('currentlyChosen');
 
@@ -318,10 +329,6 @@ function renderQuestion(quiz, n) {
                 '</div>' +
                 '</button>');
 
-            $(document).on('click', '.goToQuestion', function () {
-                renderQuestion(quiz, this.id);
-            })
-
             var scoreData = calculateStars(question);
             if (scoreData.correct) {
                 $('#' + i).addClass('btn-success');
@@ -332,6 +339,8 @@ function renderQuestion(quiz, n) {
         $('.goToQuestion').removeClass('btn-warning');
         $('#' + n).addClass('btn-warning');
     }
+
+   
 
     // Check for previously answered questions
     if (quiz.questions[n]._id in responses && responses[quiz.questions[n]._id].correct) {
@@ -345,7 +354,7 @@ function quizCompleted() {
         $('#activeQuiz').html('Your responses have been submitted. You can change answers (penalties may apply) until your TA inactivates this quiz.');
     } else {
         $('#postQuiz').show();
-        socket.emit('quizComplete', { groupId: groupId, quizId: quizData._id })
+        socket.emit('quizComplete', { groupId: groupId, quizId: quizData._id });
     }
 }
 
@@ -358,7 +367,6 @@ function renderQuestionScoreMobile(questionIndex) {
 
 function calculateStars(question) {
     var result = {};
-
     var maxScore = question.points + question.firstTryBonus;
 
     if (question._id in responses) {
@@ -374,27 +382,39 @@ function calculateStars(question) {
 }
 
 
-socket.on('postQuiz', function(data) {
-    console.log('postQuiz');
+socket.on('postQuiz', function(data){
+  function peformPostQuizActions(){
     if (groupId && data.groupId != groupId) return;
-
-    $('.preQuiz, #activeQuiz').hide();
-    $('#postQuiz').show();
+    
+    $(".preQuiz").hide();
+    $('#activeQuiz').hide();
+    $("#postQuiz").show();
     $('#score').html(score);
     var html = "";
-    data.members.forEach(function(member) {
-        html += "<br/><button class='teachingPt btn btn-default col-md-6 col-xs-8 col-sm-8 col-md-offset-3 col-sm-offset-2 col-xs-offset-2 ' id='" + member._id + "'>" + (member.name.first + ' ' +
-            member.name.last) + "</button><br/>"
+    
+    if (localStorage.getItem('IqcAwardedTp'+ groupId) == 'true'){
+      $("#teachingPointsPicker").html('You have already awarded teaching points for this quiz.');
+      return;
+    }
+    
+    
+    data.members.forEach(function(member){
+      html+="<br/><button class='teachingPt btn btn-default col-md-6 col-xs-8 col-sm-8 col-md-offset-3 col-sm-offset-2 col-xs-offset-2 ' id='"+ member._id +"'>" + (member.name.first+' '
+      +member.name.last) +"</button><br/>"
     })
     $("#teachingPointsPicker").html(html);
-    $(document).on('click', '.teachingPt', function () {
-        emit('awardPoint', { receiverId: this.id });
-        $('#postQuiz').html('Quiz complete');
-    })
+    $(document).on('click','.teachingPt', function(e){
+      emit('awardPoint', { receiverId : e.target.id });
+      localStorage.setItem('IqcAwardedTp'+ groupId, 'true');
+      $('#postQuiz').html('Quiz complete');
+    })    
+  }
+  
+  setTimeout(peformPostQuizActions, 2000);
 })
 
 socket.on('info', function(data) {
-    console.log('info');
-    console.log(data);
     swal('', data.message, 'info');
 })
+
+})();
