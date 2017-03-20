@@ -108,7 +108,7 @@ exports.getMarkListByStudent = function (req, res) {
 // Retrieve marks by tutorial quiz
 exports.getMarkListByTutorialQuiz = function (req, res) {
     models.TutorialQuiz.findOne({ tutorial: req.tutorial, quiz: req.quiz }).exec(function (err, tutorialQuiz) {
-        console.log('getMarkListByTutQuiz', err, tutorialQuiz);
+        console.log('getMarkListByTutQuiz 1', err, tutorialQuiz);
         models.Response.find({ _id: { $in: tutorialQuiz.responses }}).populate({
             path: 'group',
             model: models.Group,
@@ -117,6 +117,7 @@ exports.getMarkListByTutorialQuiz = function (req, res) {
                 model: models.User
             }
         }).exec(function (err, responses) {
+            console.log('getMarkListByTutQuiz 2', err, responses);
             var students = {};
             // tally points per student
             _.each(responses, function (response) {
