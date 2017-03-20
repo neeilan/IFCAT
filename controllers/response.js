@@ -172,7 +172,7 @@ exports.getMarkListByCourse = function (req, res) {
         _id: {
             $in: req.body.tutorialQuizzes || [] 
         }
-    }).exec(function (err, tutorialQuizzes) {
+    }).populate('tutorial quiz').exec(function (err, tutorialQuizzes) {
         async.mapSeries(tutorialQuizzes, function (tutorialQuiz, done) {
             models.Response.find({ _id: { $in: tutorialQuiz.responses }}).populate({
                 path: 'group',
