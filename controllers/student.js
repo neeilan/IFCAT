@@ -39,27 +39,11 @@ exports.getStudentListBySearchQuery = function (req, res) {
 };
 // Retrieve list of students for tutorial
 exports.getStudentsByTutorial = function (req, res) {
-    var currentPage = parseInt(req.query.page, 10) || 1,
-        perPage = parseInt(req.query.perPage, 10) || 20,
-        start = (currentPage - 1) * perPage, 
-        end = start + perPage;
     req.tutorial.withStudents().execPopulate().then(function () {
-        var totalPages = _.round(req.tutorial.students.length / perPage), pages = [];
-        // build pages
-        for (var page = 1; page <= totalPages; page++) {    
-            if ((currentPage <= 2 && page <= 5) || 
-                (currentPage - 2 <= page && page <= currentPage + 2) ||
-                (totalPages - 2 < currentPage && totalPages - 5 < page)) pages.push(page);
-        }
         res.render('admin/tutorial-students', {
             title: 'Students', 
             course: req.course, 
-            tutorial: req.tutorial,
-            students: _.slice(req.tutorial.students, start, end),
-            currentPage: currentPage,
-            perPage: perPage,
-            totalPages: totalPages,
-            pages: pages
+            tutorial: req.tutorial
         });
     });
 };

@@ -19,20 +19,13 @@
             <th class="actions"></th>
         </tr>
     </thead>
-    <tfoot>
-        <tr>
-            <td colspan="4" style="text-align: center">
-                <%- include ./pagination %>
-            </td>
-        </tr>
-    </tfoot>
     <tbody>
-    <% if (_.isEmpty(students)) { %>
+    <% if (_.isEmpty(tutorial.students)) { %>
         <tr>
             <td colspan="4">No students have been added to this tutorial yet.</td>
         </tr>
     <% } else { %>  
-        <% _.each(students, function (student) { %>
+        <% _.each(tutorial.students, function (student) { %>
             <tr>
                 <td><%= student.name.full %></td>
                 <td><%= student.student.UTORid %></td>
