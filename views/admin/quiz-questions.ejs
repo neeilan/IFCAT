@@ -72,7 +72,7 @@ $(function () {
             message: '<p>You are about to delete question and all of its associated information.</p>\
                 <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
             callback: function () {
-                $.delete(btn.href, function () { window.location.reload(true); });
+                $.delete(btn.href, function () { window.location.reload(true) });
             }
         });
     });

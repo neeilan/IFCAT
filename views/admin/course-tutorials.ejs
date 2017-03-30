@@ -47,7 +47,7 @@
                             <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/students"><span 
                                 class="glyphicon glyphicon-user"></span> Manage Students</a></li>
                             <li class="divider"></li>
-                            <li><a href="#/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete Tutorial</a></li>
+                            <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete Tutorial</a></li>
                         </ul>
                     </div>
                 </td>
@@ -70,7 +70,7 @@ $(function () {
             message: '<p>You are about to delete tutorial and all of its associated information.</p>\
                 <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
             callback: function () {
-                $.delete(btn.href.substring(1), function () { window.location.reload(true); });
+                $.delete(btn.href, function () { window.location.reload(true) });
             }
         });
     });
