@@ -191,7 +191,7 @@ exports.resetdemo = function (req, res) {
             if (err) {
                 return res.send(err);
             }
-            res.send('Responses have been cleared: ' + tutorialQuiz.toJSON());
+            res.send('Responses have been cleared: ' + JSON.stringify(tutorialQuiz.toJSON()));
         });
     }
 };
