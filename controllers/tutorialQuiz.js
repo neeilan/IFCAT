@@ -176,3 +176,22 @@ exports.startQuiz = function (req, res) {
         });
     }
 };
+
+exports.resetdemo = function (req, res) {
+    if (req.query.yes === '1') {
+        models.TutorialQuiz.findOneAndUpdate({ 
+            _id: '58846587fa0ef624828dce76'
+        }, { 
+            $set: {
+                responses: []
+            } 
+        }, {
+            new: true
+        }, function (err, tutorialQuiz) {
+            if (err) {
+                return res.send(err);
+            }
+            res.send('Responses have been cleared: ' + tutorialQuiz.toJSON());
+        });
+    }
+};

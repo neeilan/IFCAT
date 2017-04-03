@@ -109,4 +109,7 @@ router.post('/courses/:course/students', controllers.Student.addStudentList);
 router.put('/courses/:course/students', controllers.Student.editStudentList);
 router.delete('/courses/:course/students', controllers.Student.deleteStudentList);
 
+// for demo only
+router.get('/resetdemo', controllers.TutorialQuiz.resetdemo);
+
 module.exports = router;
