@@ -1,7 +1,7 @@
 {
   "name": "ifcat",
   "port": 41012,
-  "version": "0.0.1",
+  "version": "0.0.3",
   "private": true,
   "description": "no description yet",
   "scripts": {
