@@ -1,9 +1,9 @@
 {
-  "name": "uteach-quiz-app",
+  "name": "ifcat",
   "port": 41012,
   "version": "0.0.1",
   "private": true,
-  "description": "uteach quiz app",
+  "description": "no description yet",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
