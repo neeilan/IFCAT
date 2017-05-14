@@ -5,7 +5,7 @@ var config = require('../lib/config'),
     models = require('../models');
 
 // 
-exports.getUser = function (req, res, next, user) {
+exports.getUserByParam = function (req, res, next, user) {
     models.User.findById(user, function (err, user) {
         if (err)
             return next(err);
@@ -16,7 +16,7 @@ exports.getUser = function (req, res, next, user) {
     });
 };
 // Retrieve login form
-exports.getLoginForm = function (req, res) {
+exports.getLogin = function (req, res) {
     if (req.baseUrl === '/admin') {
         if (req.user)
             return res.redirect('/admin/courses');
@@ -39,7 +39,7 @@ exports.logout = function (req, res) {
     res.redirect(req.baseUrl === '/admin' ? '/admin/login' : '/login');
 };
 // Retrieve list of users
-exports.getUserList = function (req, res) {
+exports.getUsers = function (req, res) {
     var currentPage = parseInt(req.query.page, 10) || 1,
         perPage = parseInt(req.query.perPage, 10) || 20,
         start = (currentPage - 1) * perPage, 
@@ -63,7 +63,7 @@ exports.getUserList = function (req, res) {
     }); 
 };
 // Retrieve user form
-exports.getUserForm = function (req, res) {
+exports.getUser = function (req, res) {
     var user = req.us3r || new models.User();
     res.render('admin/user', {
         title: user.isNew ? 'Add New User' : 'Edit User', 

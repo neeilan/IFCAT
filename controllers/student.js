@@ -1,11 +1,11 @@
-var _ = require('lodash'),
+const _ = require('lodash'),
     async = require('async'),
-    csv = require('csv');
-var config = require('../lib/config'),
+    config = require('../lib/config'),
+    csv = require('csv'),
     models = require('../models');
 
 // Retrieve list of students for course
-exports.getStudentListByCourse = function (req, res) {
+exports.getStudentsByCourse = (req, res) => {
     /*var currentPage = parseInt(req.query.page, 10) || 1,
         perPage = parseInt(req.query.perPage, 10) || 20,
         start = (currentPage - 1) * perPage, 
@@ -30,7 +30,7 @@ exports.getStudentListByCourse = function (req, res) {
     }); 
 };
 // Retrieve list of students matching search query
-exports.getStudentListBySearchQuery = function (req, res) {
+exports.getStudentsBySearchQuery = (req, res) => {
     models.User.findBySearchQuery(req.query.q, 'student').exec(function (err, students) {
         res.render('admin/tables/course-students-search-results', { 
             course: req.course, 
@@ -39,7 +39,7 @@ exports.getStudentListBySearchQuery = function (req, res) {
     });
 };
 // Retrieve list of students for tutorial
-exports.getStudentsByTutorial = function (req, res) {
+exports.getStudentsByTutorial = (req, res) => {
     req.tutorial.withStudents().execPopulate().then(function () {
         res.render('admin/tutorial-students', {
             title: 'Students', 
@@ -49,7 +49,7 @@ exports.getStudentsByTutorial = function (req, res) {
     });
 };
 // Add student to course
-exports.addStudentList = function (req, res) {
+exports.addStudents = (req, res) => {
     async.each(req.body.students || [], function (student, done) {
         req.course.update({ $addToSet: { students: student }}, done);
     }, function (err) {
@@ -61,7 +61,7 @@ exports.addStudentList = function (req, res) {
     });
 };
 // Update students' tutorials
-exports.editStudentList = function (req, res) {
+exports.editStudents = (req, res) => {
     var stack = _.mapValues(req.body.tutorials, function (users) { 
         return _.keys(users).sort();
     });
@@ -78,7 +78,7 @@ exports.editStudentList = function (req, res) {
     });
 };
 // Delete student from course and associated tutorial
-exports.deleteStudentList = function (req, res) {
+exports.deleteStudents = (req, res) => {
     var students = req.body.students || [];
     req.course.withTutorials().execPopulate().then(function () {
         async.series([
@@ -100,7 +100,7 @@ exports.deleteStudentList = function (req, res) {
     });
 };
 // Import list of students
-exports.importStudentList = function (req, res) {
+exports.importStudents = (req, res) => {
     // read spreadsheet
     csv.parse(req.file.buffer.toString(), {
         columns: true,
@@ -182,13 +182,13 @@ exports.importStudentList = function (req, res) {
 // TO-FIX!
 
 // Retrieve courses enrolled for student
-exports.getCourseList = function (req, res) {
+exports.getCourses = (req, res) => {
     models.Course.findByStudent(req.user.id).exec(function (err, courses) { 
         res.render('student/courses', { courses: courses });
     });
 };
 // Retrieve quizzes within course
-exports.getQuizList = function (req, res) {
+exports.getQuizzes = (req, res) => {
     req.course.withTutorials().execPopulate().then(function () {
         // find tutorials that student is in
         var tutorials = req.course.tutorials.filter(function (tutorial) {

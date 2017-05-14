@@ -1,12 +1,12 @@
-var util = require('util');
-var _ = require('lodash'),
-    async = require('async');
-var config = require('../lib/config'),
-    models = require('../models');
+const _ = require('lodash'),
+    async = require('async'),
+    config = require('../lib/config'),
+    models = require('../models'),
+    util = require('util');
 
 // Retrieve list of instructors for course
-exports.getInstructorListByCourse = function (req, res) {
-    req.course.withInstructors().execPopulate().then(function () {
+exports.getInstructorsByCourse = (req, res) => {
+    req.course.withInstructors().execPopulate().then(() => {
         res.render('admin/course-instructors', { 
             title: 'Instructors',
             course: req.course
@@ -14,8 +14,8 @@ exports.getInstructorListByCourse = function (req, res) {
     });
 };
 // Retrieve list of instructors matching search query
-exports.getInstructorListBySearchQuery = function (req, res) {
-    models.User.findBySearchQuery(req.query.q, 'instructor').exec(function (err, instructors) {
+exports.getInstructorsBySearchQuery = (req, res) => {
+    models.User.findBySearchQuery(req.query.q, 'instructor').exec((err, instructors) => {
         res.render('admin/tables/course-instructors-search-results', { 
             course: req.course, 
             instructors: instructors
@@ -23,10 +23,12 @@ exports.getInstructorListBySearchQuery = function (req, res) {
     });
 };
 // Add instructor to course
-exports.addInstructorList = function (req, res) {
-    async.each(req.body.instructors || [], function (instructor, done) {
-        req.course.update({ $addToSet: { instructors: instructor }}, done);
-    }, function (err) {
+exports.addInstructors = (req, res) => {
+    req.course.update({ 
+        $addToSet: { 
+            instructors: { $each: req.body.instructors || [] }
+        }
+    }, err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
@@ -35,8 +37,8 @@ exports.addInstructorList = function (req, res) {
     });  
 };
 // Delete instructor from course
-exports.deleteInstructor = function (req, res) {    
-    req.course.update({ $pull: { instructors: req.us3r.id }}, function (err) {
+exports.deleteInstructor = (req, res) => {
+    req.course.update({ $pull: { instructors: req.us3r.id }}, err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else

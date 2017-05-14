@@ -1,11 +1,11 @@
-var url = require('url');
-var _ = require('lodash'),
-    async = require('async');
-var config = require('../lib/config'),
-    models = require('../models');
+const _ = require('lodash'),
+    async = require('async'),
+    config = require('../lib/config'),
+    models = require('../models'),
+    url = require('url');
 
 // Retrieve course
-exports.getQuestion = function (req, res, next, question) {
+exports.getQuestionByParam = function (req, res, next, question) {
     models.Question.findById(question, function (err, question) {
         if (err)
             return next(err);
@@ -16,7 +16,7 @@ exports.getQuestion = function (req, res, next, question) {
     });
 };
 // Retrieve list of questions for quiz
-exports.getQuestionList = function (req, res) { 
+exports.getQuestions = (req, res) => { 
     req.quiz.withQuestions().execPopulate().then(function (err) {
         res.render('admin/quiz-questions', {
             title: 'Questions', 
@@ -26,7 +26,7 @@ exports.getQuestionList = function (req, res) {
     });
 };
 // Sort list of questions
-exports.sortQuestionList = function (req, res) {
+exports.sortQuestions = (req, res) => {
     var newOrder = req.body.questions || [];
     // sort questions based off order given
     req.quiz.questions.sort(function (a, b) {
@@ -39,7 +39,7 @@ exports.sortQuestionList = function (req, res) {
     });
 };
 // Retrieve specific question for quiz
-exports.getQuestionForm = function (req, res) {
+exports.getQuestion = (req, res) => {
     var question = req.question || new models.Question();
     req.course.withFiles().execPopulate().then(function () {
         res.render('admin/quiz-question', {
@@ -51,7 +51,7 @@ exports.getQuestionForm = function (req, res) {
     });
 };
 // Add new question for quiz
-exports.addQuestion = function (req, res) {
+exports.addQuestion = (req, res) => {
     var question = new models.Question();
     async.series([
         function add(done) {
@@ -73,7 +73,7 @@ exports.addQuestion = function (req, res) {
     });
 };
 // Update specific question for quiz
-exports.editQuestion = function (req, res) {
+exports.editQuestion = (req, res) => {
     req.question.store(req.body, function (err) {
         if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
@@ -84,7 +84,7 @@ exports.editQuestion = function (req, res) {
     });      
 };
 // Delete specific question for quiz
-exports.deleteQuestion = function (req, res) {
+exports.deleteQuestion = (req, res) => {
     req.question.remove(function (err) {
         if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
@@ -94,7 +94,7 @@ exports.deleteQuestion = function (req, res) {
     });
 };
 // Preview question
-exports.previewQuestion = function (req, res) {
+exports.previewQuestion = (req, res) => {
     var question = new models.Question();
         question.number = _.trim(req.body.number)
         question.question = _.trim(req.body.question);

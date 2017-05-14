@@ -1,11 +1,11 @@
-var _ = require('lodash'),
+const _ = require('lodash'),
     async = require('async'),
+    config = require('../lib/config'),
+    models = require('../models'),
     mongoose = require('mongoose');
-var config = require('../lib/config'),
-    models = require('../models');
 
 // Retrieve group
-exports.getGroup = function (req, res, next, group) { 
+exports.getGroupByParam = function (req, res, next, group) { 
     models.Group.findById(group).exec(function (err, group) {
         if (err)
             return next(err);
@@ -16,7 +16,7 @@ exports.getGroup = function (req, res, next, group) {
     });
 };
 // Temporarily generate groups
-exports.generateGroupList = function (req, res) {
+exports.generateGroups = (req, res) => {
     models.TutorialQuiz.findOne({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate({
         path: 'tutorial',
         populate: {
@@ -54,7 +54,7 @@ exports.generateGroupList = function (req, res) {
     });
 };
 // Save groups for tutorial
-exports.saveGroupList = function (req, res, next) { 
+exports.saveGroups = function (req, res, next) { 
     var oldStack = {}, newStack = {};
     // key might be group ID (for updating) or <number> (for adding)
     _.forOwn(req.body.groups || {}, function (users, groupId) {

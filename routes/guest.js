@@ -4,7 +4,7 @@ var passport = require('passport'),
 var controllers = require('../controllers');
 
 // non-authenticated routes
-router.get('/login', controllers.User.getLoginForm);
+router.get('/login', controllers.User.getLogin);
 
 router.post('/signup', passport.authenticate('local-signup', {
     successRedirect: '/student/courses',

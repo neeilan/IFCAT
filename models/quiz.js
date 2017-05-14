@@ -6,9 +6,14 @@ var models = require('.');
 
 var QuizSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    // note: questions are sorted in the order that they are arranged 
-    // i.e. [0] => 1st question, [1] => 2nd question, etc
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
+    questionGroups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'QuestionGroup' }],
+    order: [
+        {
+            type: { type: String, enum: ['Question', 'QuestionGroup'] },
+            id: mongoose.Schema.Types.ObjectId
+        }
+    ],
     shuffleChoices: Boolean,
     useLaTeX: Boolean,
     points: { type: Number, default : 4 },

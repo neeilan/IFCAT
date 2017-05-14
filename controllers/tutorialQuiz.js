@@ -1,10 +1,9 @@
-var _ = require('lodash'),
-    async = require('async');
-var config = require('../lib/config'),
+const _ = require('lodash'),
+    async = require('async'),
+    config = require('../lib/config'),
     models = require('../models');
-
 // Retrieve course (deprecated)
-exports.getQuiz = function (req, res, next, tutorialQuiz) {
+exports.getQuizByParam = function (req, res, next, tutorialQuiz) {
     models.TutorialQuiz.findById(tutorialQuiz).populate('tutorial quiz').exec(function (err, tutorialQuiz) {
         if (err)
             return next(err);
@@ -15,7 +14,7 @@ exports.getQuiz = function (req, res, next, tutorialQuiz) {
     });
 };
 // Retrieve quizzes within course OR by tutorial
-exports.conductTutorialQuizList = function (req, res) {
+exports.conductTutorialQuizzes = (req, res) => {
     var query = { quiz: { $in: req.course.quizzes }};
     if (req.tutorial)
         query = { tutorial: req.tutorial };
@@ -35,7 +34,7 @@ exports.conductTutorialQuizList = function (req, res) {
     });
 };
 // Retrieve quiz for tutorial
-exports.conductTutorialQuiz = function (req, res) {
+exports.conductTutorialQuiz = (req, res) => {
     models.TutorialQuiz.findOne({ tutorial: req.tutorial, quiz: req.quiz }).populate([{
         path: 'tutorial',
         populate: {
@@ -57,7 +56,7 @@ exports.conductTutorialQuiz = function (req, res) {
     });
 };
 // Edit quizzes 
-exports.editTutorialQuizListByCourse = function (req, res) {
+exports.editTutorialQuizzesByCourse = (req, res) => {
     // find property to update
     var property = _.find(['published', 'active', 'archived'], function (p) {
         return req.body && _.has(req.body, p);
@@ -81,7 +80,7 @@ exports.editTutorialQuizListByCourse = function (req, res) {
     });
 };
 // Publish quiz for tutorial
-exports.editTutorialQuiz = function (req, res) {
+exports.editTutorialQuiz = (req, res) => {
     models.TutorialQuiz.findOneAndUpdate({ 
         tutorial: req.tutorial, 
         quiz: req.quiz 
@@ -116,7 +115,7 @@ exports.editTutorialQuiz = function (req, res) {
 // --------------------------------------------------------------------------------------------------
 
 // Retrieve quizzes within course
-exports.getQuizListForStudent = function (req, res) { 
+exports.getQuizzesForStudent = (req, res) => { 
     models.Course.populate(req.course, {
         // find the tutorial that student is in
         path: 'tutorials',
@@ -147,7 +146,7 @@ exports.getQuizListForStudent = function (req, res) {
     });
 };
 //
-exports.startQuiz = function (req, res) {
+exports.startQuiz = (req, res) => {
     if (req.tutorialQuiz.archived){
         req.tutorialQuiz.quiz.withQuestions().execPopulate()
         .then((quiz)=>{
@@ -173,25 +172,6 @@ exports.startQuiz = function (req, res) {
             course: req.course,
             tutorialQuiz: req.tutorialQuiz,
             quiz: req.tutorialQuiz.quiz
-        });
-    }
-};
-
-exports.resetdemo = function (req, res) {
-    if (req.query.yes === '1') {
-        models.TutorialQuiz.findOneAndUpdate({ 
-            _id: '58846587fa0ef624828dce76'
-        }, { 
-            $set: {
-                responses: []
-            } 
-        }, {
-            new: true
-        }, function (err, tutorialQuiz) {
-            if (err) {
-                return res.send(err);
-            }
-            res.send('Responses have been cleared: ' + JSON.stringify(tutorialQuiz.toJSON()));
         });
     }
 };

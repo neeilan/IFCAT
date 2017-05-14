@@ -1,13 +1,12 @@
-var util = require('util');
-var _ = require('lodash'),
+const _ = require('lodash'),
     async = require('async'),
-    mongoose = require('mongoose');
-var config = require('../lib/config'),
-    models = require('../models');
-
+    config = require('../lib/config'),
+    models = require('../models'),
+    mongoose = require('mongoose'),
+    util = require('util');
 // Retrieve list of teaching assistants for course
-exports.getTeachingAssistantListByCourse = function (req, res) {
-    req.course.withTutorials().withTeachingAssistants().execPopulate().then(function (err) {
+exports.getTeachingAssistantsByCourse = (req, res) => {
+    req.course.withTutorials().withTeachingAssistants().execPopulate().then(err => {
         res.render('admin/course-teaching-assistants', {
             title: 'Teaching Assistants',
             course: req.course
@@ -15,8 +14,8 @@ exports.getTeachingAssistantListByCourse = function (req, res) {
     });
 };
 // Retrieve list of teaching assistants matching search query
-exports.getTeachingAssistantListBySearchQuery = function (req, res) {
-    models.User.findBySearchQuery(req.query.q, 'teachingAssistant').exec(function (err, teachingAssistants) {
+exports.getTeachingAssistantsBySearchQuery = (req, res) => {
+    models.User.findBySearchQuery(req.query.q, 'teachingAssistant').exec((err, teachingAssistants) => {
         res.render('admin/tables/course-teaching-assistants-search-results', { 
             course: req.course, 
             teachingAssistants: teachingAssistants
@@ -24,19 +23,21 @@ exports.getTeachingAssistantListBySearchQuery = function (req, res) {
     });
 };
 // Add teaching assistant to course
-exports.addTeachingAssistantList = function (req, res) {
-    async.each(req.body.teachingAssistants || [], function (teachingAssistant, done) {
-        req.course.update({ $addToSet: { teachingAssistants: teachingAssistant }}, done);
-    }, function (err) {
+exports.addTeachingAssistants = (req, res) => {
+    req.course.update({ 
+        $addToSet: { 
+            teachingAssistants: { $each: req.body.teachingAssistants || [] }
+        }
+    }, err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
-            req.flash('success', 'List of teaching assistants has been updated.');
+            req.flash('success', 's of teaching assistants has been updated.');
         res.redirect('/admin/courses/' + req.course.id + '/teaching-assistants');
     });
 };
 // Update list of teaching assistants for course
-exports.editTeachingAssistantList = function (req, res) {
+exports.editTeachingAssistants = (req, res) => {
     var stack = _.mapValues(req.body.tutorials, function (users) { 
         return _.keys(users).sort();
     });
@@ -53,7 +54,7 @@ exports.editTeachingAssistantList = function (req, res) {
     });
 };
 // Delete list of teaching assistants from course and associated tutorials
-exports.deleteTeachingAssistantList = function (req, res) {
+exports.deleteTeachingAssistants = (req, res) => {
     var teachingAssistants = req.body.teachingAssistants || [];    
     req.course.withTutorials().execPopulate().then(function () {
         async.series([
@@ -69,7 +70,7 @@ exports.deleteTeachingAssistantList = function (req, res) {
             if (err)
                 req.flash('error', 'An error occurred while trying to perform operation.');
             else
-                req.flash('success', 'List of teaching assistants has been updated.');
+                req.flash('success', 's of teaching assistants has been updated.');
             res.sendStatus(200);
         });
     });  

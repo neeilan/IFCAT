@@ -1,10 +1,10 @@
-var _ = require('lodash'),
-    async = require('async');
-var config = require('../lib/config'),
+const _ = require('lodash'),
+    async = require('async'),
+    config = require('../lib/config'),
     models = require('../models');
 
 // Retrieve group responses
-exports.getResponseList = function (req, res) {
+exports.getResponses = (req, res) => {
     models.TutorialQuiz.findOne({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate({
         path: 'responses',
         model: models.Response,
@@ -47,7 +47,7 @@ exports.getResponseList = function (req, res) {
     });
 };
 // Retrieve marks by student
-exports.getMarkListByStudent = function (req, res) {
+exports.getMarksByStudent = (req, res) => {
     models.TutorialQuiz.find({ tutorial: req.tutorial.id }).populate([{
         path: 'quiz',
         model: models.Quiz
@@ -106,7 +106,7 @@ exports.getMarkListByStudent = function (req, res) {
     });
 };
 // Retrieve marks by tutorial quiz
-exports.getMarkListByTutorialQuiz = function (req, res) {
+exports.getMarksByTutorialQuiz = (req, res) => {
     models.TutorialQuiz.findOne({ tutorial: req.tutorial, quiz: req.quiz }).exec(function (err, tutorialQuiz) {
         models.Response.find({ _id: { $in: tutorialQuiz.responses }}).populate({
             path: 'group',
@@ -167,7 +167,7 @@ exports.getMarkListByTutorialQuiz = function (req, res) {
     });
 };
 // Retrieve marks by course
-exports.getMarkListByCourse = function (req, res) {
+exports.getMarksByCourse = (req, res) => {
     models.TutorialQuiz.find({ 
         _id: {
             $in: req.body.tutorialQuizzes || [] 

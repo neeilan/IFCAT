@@ -1,10 +1,9 @@
-var _ = require('lodash'),
-    async = require('async');
-var models = require('../models');
-
+const _ = require('lodash'),
+    async = require('async'),
+    models = require('../models');
 // Retrieve course
-exports.getCourse = function (req, res, next, course) {
-    models.Course.findById(course, function (err, course) {
+exports.getCourseByParam = (req, res, next, id) => {
+    models.Course.findById(id, (err, course) => {
         if (err)
             return next(err);
         if (!course)
@@ -14,29 +13,29 @@ exports.getCourse = function (req, res, next, course) {
     });
 };
 // Retrieve many courses
-exports.getCourseList = function (req, res) {
-    models.Course.find().sort('code').exec(function (err, courses) {
+exports.getCourses = (req, res) => {
+    models.Course.find().sort('code').exec((err, courses) => {
         res.render('admin/courses', { 
             title: 'Courses',
-            courses: _.filter(courses, function (course) {
-                return req.user.hasRole('admin') || 
-                    course.instructors.indexOf(req.user.id) !== -1 || 
-                    course.teachingAssistants.indexOf(req.user.id) !== -1; 
+            courses: _.filter(courses,  course => {
+                return req.user.hasRole('admin') ||
+                    course.instructors.indexOf(req.user.id) !== -1 ||
+                    course.teachingAssistants.indexOf(req.user.id) !== -1;
             }) 
         });
     });
 };
 // Get form for course
-exports.getCourseForm = function (req, res) {
-    var course = req.course || new models.Course();
-    res.render('admin/course', { 
+exports.getCourse = (req, res) => {
+    let course = req.course || new models.Course();
+    res.render('admin/course', {
         title: course.isNew ? 'Add New Course' : 'Edit Course',
         course: course 
     });
 };
 // Add course
-exports.addCourse = function (req, res) {
-    models.Course.create(req.body, function (err, course) {
+exports.addCourse = (req, res) => {
+    models.Course.create(req.body, (err, course) => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
@@ -45,8 +44,8 @@ exports.addCourse = function (req, res) {
     });
 };
 // Update course
-exports.editCourse = function (req, res) {
-    req.course.set(req.body).save(function (err) {  
+exports.editCourse = (req, res) => {
+    req.course.set(req.body).save(err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
@@ -55,8 +54,8 @@ exports.editCourse = function (req, res) {
     });
 };
 // Delete course
-exports.deleteCourse = function (req, res) {
-    req.course.remove(function (err) {
+exports.deleteCourse = (req, res) => {
+    req.course.remove(err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else

@@ -1,13 +1,13 @@
-var async = require('async'),
+const async = require('async'),
+    config = require('../lib/config'),
     fs = require('fs-extra'),
+    models = require('../models'),
     mongoose = require('mongoose'),
     path = require('path');
-var config = require('../lib/config'),
-    models = require('../models');
 
 // Retrieve file
-exports.getFile = function (req, res, next, file) {
-    models.File.findById(file, function (err, file) {
+exports.getFileByParam = (req, res, next, id) => {
+    models.File.findById(id, (err, file) => {
         if (err)
             return next(err);
         if (!file)
@@ -17,7 +17,7 @@ exports.getFile = function (req, res, next, file) {
     });
 };
 // Retrieve all files in the course
-exports.getFileList = function (req, res) {
+exports.getFiles = (req, res) => {
     req.course.withFiles().execPopulate().then(function () {
         res.render('admin/course-files', { 
             title: 'Files',
@@ -26,7 +26,7 @@ exports.getFileList = function (req, res) {
     });
 };
 // Add new files
-exports.addFiles = function (req, res) {
+exports.addFiles = (req, res) => {
     async.eachSeries(req.files, function (obj, done) {
         var file = new models.File();
         file.store(obj, function (err) {
@@ -43,8 +43,8 @@ exports.addFiles = function (req, res) {
     });
 };
 // Delete specific files from course
-exports.deleteFiles = function (req, res) {
-    var dir = config.uploadPath + '/' + req.course.id;
+exports.deleteFiles = (req, res) => {
+    var dir = `${config.uploadPath}/${req.course.id}`;
     async.each(req.body.files, function (id, done) {
         async.waterfall([
             function findFile(done) {

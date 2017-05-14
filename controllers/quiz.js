@@ -1,11 +1,11 @@
-var _ = require('lodash'),
+const _ = require('lodash'),
     async = require('async'),
-    mongoose = require('mongoose');
-var config = require('../lib/config'),
+    config = require('../lib/config'),
+    mongoose = require('mongoose'),
     models = require('../models');
 
 // Retrieve course
-exports.getQuiz = function (req, res, next, quiz) {
+exports.getQuizByParam = function (req, res, next, quiz) {
     models.Quiz.findById(quiz, function (err, quiz) {
         if (err)
             return next(err);
@@ -16,7 +16,7 @@ exports.getQuiz = function (req, res, next, quiz) {
     });
 };
 // Retrieve quizzes within course
-exports.getQuizList = function (req, res) {
+exports.getQuizzes = (req, res) => {
     req.course.withQuizzes().execPopulate().then(function() {
         res.render('admin/course-quizzes', { 
             title: 'Quizzes',
@@ -25,7 +25,7 @@ exports.getQuizList = function (req, res) {
     });
 };
 // Retrieve quiz form
-exports.getQuizForm = function (req, res) {
+exports.getQuiz = (req, res) => {
     var quiz = req.quiz || new models.Quiz();
     req.course.withTutorials().execPopulate().then(function () {
         models.TutorialQuiz.find({ quiz: quiz.id }).exec(function (err, tutorialQuizzes) {
@@ -41,7 +41,7 @@ exports.getQuizForm = function (req, res) {
     });
 };
 // Add quiz to course
-exports.addQuiz = function (req, res) {
+exports.addQuiz = (req, res) => {
     var quiz = new models.Quiz();
     async.series([
         function add(done) {
@@ -59,7 +59,7 @@ exports.addQuiz = function (req, res) {
     });
 };
 // Update quiz
-exports.editQuiz = function (req, res) {
+exports.editQuiz = (req, res) => {
     req.quiz.store(req.body, function (err) { 
         if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
@@ -69,7 +69,7 @@ exports.editQuiz = function (req, res) {
     });
 };
 // Copy quiz
-exports.copyQuiz = function (req, res) {
+exports.copyQuiz = (req, res) => {
     async.waterfall([
         function cloneQuestions(done) {
             req.quiz.withQuestions().execPopulate().then(function () {
@@ -103,7 +103,7 @@ exports.copyQuiz = function (req, res) {
     });
 };
 // Delete quiz
-exports.deleteQuiz = function (req, res) {
+exports.deleteQuiz = (req, res) => {
     req.quiz.remove(function (err) {
         if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
