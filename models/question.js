@@ -1,13 +1,13 @@
-var url = require('url');
-var _ = require('lodash'),
+const _ = require('lodash'),
     async = require('async'),
-    mongoose = require('mongoose');
-var models = require('.');
+    models = require('.'),
+    mongoose = require('mongoose'),
+    url = require('url');
 
-var QuestionSchema = new mongoose.Schema({
+let QuestionSchema = new mongoose.Schema({
     number: { type: String, required: true },
     question: { type: String, required: true },
-    type: { type: String, enum: ['multiple choice', 'multiple select', 'short answer'] },
+    type: { type: String, enum: ['multiple choice', 'multiple select', 'short answer', 'code tracing'] },
     choices: [String],
     answers: [String],
     files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
@@ -23,24 +23,15 @@ var QuestionSchema = new mongoose.Schema({
 });
 // Delete cascade
 QuestionSchema.pre('remove', function (next) {
-    var self = this;
-    async.parallel([
-        function deleteFromQuiz(done) {
-            models.Quiz.update({ questions: { $in: [self._id] }}, { $pull: { questions: self._id }}, { multi: true }).exec(done);
-        },
-        function deleteResponses(done) {
-            models.Response.remove({ question: self._id }).exec(done);
-        }
+    let self = this;
+    async.series([
+        done => models.Quiz.update({ questions: { $in: [self._id] }}, { $pull: { questions: self._id }}, done),
+        done => models.Response.remove({ question: self._id }, done)
     ], next);
 });
 // Populate files
 QuestionSchema.methods.withFiles = function () {
-    return this.populate({ 
-        path: 'files',
-        options: {
-            sort: { name: 1 }
-        }
-    });
+    return this.populate({ path: 'files', options: { sort: { name: 1 }}});
 };
 // Check if question is a multiple choice question
 QuestionSchema.methods.isMultipleChoice = function () {
@@ -54,6 +45,10 @@ QuestionSchema.methods.isMultipleSelect = function () {
 QuestionSchema.methods.isShortAnswer = function () {
     return this.type === 'short answer';
 };
+// Check if question is a code tracing question
+QuestionSchema.methods.isCodeTracing = function () {
+    return this.type === 'code tracing';
+};
 // Check if question has file with given ID
 QuestionSchema.methods.hasFile = function (id) {
     return this.files.indexOf(id) > -1;
@@ -62,8 +57,8 @@ QuestionSchema.methods.hasFile = function (id) {
 QuestionSchema.methods.isAnswer = function (choice) {
     return this.answers.indexOf(choice) > -1;
 };
-// Save question
-QuestionSchema.methods.store = function (obj, callback) {
+// Set question
+QuestionSchema.methods.store = function (obj) {
     this.number = _.trim(obj.number);
     this.question = _.trim(obj.question);
     this.type = obj.type;
@@ -78,7 +73,7 @@ QuestionSchema.methods.store = function (obj, callback) {
     this.firstTryBonus = obj.firstTryBonus;
     this.penalty = obj.penalty;
     
-    var selected, key, matches, self = this;
+    let selected, self = this;
 
     _.each(obj.links, function (link) {
         link = _.trim(link);
@@ -91,10 +86,9 @@ QuestionSchema.methods.store = function (obj, callback) {
     });
 
     if (this.isMultipleChoice()) {
-        selected = _.isObject(obj.answer) ? obj.answer[_.kebabCase(this.type)] : false;
-        _.forOwn(obj.choices, function (choice, i) {
+        selected = _.isObject(obj.answer) ? obj.answer[this.type] : false;
+        _.forOwn(obj.choices, (choice, i) => {
             choice = _.trim(choice);
-            // add unique choices
             if (choice && self.choices.indexOf(choice) === -1) {
                 self.choices.push(choice);
                 // mark as the answer if selected
@@ -103,10 +97,9 @@ QuestionSchema.methods.store = function (obj, callback) {
             }
         });
     } else if (this.isMultipleSelect()) {
-        selected = _.isObject(obj.answers) ? obj.answers[_.kebabCase(this.type)] : [];
-        _.forOwn(obj.choices, function (choice, i) {
+        selected = _.isObject(obj.answers) ? obj.answers[this.type] : [];
+        _.forOwn(obj.choices, (choice, i) => {
             choice = _.trim(choice);
-            // add unique choices
             if (choice && self.choices.indexOf(choice) === -1) {
                 self.choices.push(choice);
                 // mark as one of answers if selected
@@ -115,16 +108,17 @@ QuestionSchema.methods.store = function (obj, callback) {
             }
         });
     } else if (this.isShortAnswer()) {
-        _.forOwn(obj.choices, function (choice) {
+        _.forOwn(obj.choices, choice => {
             choice = _.trim(choice);
-            // add unique choices
             if (choice && self.choices.indexOf(choice) === -1) {
                 self.choices.push(choice);
                 self.answers.push(choice);
             }
         });
+    } else if (this.isCodeTracing()) {
+        self.answers = obj.answers[this.type].split("\n");
     }
-    return this.save(callback);
+    return self;
 };
 
 module.exports = mongoose.model('Question', QuestionSchema);

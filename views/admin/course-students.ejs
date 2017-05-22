@@ -43,9 +43,9 @@
                     <td>
                     <% _.each(course.tutorials, function (tutorial) { %>
                         <input type="checkbox" 
-                            name="tutorials[<%= tutorial.id %>][<%= student.id %>]" 
-                            value="1" data-label="<%= tutorial.number %>" data-group="<%= student.id %>"<%= 
-                            tutorial.hasStudent(student.id) ? ' checked' : '' %>>
+                            name="tutorials[<%= tutorial.id %>][<%= student.id %>]" value="1" 
+                            data-label="<%= tutorial.number %>" 
+                            data-group="<%= student.id %>"<%= tutorial.hasStudent(student.id) ? ' checked' : '' %>>
                     <% }) %>
                     </td>
                 </tr>
@@ -57,19 +57,4 @@
 
 <%- include ./modals/import-students -%>
 <%- include ./modals/find-students -%>
-<%- include ./body-js %>
-
-<script>
-$(function () {
-    $('#btn-delete').click(function () {
-        var $boxes = $('tbody [name^=students]:checked');
-        if ($boxes.length) {
-            $.delete('/admin/courses/<%= course.id %>/students', $boxes.serialize(), function () { 
-                window.location.reload(true);
-            });
-        }
-    });
-});
-</script>
-
 <%- include ./footer %>

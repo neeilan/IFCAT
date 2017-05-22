@@ -67,13 +67,6 @@ router.post('/courses/:course/quizzes/:quiz/questions/preview', controllers.Ques
 router.put('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.editQuestion);
 router.delete('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.deleteQuestion);
 
-// router.get('/courses/:course/quizzes/:quiz/question-groups/new', controllers.QuestionGroup.getQuestion);
-// router.get('/courses/:course/quizzes/:quiz/question-groups/:question/edit', controllers.QuestionGroup.getQuestion);
-// router.post('/courses/:course/quizzes/:quiz/question-groups', controllers.QuestionGroup.addQuestion);
-// router.post('/courses/:course/quizzes/:quiz/question-groups/preview', controllers.QuestionGroup.previewQuestion);
-// router.put('/courses/:course/quizzes/:quiz/question-groups/:question', controllers.QuestionGroup.editQuestion);
-// router.delete('/courses/:course/quizzes/:quiz/question-groups/:question', controllers.QuestionGroup.deleteQuestion);
-
 router.get('/courses/:course/files', controllers.File.getFiles);
 router.post('/courses/:course/files', upload.any.array('files'), controllers.File.addFiles);
 router.delete('/courses/:course/files', controllers.File.deleteFiles);

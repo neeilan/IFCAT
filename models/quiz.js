@@ -1,19 +1,11 @@
-var _ = require('lodash'),
+const _ = require('lodash'),
     async = require('async'),
+    models = require('.'),
     mongoose = require('mongoose');
 
-var models = require('.');
-
-var QuizSchema = new mongoose.Schema({
+let QuizSchema = new mongoose.Schema({
     name: { type: String, required: true },
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
-    questionGroups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'QuestionGroup' }],
-    order: [
-        {
-            type: { type: String, enum: ['Question', 'QuestionGroup'] },
-            id: mongoose.Schema.Types.ObjectId
-        }
-    ],
     shuffleChoices: Boolean,
     useLaTeX: Boolean,
     points: { type: Number, default : 4 },
@@ -24,17 +16,11 @@ var QuizSchema = new mongoose.Schema({
 });
 // Delete cascade
 QuizSchema.pre('remove', function (next) {
-    var self = this;
-    async.parallel([
-        function deleteFromCourse(done) {
-            models.Course.update({ quizzes: { $in: [self._id] }}, { $pull: { quizzes: self._id }}).exec(done);
-        },
-        function deleteQuestions(done) {
-            models.Question.remove({ _id: { $in: self.questions }}).exec(done);
-        },
-        function deleteTutorialQuiz(done) {
-            models.TutorialQuiz.remove({ quiz: self._id }).exec(done);
-        }
+    let self = this;
+    async.series([
+        done => models.Course.update({ quizzes: { $in: [self._id] }}, { $pull: { quizzes: self._id }}, done),
+        done => models.Question.remove({ _id: { $in: self.questions }}, done),
+        done => models.TutorialQuiz.remove({ quiz: self._id }, done)
     ], next);
 });
 // populate questions
@@ -43,7 +29,7 @@ QuizSchema.methods.withQuestions = function () {
 };
 // Load quiz' tutorials (deprecated)
 QuizSchema.methods.loadTutorials = function () {
-    var quiz = this;
+    let quiz = this;
     return models.TutorialQuiz.find({ quiz: quiz }).populate('tutorial').exec(function (err, tutorialQuizzes) {
         quiz.tutorials = tutorialQuizzes.map(function (tutorialQuiz) { 
             return tutorialQuiz.tutorial.id;
@@ -60,7 +46,7 @@ QuizSchema.methods.store = function (obj, callback) {
     this.firstTryBonus = obj.firstTryBonus;
     this.penalty = obj.penalty;
 
-    var quiz = this, newTutorials = obj.tutorials || [];
+    let quiz = this, newTutorials = obj.tutorials || [];
 
     // console.log('new', newTutorials)
 
@@ -88,7 +74,7 @@ QuizSchema.methods.store = function (obj, callback) {
         },
         function addTutorialQuizzes(done) {
             models.TutorialQuiz.find({ 'quiz': quiz.id }).exec(function (err, tutorialQuizzes) {
-                var oldTutorials = _.map(tutorialQuizzes, function (tutorialQuiz) {
+                let oldTutorials = _.map(tutorialQuizzes, function (tutorialQuiz) {
                     return tutorialQuiz.tutorial.toString();
                 });
 

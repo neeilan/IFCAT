@@ -19,6 +19,7 @@ exports.getStudentsByCourse = (req, res) => {
                 (totalPages - 2 < currentPage && totalPages - 5 < page)) pages.push(page);
         }*/
         res.render('admin/course-students', {
+            bodyClass: 'students',
             title: 'Students',
             course: req.course,
             students: req.course.students/*,
@@ -31,7 +32,7 @@ exports.getStudentsByCourse = (req, res) => {
 };
 // Retrieve list of students matching search query
 exports.getStudentsBySearchQuery = (req, res) => {
-    models.User.findBySearchQuery(req.query.q, 'student').exec(function (err, students) {
+    models.User.findBySearchQuery({ q: req.query.q, role: 'student' }, (err, students) => {
         res.render('admin/tables/course-students-search-results', { 
             course: req.course, 
             students: students 
@@ -50,14 +51,12 @@ exports.getStudentsByTutorial = (req, res) => {
 };
 // Add student to course
 exports.addStudents = (req, res) => {
-    async.each(req.body.students || [], function (student, done) {
-        req.course.update({ $addToSet: { students: student }}, done);
-    }, function (err) {
+    req.course.update({ $addToSet: { students: { $each: req.body.students || [] }}}, err => {
         if (err)
             req.flash('error', 'An error has occurred while trying perform operation.');
         else
             req.flash('success', 'The list of students has been updated.');
-        res.redirect('/admin/courses/' + req.course.id + '/students');
+        res.redirect(`/admin/courses/${req.course.id}/students`);
     });
 };
 // Update students' tutorials
@@ -73,7 +72,7 @@ exports.editStudents = (req, res) => {
                 req.flash('error', 'An error occurred while trying to perform operation.');
             else
                 req.flash('success', 'The list of tutorials has been updated.');
-            res.redirect('/admin/courses/' + req.course.id + '/students');
+            res.redirect(`/admin/courses/${req.course.id}/students`);
         });
     });
 };

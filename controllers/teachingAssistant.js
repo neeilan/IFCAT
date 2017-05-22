@@ -8,6 +8,7 @@ const _ = require('lodash'),
 exports.getTeachingAssistantsByCourse = (req, res) => {
     req.course.withTutorials().withTeachingAssistants().execPopulate().then(err => {
         res.render('admin/course-teaching-assistants', {
+            bodyClass: 'teaching-assistants',
             title: 'Teaching Assistants',
             course: req.course
         });
@@ -15,7 +16,7 @@ exports.getTeachingAssistantsByCourse = (req, res) => {
 };
 // Retrieve list of teaching assistants matching search query
 exports.getTeachingAssistantsBySearchQuery = (req, res) => {
-    models.User.findBySearchQuery(req.query.q, 'teachingAssistant').exec((err, teachingAssistants) => {
+    models.User.findBySearchQuery({ q: req.query.q, role: 'teachingAssistant' }, (err, teachingAssistants) => {
         res.render('admin/tables/course-teaching-assistants-search-results', { 
             course: req.course, 
             teachingAssistants: teachingAssistants
@@ -24,16 +25,12 @@ exports.getTeachingAssistantsBySearchQuery = (req, res) => {
 };
 // Add teaching assistant to course
 exports.addTeachingAssistants = (req, res) => {
-    req.course.update({ 
-        $addToSet: { 
-            teachingAssistants: { $each: req.body.teachingAssistants || [] }
-        }
-    }, err => {
+    req.course.update({ $addToSet: { teachingAssistants: { $each: req.body.teachingAssistants || [] }}}, err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
             req.flash('success', 's of teaching assistants has been updated.');
-        res.redirect('/admin/courses/' + req.course.id + '/teaching-assistants');
+        res.redirect(`/admin/courses/${req.course.id}/teaching-assistants`);
     });
 };
 // Update list of teaching assistants for course
@@ -55,7 +52,7 @@ exports.editTeachingAssistants = (req, res) => {
 };
 // Delete list of teaching assistants from course and associated tutorials
 exports.deleteTeachingAssistants = (req, res) => {
-    var teachingAssistants = req.body.teachingAssistants || [];    
+    var teachingAssistants = req.body.teachingAssistants || [];
     req.course.withTutorials().execPopulate().then(function () {
         async.series([
             function deleteFromCourse(done) {
@@ -70,7 +67,7 @@ exports.deleteTeachingAssistants = (req, res) => {
             if (err)
                 req.flash('error', 'An error occurred while trying to perform operation.');
             else
-                req.flash('success', 's of teaching assistants has been updated.');
+                req.flash('success', 'List of teaching assistants has been updated.');
             res.sendStatus(200);
         });
     });  

@@ -5,8 +5,8 @@ const _ = require('lodash'),
     mongoose = require('mongoose');
 
 // Retrieve group
-exports.getGroupByParam = function (req, res, next, group) { 
-    models.Group.findById(group).exec(function (err, group) {
+exports.getGroupByParam = (req, res, next, id) => { 
+    models.Group.findById(id, (err, group) => {
         if (err)
             return next(err);
         if (!group)

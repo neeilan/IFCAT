@@ -5,8 +5,8 @@ var config = require('../lib/config'),
     models = require('../models');
 
 // 
-exports.getUserByParam = function (req, res, next, user) {
-    models.User.findById(user, function (err, user) {
+exports.getUserByParam = (req, res, next, id) => {
+    models.User.findById(id, (err, user) => {
         if (err)
             return next(err);
         if (!user)
@@ -20,7 +20,10 @@ exports.getLogin = function (req, res) {
     if (req.baseUrl === '/admin') {
         if (req.user)
             return res.redirect('/admin/courses');
-        res.render('admin/login', { title: 'Login' });
+        res.render('admin/login', { 
+            bodyClass: 'login',
+            title: 'Login' 
+        });
     } else {
         if (req.user)
             return res.redirect('/student/courses');
@@ -53,6 +56,7 @@ exports.getUsers = function (req, res) {
                 (totalPages - 2 < currentPage && totalPages - 5 < page)) pages.push(page);
         }
         res.render('admin/users', {
+            bodyClass: 'users',
             title: 'Users',
             users: _.slice(users, start, end),
             currentPage: currentPage,

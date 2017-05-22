@@ -54,19 +54,4 @@
 </form>
 
 <%- include ./modals/find-teaching-assistants %>
-<%- include ./body-js -%>
-
-<script>
-$(function () {
-    $('#btn-delete').click(function () {
-        var $boxes = $('tbody [name^=teachingAssistants]:checked');
-        if ($boxes.length) {
-            $.delete('/admin/courses/<%= course.id %>/teaching-assistants', $boxes.serialize(), function () { 
-                window.location.reload(true);
-            });
-        }
-    });
-});
-</script>
-
 <%- include ./footer -%>

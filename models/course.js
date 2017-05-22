@@ -1,4 +1,4 @@
-var async = require('async'),
+const async = require('async'),
     fs = require('fs-extra'),
     mongoose = require('mongoose');
 var config = require('../lib/config'),
@@ -17,39 +17,34 @@ var CourseSchema = new mongoose.Schema({
     timestamps: true
 });
 // Delete cascade
-CourseSchema.pre('remove', function (next) {
-    var self = this, path = config.uploadPath + '/' + this.id;
+CourseSchema.pre('remove', function (next) { console.log('pre')
+    let self = this, path = `${config.uploadPath}/${self.id}`;
     async.series([
-        function deleteTutorials(done) {
-            models.Tutorial.find({ _id: { $in: self.tutorials }}, function (err, tutorials) {
+        // delete documents
+        done => {
+            models.Tutorial.find({ _id: { $in: self.tutorials }}, (err, docs) => {
                 if (err)
                     return done(err);
-                async.eachSeries(tutorials, function (tutorial, done) { 
-                    tutorial.remove(done); 
-                }, done);
+                async.eachSeries(docs, (doc, done) => doc.remove(done), done);
             });
         },
-        function deleteQuizzes(done) {
-            models.Quiz.find({ _id: { $in: self.quizzes }}, function (err, quizzes) {
+        done => {
+            models.Quiz.find({ _id: { $in: self.quizzes }}, (err, docs) => {
                 if (err)
                     return done(err);
-                async.eachSeries(quizzes, function (quiz, done) { 
-                    quiz.remove(done); 
-                }, done);
+                async.eachSeries(docs, (doc, done) => doc.remove(done), done);
             });
         },
-        function deleteFiles(done) {
-            models.File.find({ _id: { $in: self.files }}, function (err, files) {
+        done => {
+            models.File.find({ _id: { $in: self.files }}, (err, docs) => {
                 if (err)
                     return done(err);
-                async.eachSeries(files, function (file, done) { 
-                    file.remove(done); 
-                }, done);
+                async.eachSeries(docs, (doc, done) => doc.remove(done), done);
             });
         },
-        // delete upload directory & files
-        function deleteFolder(done) {
-            fs.stat(path, function (err, stats) {
+        // delete upload directory and its files
+        done => {
+            fs.stat(path, (err, stats) => {
                 if (err && err.code === 'ENOENT')
                     done();
                 else if (err)

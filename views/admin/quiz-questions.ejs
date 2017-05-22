@@ -2,7 +2,7 @@
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
-    <li><a href="/admin/courses/<%= course.id %>/quizzes">Quizzes</a> ‐ <%= quiz.name %></li>
+    <li><a href="/admin/courses/<%= course._id %>/quizzes">Quizzes</a> ‐ <%= quiz.name %></li>
     <li class="active">Questions</li>
 </ol>
 
@@ -11,11 +11,11 @@
 <%- include ./flash %>
 
 <div class="nav-actions">
-    <a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/new"
+    <a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz.id %>/questions/new"
         class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add New Question</a>
 </div>
 
-<table class="table table-striped dim" id="table-questions">
+<table class="table table-striped dim">
     <thead>
         <tr>
             <th style="width: 10px;"></th>
@@ -33,7 +33,7 @@
             <tr>
                 <td style="width: 10px;">
                     <span class="glyphicon glyphicon-option-vertical handle" title="Hold and drag to new location"></span>
-                    <input type="hidden" name="questions[]" value="<%= question.id %>">
+                    <input type="hidden" name="questions[]" value="<%- question._id %>">
                 </td>
                 <td style="width: 10px;"><%= question.number %>.</td>
                 <td style="width: 130px;"><%= question.type %></td>
@@ -44,9 +44,9 @@
                             Actions<span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= question.id %>/edit"><span class="glyphicon glyphicon-pencil"></span> Edit Question</a></li>
+                            <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz.id %>/questions/<%= question._id %>/edit"><span class="glyphicon glyphicon-pencil"></span> Edit Question</a></li>
                             <li class="divider"></li>
-                            <li><a href="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= question.id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete Question</a></li>
+                            <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz.id %>/questions/<%= question._id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete Question</a></li>
                         </ul>
                     </div>
                 </td>
@@ -55,48 +55,5 @@
     <% } %>
     </tbody>
 </table>
-
-<%- include ./body-js -%>
-
-<script>
-$(function () {
-    var $heading = $('.container > h1'),
-        $table = $('#table-questions'),
-        $dim = $table.closest('.dim-wrap');
-           
-    $table.find('.btn-delete').click(function (e) {
-        e.preventDefault();
-        var btn = this;
-        $.deletebox({
-            title: 'Delete question',
-            message: '<p>You are about to delete question and all of its associated information.</p>\
-                <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
-            callback: function () {
-                $.delete(btn.href, function () { window.location.reload(true) });
-            }
-        });
-    });
-
-    $table.find('tbody').sortable({ 
-        axis: 'y', 
-        cancel: false,
-        handle: '.handle',
-        update: function () {
-            $dim.addClass('on');
-            $.bootstrapAlert('close');
-            $.ajax(window.location.href + '/sort', {
-                type: 'put',
-                data: $('[name^=questions]').serialize(),
-                error: function (xhr) {
-                    $heading.after($.bootstrapAlert('danger', xhr.responseText));
-                },
-                complete: function () {
-                    $dim.removeClass('on');
-                }
-            });
-        }
-    });
-});
-</script>
 
 <%- include ./footer -%>

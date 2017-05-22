@@ -14,8 +14,9 @@ exports.getCourseByParam = (req, res, next, id) => {
 };
 // Retrieve many courses
 exports.getCourses = (req, res) => {
-    models.Course.find().sort('code').exec((err, courses) => {
-        res.render('admin/courses', { 
+    models.Course.find().sort('code').lean().exec((err, courses) => {
+        res.render('admin/courses', {
+            bodyClass: 'courses',
             title: 'Courses',
             courses: _.filter(courses,  course => {
                 return req.user.hasRole('admin') ||
@@ -29,6 +30,7 @@ exports.getCourses = (req, res) => {
 exports.getCourse = (req, res) => {
     let course = req.course || new models.Course();
     res.render('admin/course', {
+        bodyClass: 'course',
         title: course.isNew ? 'Add New Course' : 'Edit Course',
         course: course 
     });
@@ -59,7 +61,7 @@ exports.deleteCourse = (req, res) => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
-            req.flash('success', 'Course <b>%s</b> has been deleted.', req.course.name);   
+            req.flash('success', 'Course <b>%s</b> has been deleted.', req.course.name);
         res.sendStatus(200);
     });
 };

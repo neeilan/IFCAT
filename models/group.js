@@ -1,8 +1,8 @@
-var _ = require('lodash'),
+const _ = require('lodash'),
+    models = require('.'),
     mongoose = require('mongoose');
-var models = require('.');
 
-var GroupSchema = new mongoose.Schema({
+let GroupSchema = new mongoose.Schema({
     name: { type: String, required: true },
     members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     driver: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

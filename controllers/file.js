@@ -19,7 +19,8 @@ exports.getFileByParam = (req, res, next, id) => {
 // Retrieve all files in the course
 exports.getFiles = (req, res) => {
     req.course.withFiles().execPopulate().then(function () {
-        res.render('admin/course-files', { 
+        res.render('admin/course-files', {
+            bodyClass: 'files',
             title: 'Files',
             course: req.course
         });
@@ -27,14 +28,14 @@ exports.getFiles = (req, res) => {
 };
 // Add new files
 exports.addFiles = (req, res) => {
-    async.eachSeries(req.files, function (obj, done) {
+    async.eachSeries(req.files, (obj, done) => {
         var file = new models.File();
-        file.store(obj, function (err) {
+        file.store(obj).save(err => {
             if (err)
                 return done(err);
             req.course.update({ $push: { files: file._id }}, done);
         });
-    }, function (err) {
+    }, err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
@@ -44,7 +45,7 @@ exports.addFiles = (req, res) => {
 };
 // Delete specific files from course
 exports.deleteFiles = (req, res) => {
-    var dir = `${config.uploadPath}/${req.course.id}`;
+    let dir = `${config.uploadPath}/${req.course.id}`;
     async.each(req.body.files, function (id, done) {
         async.waterfall([
             function findFile(done) {
@@ -77,7 +78,7 @@ exports.deleteFiles = (req, res) => {
                 });
             }
         ], done);
-    }, function (err) {
+    }, err => {
         if (err) 
             req.flash('error', 'An error occurred while trying to perform operation.');
         else

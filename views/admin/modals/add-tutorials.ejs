@@ -1,11 +1,10 @@
-<!-- add multiple tutorials modal -->
 <div class="modal fade" id="modal-add-tutorials" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Add tutorials</h4>
             </div>
-            <form action="/admin/courses/<%= course.id %>/tutorials" method="post">
+            <form action="/admin/courses/<%= course._id %>/tutorials" method="post">
                 <div class="modal-body">
                     <label>Add</label>
                     <input type="number" name="len" value="" min="1" max="99" class="form-control">

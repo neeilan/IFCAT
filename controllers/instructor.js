@@ -8,6 +8,7 @@ const _ = require('lodash'),
 exports.getInstructorsByCourse = (req, res) => {
     req.course.withInstructors().execPopulate().then(() => {
         res.render('admin/course-instructors', { 
+            bodyClass: 'instructors',
             title: 'Instructors',
             course: req.course
         });
@@ -15,7 +16,7 @@ exports.getInstructorsByCourse = (req, res) => {
 };
 // Retrieve list of instructors matching search query
 exports.getInstructorsBySearchQuery = (req, res) => {
-    models.User.findBySearchQuery(req.query.q, 'instructor').exec((err, instructors) => {
+    models.User.findBySearchQuery({ q: req.query.q, role: 'instructor' }, (err, instructors) => {
         res.render('admin/tables/course-instructors-search-results', { 
             course: req.course, 
             instructors: instructors
@@ -24,16 +25,12 @@ exports.getInstructorsBySearchQuery = (req, res) => {
 };
 // Add instructor to course
 exports.addInstructors = (req, res) => {
-    req.course.update({ 
-        $addToSet: { 
-            instructors: { $each: req.body.instructors || [] }
-        }
-    }, err => {
+    req.course.update({ $addToSet: { instructors: { $each: req.body.instructors || [] }}}, err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
             req.flash('success', 'The instructors have been assigned to the course.');
-        res.redirect('/admin/courses/' + req.course.id + '/instructors');
+        res.redirect(`/admin/courses/${req.course.id}/instructors`);
     });  
 };
 // Delete instructor from course

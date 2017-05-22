@@ -19,15 +19,3 @@
         </div>
     </div>
 </div>
-
-<script>
-$(function () {
-    $('#files').change(function () {
-        var options  = '';
-        $.each(this.files, function (i, file) {
-            options += '<li class="list-group-item">' + file.name + '</li>';
-        });
-        $(this).closest('.modal-body').find('.list-group').html(options);
-    });
-});
-</script>

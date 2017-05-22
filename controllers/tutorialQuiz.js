@@ -3,8 +3,8 @@ const _ = require('lodash'),
     config = require('../lib/config'),
     models = require('../models');
 // Retrieve course (deprecated)
-exports.getQuizByParam = function (req, res, next, tutorialQuiz) {
-    models.TutorialQuiz.findById(tutorialQuiz).populate('tutorial quiz').exec(function (err, tutorialQuiz) {
+exports.getQuizByParam = (req, res, next, id) => {
+    models.TutorialQuiz.findById(id).populate('tutorial quiz').exec((err, tutorialQuiz) => {
         if (err)
             return next(err);
         if (!tutorialQuiz)

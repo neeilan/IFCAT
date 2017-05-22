@@ -5,8 +5,8 @@ const _ = require('lodash'),
     models = require('../models');
 
 // Retrieve course
-exports.getQuizByParam = function (req, res, next, quiz) {
-    models.Quiz.findById(quiz, function (err, quiz) {
+exports.getQuizByParam = (req, res, next, id) => {
+    models.Quiz.findById(id, (err, quiz) => {
         if (err)
             return next(err);
         if (!quiz)
@@ -18,7 +18,8 @@ exports.getQuizByParam = function (req, res, next, quiz) {
 // Retrieve quizzes within course
 exports.getQuizzes = (req, res) => {
     req.course.withQuizzes().execPopulate().then(function() {
-        res.render('admin/course-quizzes', { 
+        res.render('admin/course-quizzes', {
+            bodyClass: 'quizzes',
             title: 'Quizzes',
             course: req.course 
         });
@@ -28,11 +29,10 @@ exports.getQuizzes = (req, res) => {
 exports.getQuiz = (req, res) => {
     var quiz = req.quiz || new models.Quiz();
     req.course.withTutorials().execPopulate().then(function () {
-        models.TutorialQuiz.find({ quiz: quiz.id }).exec(function (err, tutorialQuizzes) {
-            quiz.tutorials = _.map(tutorialQuizzes, function (tutorialQuiz) {
-                return tutorialQuiz.tutorial.toString();
-            });
+        models.TutorialQuiz.find({ quiz: quiz.id }, (err, tutorialQuizzes) => {
+            quiz.tutorials = _.map(tutorialQuizzes, tutorialQuiz => tutorialQuiz.tutorial.toString());
             res.render('admin/course-quiz', {
+                bodyClass: 'quiz',
                 title: quiz.isNew ? 'Add New Quiz' : 'Edit Quiz',
                 course: req.course, 
                 quiz: quiz

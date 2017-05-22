@@ -99,6 +99,9 @@ input[type=checkbox][data-label] {
     background-color: #fff !important;
     border: 0 !important;
 }
+.mce-tinymce {
+    box-sizing: border-box !important;
+}
 .nav-actions {
     padding: 10px 0;
 }

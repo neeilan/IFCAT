@@ -5,13 +5,13 @@ const _ = require('lodash'),
     url = require('url');
 
 // Retrieve course
-exports.getQuestionByParam = function (req, res, next, question) {
-    models.Question.findById(question, function (err, question) {
+exports.getQuestionByParam = (req, res, next, id) => {
+    models.Question.findById(id, (err, question) => {
         if (err)
             return next(err);
         if (!question)
             return next(new Error('No question is found.'));
-        req.question = question;         
+        req.question = question;
         next();
     });
 };
@@ -19,9 +19,10 @@ exports.getQuestionByParam = function (req, res, next, question) {
 exports.getQuestions = (req, res) => { 
     req.quiz.withQuestions().execPopulate().then(function (err) {
         res.render('admin/quiz-questions', {
-            title: 'Questions', 
-            course: req.course, 
-            quiz: req.quiz 
+            bodyClass: 'questions',
+            title: 'Questions',
+            course: req.course,
+            quiz: req.quiz
         });
     });
 };
@@ -29,7 +30,7 @@ exports.getQuestions = (req, res) => {
 exports.sortQuestions = (req, res) => {
     var newOrder = req.body.questions || [];
     // sort questions based off order given
-    req.quiz.questions.sort(function (a, b) {
+    req.quiz.questions.sort((a, b) => {
         return newOrder.indexOf(a.toString()) < newOrder.indexOf(b.toString()) ? -1 : 1;
     });
     req.quiz.save(function (err) {
@@ -43,6 +44,7 @@ exports.getQuestion = (req, res) => {
     var question = req.question || new models.Question();
     req.course.withFiles().execPopulate().then(function () {
         res.render('admin/quiz-question', {
+            bodyClass: 'question',
             title: question.isNew ? 'Add New Question' : 'Edit Question',
             course: req.course, 
             quiz: req.quiz, 
@@ -54,38 +56,30 @@ exports.getQuestion = (req, res) => {
 exports.addQuestion = (req, res) => {
     var question = new models.Question();
     async.series([
-        function add(done) {
-            question.store(req.body, done);
-        },
-        function addIntoQuiz(done) {
-            req.quiz.update({ $addToSet: { questions: question.id }}, done);
-        }
+        done => question.store(req.body).save(done),
+        done => req.quiz.update({ $addToSet: { questions: question.id }}, done)
     ], function (err) {
         if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', 'Question <b>%s</b> has been created.', question.number);
-        // if set, go to back to list page
-        if (req.body.back === '1')
-            res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/questions');
-        else
-            res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/questions/new');
+        let backUrl = `/admin/courses/${req.course.id}/quizzes/${req.quiz.id}/questions`;
+        res.redirect(req.body.back === '1' ? backUrl : backUrl + '/new');
     });
 };
 // Update specific question for quiz
 exports.editQuestion = (req, res) => {
-    req.question.store(req.body, function (err) {
+    req.question.store(req.body).save(err => {
         if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', 'Question <b>%s</b> has been updated.', req.question.number);
-
-        res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/questions/' + req.question.id + '/edit');
-    });      
+        res.redirect(`/admin/courses/${req.course.id}/quizzes/${req.quiz.id}/questions/${req.question.id}/edit`);
+    });
 };
 // Delete specific question for quiz
 exports.deleteQuestion = (req, res) => {
-    req.question.remove(function (err) {
+    req.question.remove(err => {
         if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else

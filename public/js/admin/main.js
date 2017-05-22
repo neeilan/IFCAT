@@ -35,19 +35,8 @@ $(function () {
         });
     });
 
-    // add user to course when button is clicked
-    $('#btn-search').click(function () {
-        $('#search-results').load($(this).closest('form')[0].action + '/search?q=' + q.value);
-    });
-
-    // delete user from course when button is clicked
-    $('.btn-delete-user').click(function (e) {
-        e.preventDefault();
-        $.delete(this.href, function () { window.location.reload(true); });
-    });
-
     // style checkboxes with switch control
-    $(":checkbox.bootstrap-switch").bootstrapSwitch({  
+    $(":checkbox.bootstrap-switch").bootstrapSwitch({
         inverse: true,
         offText: 'No',
         onText: 'Yes',
@@ -146,3 +135,15 @@ $(function () {
         });
     };
 });
+
+// tinymce.init({
+//     selector: '.tinymce',
+//     menubar: false,
+//     statusbar: false,
+//     plugins: [
+//         'advlist autolink lists link image charmap',
+//         'searchreplace visualblocks code',
+//         'media table contextmenu paste code'
+//     ],
+//     toolbar: 'styleselect | bullist numlist | charmap link image table | undo redo'
+// });
