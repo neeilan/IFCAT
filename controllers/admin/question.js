@@ -1,9 +1,8 @@
 const _ = require('lodash'),
     async = require('async'),
-    config = require('../lib/config'),
-    models = require('../models'),
+    config = require('../../lib/config'),
+    models = require('../../models'),
     url = require('url');
-
 // Retrieve course
 exports.getQuestionByParam = (req, res, next, id) => {
     models.Question.findById(id, (err, question) => {

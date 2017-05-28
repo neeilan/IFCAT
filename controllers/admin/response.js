@@ -1,7 +1,7 @@
 const _ = require('lodash'),
     async = require('async'),
-    config = require('../lib/config'),
-    models = require('../models');
+    config = require('../../lib/config'),
+    models = require('../../models');
 
 // Retrieve group responses
 exports.getResponses = (req, res) => {

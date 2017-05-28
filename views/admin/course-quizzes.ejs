@@ -1,4 +1,4 @@
-<%- include ./header -%>
+<% include ./header %>
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
@@ -7,7 +7,7 @@
 
 <h1><%- title %></h1>
 
-<%- include ./flash %>
+<% include ./flash %>
 
 <div class="nav-actions">
     <a href="/admin/courses/<%= course._id %>/quizzes/new" class="btn btn-default btn-sm"><span 
@@ -54,4 +54,4 @@
     </tbody>
 </table>
 
-<%- include ./footer -%>
+<% include ./footer %>

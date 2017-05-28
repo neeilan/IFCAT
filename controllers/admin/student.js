@@ -1,8 +1,8 @@
 const _ = require('lodash'),
     async = require('async'),
-    config = require('../lib/config'),
+    config = require('../../lib/config'),
     csv = require('csv'),
-    models = require('../models');
+    models = require('../../models');
 // Retrieve list of students for course
 exports.getStudentsByCourse = (req, res) => {
     req.course.withTutorials().withStudents().execPopulate().then(err => {
@@ -161,35 +161,5 @@ exports.importStudents = (req, res) => {
                 req.flash('success', 'The students have been imported.');
             res.redirect(`/admin/courses/${req.course.id}/students`);
         });
-    });
-};
-
-// TO-FIX!
-
-// Retrieve courses enrolled for student
-exports.getCourses = (req, res) => {
-    models.Course.findByStudent(req.user.id).exec(function (err, courses) { 
-        res.render('student/courses', { courses: courses });
-    });
-};
-// Retrieve quizzes within course
-exports.getQuizzes = (req, res) => {
-    req.course.withTutorials().execPopulate().then(function () {
-        // find tutorials that student is in
-        var tutorials = req.course.tutorials.filter(function (tutorial) {
-            return (tutorial.students.indexOf(req.user.id) > -1);
-        });
-        // find tutorial quizzes
-        if (tutorials) {
-            models.TutorialQuiz.find({ tutorial: tutorials[0].id, published: true }).populate('quiz').exec(function (err, tutorialQuizzes) {
-                // //console.log('tutorial', tutorials[0]);
-                // //console.log('tutorialQuizzes', tutorialQuizzes);
-                res.render('student/tutorial-quizzes', { 
-                    course: req.course,
-                    tutorial: tutorials[0],
-                    tutorialQuizzes: tutorialQuizzes 
-                });
-            });
-        }
     });
 };

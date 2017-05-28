@@ -1,4 +1,4 @@
-const models = require('../models');
+const models = require('../../models');
 // Retrieve list of instructors for course
 exports.getInstructorsByCourse = (req, res) => {
     req.course.withInstructors().execPopulate().then(() => {

@@ -1,9 +1,8 @@
 const _ = require('lodash'),
     async = require('async'),
-    config = require('../lib/config'),
+    config = require('../../lib/config'),
     mongoose = require('mongoose'),
-    models = require('../models');
-
+    models = require('../../models');
 // Retrieve course
 exports.getQuizByParam = (req, res, next, id) => {
     models.Quiz.findById(id, (err, quiz) => {

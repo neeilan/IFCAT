@@ -1,10 +1,9 @@
 const async = require('async'),
-    config = require('../lib/config'),
+    config = require('../../lib/config'),
     fs = require('fs-extra'),
-    models = require('../models'),
+    models = require('../../models'),
     mongoose = require('mongoose'),
     path = require('path');
-
 // Retrieve file
 exports.getFileByParam = (req, res, next, id) => {
     models.File.findById(id, (err, file) => {
@@ -18,7 +17,7 @@ exports.getFileByParam = (req, res, next, id) => {
 };
 // Retrieve all files in the course
 exports.getFiles = (req, res) => {
-    req.course.withFiles().execPopulate().then(function () {
+    req.course.withFiles().execPopulate().then(() => {
         res.render('admin/course-files', {
             bodyClass: 'files',
             title: 'Files',
@@ -40,16 +39,16 @@ exports.addFiles = (req, res) => {
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
             req.flash('success', 'The files have been added.');
-        res.redirect(req.originalUrl);
+        res.redirect(`/admin/${req.course._id}/files`);
     });
 };
 // Delete specific files from course
 exports.deleteFiles = (req, res) => {
     let dir = `${config.uploadPath}/${req.course.id}`;
-    async.each(req.body.files, function (id, done) {
+    async.eachSeries(req.body.files, (id, done) => {
         async.waterfall([
-            function findFile(done) {
-                models.File.findById(id, function (err, file) {
+            done => {
+                models.File.findById(id, (err, file) => {
                     if (err)
                         return done(err);
                     if (!file)
@@ -57,16 +56,16 @@ exports.deleteFiles = (req, res) => {
                     done(null, file);
                 });
             },
-            function removeFile(file, done) {
-                file.remove(function (err) {
+            (file, done) => {
+                file.remove(err => {
                     if (err)
                         return done(err);
                     done(null, file);
                 });
             },
-            function unlinkFile(file, done) {
-                var filename = path.resolve(dir + '/' + file.name);
-                fs.stat(filename, function (err, stats) {
+            (file, done) => {
+                let filename = path.resolve(`${dir}/${file.name}`);
+                fs.stat(filename, (err, stats) => {
                     if (err && err.code === 'ENOENT')
                         return done();
                     else if (err)
@@ -84,17 +83,5 @@ exports.deleteFiles = (req, res) => {
         else
             req.flash('success', 'The files have been deleted.');
         res.sendStatus(200);
-    });
-};
-
-// Retrieve a file by Id
-exports.getFileLinkById = function (req,res){
-    models.Course.findOne({ files : req.params.id }).exec()
-    .then(function(course){
-        models.File.findById(req.params.id).exec()
-        .then(function(file){
-            var fileUrl = '/upl/' + course._id + '/' + file.name;
-            res.redirect(fileUrl);
-        });      
     });
 };

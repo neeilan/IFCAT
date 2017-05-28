@@ -1,7 +1,7 @@
-var passport = require('passport'),
-    router = require('express').Router();
+const controllers = require('../controllers/student'),
+    passport = require('passport');
 
-var controllers = require('../controllers');
+let router = require('express').Router();
 
 // non-authenticated routes
 router.get('/login', controllers.User.getLogin);
@@ -18,10 +18,10 @@ router.get('/login/callback', passport.authenticate('auth0', {
     res.redirect(req.session.returnTo || '/student/courses');
 });
 
-router.get('/', function(req, res) {
+router.get('/', (req, res) => {
     if (!req.user) 
         return res.redirect('/login');
-    if (req.user.hasRole('admin'))
+    if (req.user.hasAnyRole(['admin', 'instructor', 'teachingAssistant']))
         return res.redirect('/admin/courses');
     res.redirect('/student/courses');
 })

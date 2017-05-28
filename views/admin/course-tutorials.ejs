@@ -1,4 +1,4 @@
-<%- include ./header -%>
+<% include ./header %>
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
@@ -7,7 +7,7 @@
 
 <h1><%- title %></h1>
 
-<%- include ./flash %>
+<% include ./flash %>
 
 <div class="nav-actions">
     <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-add-tutorials"><span class="glyphicon glyphicon-plus"></span> Add Tutorials</button>
@@ -52,4 +52,4 @@
 </table>
 
 <%- include ./modals/add-tutorials -%>
-<%- include ./footer -%>
+<% include ./footer %>

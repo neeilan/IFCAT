@@ -1,7 +1,7 @@
 const _ = require('lodash'),
     async = require('async'),
-    config = require('../lib/config'),
-    models = require('../models');
+    config = require('../../lib/config'),
+    models = require('../../models');
 // Retrieve course (deprecated)
 exports.getQuizByParam = (req, res, next, id) => {
     models.TutorialQuiz.findById(id).populate('tutorial quiz').exec((err, tutorialQuiz) => {
@@ -14,23 +14,43 @@ exports.getQuizByParam = (req, res, next, id) => {
     });
 };
 // Retrieve quizzes within course OR by tutorial
-exports.conductTutorialQuizzes = (req, res) => {
-    var query = { quiz: { $in: req.course.quizzes }};
+exports.getTutorialQuizzes = (req, res) => {
+    let page = parseInt(req.query.page, 10) || 1,
+        perPage = parseInt(req.query.perPage, 10) || 10;
+    let query = { quiz: { $in: req.course.quizzes }};
     if (req.tutorial)
         query = { tutorial: req.tutorial };
-    models.TutorialQuiz.find(query).populate('tutorial quiz').exec((err, tutorialQuizzes) => {
+    async.series([
+        done => {
+            models.TutorialQuiz.count(query, done);
+        },
+        done => {
+            models.TutorialQuiz
+                .find(query)
+                .populate('tutorial quiz')
+                .skip((page - 1) * perPage)
+                .limit(perPage)
+                .exec(done);
+        }
+    ], (err, data) => {
+        let pages = _.range(1, _.ceil(data[0] / perPage) + 1);
         res.render('admin/tutorial-quizzes', {
             bodyClass: 'tutorial-quizzes',
             title: 'Conduct Quizzes',
             course: req.course,
             tutorial: req.tutorial,
-            tutorialQuizzes: tutorialQuizzes.sort((a, b) => {
+            tutorialQuizzes: data[1].sort((a, b) => {
                 var m = a.quiz.name.toLowerCase(),
                     n = b.quiz.name.toLowerCase(),
                     s = a.tutorial.number.toLowerCase(),
                     t = b.tutorial.number.toLowerCase();
                 return m.localeCompare(n) || s.localeCompare(t);
-            })
+            }),
+            pagination: {
+                page: page,
+                pages: _.filter(pages, p => p >= page - 2 && p <= page + 2),
+                perPage: perPage
+            }
         });
     });
 };
@@ -46,7 +66,8 @@ exports.conductTutorialQuiz = (req, res) => {
         path: 'groups'
     }]).exec((err, tutorialQuiz) => {
         res.render('admin/tutorial-quiz', {
-            title: 'Conduct ' + req.quiz.name + ' in TUT ' + req.tutorial.number,
+            class: 'conduct-quiz',
+            title: `Conduct ${req.quiz.name} in tutorial ${req.tutorial.number}`,
             course: req.course, 
             tutorial: req.tutorial,
             quiz: req.quiz,

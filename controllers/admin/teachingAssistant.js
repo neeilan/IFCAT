@@ -1,6 +1,6 @@
 const async = require('async'),
-    config = require('../lib/config'),
-    models = require('../models');
+    config = require('../../lib/config'),
+    models = require('../../models');
 // Retrieve list of teaching assistants for course
 exports.getTeachingAssistantsByCourse = (req, res) => {
     req.course.withTutorials().withTeachingAssistants().execPopulate().then(err => {

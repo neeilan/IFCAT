@@ -1,4 +1,4 @@
-<%- include ./header -%>
+<% include ./header %>
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
@@ -9,7 +9,7 @@
 
 <h2 id="title"><%- title %></h2>
 
-<%- include ./flash %>
+<% include ./flash %>
 
 <ul class="nav nav-tabs">
     <li class="active"><a href="#settings" data-toggle="tab">Settings</a></li>
@@ -123,27 +123,4 @@
     </div>
 </div>
 
-<%- include ./body-js -%>
-
-<script>
-$(function () {
-    var $tab = $('#groups'), 
-        $table = $tab.find('table'),
-        $tr = $table.find('tbody > tr:first-child');
-    var nextNumber = function () {
-        var num = 1, used = $tr.find('.btn-circle').map(function () { return parseInt($(this).text(), 10) || -1 }).get().sort();
-        // find first unused number
-        while (used.indexOf(num) > -1) { num++ }
-        return num;
-    };
-    // add new group to table
-    $tab.find('.btn-add').click(function () {
-        var n = nextNumber();
-        $table.find('.btn-circle:last-child').each(function () {
-            $(this).before(this.outerHTML.replace(/new/g, n)); 
-        });
-    }); 
-});
-</script>
-
-<%- include ./footer -%>
+<% include ./footer %>

@@ -1,4 +1,4 @@
-<%- include ./header -%>
+<% include ./header %>
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a></li>
@@ -7,7 +7,7 @@
 
 <h1><%= title %></h1>
 
-<%- include ./flash %>
+<% include ./flash %>
 
 <form action="/admin/courses/<%= course.isNew ? '' : course.id + '?_method=put' %>" 
     method="post" autocomplete="off" class="form-horizontal">
@@ -33,4 +33,4 @@
     </div>
 </form>
 
-<%- include ./footer -%>
+<% include ./footer %>

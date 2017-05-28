@@ -1,10 +1,10 @@
-<%- include ./header -%>
+<% include ./header %>
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
-<% if (tutorial) { %>
-    <li><a href="/admin/courses/<%= course.id %>/tutorials">Tutorials</a> ‐ TUT <%= tutorial.number %></li>
-<% } %>
+    <% if (tutorial) { %>
+        <li><a href="/admin/courses/<%= course.id %>/tutorials">Tutorials</a> ‐ TUT <%= tutorial.number %></li>
+    <% } %>
     <li class="active">Quizzes</li>
 </ol>
 
@@ -34,44 +34,37 @@
                 <th style="width: 10px;"><input type="checkbox"></th>
                 <th>Quiz</th>
                 <th>Tutorial</th>
-                <th class="text-center">Published</th>
-                <th class="text-center">Active</th>
-                <th class="text-center">Archived</th>
+                <% _.each(['Published', 'Active', 'Archived'], field => { %>
+                    <th class="text-center"><%- field %></th>
+                <% }) %>
                 <th class="actions"></th>
             </tr>
         </thead>
+        <tfoot>
+            <tr><td colspan="7" class="clearfix"><% include ./pagination %></td></tr>
+        </tfoot>
         <tbody>
         <% if (_.isEmpty(tutorialQuizzes)) { %>
             <tr><td colspan="7">No quizzes have been added for this tutorial yet.</td></tr>
         <% } else { %>
-            <% _.each(tutorialQuizzes, function (tutorialQuiz) { %>
+            <% _.each(tutorialQuizzes, tutorialQuiz => { %>
                 <tr>
                     <td><input type="checkbox" name="tutorialQuizzes[]" value="<%= tutorialQuiz.id %>"></td>
                     <td><%= tutorialQuiz.quiz.name %></td>
                     <td><%= 'TUT ' + tutorialQuiz.tutorial.number %></td>
-                    <td class="text-center">
-                    <% if (tutorialQuiz.published) { %>
-                        <span class="glyphicon glyphicon-ok"></span>
-                    <% } %>
-                    </td>
-                    <td class="text-center">
-                    <% if (tutorialQuiz.active) { %>
-                        <span class="glyphicon glyphicon-ok"></span>
-                    <% } %>
-                    </td>
-                    <td class="text-center">
-                    <% if (tutorialQuiz.archived) { %>
-                        <span class="glyphicon glyphicon-ok"></span>
-                    <% } %>
-                    </td>
+                    <% _.each(['published', 'active', 'archived'], field => { %>
+                        <td class="text-center">
+                        <% if (tutorialQuiz[field]) { %>
+                            <span class="glyphicon glyphicon-ok"></span>
+                        <% } %>
+                        </td>
+                    <% }) %>
                     <td>
                         <div class="dropdown">
-                            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                                Actions<span class="caret"></span>
-                            </button>
+                            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">Actions<span class="caret"></span></button>
                             <ul class="dropdown-menu">
-                                <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorialQuiz.tutorial.id %>/quizzes/<%= tutorialQuiz.quiz.id %>/conduct"><span class="glyphicon glyphicon-play-circle"></span> Conduct quiz</a></li>
-                                <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorialQuiz.tutorial.id %>/quizzes/<%= tutorialQuiz.quiz.id %>/marks"><span class="glyphicon glyphicon-signal"></span> View Results</a></li>
+                                <li><a href="/admin/courses/<%= course._id %>/tutorials/<%= tutorialQuiz.tutorial._id %>/quizzes/<%= tutorialQuiz.quiz._id %>/conduct"><span class="glyphicon glyphicon-play-circle"></span> Conduct quiz</a></li>
+                                <li><a href="/admin/courses/<%= course._id %>/tutorials/<%= tutorialQuiz.tutorial._id %>/quizzes/<%= tutorialQuiz.quiz._id %>/marks"><span class="glyphicon glyphicon-signal"></span> View Results</a></li>
                             </ul>
                         </div>
                     </td>
@@ -82,4 +75,4 @@
     </table>
 </form>
 
-<%- include ./footer -%>
+<% include ./footer %>

@@ -1,8 +1,7 @@
-var _ = require('lodash'),
+const _ = require('lodash'),
     async = require('async'),
-    util = require('util');
-var config = require('../lib/config'),
-    models = require('../models');
+    config = require('../../lib/config'),
+    models = require('../../models');
 //
 exports.getUserByParam = (req, res, next, id) => {
     models.User.findById(id, (err, user) => {
@@ -15,30 +14,18 @@ exports.getUserByParam = (req, res, next, id) => {
     });
 };
 // Retrieve login form
-exports.getLogin = function (req, res) {
-    if (req.baseUrl === '/admin') {
-        if (req.user)
-            return res.redirect('/admin/courses');
-        res.render('admin/login', { 
-            bodyClass: 'login',
-            title: 'Login' 
-        });
-    } else {
-        if (req.user)
-            return res.redirect('/student/courses');
-        var auth0Config = config.auth0;
-        res.render('login', {
-            domain : auth0Config.domain,
-            clientId : auth0Config.clientId,
-            callbackUrl : auth0Config.callbackUrl,
-            title: 'Login'
-        });
-    }
+exports.getLogin = (req, res) => {
+    if (req.user)
+        return res.redirect('/admin/courses');
+    res.render('admin/login', { 
+        bodyClass: 'login',
+        title: 'Login' 
+    });
 };
 // Logout user
-exports.logout = function (req, res) {
+exports.logout = (req, res) => {
     req.logout();
-    res.redirect(req.baseUrl === '/admin' ? '/admin/login' : '/login');
+    res.redirect('/admin/login');
 };
 // Retrieve list of users
 exports.getUsers = (req, res) => {
@@ -66,9 +53,11 @@ exports.getUsers = (req, res) => {
             bodyClass: 'users',
             title: 'Users',
             users: data[1],
-            page: page,
-            perPage: perPage,
-            pages: _.filter(pages, p => _.inRange(p, page - 2, page + 2))
+            pagination: {
+                page: page,
+                pages: _.filter(pages, p => p >= page - 2 && p <= page + 2),
+                perPage: perPage
+            }
         });
     });
 };

@@ -9,7 +9,7 @@
                 <div class="col-xs-4 col-files">
                     <ul class="list-group">
                     <% _.each(course.files, function (file) { %>
-                        <li class="list-group-item<%= question.files.indexOf(file.id) > -1  ? ' active' : '' %>">
+                        <li class="list-group-item<%= question.files.indexOf(file.id) > -1 ? ' active' : '' %>">
                             <input type="checkbox" name="files[]" value="<%= file.id %>"<%=
                                 question.files.indexOf(file.id) > -1 ? 'checked' : '' %>> 
                             <a href="/upl/<%= course.id %>/<%= file.name %>" target="_preview"><%= file.name %></a>

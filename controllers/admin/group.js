@@ -1,9 +1,8 @@
 const _ = require('lodash'),
     async = require('async'),
-    config = require('../lib/config'),
-    models = require('../models'),
+    config = require('../../lib/config'),
+    models = require('../../models'),
     mongoose = require('mongoose');
-
 // Retrieve group
 exports.getGroupByParam = (req, res, next, id) => { 
     models.Group.findById(id, (err, group) => {
@@ -23,7 +22,7 @@ exports.generateGroups = (req, res) => {
             path: 'students',
             sort: { 'name.first': 1, 'name.last': 1 }
         }
-    }).exec(function (err, tutorialQuiz) {
+    }).exec((err, tutorialQuiz) => {
         // shuffle students
         var students = _.shuffle(req.tutorial.students.map(String));
         // get # of members per group
@@ -38,9 +37,9 @@ exports.generateGroups = (req, res) => {
                 members: chunk
             };
         });
-
         res.render('admin/tutorial-quiz', {
-            title: 'Conduct ' + req.quiz.name + ' in TUT ' + req.tutorial.number,
+            class: 'conduct-quiz',
+            title: `Conduct ${req.quiz.name} in TUT ${req.tutorial.number}`,
             course: req.course, 
             tutorial: req.tutorial,
             quiz: req.quiz,
@@ -54,7 +53,7 @@ exports.generateGroups = (req, res) => {
     });
 };
 // Save groups for tutorial
-exports.saveGroups = function (req, res, next) { 
+exports.saveGroups = (req, res, next) => { 
     var oldStack = {}, newStack = {};
     // key might be group ID (for updating) or <number> (for adding)
     _.forOwn(req.body.groups || {}, function (users, groupId) {

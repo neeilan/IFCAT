@@ -1,4 +1,4 @@
-<%- include ./header -%>
+<% include ./header %>
 
 <ol class="breadcrumb">
     <li class="active">Users</li>
@@ -6,7 +6,7 @@
 
 <h1><%- title %></h1>
 
-<%- include ./flash %>
+<% include ./flash %>
 
 <div class="nav-actions">
     <a href="/admin/users/new" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add New User</a>
@@ -35,11 +35,7 @@
         </tbody>
     <% } else { %>
         <tfoot>
-            <tr>
-                <td colspan="4" class="clearfix">
-                    <%- include ./pagination %>
-                </td>
-            </tr>
+            <tr><td colspan="4" class="clearfix"><% include ./pagination %></td></tr>
         </tfoot>
         <tbody>
         <% _.each(users, user => { %>
@@ -49,8 +45,7 @@
                 <td><% _.each(user.roles, role => { %><p><%= _.startCase(role) %></p><% }) %></td>
                 <td>
                     <div class="dropdown">
-                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                            Actions<span class="caret"></span>
+                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">Actions<span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
                             <li><a href="/admin/users/<%= user._id %>/edit"><span class="glyphicon glyphicon-pencil"></span> Edit user</a></li>
@@ -65,4 +60,4 @@
     <% } %>
 </table>
 
-<%- include ./footer -%>
+<% include ./footer %>

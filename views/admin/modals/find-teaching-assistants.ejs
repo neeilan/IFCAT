@@ -7,12 +7,12 @@
             <form action="/admin/courses/<%= course.id %>/teaching-assistants" method="post">
                 <div class="modal-body">
                     <input type="text" name="q" value="" class="form-control input-sm" placeholder="Name, email, or leave blank">
-                    <input type="button" value="Search" class="btn btn-default btn-sm" id="btn-search">
+                    <input type="button" value="Search" class="btn btn-default btn-sm" id="btn-search" data-focus>
                     <div id="search-results"></div>
                 </div>
                 <div class="modal-footer">
                     <input type="button" value="Cancel" class="btn btn-default btn-sm" data-dismiss="modal">
-                    <input type="submit" value="Update" class="btn btn-primary btn-sm">
+                    <input type="button" value="Update" class="btn btn-primary btn-sm" onclick="this.form.submit()">
                 </div>
             </form>
         </div>
