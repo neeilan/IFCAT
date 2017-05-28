@@ -2,7 +2,7 @@
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
-    <li><a href="/admin/courses/<%= course.id %>/quizzes">Quizzes</a></li>
+    <li><a href="/admin/courses/<%= course._id %>/quizzes">Quizzes</a></li>
     <li class="active"><%= quiz.isNew ? 'New' : 'Edit' %></li>
 </ol>
 
@@ -10,7 +10,7 @@
 
 <%- include ./flash %>
 
-<form action="/admin/courses/<%= course.id %>/quizzes/<%= quiz.isNew ? '' : quiz.id + '?_method=put' %>" 
+<form action="/admin/courses/<%= course._id %>/quizzes/<%= quiz.isNew ? '' : quiz._id + '?_method=put' %>" 
     method="post" autocomplete="off" class="form-horizontal">
 
     <div class="form-group required">
@@ -25,7 +25,7 @@
         <label class="col-sm-2 control-label">Available to</label>
         <div class="col-sm-10">
             <select name="tutorials[]" multiple class="form-control">
-            <% _.each(course.tutorials, function (tutorial) { %>
+            <% _.each(course.tutorials, tutorial => { %>
                 <option value="<%= tutorial.id %>"<%= quiz.isNew || quiz.tutorials.indexOf(tutorial.id) !== -1 ? 
                     ' selected' : '' %>>TUT <%= tutorial.number %></option> 
             <% }) %>
@@ -83,7 +83,7 @@
     </div>
     <div class="form-group" style="margin-top: 30px;">
         <div class="col-sm-offset-2 col-sm-10">
-            <a href="/admin/courses/<%= course.id %>/quizzes" class="btn btn-default btn-sm">Cancel</a>
+            <a href="/admin/courses/<%= course._id %>/quizzes" class="btn btn-default btn-sm">Cancel</a>
             <button type="submit" class="btn btn-primary btn-sm">Save</button>
         </div>
     </div>

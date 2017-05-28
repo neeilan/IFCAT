@@ -94,7 +94,7 @@ router.delete('/users/:us3r', controllers.User.deleteUser);
 router.get('/courses/:course/instructors', controllers.Instructor.getInstructorsByCourse);
 router.get('/courses/:course/instructors/search', controllers.Instructor.getInstructorsBySearchQuery);
 router.post('/courses/:course/instructors', controllers.Instructor.addInstructors);
-router.delete('/courses/:course/instructors/:us3r', controllers.Instructor.deleteInstructor);
+router.delete('/courses/:course/instructors', controllers.Instructor.deleteInstructors);
 
 router.get('/courses/:course/teaching-assistants', controllers.TeachingAssistant.getTeachingAssistantsByCourse);
 router.get('/courses/:course/teaching-assistants/search', controllers.TeachingAssistant.getTeachingAssistantsBySearchQuery);

@@ -18,12 +18,13 @@ exports.conductTutorialQuizzes = (req, res) => {
     var query = { quiz: { $in: req.course.quizzes }};
     if (req.tutorial)
         query = { tutorial: req.tutorial };
-    models.TutorialQuiz.find(query).populate('tutorial quiz').exec(function (err, tutorialQuizzes) {
+    models.TutorialQuiz.find(query).populate('tutorial quiz').exec((err, tutorialQuizzes) => {
         res.render('admin/tutorial-quizzes', {
+            bodyClass: 'tutorial-quizzes',
             title: 'Conduct Quizzes',
             course: req.course,
             tutorial: req.tutorial,
-            tutorialQuizzes: tutorialQuizzes.sort(function (a, b) {
+            tutorialQuizzes: tutorialQuizzes.sort((a, b) => {
                 var m = a.quiz.name.toLowerCase(),
                     n = b.quiz.name.toLowerCase(),
                     s = a.tutorial.number.toLowerCase(),
@@ -43,7 +44,7 @@ exports.conductTutorialQuiz = (req, res) => {
         }
     }, {
         path: 'groups'
-    }]).exec(function (err, tutorialQuiz) {
+    }]).exec((err, tutorialQuiz) => {
         res.render('admin/tutorial-quiz', {
             title: 'Conduct ' + req.quiz.name + ' in TUT ' + req.tutorial.number,
             course: req.course, 

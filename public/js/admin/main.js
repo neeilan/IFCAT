@@ -3,7 +3,7 @@ $(function () {
     $.ajaxSetup({ cache: false });
 
     // activate current navbar item
-    $('#navbar-collapse li > [href!="#"]').each(function () {
+    $('#navbar-collapse li > a[href!="#"]').each(function () {
         if (window.location.href.indexOf(this.href) > -1) {
             $(this).parent().addClass('active');
             return false;
@@ -56,7 +56,7 @@ $(function () {
     // toggle checkbox-radios
     $(document).on('click', '.btn-circle', function (e) {
         var btn = $(this).toggleClass('active'), 
-            input = btn.find('input').prop('checked', btn.hasClass('active'));
+            input = $('input', btn).prop('checked', btn.hasClass('active'));
         // inactivate other checkbox-radios if they belong to the same group
         if (input.data('group')) {
             $(e.delegateTarget).find('.btn-circle').has('[data-group=' + input.data('group') + ']').not(btn).each(function () {

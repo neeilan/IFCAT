@@ -1,8 +1,7 @@
 $(function () {
     if ($('body').hasClass('questions')) {
-        var container = $('.container'),
-            heading = $('> h1'),
-            table = $('> table:eq(0)'),
+        var heading = $('> h1'),
+            table = $('table:eq(0)'),
             dim = table.closest('.dim-wrap');
         // Confirm and delete selected row
         $('.btn-delete', table).click(function (e) {
@@ -24,11 +23,11 @@ $(function () {
             axis: 'y', 
             cancel: false,
             handle: '.handle',
-            update: function (e, ui) {
+            update: function () {
                 dim.addClass('on');
                 $.ajax(window.location.href.split(/[?#]/)[0] + '/sort', {
                     type: 'put',
-                    data: $(ui).serialize(),
+                    data: $('input[name^=questions]', table).serialize(),
                     error: function (xhr) {
                         heading.after('<div class="alert alert-danger alert-dismissible"><a href="#" class="close" data-dismiss="alert">&times;</a>' + xhr.responseText + '</div>')
                     },

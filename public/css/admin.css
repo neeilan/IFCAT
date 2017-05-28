@@ -85,6 +85,10 @@ input[type=checkbox][data-label] {
     margin-left: -12px;
     top: 5px;
 }
+.per-page {
+    margin: 20px;
+    width: auto;
+}
 .pagination > li > a, .pagination > li > span {
     color: #333;
     margin-left: 3px;
@@ -95,10 +99,10 @@ input[type=checkbox][data-label] {
     background-color: #333;
     border-color: #333;    
 }
-.pagination > .divider > *, .pagination > .previous > *, .pagination > .next > * {
+/*.pagination > .divider > *, .pagination > .previous > *, .pagination > .next > * {
     background-color: #fff !important;
     border: 0 !important;
-}
+}*/
 .mce-tinymce {
     box-sizing: border-box !important;
 }
@@ -111,14 +115,11 @@ input[type=checkbox][data-label] {
 .table > tfoot > tr > th {
     border-top: 2px solid #ddd;
 }
-.table > tbody > tr > td {
+/*.table > tbody > tr > td {
     vertical-align: middle;
-}
+}*/
 .table th.actions, .table td.actions {
     width: 105px;
-}
-.table tfoot .pagination {
-    margin: 0;
 }
 .tab-pane {
     padding: 10px;
@@ -135,7 +136,7 @@ input[type=checkbox][data-label] {
 #modal-find-users .modal-body {
     min-height: 150px;
 }
-#modal-find-users #q {
+#modal-find-users input[name=q] {
     float: left;
     margin-right: 10px;
     width: 80%;

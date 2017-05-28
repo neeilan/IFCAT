@@ -1,13 +1,11 @@
 $(function () {
     if ($('body').hasClass('quizzes')) {
-        // Confirm and copy row
         $('.btn-copy').click(function (e) {
             e.preventDefault();
             $.post(this.href, function () {
                 window.location.reload(true);
             });
         });
-        // Confirm and delete row
         $('.btn-delete').click(function (e) {
             e.preventDefault();
             var btn = this;

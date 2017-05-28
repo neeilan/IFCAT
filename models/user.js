@@ -147,7 +147,7 @@ UserSchema.statics.findByRole = function (role) {
     return this.find({ roles: { $in: [role] }}).sort({ 'name.first': 1, 'name.last': 1 });
 };
 // Find users by search query
-UserSchema.statics.findByQuery = function (query, done) {
+UserSchema.statics.findBySearchQuery = function (query, done) {
     let $and = [];
     if (query.q) {
         let re = new RegExp('(' + query.q.replace(/\s/, '|').trim() + ')', 'i');
@@ -161,9 +161,9 @@ UserSchema.statics.findByQuery = function (query, done) {
             ]
         });
     }
-    if (query.role) {
+    if (query.roles) {
         $and.push({ 
-            roles: { $in: [query.role] }
+            roles: { $in: query.roles }
         });
     }
     return this.find().and($and).sort({ 'name.first': 1, 'name.last': 1 }).exec(done);

@@ -15,7 +15,9 @@ exports.getTutorialByParam = (req, res, next, id) => {
 };
 // Retrieve list of tutorials for course
 exports.getTutorials = (req, res) => {
-    models.Tutorial.find({ _id: { $in: req.course.tutorials }}, (err, tutorials) => {
+    models.Tutorial.find({ 
+        _id: { $in: req.course.tutorials }
+    }).populate('teachingAssistants').exec((err, tutorials) => {
         res.render('admin/course-tutorials', {
             bodyClass: 'tutorials',
             title: 'Tutorials',

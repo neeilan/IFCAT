@@ -1,7 +1,7 @@
 $(function () {
     if ($('body').hasClass('tutorials')) {
         // Confirm and delete tutorial upon click
-        $('.btn-delete', body).click(function (e) {
+        $('.btn-delete').click(function (e) {
             e.preventDefault();
             var btn = this;
             $.deletebox({
