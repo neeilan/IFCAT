@@ -61,29 +61,27 @@ exports.editStudents = (req, res) => {
 // Delete students from course and associated tutorials
 exports.deleteStudents = (req, res) => {
     let students = req.body.students || [];
-    req.course.withTutorials().execPopulate().then(function () {
-        async.series([
-            done => {
-                req.course.update({ 
-                    $pull: { students: { $in: students }}
-                }, done);
-            },
-            done => {
-                models.Tutorial.update({ 
-                    _id: { $in: req.course.tutorials }
-                }, { 
-                    $pull: { students: { $in: students }}
-                }, {
-                    multi: true
-                }, done);
-            }
-        ], err => {
-            if (err)
-                req.flash('error', 'An error has occurred while trying perform operation.');
-            else
-                req.flash('success', 'The list of students has been updated.');
-            res.sendStatus(200);
-        });
+    async.series([
+        done => {
+            req.course.update({ 
+                $pull: { students: { $in: students }}
+            }, done);
+        },
+        done => {
+            models.Tutorial.update({ 
+                _id: { $in: req.course.tutorials }
+            }, { 
+                $pull: { students: { $in: students }}
+            }, {
+                multi: true
+            }, done);
+        }
+    ], err => {
+        if (err)
+            req.flash('error', 'An error has occurred while trying perform operation.');
+        else
+            req.flash('success', 'The list of students has been updated.');
+        res.sendStatus(200);
     });
 };
 // Import list of students
