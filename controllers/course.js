@@ -52,7 +52,7 @@ exports.editCourse = (req, res) => {
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
             req.flash('success', 'Course <b>%s</b> has been updated.', req.course.name);
-        res.redirect('/admin/courses/' + req.course.id + '/edit');
+        res.redirect(`/admin/courses/${req.course.id}/edit`);
     });
 };
 // Delete course

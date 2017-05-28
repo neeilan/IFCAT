@@ -1,16 +1,6 @@
 $(function () {
-    if ($('body').hasClass('users')) {
-        // add user to course when button is clicked
-        $('#btn-search').click(function () {
-            $('#search-results').load($(this).closest('form')[0].action + '/search?q=' + q.value);
-        });
-        // delete user from course when button is clicked
-        $('.btn-delete-user').click(function (e) {
-            e.preventDefault();
-            $.delete(this.href, function () { window.location.reload(true); });
-        });
-    }
-    if ($('body').hasClass('instructors')) {
+    var body = $('body');
+    if (body.hasClass('users')) {
         $('.btn-delete').click(function (e) {
             e.preventDefault();
             var btn = this;
@@ -26,24 +16,31 @@ $(function () {
             });
         });
     }
-    if ($('body').hasClass('teaching-assistants')) {
-        $('#btn-delete').click(function () {
-            var inputs = $('tbody [name^=teachingAssistants]:checked');
+    if (body.hasClass('instructors') || body.hasClass('teaching-assistants') || body.hasClass('students')) {
+        $('#btn-search').click(function () {
+            var input = $(this);
+            $('#search-results').load(input.closest('form')[0].action + '/search?q=' + input.prev('[name=q]').val());
+        });
+        $('#btn-delete').click(function (e) {
+            e.preventDefault();
+            var inputs = $(
+                ':not(.modal) input[name^=instructors]:checked,' +
+                ':not(.modal) input[name^=teachingAssistants]:checked,' +
+                ':not(.modal) input[name^=students]:checked'
+            );
             if (inputs.length) {
-                $.delete('/admin/courses/<%= course.id %>/teaching-assistants', inputs.serialize(), function () { 
+                $.delete(this.href, inputs.serialize(), function () { 
                     window.location.reload(true);
                 });
             }
         });
     }
-    if ($('body').hasClass('students')) {
-        $('#btn-delete').click(function () {
-            var inputs = $('tbody [name^=students]:checked');
-            if (inputs.length) {
-                $.delete('/admin/courses/<%= course.id %>/students', inputs.serialize(), function () { 
-                    window.location.reload(true);
-                });
-            }
+    if (body.hasClass('teaching-assistants') || body.hasClass('students')) {
+        $('#btn-update').click(function (e) {
+            e.preventDefault();
+            $.put(this.href, $(':not(.modal) input[name^=tutorials]:checked').serialize(), function () { 
+                window.location.reload(true);
+            });
         });
     }
 });

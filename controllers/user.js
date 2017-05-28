@@ -3,8 +3,7 @@ var _ = require('lodash'),
     util = require('util');
 var config = require('../lib/config'),
     models = require('../models');
-
-// 
+//
 exports.getUserByParam = (req, res, next, id) => {
     models.User.findById(id, (err, user) => {
         if (err)
@@ -42,32 +41,39 @@ exports.logout = function (req, res) {
     res.redirect(req.baseUrl === '/admin' ? '/admin/login' : '/login');
 };
 // Retrieve list of users
-exports.getUsers = function (req, res) {
-    var currentPage = parseInt(req.query.page, 10) || 1,
-        perPage = parseInt(req.query.perPage, 10) || 20,
-        start = (currentPage - 1) * perPage, 
-        end = start + perPage;
-    models.User.find().sort({ 'name.first': 1, 'name.last': 1 }).exec(function (err, users) {
-        var totalPages = _.round(users.length / perPage), pages = [];
-        // build pages
-        for (var page = 1; page <= totalPages; page++) {    
-            if ((currentPage <= 2 && page <= 5) || 
-                (currentPage - 2 <= page && page <= currentPage + 2) ||
-                (totalPages - 2 < currentPage && totalPages - 5 < page)) pages.push(page);
+exports.getUsers = (req, res) => {
+    let page = parseInt(req.query.page, 10) || 1,
+        perPage = parseInt(req.query.perPage, 10) || 5,
+        sortBy = JSON.parse(req.query.sortBy || '{ "createdAt": -1 }');
+    let query = {};
+
+    async.series([
+        done => {
+            models.User.count(query, done);
+        },
+        done => {
+            models.User
+                .find(query)
+                .select('local.email student oauth.id name roles')
+                .sort(sortBy)
+                .skip((page - 1) * perPage)
+                .limit(perPage)
+                .exec(done);
         }
+    ], (err, data) => {
+        let pages = _.range(1, _.ceil(data[0] / perPage) + 1);
         res.render('admin/users', {
             bodyClass: 'users',
             title: 'Users',
-            users: _.slice(users, start, end),
-            currentPage: currentPage,
+            users: data[1],
+            page: page,
             perPage: perPage,
-            totalPages: totalPages,
-            pages: pages
+            pages: _.filter(pages, p => _.inRange(p, page - 2, page + 2))
         });
-    }); 
+    });
 };
 // Retrieve user form
-exports.getUser = function (req, res) {
+exports.getUser = (req, res) => {
     var user = req.us3r || new models.User();
     res.render('admin/user', {
         title: user.isNew ? 'Add New User' : 'Edit User', 
@@ -75,9 +81,9 @@ exports.getUser = function (req, res) {
     });
 };
 // Add new user
-exports.addUser = function (req, res) {
+exports.addUser = (req, res) => {
     var user = new models.User(req.body);
-    user.save(function (err) {
+    user.save(err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform action.');
         else
@@ -86,18 +92,18 @@ exports.addUser = function (req, res) {
     });
 };
 // Update specific user
-exports.editUser = function (req, res) {
-    req.us3r.set(req.body).save(function (err) {
+exports.editUser = (req, res) => {
+    req.us3r.set(req.body).save(err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform action.');
         else
             req.flash('success', 'User <b>%s</b> has been updated.', req.us3r.name.full);
-        res.redirect('/admin/users/' + req.us3r.id + '/edit');
+        res.redirect(`/admin/users/${req.us3r.id}/edit`);
     });
 };
 // Delete specific user
-exports.deleteUser = function (req, res) {
-    req.us3r.remove(function (err) {
+exports.deleteUser = (req, res) => {
+    req.us3r.remove(err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform action.');
         else
@@ -106,8 +112,8 @@ exports.deleteUser = function (req, res) {
     });
 };
 // Reset administrator
-exports.install = function (req, res, next) {
-    models.User.findOne({ 'local.email': 'admin' }, function (err, user) {
+exports.install = (req, res, next) => {
+    models.User.findOne({ 'local.email': 'admin' }, (err, user) => {
         if (err)
             return next(err);
         if (!user)
@@ -118,10 +124,10 @@ exports.install = function (req, res, next) {
             },
             local: {
                 email: 'admin',
-                password: '@dm1n'
+                password: '@dm!n'
             },
             roles: ['admin']
-        }).save(function (err) {
+        }).save(err => {
             if (err)
                 return next(err);
             res.send('Sweet Christmas.');

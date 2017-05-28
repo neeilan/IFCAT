@@ -3,36 +3,20 @@ const _ = require('lodash'),
     config = require('../lib/config'),
     csv = require('csv'),
     models = require('../models');
-
 // Retrieve list of students for course
 exports.getStudentsByCourse = (req, res) => {
-    /*var currentPage = parseInt(req.query.page, 10) || 1,
-        perPage = parseInt(req.query.perPage, 10) || 20,
-        start = (currentPage - 1) * perPage, 
-        end = start + perPage;*/
-    req.course.withTutorials().withStudents().execPopulate().then(function (err) {
-        /*var totalPages = _.round(req.course.students.length / perPage), pages = [];
-        // build pages
-        for (var page = 1; page <= totalPages; page++) {    
-            if ((currentPage <= 2 && page <= 5) || 
-                (currentPage - 2 <= page && page <= currentPage + 2) ||
-                (totalPages - 2 < currentPage && totalPages - 5 < page)) pages.push(page);
-        }*/
+    req.course.withTutorials().withStudents().execPopulate().then(err => {
         res.render('admin/course-students', {
             bodyClass: 'students',
             title: 'Students',
             course: req.course,
-            students: req.course.students/*,
-            currentPage: currentPage,
-            perPage: perPage,
-            totalPages: totalPages,
-            pages: pages*/
+            students: req.course.students
         });
     }); 
 };
 // Retrieve list of students matching search query
 exports.getStudentsBySearchQuery = (req, res) => {
-    models.User.findBySearchQuery({ q: req.query.q, role: 'student' }, (err, students) => {
+    models.User.findBySearchQuery({ q: req.query.q, roles: ['student'] }, (err, students) => {
         res.render('admin/tables/course-students-search-results', { 
             course: req.course, 
             students: students 
@@ -41,7 +25,7 @@ exports.getStudentsBySearchQuery = (req, res) => {
 };
 // Retrieve list of students for tutorial
 exports.getStudentsByTutorial = (req, res) => {
-    req.tutorial.withStudents().execPopulate().then(function () {
+    req.tutorial.withStudents().execPopulate().then(() => {
         res.render('admin/tutorial-students', {
             title: 'Students', 
             course: req.course, 
@@ -59,37 +43,41 @@ exports.addStudents = (req, res) => {
         res.redirect(`/admin/courses/${req.course.id}/students`);
     });
 };
-// Update students' tutorials
+// Update students in tutorials
 exports.editStudents = (req, res) => {
-    var stack = _.mapValues(req.body.tutorials, function (users) { 
-        return _.keys(users).sort();
-    });
-    req.course.withTutorials().execPopulate().then(function () {
-        async.eachSeries(req.course.tutorials, function (tutorial, done) {
-            tutorial.update({ $set: { students: stack[tutorial.id] || [] }}, done);
-        }, function (err) {
+    req.body.tutorials = req.body.tutorials || {};
+    req.course.withTutorials().execPopulate().then(() => {
+        async.eachSeries(req.course.tutorials, (tutorial, done) => {
+            tutorial.update({ $set: { students: req.body.tutorials[tutorial.id] || [] }}, done);
+        }, err => {
             if (err)
                 req.flash('error', 'An error occurred while trying to perform operation.');
             else
                 req.flash('success', 'The list of tutorials has been updated.');
-            res.redirect(`/admin/courses/${req.course.id}/students`);
+            res.sendStatus(200);
         });
     });
 };
-// Delete student from course and associated tutorial
+// Delete students from course and associated tutorials
 exports.deleteStudents = (req, res) => {
-    var students = req.body.students || [];
+    let students = req.body.students || [];
     req.course.withTutorials().execPopulate().then(function () {
         async.series([
-            function deleteFromCourse(done) {
-                req.course.update({ $pull: { students: { $in: students }}}, done);
+            done => {
+                req.course.update({ 
+                    $pull: { students: { $in: students }}
+                }, done);
             },
-            function deleleFromTutorials(done) {
-                async.eachSeries(req.course.tutorials, function (tutorial, done) {
-                    tutorial.update({ $pull: { students: { $in: students }}}, done);
+            done => {
+                models.Tutorial.update({ 
+                    _id: { $in: req.course.tutorials }
+                }, { 
+                    $pull: { students: { $in: students }}
+                }, {
+                    multi: true
                 }, done);
             }
-        ], function (err) {
+        ], err => {
             if (err)
                 req.flash('error', 'An error has occurred while trying perform operation.');
             else
@@ -105,18 +93,18 @@ exports.importStudents = (req, res) => {
         columns: true,
         delimiter: ',',
         skip_empty_lines: true
-    }, function (err, rows) {
+    }, (err, rows) => {
         if (err) {
             req.flash('error', 'An error occurred while trying to perform operation.');
-            return res.redirect('/admin/courses/' + req.course.id + '/students');
+            return res.redirect(`/admin/courses/${req.course.id}/students`);
         }
         // process records
-        async.eachSeries(rows, function (row, done) {
+        async.eachSeries(rows, (row, done) => {
             row.student = {};
             row.name = {};
             row.local = {};
             // normalize properties
-            _.forOwn(row, function (val, key) {
+            _.forOwn(row, (val, key) => {
                 if (/^utorid/i.test(key))
                     row.student.UTORid = val;
                 else if (/^student(.+)/i.test(key))
@@ -135,7 +123,7 @@ exports.importStudents = (req, res) => {
             // save
             async.waterfall([
                 function saveStudent(done) {
-                    models.User.findOne({ 'student.UTORid': row.student.UTORid }, function (err, user) {
+                    models.User.findOne({ 'student.UTORid': row.student.UTORid }, (err, user) => {
                         if (err)
                             return done(err);
                         if (!user)
@@ -168,12 +156,12 @@ exports.importStudents = (req, res) => {
                     }, done);
                 }
             ], done);
-        }, function (err) {
+        }, err => {
             if (err)
                 req.flash('error', 'An error has occurred while trying to perform operation.');
             else
                 req.flash('success', 'The students have been imported.');
-            res.redirect('/admin/courses/' + req.course.id + '/students');
+            res.redirect(`/admin/courses/${req.course.id}/students`);
         });
     });
 };
