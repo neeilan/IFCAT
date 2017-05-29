@@ -30,7 +30,7 @@ exports.logout = (req, res) => {
 // Retrieve list of users
 exports.getUsers = (req, res) => {
     let page = parseInt(req.query.page, 10) || 1,
-        perPage = parseInt(req.query.perPage, 10) || 5,
+        perPage = parseInt(req.query.perPage, 10) || 10,
         sortBy = JSON.parse(req.query.sortBy || '{ "createdAt": -1 }');
     let query = {};
 

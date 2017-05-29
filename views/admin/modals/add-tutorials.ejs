@@ -4,7 +4,7 @@
             <div class="modal-header">
                 <h4 class="modal-title">Add tutorials</h4>
             </div>
-            <form action="/admin/courses/<%= course._id %>/tutorials" method="post">
+            <form method="post" action="/admin/courses/<%= course._id %>/tutorials">
                 <div class="modal-body">
                     <label>Add</label>
                     <input type="number" name="len" value="" min="1" max="99" class="form-control">

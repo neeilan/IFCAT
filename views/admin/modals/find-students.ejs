@@ -4,7 +4,7 @@
             <div class="modal-header">
                 <h4 class="modal-title">Find students</h4>
             </div>
-            <form action="/admin/courses/<%= course.id %>/students" method="post">
+            <form method="post" action="/admin/courses/<%= course.id %>/students">
                 <div class="modal-body">
                     <input type="text" name="q" value="" class="form-control input-sm" placeholder="Name, UTORid, student number, or leave blank">
                     <input type="button" value="Search" class="btn btn-default btn-sm" id="btn-search" data-focus>

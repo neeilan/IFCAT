@@ -8,19 +8,17 @@
                 <% if (_.isEmpty(question.links)) { %>
                     <div class="form-group">
                         <div class="col-xs-8"> 
-                            <input type="text" name="links[]" value="" class="form-control" 
-                                placeholder="http://www.example.com">
+                            <input type="text" name="links[]" value="" class="form-control" placeholder="http://www.example.com">
                         </div>
                         <div class="col-xs-2">
                             <span class="glyphicon glyphicon-remove"></span>
                         </div> 
                     </div> 
                 <% } else { %>
-                    <% _.each(question.links, function (link) { %>    
+                    <% _.each(question.links, link => { %>
                         <div class="form-group">
                             <div class="col-xs-8"> 
-                                <input type="text" name="links[]" value="<%= link %>" class="form-control" 
-                                    placeholder="http://www.example.com">
+                                <input type="text" name="links[]" value="<%= link %>" class="form-control" placeholder="http://www.example.com">
                             </div>
                             <div class="col-xs-2">
                                 <span class="glyphicon glyphicon-remove"></span>
@@ -30,15 +28,12 @@
                 <% } %>
                 <div class="form-group">
                     <div class="col-xs-8"> 
-                        <button type="button" class="btn btn-default btn-sm" id="btn-add-link">
-                            <span class="glyphicon glyphicon-plus"></span> Add another link
-                        </button>
+                        <button type="button" class="btn btn-default btn-sm" id="btn-add-link"><span class="glyphicon glyphicon-plus"></span> Add another link</button>
                     </div>
                 </div>
                 <div class="form-group" style="display: none">
                     <div class="col-xs-8"> 
-                        <input type="text" name="links[]" value="" class="form-control" 
-                            placeholder="http://www.example.com">
+                        <input type="text" name="links[]" value="" class="form-control" placeholder="http://www.example.com">
                     </div>
                     <div class="col-xs-2">
                         <span class="glyphicon glyphicon-remove"></span>

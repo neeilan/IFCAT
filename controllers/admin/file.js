@@ -39,7 +39,7 @@ exports.addFiles = (req, res) => {
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
             req.flash('success', 'The files have been added.');
-        res.redirect(`/admin/${req.course._id}/files`);
+        res.redirect(`/admin/courses/${req.course._id}/files`);
     });
 };
 // Delete specific files from course

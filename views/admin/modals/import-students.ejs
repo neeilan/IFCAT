@@ -4,7 +4,7 @@
             <div class="modal-header">
                 <h4 class="modal-title">Import students by CSV file</h4>
             </div>
-            <form action="/admin/courses/<%= course.id %>/students/import" method="post" enctype="multipart/form-data">
+            <form method="post" action="/admin/courses/<%= course.id %>/students/import" enctype="multipart/form-data">
                 <div class="modal-body">
                     <p>
                         <span class="btn btn-default btn-file" onclick="file.click()" data-focus>

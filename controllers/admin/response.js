@@ -2,47 +2,22 @@ const _ = require('lodash'),
     async = require('async'),
     config = require('../../lib/config'),
     models = require('../../models');
-
 // Retrieve group responses
-exports.getResponses = (req, res) => {
-    models.TutorialQuiz.findOne({ tutorial: req.tutorial.id, quiz: req.quiz.id }).populate({
-        path: 'responses',
-        model: models.Response,
-        populate: [{
-            path: 'group',
-            model: models.Group
-        }, {
-            path: 'question',
-            models: models.Question
-        }]
-    }).exec(function (err, tutorialQuiz) {
-        var responses = _.filter(tutorialQuiz.responses, function (response) {
-            return response.group && response.group.id === req.group.id;
-        });
-        // tally the points
-        var totalPoints = _.reduce(responses, function (sum, response) {
-            return sum + response.points;
-        }, 0);
-
-        // var teachingPoints = {};
-        // _.each(req.group.teachingPoints, function(recipient){
-        //     if (!(recipient in teachingPoints)){
-        //         teachingPoints[recipient] = 1;
-        //     }
-        //     else {
-        //         teachingPoints[recipient]++;
-        //     }
-        // })
-        
+exports.getResponsesByGroup = (req, res) => {
+    async.series([
+        done => models.TutorialQuiz.findOne({ tutorial: req.tutorial._id, quiz: req.quiz._id }, done),
+        done => models.Response.find({ group: req.group._id }).populate('question').exec(done)
+    ], (err, data) => {
         res.render('admin/group-responses', {
+            bodyClass: 'group-responses',
             title: 'Responses',
             course: req.course,
             tutorial: req.tutorial,
             quiz: req.quiz,
-            tutorialQuiz: tutorialQuiz,
+            tutorialQuiz: data[0],
             group: req.group,
-            responses: responses,
-            totalPoints: totalPoints
+            responses: data[1],
+            totalPoints: _.reduce(data[1], (sum, response) => sum + response.points, 0)
         });
     });
 };
@@ -97,7 +72,6 @@ exports.getMarksByStudent = (req, res) => {
         res.render('admin/student-marks', {
             title: 'Marks',
             course: req.course,
-            tutorial: req.tutorial,
             student: req.us3r,
             marks: marks,
             totalPoints: totalPoints,

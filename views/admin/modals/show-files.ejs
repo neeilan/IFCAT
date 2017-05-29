@@ -8,7 +8,7 @@
                 <div class="col-xs-8 col-preview"></div>
                 <div class="col-xs-4 col-files">
                     <ul class="list-group">
-                    <% _.each(course.files, function (file) { %>
+                    <% _.each(course.files, file => { %>
                         <li class="list-group-item<%= question.files.indexOf(file.id) > -1 ? ' active' : '' %>">
                             <input type="checkbox" name="files[]" value="<%= file.id %>"<%=
                                 question.files.indexOf(file.id) > -1 ? 'checked' : '' %>> 
