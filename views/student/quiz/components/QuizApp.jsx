@@ -109,28 +109,15 @@ export default class QuizApp extends React.Component {
                         selectedQuestion: this.state.quiz.questions[0]
                     });
                     let selectedQuestion = this.state.quiz.questions[0];
-                    return ( <
-                        Question previouslyAnswered = {
-                            false
-                        }
-                        isDriver = {
-                            this.state.isDriver
-                        }
-                        question = {
-                            selectedQuestion.question
-                        }
-                        questionType = {
-                            selectedQuestion.type
-                        }
-                        choices = {
-                            selectedQuestion.choices
-                        }
-                        attachments = {
-                            selectedQuestion.attachments
-                        }
-                        submitCb = {
-                            this.submitChoiceCb
-                        }
+                    return ( 
+			<Question 
+				previouslyAnswered = {false}
+				isDriver = {this.state.isDriver}
+				question = {selectedQuestion.question}
+				questionType = {selectedQuestion.type}
+				choices = {selectedQuestion.choices}
+				attachments = {selectedQuestion.attachments}
+				submitCb = {this.submitChoiceCb}
                         />
                     );
                 } else {
@@ -138,42 +125,24 @@ export default class QuizApp extends React.Component {
                 }
             }
             console.log(this.state.selectedQuestion);
-            return ( <
-                Question previouslyAnswered = {
-                    false
-                }
-                isDriver = {
-                    true
-                }
-                question = {
-                    this.state.selectedQuestion.question
-                }
-                questionType = {
-                    this.state.selectedQuestion.type
-                }
-                choices = {
-                    this.state.selectedQuestion.choices
-                }
-                attachments = {
-                    this.state.selectedQuestion.attachments
-                }
-                submitCb = {
-                    this.submitChoiceCb
-                }
+            return ( 
+		<Question 
+			previouslyAnswered = {false}
+			isDriver = {true}
+			question = {this.state.selectedQuestion.question}
+			questionType = {this.state.selectedQuestion.type}
+			choices = {this.state.selectedQuestion.choices}
+			attachments = {this.state.selectedQuestion.attachments}
+			submitCb = {this.submitChoiceCb}
                 />
             );
         }
 
         getScoreBar() {
-            return ( < ScoreBar questions = {
-                    this.state.quiz.questions
-                }
-                selectQuestionCb = {
-                    this.selectQuestionCb
-                }
-                selectedQuestion = {
-                    this.state.selectedQuestion
-                }
+            return (<ScoreBar 
+			questions = {this.state.quiz.questions}
+			selectQuestionCb = {this.selectQuestionCb}
+			selectedQuestion = {this.state.selectedQuestion}
                 />)
             }
 
@@ -181,19 +150,13 @@ export default class QuizApp extends React.Component {
                 if (!this.state.complete) {
                     return null;
                 }
-                return ( <
-                    PostQuiz finalScore = {
-                        10
-                    }
-                    teammates = {
-                        [{
+                return ( <PostQuiz finalScore = {10}
+                    teammates = {[{
                             name: 'Kobe',
                             id: 'KB24'
                         }]
-                    }
-                    awardPointCb = {
-                        this.awardPointCb
-                    }
+			}
+                    awardPointCb = {this.awardPointCb}
                     />
                 );
             }
@@ -202,8 +165,7 @@ export default class QuizApp extends React.Component {
                 if (this.state.quiz.allocateMembers !== enums.allocateMembers.selfSelect) {
                     return null;
                 }
-                return ( <
-                    GroupBuilder groups = {
+                return ( <GroupBuilder groups = {
                         [{
                             name: 'G1'
                         }, {
@@ -219,20 +181,9 @@ export default class QuizApp extends React.Component {
 
             render() {
 
-                var scoreIndicator = this.state.inProgress ? < span > Score : {
-                    this.state.score
-                } < /span> : null;
-                var starScore = this.state.inProgress ? < StarScore full = {
-                    3
-                }
-                empty = {
-                    5
-                }
-                /> : null;
-                var preQuiz = this.state.inProgress ? null : < PreQuiz setDriverCb = {
-                    this.setDriverCb
-                }
-                />;
+                var scoreIndicator = this.state.inProgress ? < span > Score : {this.state.score} < /span> : null;
+                var starScore = this.state.inProgress ? < StarScore full = {3} empty = {5} /> : null;
+                var preQuiz = this.state.inProgress ? null : < PreQuiz setDriverCb = {this.setDriverCb} />;
                 var scoreBar = this.state.inProgress ? this.getScoreBar() : null;
                 var question = this.state.inProgress ? this.getCurrentQuestion() : null;
                 var postQuiz = this.state.inProgress ? null : this.getPostQuiz();
