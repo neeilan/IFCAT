@@ -1,4 +1,4 @@
-<% include ./header %>
+<% include ../partials/header %>
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
@@ -8,7 +8,7 @@
 
 <h1><%- title %></h1>
 
-<% include ./flash %>
+<% include ../partials/flash %>
 
 <div class="nav-actions">
     <a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz.id %>/questions/new"
@@ -56,4 +56,4 @@
     </tbody>
 </table>
 
-<% include ./footer %>
+<% include ../partials/footer %>

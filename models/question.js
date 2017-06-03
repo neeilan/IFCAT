@@ -6,8 +6,9 @@ const _ = require('lodash'),
 
 let QuestionSchema = new mongoose.Schema({
     number: { type: String, required: true },
-    question: { type: String, required: true },
     type: { type: String, enum: ['multiple choice', 'multiple select', 'short answer', 'code tracing'] },
+    question: { type: String, required: true },
+    code: String,
     choices: [String],
     answers: [String],
     files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
@@ -18,7 +19,7 @@ let QuestionSchema = new mongoose.Schema({
     points: Number,
     firstTryBonus: Number,
     penalty: Number
-}, { 
+}, {
     timestamps: true 
 });
 // Delete cascade
@@ -60,8 +61,9 @@ QuestionSchema.methods.isAnswer = function (choice) {
 // Set question
 QuestionSchema.methods.store = function (obj) {
     this.number = _.trim(obj.number);
-    this.question = _.trim(obj.question);
     this.type = obj.type;
+    this.question = _.trim(obj.question);
+    this.code = _.trim(obj.code);
     this.files = obj.files || [];
     this.links = [];
     this.choices = []; 

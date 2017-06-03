@@ -1,4 +1,4 @@
-<% include ./header %>
+<% include ../partials/header %>
 
 <ol class="breadcrumb">
     <li><a href="/admin/users">Users</a></li>
@@ -7,7 +7,7 @@
 
 <h1><%- title %></h1>
 
-<% include ./flash %>
+<% include ../partials/flash %>
 
 <form action="/admin/users/<%= us3r.isNew ? '' : us3r.id + '?_method=put' %>" method="post" autocomplete="off" class="form-horizontal">
     <div class="form-group required">
@@ -71,4 +71,4 @@
     </div>
 </form>
 
-<% include ./footer %>
+<% include ../partials/footer %>

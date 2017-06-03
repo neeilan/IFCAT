@@ -1,4 +1,4 @@
-<% include ./header %>
+<% include ../partials/header %>
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
@@ -41,7 +41,9 @@
             </tr>
         </thead>
         <tfoot>
-            <tr><td colspan="7" class="clearfix"><% include ./pagination %></td></tr>
+            <tr>
+                <td colspan="7" class="clearfix"><% include ../partials/pagination %></td>
+            </tr>
         </tfoot>
         <tbody>
         <% if (_.isEmpty(tutorialQuizzes)) { %>
@@ -75,4 +77,4 @@
     </table>
 </form>
 
-<% include ./footer %>
+<% include ../partials/footer %>

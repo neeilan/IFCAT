@@ -16,8 +16,8 @@ exports.getQuizByParam = (req, res, next, id) => {
 };
 // Retrieve quizzes within course
 exports.getQuizzes = (req, res) => {
-    req.course.withQuizzes().execPopulate().then(function() {
-        res.render('admin/course-quizzes', {
+    req.course.withQuizzes().execPopulate().then(() => {
+        res.render('admin/pages/course-quizzes', {
             bodyClass: 'quizzes',
             title: 'Quizzes',
             course: req.course 
@@ -27,10 +27,10 @@ exports.getQuizzes = (req, res) => {
 // Retrieve quiz form
 exports.getQuiz = (req, res) => {
     var quiz = req.quiz || new models.Quiz();
-    req.course.withTutorials().execPopulate().then(function () {
+    req.course.withTutorials().execPopulate().then(() => {
         models.TutorialQuiz.find({ quiz: quiz.id }, (err, tutorialQuizzes) => {
             quiz.tutorials = _.map(tutorialQuizzes, tutorialQuiz => tutorialQuiz.tutorial.toString());
-            res.render('admin/course-quiz', {
+            res.render('admin/pages/course-quiz', {
                 bodyClass: 'quiz',
                 title: quiz.isNew ? 'Add New Quiz' : 'Edit Quiz',
                 course: req.course, 
@@ -54,23 +54,23 @@ exports.addQuiz = (req, res) => {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', '<b>%s</b> has been created.', quiz.name);
-        res.redirect('/admin/courses/' + req.course.id + '/quizzes');
+        res.redirect(`/admin/courses/${req.course._id}/quizzes`);
     });
 };
 // Update quiz
 exports.editQuiz = (req, res) => {
-    req.quiz.store(req.body, function (err) { 
+    req.quiz.store(req.body, err => { 
         if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', '<b>%s</b> has been updated.', req.quiz.name);
-        res.redirect('/admin/courses/' + req.course.id + '/quizzes/' + req.quiz.id + '/edit');
+        res.redirect(`/admin/courses/${req.course._id}/quizzes/${req.quiz._id}/edit`);
     });
 };
 // Copy quiz
 exports.copyQuiz = (req, res) => {
     async.waterfall([
-        function cloneQuestions(done) {
+        done => {
             req.quiz.withQuestions().execPopulate().then(function () {
                 async.mapSeries(req.quiz.questions, function (question, done) {
                     question._id = mongoose.Types.ObjectId();
@@ -83,17 +83,17 @@ exports.copyQuiz = (req, res) => {
                 }, done);
             });
         },
-        function cloneQuiz(questions, done) {
+        (questions, done) => {
             req.quiz._id = mongoose.Types.ObjectId();
             req.quiz.isNew = true;
             req.quiz.name += ' (copy)';
             req.quiz.questions = questions;
             req.quiz.save(done);
         },
-        function addQuiz(quiz, numAffected, done) {
+        (quiz, numAffected, done) => {
             req.course.update({ $addToSet: { quizzes: quiz }}, done)
         }
-    ], function (err) {
+    ], err => {
         if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
@@ -103,7 +103,7 @@ exports.copyQuiz = (req, res) => {
 };
 // Delete quiz
 exports.deleteQuiz = (req, res) => {
-    req.quiz.remove(function (err) {
+    req.quiz.remove(err => {
         if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else

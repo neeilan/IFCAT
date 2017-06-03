@@ -18,7 +18,7 @@ exports.getTutorials = (req, res) => {
     models.Tutorial.find({ 
         _id: { $in: req.course.tutorials }
     }).populate('teachingAssistants').exec((err, tutorials) => {
-        res.render('admin/course-tutorials', {
+        res.render('admin/pages/course-tutorials', {
             bodyClass: 'tutorials',
             title: 'Tutorials',
             course: req.course,
@@ -56,7 +56,7 @@ exports.addTutorials = (req, res) => {
 };
 // Retrieve specific tutorial for tutorial
 exports.getTutorial = (req, res) => {
-    res.render('admin/course-tutorial', {
+    res.render('admin/pages/course-tutorial', {
         bodyClass: 'tutorial',
         title: 'Edit tutorial',
         course: req.course, 

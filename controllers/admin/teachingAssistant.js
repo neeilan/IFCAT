@@ -4,7 +4,7 @@ const async = require('async'),
 // Retrieve list of teaching assistants for course
 exports.getTeachingAssistantsByCourse = (req, res) => {
     req.course.withTutorials().withTeachingAssistants().execPopulate().then(err => {
-        res.render('admin/course-teaching-assistants', {
+        res.render('admin/pages/course-teaching-assistants', {
             bodyClass: 'teaching-assistants',
             title: 'Teaching Assistants',
             course: req.course
@@ -14,7 +14,7 @@ exports.getTeachingAssistantsByCourse = (req, res) => {
 // Retrieve list of teaching assistants matching search query
 exports.getTeachingAssistantsBySearchQuery = (req, res) => {
     models.User.findBySearchQuery({ q: req.query.q, roles: ['teachingAssistant'] }, (err, teachingAssistants) => {
-        res.render('admin/tables/course-teaching-assistants-search-results', { 
+        res.render('admin/partials/course-teaching-assistants-search-results', { 
             course: req.course, 
             teachingAssistants: teachingAssistants
         });

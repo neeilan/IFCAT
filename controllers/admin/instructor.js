@@ -2,7 +2,7 @@ const models = require('../../models');
 // Retrieve list of instructors for course
 exports.getInstructorsByCourse = (req, res) => {
     req.course.withInstructors().execPopulate().then(() => {
-        res.render('admin/course-instructors', { 
+        res.render('admin/pages/course-instructors', { 
             bodyClass: 'instructors',
             title: 'Instructors',
             course: req.course
@@ -12,7 +12,7 @@ exports.getInstructorsByCourse = (req, res) => {
 // Retrieve list of instructors matching search query
 exports.getInstructorsBySearchQuery = (req, res) => {
     models.User.findBySearchQuery({ q: req.query.q, roles: ['instructor'] }, (err, instructors) => {
-        res.render('admin/tables/course-instructors-search-results', { 
+        res.render('admin/partials/course-instructors-search-results', { 
             course: req.course, 
             instructors: instructors
         });

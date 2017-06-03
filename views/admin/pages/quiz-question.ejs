@@ -1,4 +1,4 @@
-<% include ./header %>
+<% include ../partials/header %>
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
@@ -9,7 +9,7 @@
 
 <h1><%= title %></h1>
 
-<% include ./flash %>
+<% include ../partials/flash %>
 
 <form action="/admin/courses/<%= course.id %>/quizzes/<%= quiz.id %>/questions/<%= question.isNew ? '' : question.id + '?_method=put' %>" method="post" autocomplete="off" class="form-horizontal">
 
@@ -293,6 +293,6 @@
     </div>
 </form>
 
-<%- include ./modals/show-files %>
-<%- include ./modals/show-links %>
-<% include ./footer %>
+<% include ../partials/show-files %>
+<% include ../partials/show-links %>
+<% include ../partials/footer %>

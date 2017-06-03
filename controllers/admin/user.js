@@ -17,7 +17,7 @@ exports.getUserByParam = (req, res, next, id) => {
 exports.getLogin = (req, res) => {
     if (req.user)
         return res.redirect('/admin/courses');
-    res.render('admin/login', { 
+    res.render('admin/pages/login', { 
         bodyClass: 'login',
         title: 'Login' 
     });
@@ -49,7 +49,7 @@ exports.getUsers = (req, res) => {
         }
     ], (err, data) => {
         let pages = _.range(1, _.ceil(data[0] / perPage) + 1);
-        res.render('admin/users', {
+        res.render('admin/pages/users', {
             bodyClass: 'users',
             title: 'Users',
             users: data[1],
@@ -64,7 +64,7 @@ exports.getUsers = (req, res) => {
 // Retrieve user form
 exports.getUser = (req, res) => {
     var user = req.us3r || new models.User();
-    res.render('admin/user', {
+    res.render('admin/pages/user', {
         title: user.isNew ? 'Add New User' : 'Edit User', 
         us3r: user 
     });

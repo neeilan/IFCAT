@@ -17,7 +17,7 @@ exports.getQuestionByParam = (req, res, next, id) => {
 // Retrieve list of questions for quiz
 exports.getQuestions = (req, res) => { 
     req.quiz.withQuestions().execPopulate().then(function (err) {
-        res.render('admin/quiz-questions', {
+        res.render('admin/pages/quiz-questions', {
             bodyClass: 'questions',
             title: 'Questions',
             course: req.course,
@@ -32,7 +32,7 @@ exports.sortQuestions = (req, res) => {
     req.quiz.questions.sort((a, b) => {
         return newOrder.indexOf(a.toString()) < newOrder.indexOf(b.toString()) ? -1 : 1;
     });
-    req.quiz.save(function (err) {
+    req.quiz.save(err => {
         if (err)
             return res.status(500).send('An error has occurred while trying to perform operation.');
         res.sendStatus(200);
@@ -42,7 +42,7 @@ exports.sortQuestions = (req, res) => {
 exports.getQuestion = (req, res) => {
     var question = req.question || new models.Question();
     req.course.withFiles().execPopulate().then(function () {
-        res.render('admin/quiz-question', {
+        res.render('admin/pages/quiz-question', {
             bodyClass: 'question',
             title: question.isNew ? 'Add New Question' : 'Edit Question',
             course: req.course, 
@@ -120,7 +120,7 @@ exports.previewQuestion = (req, res) => {
         if (!!req.body.shuffleChoices)
             question.choices = _.shuffle(question.choices);
 
-        res.render('admin/quiz-question-preview', { 
+        res.render('admin/pages/quiz-question-preview', { 
             title: 'Preview Question', 
             course: req.course, 
             question: question 

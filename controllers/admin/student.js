@@ -6,7 +6,7 @@ const _ = require('lodash'),
 // Retrieve list of students for course
 exports.getStudentsByCourse = (req, res) => {
     req.course.withTutorials().withStudents().execPopulate().then(err => {
-        res.render('admin/course-students', {
+        res.render('admin/pages/course-students', {
             bodyClass: 'students',
             title: 'Students',
             course: req.course,
@@ -17,7 +17,7 @@ exports.getStudentsByCourse = (req, res) => {
 // Retrieve list of students matching search query
 exports.getStudentsBySearchQuery = (req, res) => {
     models.User.findBySearchQuery({ q: req.query.q, roles: ['student'] }, (err, students) => {
-        res.render('admin/tables/course-students-search-results', { 
+        res.render('admin/partials/course-students-search-results', { 
             course: req.course, 
             students: students 
         });
@@ -26,7 +26,7 @@ exports.getStudentsBySearchQuery = (req, res) => {
 // Retrieve list of students for tutorial
 exports.getStudentsByTutorial = (req, res) => {
     req.tutorial.withStudents().execPopulate().then(() => {
-        res.render('admin/tutorial-students', {
+        res.render('admin/pages/tutorial-students', {
             title: 'Students', 
             course: req.course, 
             tutorial: req.tutorial

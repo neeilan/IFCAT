@@ -15,7 +15,7 @@ exports.getCourseByParam = (req, res, next, id) => {
 // Retrieve many courses
 exports.getCourses = (req, res) => {
     models.Course.find().sort('code').lean().exec((err, courses) => {
-        res.render('admin/courses', {
+        res.render('admin/pages/courses', {
             bodyClass: 'courses',
             title: 'Courses',
             courses: _.filter(courses,  course => {
@@ -29,7 +29,7 @@ exports.getCourses = (req, res) => {
 // Get form for course
 exports.getCourse = (req, res) => {
     let course = req.course || new models.Course();
-    res.render('admin/course', {
+    res.render('admin/pages/course', {
         bodyClass: 'course',
         title: course.isNew ? 'Add New Course' : 'Edit Course',
         course: course 

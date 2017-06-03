@@ -1,4 +1,4 @@
-<% include ./header %>
+<% include ../partials/header %>
 
 <ol class="breadcrumb">
     <li class="active">Courses</li>
@@ -6,7 +6,7 @@
 
 <h1><%= title %></h1>
 
-<% include ./flash %>
+<% include ../partials/flash %>
 
 <% if (user.hasRole('admin')) { %>
 <div class="nav-actions">
@@ -75,4 +75,4 @@
     </tbody>
 </table>
 
-<% include ./footer %>
+<% include ../partials/footer %>

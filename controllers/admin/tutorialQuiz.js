@@ -23,7 +23,7 @@ exports.getTutorialQuizzes = (req, res) => {
         }
     ], (err, data) => {
         let pages = _.range(1, _.ceil(data[0] / perPage) + 1);
-        res.render('admin/tutorial-quizzes', {
+        res.render('admin/pages/tutorial-quizzes', {
             bodyClass: 'tutorial-quizzes',
             title: 'Conduct Quizzes',
             course: req.course,
@@ -77,7 +77,7 @@ exports.getTutorialQuiz = (req, res) => {
     }, {
         path: 'groups'
     }]).exec((err, tutorialQuiz) => {
-        res.render('admin/tutorial-quiz', {
+        res.render('admin/pages/tutorial-quiz', {
             class: 'tutorial-quiz',
             title: `Conduct ${req.quiz.name} in tutorial ${req.tutorial.number}`,
             course: req.course, 

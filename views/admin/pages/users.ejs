@@ -1,4 +1,4 @@
-<% include ./header %>
+<% include ../partials/header %>
 
 <ol class="breadcrumb">
     <li class="active">Users</li>
@@ -6,7 +6,7 @@
 
 <h1><%- title %></h1>
 
-<% include ./flash %>
+<% include ../partials/flash %>
 
 <div class="nav-actions">
     <a href="/admin/users/new" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add New User</a>
@@ -35,7 +35,9 @@
         </tbody>
     <% } else { %>
         <tfoot>
-            <tr><td colspan="4" class="clearfix"><% include ./pagination %></td></tr>
+            <tr>
+                <td colspan="4" class="clearfix"><% include ../partials/pagination %></td>
+            </tr>
         </tfoot>
         <tbody>
         <% _.each(users, user => { %>
@@ -60,4 +62,4 @@
     <% } %>
 </table>
 
-<% include ./footer %>
+<% include ../partials/footer %>

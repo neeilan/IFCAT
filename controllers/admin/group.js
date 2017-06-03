@@ -37,7 +37,7 @@ exports.generateGroups = (req, res) => {
                 members: chunk
             };
         });
-        res.render('admin/tutorial-quiz', {
+        res.render('admin/pages/tutorial-quiz', {
             class: 'conduct-quiz',
             title: `Conduct ${req.quiz.name} in TUT ${req.tutorial.number}`,
             course: req.course, 

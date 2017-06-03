@@ -1,4 +1,4 @@
-<% include ./header %>
+<% include ../partials/header %>
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
@@ -7,7 +7,7 @@
 
 <h1><%- title %></h1>
 
-<% include ./flash %>
+<% include ../partials/flash %>
 
 <div class="nav-actions">
     <button class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-upload-files"><span class="glyphicon glyphicon-plus"></span> Upload Files</button>
@@ -46,5 +46,5 @@
     </tbody>
 </table>
 
-<%- include ./modals/upload-files -%>
-<% include ./footer %>
+<% include ../partials/upload-files %>
+<% include ../partials/footer %>

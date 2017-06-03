@@ -1,4 +1,4 @@
-<% include ./header %>
+<% include ../partials/header %>
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
@@ -7,7 +7,7 @@
 
 <h1><%- title %></h1>
 
-<% include ./flash %>
+<% include ../partials/flash %>
 
 <div class="nav-actions">
     <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-import-students"><span class="glyphicon glyphicon-save"></span> Import students</button>
@@ -47,6 +47,6 @@
     </tbody>
 </table>
 
-<% include ./modals/import-students %>
-<% include ./modals/find-students %>
-<% include ./footer %>
+<% include ../partials/import-students %>
+<% include ../partials/find-students %>
+<% include ../partials/footer %>

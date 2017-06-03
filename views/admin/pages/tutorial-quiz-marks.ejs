@@ -1,9 +1,9 @@
-<% include ./header %>
+<% include ../partials/header %>
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%- course.code %></li>
-    <li><a href="/admin/courses/<%- course.id %>/tutorials">Tutorials</a> ‐ TUT <%- tutorial.number %></li>
-    <li><a href="/admin/courses/<%- course.id %>/tutorials/<%- tutorial.id %>/quizzes">Quizzes</a> ‐ <%- quiz.name %></li>
+    <li><a href="/admin/courses/<%- course._id %>/tutorials">Tutorials</a> ‐ TUT <%- tutorial.number %></li>
+    <li><a href="/admin/courses/<%- course._id %>/tutorials/<%- tutorial._id %>/quizzes">Quizzes</a> ‐ <%- quiz.name %></li>
     <li class="active">Marks</li>
 </ol>
 
@@ -11,7 +11,7 @@
 
 <div class="nav-actions">
     <a class="btn btn-default btn-sm" 
-        href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= quiz.id %>/marks?export=1"><span 
+        href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial._id %>/quizzes/<%= quiz._id %>/marks?export=1"><span 
         class="glyphicon glyphicon-save"></span> Export</a>
 </div>
 
@@ -33,17 +33,17 @@
             <td colspan="7">No students have been added yet.</td>
         </tr>
     <% } else { %>
-        <% _.each(students, function (student) { %>
+        <% _.each(students, student => { %>
             <tr>
                 <td><%= student.student.UTORid %></td>
                 <td><%= student.student.number %></td>
                 <td>
-                    <a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/students/<%= student.id %>/marks"><%= student.name.full %></a>
+                    <a href="/admin/courses/<%= course._id %>/tutorials/<%= tutorial._id %>/students/<%= student._id %>/marks"><%= student.name.full %></a>
                 </td>
                 <td>TUT <%= student.tutorial.number %></td>
                 <td><%= student.quiz.name %></td>
                 <td>
-                    <a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= quiz.id %>/groups/<%= student.group.id %>/responses">Group <%= student.group.name %></a>
+                    <a href="/admin/courses/<%= course._id %>/tutorials/<%= tutorial._id %>/quizzes/<%= quiz._id %>/groups/<%= student.group._id %>/responses">Group <%= student.group.name %></a>
                 </td>
                 <td class="text-center"><%= student.points %></td>
             </tr>
@@ -52,4 +52,4 @@
     </tbody>
 </table>
 
-<% include ./footer %>
+<% include ../partials/footer %>
