@@ -63,12 +63,12 @@ QuestionSchema.methods.store = function (obj) {
     this.number = _.trim(obj.number);
     this.type = obj.type;
     this.question = _.trim(obj.question);
-    this.code = _.trim(obj.code);
-    this.files = obj.files || [];
-    this.links = [];
     this.choices = []; 
     this.answers = [];
-    this.caseSensitive = !!obj.caseSensitive;
+    // multimedia options
+    this.files = obj.files || [];
+    this.links = [];
+    // additional options
     this.shuffleChoices = !!obj.shuffleChoices;
     this.useLaTeX = !!obj.useLaTeX;
     this.points = obj.points;
@@ -77,7 +77,7 @@ QuestionSchema.methods.store = function (obj) {
     
     let selected, self = this;
 
-    _.each(obj.links, function (link) {
+    _.each(obj.links, link => {
         link = _.trim(link);
         if (link) {
             if (!url.parse(link).protocol)
@@ -86,20 +86,19 @@ QuestionSchema.methods.store = function (obj) {
                 self.links.push(link);
         }
     });
-
+    // type-specific options
     if (this.isMultipleChoice()) {
-        selected = _.isObject(obj.answer) ? obj.answer[this.type] : false;
         _.forOwn(obj.choices, (choice, i) => {
             choice = _.trim(choice);
             if (choice && self.choices.indexOf(choice) === -1) {
                 self.choices.push(choice);
                 // mark as the answer if selected
-                if (i === selected)
+                if (i === obj.answer)
                     self.answers = [choice];
             }
         });
     } else if (this.isMultipleSelect()) {
-        selected = _.isObject(obj.answers) ? obj.answers[this.type] : [];
+        selected = _.isObject(obj.answers) ? obj.answers : [];
         _.forOwn(obj.choices, (choice, i) => {
             choice = _.trim(choice);
             if (choice && self.choices.indexOf(choice) === -1) {
@@ -110,15 +109,16 @@ QuestionSchema.methods.store = function (obj) {
             }
         });
     } else if (this.isShortAnswer()) {
-        _.forOwn(obj.choices, choice => {
-            choice = _.trim(choice);
-            if (choice && self.choices.indexOf(choice) === -1) {
-                self.choices.push(choice);
-                self.answers.push(choice);
+        _.forOwn(obj.answers, answer => {
+            answer = _.trim(answer);
+            if (answer && self.answers.indexOf(answer) === -1) {
+                self.answers.push(answer);
             }
         });
+        self.caseSensitive = !!obj.caseSensitive;
     } else if (this.isCodeTracing()) {
-        self.answers = obj.answers[this.type].split("\n");
+        self.code = _.trim(obj.code);
+        self.answers = obj.answers.split("\n");
     }
     return self;
 };
