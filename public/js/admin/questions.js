@@ -40,7 +40,6 @@ $(function () {
     }
 
     if ($('body').hasClass('question')) {
-        var win;
         // Change DOM upon changing question type
         $('select[name=type]').change(function () {
             var select = this;
@@ -62,23 +61,21 @@ $(function () {
         // Update file counter
         $('#modal-show-files').on('hidden.bs.modal', function () {
             var count = $(this).find(':checked').length;
-            $('#file-counter').text(count !== 1 ? count + ' files selected' : '1 file selected');
+            $('.counter.files').text(count !== 1 ? count + ' files selected' : '1 file selected');
         });
         // Add new link input
         $('#btn-add-link').click(function () {
-            $(this).closest('.form-group').before(function () {
-                var id = _.toNumber(_.uniqueId()) + 999;
-                var $new = $(this).next().clone().toggle(true);
-                return $new;
-            });
+            var template = $(this).closest('.form-group').prev(),
+                clone = template.clone().toggle(true);
+            template.before(clone);
         });
         // Change link counter
         $('#modal-show-links').on('hidden.bs.modal', function () {
             var count = 0;
-            $(this).find('[name^=links]').each(function() { 
+            $('[name^=links]', this).each(function() { 
                 count += $.trim(this.value) !== '' ? 1 : 0;
             });
-            $('#link-counter').text(count + ' link' + (count !== 1 ? 's' : '') + ' added');
+            $('.counter.links').text(count + ' link' + (count !== 1 ? 's' : '') + ' added');
         });
         // Remove choice input
         $(document).on('click', '.glyphicon-remove', function () {
@@ -86,17 +83,17 @@ $(function () {
         });
         // Add choice input
         $('.btn-add-choice').click(function () {
-            $(this).closest('.form-group').before(function () {
-                var id = _.toNumber(_.uniqueId()) + 999;
-                var $new = $(this).next().clone().toggle(true);
-                    $new.find('textarea').attr('name', function () {
-                        return this.name.replace(/new/, id);
-                    });
-                    $new.find(':radio, :checkbox').val(function () {
-                        return this.value.replace(/new/, id);
-                    });
-                return $new;
+            var template = $(this).closest('.form-group').prev(),
+                clone = template.clone().toggle(true),
+                id = _.toNumber(_.uniqueId()) + 999;
+            // replace [new]
+            $('textarea', clone).attr('name', function () {
+                return this.name.replace(/new/, id);
             });
+            $(':radio, :checkbox', clone).val(function () {
+                return this.value.replace(/new/, id);
+            });
+            template.before(clone);
         });
         //
         $(document).on('change', '[name=points], [name=firstTryBonus], [name=penalty]', function () {
@@ -128,6 +125,7 @@ $(function () {
             $('#points-calculator').html(table);
         });
         // Preview question
+        var win;
         $('#btn-preview').click(function () {
             // close previous window
             if (win) {

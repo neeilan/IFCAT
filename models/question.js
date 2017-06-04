@@ -74,7 +74,7 @@ QuestionSchema.methods.store = function (obj) {
     this.points = obj.points;
     this.firstTryBonus = obj.firstTryBonus;
     this.penalty = obj.penalty;
-    
+
     let selected, self = this;
 
     _.each(obj.links, link => {
@@ -86,6 +86,7 @@ QuestionSchema.methods.store = function (obj) {
                 self.links.push(link);
         }
     });
+
     // type-specific options
     if (this.isMultipleChoice()) {
         _.forOwn(obj.choices, (choice, i) => {

@@ -33,16 +33,16 @@
     </div>
 
     <!-- multiple-choice -->
-    <% include ../partials/multiple-choice-fieldset %>
+    <% include ../partials/fieldset-multiple-choice %>
 
     <!-- multiple-select -->
-    <% include ../partials/multiple-select-fieldset %>
+    <% include ../partials/fieldset-multiple-select %>
 
     <!-- short-answer -->
-    <% include ../partials/short-answer-fieldset %>
+    <% include ../partials/fieldset-short-answer %>
 
     <!-- code-tracing -->
-    <% include ../partials/code-tracing-fieldset %>
+    <% include ../partials/fieldset-code-tracing %>
 
     <!-- files -->
     <div class="form-group">
@@ -50,7 +50,7 @@
         <div class="col-sm-10">
             <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-show-files">
                 <span class="glyphicon glyphicon-file"></span> Show files</a>
-            <a href="#" class="counter" data-toggle="modal" data-target="#modal-show-files"><%= question.files.length != 1 ? question.files.length + ' files selected' : '1 file selected' %></a>
+            <a href="#" class="counter files" data-toggle="modal" data-target="#modal-show-files"><%= question.files.length != 1 ? question.files.length + ' files selected' : '1 file selected' %></a>
         </div>
     </div>
 
@@ -60,7 +60,7 @@
         <div class="col-sm-10">
             <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-show-links">
                 <span class="glyphicon glyphicon-link"></span> Show links</a>
-            <a href="#" class="counter" data-toggle="modal" data-target="#modal-show-links"><%= question.links.length != 1 ? question.links.length + ' links added' : '1 link added' %></a>
+            <a href="#" class="counter links" data-toggle="modal" data-target="#modal-show-links"><%= question.links.length != 1 ? question.links.length + ' links added' : '1 link added' %></a>
         </div>
     </div>
 
@@ -120,8 +120,9 @@
             <% } %>
         </div>
     </div>
+
+    <% include ../partials/modal-show-files %>
+    <% include ../partials/modal-show-links %>
 </form>
 
-<% include ../partials/show-files-modal %>
-<% include ../partials/show-links-modal %>
 <% include ../partials/footer %>
