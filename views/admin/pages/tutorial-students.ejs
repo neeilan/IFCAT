@@ -1,0 +1,42 @@
+<% include ../partials/header %>
+
+<ol class="breadcrumb">
+    <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
+    <li><a href="/admin/courses/<%= course.id %>/tutorials">Tutorials</a> ‐ TUT <%= tutorial.number %></li>
+    <li class="active">Students</li>
+</ol>
+
+<h1><%- title %></h1>
+
+<% include ../partials/flash %>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>UTORid</th>
+            <th>Student No.</th>
+            <th class="actions"></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% if (_.isEmpty(tutorial.students)) { %>
+        <tr>
+            <td colspan="4">No students have been added to this tutorial yet.</td>
+        </tr>
+    <% } else { %>  
+        <% _.each(tutorial.students, function (student) { %>
+            <tr>
+                <td><%= student.name.full %></td>
+                <td><%= student.student.UTORid %></td>
+                <td><%= student.student.number %></td>
+                <th>
+                    <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/students/<%= student.id %>/marks"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> View Marks</a>
+                </th>
+            </tr>
+        <% }) %>
+    <% } %>
+    </tbody>
+</table>
+
+<% include ../partials/footer %>

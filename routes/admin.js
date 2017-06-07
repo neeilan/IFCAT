@@ -1,8 +1,9 @@
 const _ = require('lodash'),
-    controllers = require('../controllers'),
+    controllers = require('../controllers/admin'),
     passport = require('passport'),
-    router = require('express').Router(),
     upload = require('../lib/upload');
+
+let router = require('express').Router();
 
 // query single objects
 router.param('us3r', controllers.User.getUserByParam);
@@ -33,6 +34,13 @@ router.use((req, res, next) => {
 // authenticated routes
 router.get('/logout', controllers.User.logout);
 
+router.get('/users', controllers.User.getUsers);
+router.get('/users/new', controllers.User.getUser);
+router.get('/users/:us3r/edit', controllers.User.getUser);
+router.post('/users', controllers.User.addUser);
+router.put('/users/:us3r', controllers.User.editUser);
+router.delete('/users/:us3r', controllers.User.deleteUser);
+
 router.get('/', controllers.Course.getCourses);
 router.get('/courses', controllers.Course.getCourses);
 router.get('/courses/new', controllers.Course.getCourse);
@@ -41,6 +49,10 @@ router.post('/courses', controllers.Course.addCourse);
 router.put('/courses/:course', controllers.Course.editCourse);
 router.delete('/courses/:course', controllers.Course.deleteCourse);
 
+router.get('/courses/:course/files', controllers.File.getFiles);
+router.post('/courses/:course/files', upload.any.array('files'), controllers.File.addFiles);
+router.delete('/courses/:course/files', controllers.File.deleteFiles);
+
 router.get('/courses/:course/tutorials', controllers.Tutorial.getTutorials);
 router.post('/courses/:course/tutorials', controllers.Tutorial.addTutorials);
 router.get('/courses/:course/tutorials/:tutorial/edit', controllers.Tutorial.getTutorial);
@@ -48,7 +60,6 @@ router.put('/courses/:course/tutorials/:tutorial', controllers.Tutorial.editTuto
 router.delete('/courses/:course/tutorials/:tutorial', controllers.Tutorial.deleteTutorial);
 
 router.get('/courses/:course/tutorials/:tutorial/students', controllers.Student.getStudentsByTutorial);
-router.get('/courses/:course/tutorials/:tutorial/students/:us3r/marks', controllers.Response.getMarksByStudent);
 
 router.get('/courses/:course/quizzes', controllers.Quiz.getQuizzes);
 router.get('/courses/:course/quizzes/new', controllers.Quiz.getQuiz);
@@ -67,30 +78,6 @@ router.post('/courses/:course/quizzes/:quiz/questions/preview', controllers.Ques
 router.put('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.editQuestion);
 router.delete('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.deleteQuestion);
 
-router.get('/courses/:course/files', controllers.File.getFiles);
-router.post('/courses/:course/files', upload.any.array('files'), controllers.File.addFiles);
-router.delete('/courses/:course/files', controllers.File.deleteFiles);
-
-// ugly routes begin here...
-router.get('/courses/:course/conduct', controllers.TutorialQuiz.conductTutorialQuizzes);
-router.post('/courses/:course/conduct/marks', controllers.Response.getMarksByCourse);
-router.put('/courses/:course/conduct/edit', controllers.TutorialQuiz.editTutorialQuizzesByCourse);
-router.get('/courses/:course/tutorials/:tutorial/quizzes', controllers.TutorialQuiz.conductTutorialQuizzes);
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/conduct', controllers.TutorialQuiz.conductTutorialQuiz);
-router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz', controllers.TutorialQuiz.editTutorialQuiz);
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/marks', controllers.Response.getMarksByTutorialQuiz);
-
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/generate', controllers.Group.generateGroups);
-router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups', controllers.Group.saveGroups);
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/:group/responses', controllers.Response.getResponses);
-
-router.get('/users', controllers.User.getUsers);
-router.get('/users/new', controllers.User.getUser);
-router.get('/users/:us3r/edit', controllers.User.getUser);
-router.post('/users', controllers.User.addUser);
-router.put('/users/:us3r', controllers.User.editUser);
-router.delete('/users/:us3r', controllers.User.deleteUser);
-
 router.get('/courses/:course/instructors', controllers.Instructor.getInstructorsByCourse);
 router.get('/courses/:course/instructors/search', controllers.Instructor.getInstructorsBySearchQuery);
 router.post('/courses/:course/instructors', controllers.Instructor.addInstructors);
@@ -108,5 +95,21 @@ router.post('/courses/:course/students/import', upload.csv.single('file'), contr
 router.post('/courses/:course/students', controllers.Student.addStudents);
 router.put('/courses/:course/students', controllers.Student.editStudents);
 router.delete('/courses/:course/students', controllers.Student.deleteStudents);
+
+router.get('/courses/:course/tutorials/:tutorial/quizzes', controllers.TutorialQuiz.getTutorialQuizzes);
+router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/conduct', controllers.TutorialQuiz.getTutorialQuiz);
+router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz', controllers.TutorialQuiz.editTutorialQuiz);
+router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/generate', controllers.Group.generateGroups);
+router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups', controllers.Group.saveGroups);
+
+// ugly routes begin here...
+router.get('/courses/:course/conduct', controllers.TutorialQuiz.getTutorialQuizzes);
+router.put('/courses/:course/conduct', controllers.TutorialQuiz.editTutorialQuizzes);
+
+router.post('/courses/:course/conduct/marks', controllers.Response.getMarksByCourse);
+router.get('/courses/:course/students/:us3r/marks', controllers.Response.getMarksByStudent);
+router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/marks', controllers.Response.getMarksByTutorialQuiz);
+router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/:group/responses', controllers.Response.getResponsesByGroup);
+
 
 module.exports = router;

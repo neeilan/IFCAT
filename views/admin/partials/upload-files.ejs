@@ -1,0 +1,21 @@
+<div class="modal fade" id="modal-upload-files" tabindex="-1" style="display: none;">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <form method="post" action="/admin/courses/<%= course._id %>/files" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h4 class="modal-title">Upload files</h4>
+                </div>
+                <div class="modal-body">
+                    <span class="btn btn-default btn-file" onclick="this.children[0].click()" data-focus>
+                        <input type="file" name="files" multiple style="display: none;">Select Files
+                    </span>
+                    <ul class="list-group"></ul>
+                </div>
+                <div class="modal-footer"> 
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="this.form.submit()">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
