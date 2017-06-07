@@ -1,4 +1,5 @@
 import React from 'react'
+var enums = require('../enums')
 
 export default class PreQuiz extends React.Component {
 	constructor(props) {

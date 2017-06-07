@@ -39,7 +39,7 @@ app.use('/bootbox', express.static(__dirname + '/node_modules/bootbox'));
 app.use('/bootstrap-switch', express.static(__dirname + '/node_modules/bootstrap-switch/dist'));
 app.use('/font-awesome', express.static(__dirname + '/node_modules/font-awesome'));
 app.use('/lodash', express.static(__dirname + '/node_modules/lodash'));
-app.use('/socketioclient', express.static(__dirname + '/node_modules/socket.io-client'));
+app.use('/socketioclient', express.static(__dirname + '/node_modules/socket.io-client/dist'));
 app.use('/sweetalert', express.static(__dirname + '/node_modules/sweetalert'));
 app.use(express.static(__dirname + '/public'));
 

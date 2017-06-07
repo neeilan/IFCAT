@@ -1,5 +1,5 @@
 import React from 'react'
-import enums from '../enums'
+var enums = require('../enums')
 
 export default class GroupBuilder extends React.Component {
 	constructor(props) {

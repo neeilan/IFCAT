@@ -1,7 +1,7 @@
 import EmptyLine from './EmptyLine.jsx'
 
 import React from 'react'
-import enums from '../enums'
+var enums = require('../enums')
 
 export default class Question extends React.Component {
 	constructor(props) {

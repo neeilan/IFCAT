@@ -24,7 +24,7 @@ export default class QuizApp extends React.Component {
 
             this.state = {
                 score: 0,
-                quiz: null,
+                quiz: { allocateMembers : null },
                 groupId: null,
                 groupName: null,
                 userId: null,
@@ -33,7 +33,7 @@ export default class QuizApp extends React.Component {
                 selectedQuestion: null,
                 active: true,
                 complete: false,
-                inProgress: false
+                inProgress: false,
 
             }
         }
@@ -48,28 +48,32 @@ export default class QuizApp extends React.Component {
 
             socket.on('setGroup', (id) => {
                 console.log('setGroup');
+                console.log(id);
                 window.location.href = window.location.href;
             })
 
             socket.on('groupsUpdated', (data) => {
                 console.log('groupsUpdated');
+                console.log(data);
                 // renderGroups(data.groups);
             })
 
             socket.on('quizData', (tutorialQuiz) => {
+                console.log('quizData');
                 console.log(tutorialQuiz);
                 this.setState({
                     quiz: tutorialQuiz.quiz,
                     groupId: tutorialQuiz.groupId || this.state.groupId,
                     userId: tutorialQuiz.userId || this.state.userId,
                     groupName: tutorialQuiz.groupName,
-                    active: tutorialQuiz.active
+                    active: tutorialQuiz.quiz.active,
                 });
             })
 
 
             socket.on('resetDriver', (data) => {
                 console.log('resetDriver');
+                console.log(data);
                 if (this.state.groupId != data.groupId) return;
                 this.setState({
                     isDriver: false,
@@ -78,16 +82,19 @@ export default class QuizApp extends React.Component {
             })
 
             socket.on('info', (data) => {
+                console.log('info');
                 swal('', data.message, 'info');
             })
 
             socket.on('postQuiz', (data) => {
                 console.log('postQuiz');
+                console.log(data);
                 if (!this.state.groupId || data.groupId != this.state.groupId) return;
             })
 
             socket.on('assignedAsDriver', (data) => {
                 console.log('assignedAsDriver');
+                console.log(data);
 
                 if (!this.state.groupId || data.groupId != this.state.groupId) return;
                 // enable choices and submit buttons (disabled by default)

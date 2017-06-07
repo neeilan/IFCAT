@@ -3,18 +3,9 @@ import CodeOutputQuestion from './components/CodeOutputQuestion.jsx'
 
 import React from 'react'
 import ReactDOM from 'react-dom';
+import enums from './enums'
 
-const enums = {
-	questionTypes: {
-		multiSelect: 'multi select',
-		multipleChoice: 'multiple choice',
-		shortAnswer: 'short answer'
-	},
-	allocateMembers : {
-		automatically : 'automatically',
-		selfSelect : 'self-selection'
-	}
-}
+
 
 const currGroupId = 'g4';
 
@@ -65,7 +56,7 @@ const _quizData = {
 	}
 }
 // mock socket io object
-const io = () => ({
+const mock_io = () => ({
 	handlers : {},
 	on: function(event, handler){
 		this.handlers[event] = handler;
@@ -107,6 +98,7 @@ var question = {
         'Hello Bob'
     ]
 }
+
 
 ReactDOM.render(<QuizApp io={io}/>, document.getElementById('hello'));
 ReactDOM.render(<CodeOutputQuestion question={question}/>, document.getElementById('hello2'));
