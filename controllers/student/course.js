@@ -1,3 +1,4 @@
+var models = require('../../models');
 // Retrieve course
 exports.getCourseByParam = (req, res, next, id) => {
     models.Course.findById(id, (err, course) => {

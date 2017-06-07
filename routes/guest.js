@@ -4,6 +4,10 @@ const controllers = require('../controllers/student'),
 let router = require('express').Router();
 
 // non-authenticated routes
+router.get('/quiz', (req, res)=>
+{
+    res.render('student/start-quiz.ejs');
+})
 router.get('/login', controllers.User.getLogin);
 
 router.post('/signup', passport.authenticate('local-signup', {
