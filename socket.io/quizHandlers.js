@@ -243,7 +243,6 @@ module.exports = function(io){
     socket.on('joinGroup', function(data){
         models.TutorialQuiz.findById(data.quizId).exec()
         .then(function(tutQuiz){
-            console.log('here1')
             if (tutQuiz.max.membersPerGroup){
             models.Group.findById(data.newGroup).exec()
             .then(function(gr){
@@ -264,8 +263,6 @@ module.exports = function(io){
                     console.log('here2')
                     models.TutorialQuiz.findById(data.quizId).populate('groups').exec()
                     .then(function(populatedTQ){
-                        // console.log(populatedTQ);
-                        console.log('here3');
                         socket.join('group:'+ data.newGroup);
                         socket.emit('setGroup', data.newGroup)
                         socket.emit('info', {message : 'Joined Group ' + group.name });
@@ -286,8 +283,7 @@ module.exports = function(io){
             var group = new models.Group();
             group.name = (tutQuiz.groups.length + 1).toString();
             group.members = [ socket.request.user._id ];
-            group.save( function(err, group){
-                console.log(group)
+            group.save( function(err, group) {
                 if (err) console.log (err);
                     
                 models.Group.update({ _id : { $in :  tutQuiz.groups } }, { $pull : { members : socket.request.user._id } }, { multi : true },
@@ -299,7 +295,6 @@ module.exports = function(io){
                     return models.TutorialQuiz.findById(tq._id).populate('groups').exec();
                 })
                 .then(function(populatedTQ){
-                    // console.log(populatedTQ)
                     socket.join('group:'+ group._id);
                     socket.emit('info', {message : 'Created and joined Group ' + group.name });
                     emitters.emitToTutorialQuiz(tutQuiz._id, 'groupsUpdated', { groups : populatedTQ.groups })
