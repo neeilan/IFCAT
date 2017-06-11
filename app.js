@@ -40,7 +40,7 @@ app.use('/bootstrap-switch', express.static(__dirname + '/node_modules/bootstrap
 app.use('/font-awesome', express.static(__dirname + '/node_modules/font-awesome'));
 app.use('/lodash', express.static(__dirname + '/node_modules/lodash'));
 app.use('/socketioclient', express.static(__dirname + '/node_modules/socket.io-client/dist'));
-app.use('/sweetalert', express.static(__dirname + '/node_modules/sweetalert'));
+app.use('/sweetalert', express.static(__dirname + '/node_modules/sweetalert/dist'));
 app.use(express.static(__dirname + '/public'));
 
 
