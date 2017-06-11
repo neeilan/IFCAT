@@ -45,26 +45,23 @@ exports.getTutorialQuizzes = (req, res) => {
 };
 // Edit quizzes 
 exports.editTutorialQuizzes = (req, res) => {
-    let redirectTo = `/admin/courses/${req.course._id}/conduct`;
-    // find property to update
-    let property = _.find(['published', 'active', 'archived'], p => req.body && _.has(req.body, p));
-    // nothing to update
-    if (!property)
-        return res.redirect(redirectTo);
-    // update property
-    models.TutorialQuiz.update({ 
-        _id: { $in: req.body.tutorialQuizzes || [] }
-    }, { 
-        $set: { [property]: req.body[property] }
-    }, {
-        multi: true
-    }, err => {
-        if (err)
-            req.flash('error', 'An error occurred while trying to perform operation.');
-        else
-            req.flash('success', 'Quizzes have been updated.');
-        return res.redirect(redirectTo);
-    });
+    if (req.query.action && req.query.action.name && req.query.action.value) {
+        // update property
+        return models.TutorialQuiz.update({ 
+            _id: { $in: req.body.tutorialQuizzes || [] }
+        }, { 
+            $set: { [req.query.action.name]: req.query.action.value }
+        }, {
+            multi: true
+        }, err => {
+            if (err)
+                req.flash('error', 'An error occurred while trying to perform operation.');
+            else
+                req.flash('success', 'Quizzes have been updated.');
+            res.sendStatus(200);
+        });
+    }
+    res.sendStatus(200);
 };
 // Retrieve quiz for tutorial
 exports.getTutorialQuiz = (req, res) => {

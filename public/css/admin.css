@@ -4,15 +4,23 @@ body {
 body > .navbar {
     border-radius: 0px;
 }
+
 textarea.form-control {
     max-width: 100%;
 }
 input[type=checkbox][data-label] {
     display: none;
 }
+/**
+ * Alert
+ */
 .alert {
     display: inline-block;
+    font-size: 14px;
 }
+/**
+ * Numbered circles
+ */
 .btn-circle {
     background: #fff;
     border-color: #ddd;
@@ -74,6 +82,9 @@ input[type=checkbox][data-label] {
 .dim-wrap.on .dimmer {
     width: 100%;
 }
+.dropdown-menu .divider {
+    margin: 0;
+}
 .handle {
     cursor: pointer;
 }
@@ -85,24 +96,9 @@ input[type=checkbox][data-label] {
     margin-left: -12px;
     top: 5px;
 }
-.per-page {
-    margin: 20px;
-    width: auto;
-}
-.pagination > li > a, .pagination > li > span {
-    color: #333;
-    margin-left: 3px;
-    z-index: 0 !important;
-}
-.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover,
-.pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
-    background-color: #333;
-    border-color: #333;    
-}
-/*.pagination > .divider > *, .pagination > .previous > *, .pagination > .next > * {
-    background-color: #fff !important;
-    border: 0 !important;
-}*/
+/**
+ * TinyMCE
+ */
 .mce-tinymce {
     box-sizing: border-box !important;
 }
@@ -112,19 +108,71 @@ input[type=checkbox][data-label] {
 .stretch-wrap {
     overflow-x: auto;
 }
+/**
+ * Breadcrumbs
+ */
+.breadcrumb > li {
+    font-size: 12px;
+}
+/**
+ * Tables
+ */
 .table > tfoot > tr > th {
     border-top: 2px solid #ddd;
 }
-/*.table > tbody > tr > td {
-    vertical-align: middle;
-}*/
 .table th.actions, .table td.actions {
     width: 105px;
 }
+/**
+ * Pagination
+ */
+.per-page {
+    margin: 20px;
+    width: auto;
+}
+.pagination > li > a, .pagination > li > span {
+    color: #333;
+    margin-left: 3px;
+    z-index: 0 !important;
+}
+/**
+ * Tabs
+ */
 .tab-pane {
     padding: 10px;
 }
-
+/**
+ * Modals
+ */
+#modal-upload-files .modal-body {
+    padding: 0;
+    text-align: center;
+}
+#modal-upload-files .modal-body .btn {
+    margin: 15px auto;
+}
+#modal-upload-files .modal-body .list-group {
+    overflow-y: auto;
+    margin: 0;
+    max-height: 300px;
+}
+#modal-upload-files .modal-body .list-group-item {
+    border-radius: 0;
+    border-top: 1px solid #ddd;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+#modal-upload-files .modal-body .btn-remove-file {
+    padding: 8px 20px 0 0;
+    position: absolute;
+    right: 0px;
+    top: 0;
+}
 #modal-add-tutorials .modal-body label {
     font-weight: normal;
 }
@@ -157,49 +205,17 @@ input[type=checkbox][data-label] {
     padding: 8px 0;
 }
 
-/* File listing styles */
-
-#modal-upload-files .modal-body {
-    padding: 0;
-    text-align: center;
-}
-#modal-upload-files .modal-body .btn {
-    margin: 15px auto;
-}
-#modal-upload-files .modal-body .list-group {
-    overflow-y: auto;
-    margin: 0;
-    max-height: 300px;
-}
-#modal-upload-files .modal-body .list-group-item {
-    border-radius: 0;
-    border-top: 1px solid #ddd;
-    border-right: 0;
-    border-bottom: 0;
-    border-left: 0;
-    overflow: hidden;
-    text-align: left;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-#modal-upload-files .modal-body .btn-remove-file {
-    padding: 8px 20px 0 0;
-    position: absolute;
-    right: 0px;
-    top: 0;
-}
 
 .modal-preview-file .bootbox-body > * {
     display: block;
     margin: 0 auto;
 }
-
-/* Question form styles */
-
+/**
+ * Question form
+ */
 a.counter {
     margin-left: 10px;
 }
-
 #modal-show-files .modal-body {
     max-height: 500px;
     padding: 0;
@@ -247,9 +263,9 @@ a.counter {
     margin-left: auto;
     margin-right: auto;
 }
-
-/* Group listing styles */
-
+/**
+ * Groups
+ */
 #groups table {
     border-bottom: 1px solid #ddd;
 }
@@ -278,7 +294,6 @@ a.counter {
 #groups .btn-circle:last-child {
     display: none;
 }
-
 @media (min-width: 768px) {
     .nav-actions {
         width: 700px;

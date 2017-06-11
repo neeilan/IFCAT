@@ -164,7 +164,7 @@ exports.getMarksByCourse = (req, res) => {
         $sort: { '_id.member': 1, '_id.tutorialQuiz': 1 }
     }], (err, members) => {
         // export marks into CSV
-        if (req.query.export === '1' && members.length) {
+        if (req.query.export === 'true' && members.length) {
             let data = _.map(members, member => [
                 member.student.UTORid,
                 member.student.number,

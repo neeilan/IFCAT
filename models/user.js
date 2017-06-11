@@ -8,7 +8,6 @@ let UserSchema = new mongoose.Schema({
     local: {
         email: { 
             type: String,
-            trim: true,
             lowercase: true
         },
         password: {
@@ -40,17 +39,11 @@ let UserSchema = new mongoose.Schema({
     name: {
         first: {
             type: String,
-            trim: true,
-            set: function (first) {
-                return _.startCase(_.toLower(first));
-            }
+            set: first => _.startCase(first.toLowerCase())
         },
         last: {
             type: String,
-            trim: true,
-            set: function (last) {
-                return _.startCase(_.toLower(last));
-            }
+            set: last => _.startCase(last.toLowerCase())
         }
     },
     roles: [{

@@ -107,7 +107,7 @@ router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups', controll
 router.get('/courses/:course/conduct', controllers.TutorialQuiz.getTutorialQuizzes);
 router.put('/courses/:course/conduct', controllers.TutorialQuiz.editTutorialQuizzes);
 
-router.post('/courses/:course/conduct/marks', controllers.Response.getMarksByCourse);
+router.post('/courses/:course/marks', controllers.Response.getMarksByCourse);
 router.get('/courses/:course/students/:student/marks', controllers.Response.getMarksByStudent);
 router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/marks', controllers.Response.getMarksByTutorialQuiz);
 router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/:group/responses', controllers.Response.getResponsesByGroup);
