@@ -33,7 +33,7 @@ exports.generateGroups = (req, res) => {
         let chunks = _.shuffle(_.chunk(students, size));
         // map chunks to groups
         let groups = _.map(chunks, (members, i) => {
-            return group = new models.Group({ name: name, members: members });
+            return group = new models.Group({ name: i + 1, members: members });
         });
 
         console.log(groups[0])
