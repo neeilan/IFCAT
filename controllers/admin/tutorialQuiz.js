@@ -78,7 +78,7 @@ exports.getTutorialQuiz = (req, res) => {
         path: 'groups'
     }]).exec((err, tutorialQuiz) => {
         res.render('admin/pages/tutorial-quiz', {
-            class: 'tutorial-quiz',
+            bodyClass: 'tutorial-quiz',
             title: `Conduct ${req.quiz.name} in tutorial ${req.tutorial.number}`,
             course: req.course, 
             tutorial: req.tutorial,
