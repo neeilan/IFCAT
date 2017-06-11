@@ -142,11 +142,15 @@ module.exports = function(io){
         })
     })
     
-    socket.on('attemptAnswer', function(data){
+    socket.on('attemptAnswer', function(data) {
+        console.log('attemptAnswer');
         models.Question.findById(data.questionId)
         .exec()
         .then(function(question){
+            console.log(question);
             var answerIsCorrect;
+            var allCodeTracingLinesCorrect = null;
+            var isPartialAnswer = false;
             
             answerIsCorrect = (question.answers.indexOf(data.answer[0]) != -1); // mark
             
@@ -166,6 +170,23 @@ module.exports = function(io){
                 else{
                     answerIsCorrect = (question.answers.indexOf(data.answer[0]) > -1);
                 }
+            }
+            else if (question.type == 'code tracing') {
+                var numCorrectLines = 0;
+                allCodeTracingLinesCorrect = true;
+                isPartialAnswer = data.answer.length < question.answers.length;
+                for (var i = 0; i < data.answer.length && allCodeTracingLinesCorrect; i++) {
+
+                    if (data.answer[i].trim() != question.answers[i].trim()) {
+
+                        console.log(data.answer[i].trim());
+                        allCodeTracingLinesCorrect = false;
+                    } else {
+                        numCorrectLines++;
+                    }
+                }
+                answerIsCorrect = allCodeTracingLinesCorrect && (numCorrectLines == question.answers.length);
+                console.log(numCorrectLines);
             }
             
             models.Response.findOne({ group : data.groupId, question: data.questionId })
@@ -202,10 +223,19 @@ module.exports = function(io){
                 }
             })
             .then(function(response){
-                emitters.emitToGroup(data.groupId, 'groupAttempt', {
+                var event;
+                if (isPartialAnswer && question.type == 'code tracing') {
+                    event = 'ctGroupAttempt';
+                } else {
+                    event = 'groupAttempt';
+                }
+
+                emitters.emitToGroup(data.groupId, event, {
                     response: response,
                     questionNumber: data.questionNumber,
-                    groupId : data.groupId
+                    groupId : data.groupId,
+                    linesCorrect : numCorrectLines,
+                    allCodeTracingLinesCorrect : allCodeTracingLinesCorrect
                 })
             })           
             
