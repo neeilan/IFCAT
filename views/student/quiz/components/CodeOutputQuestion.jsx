@@ -1,4 +1,4 @@
-import React from 'react'
+// import React from 'react'
 var enums = require('../enums')
 
 export default class CodeOutputQuestion extends React.Component 
@@ -12,14 +12,15 @@ export default class CodeOutputQuestion extends React.Component
         this.userInputsShouldRender= this.userInputsShouldRender.bind(this);
         this.state = {
             correctOutputLines : 0,
-            enteredAnswer : ''
+            enteredAnswer : '',
+            output : []
         }
 	}
     
 	render()
-    {                                                             
+    {              
 		return (
-			<div style={{width : '100%'}} >
+			<div style={{width : '100%', textAlign: 'left'}} >
                 <pre className="prettyprint linenums" style={{border:'none'}}>
                     {this.props.question.code}
                 </pre>
@@ -34,16 +35,7 @@ export default class CodeOutputQuestion extends React.Component
     
     checkUserInput()
     {
-        let index = this.state.correctOutputLines;
-        if (this.state.enteredAnswer !== this.props.question.output[index])
-        {
-            alert("Wrong answer!");
-            return;
-        }
-        if (this.state.correctOutputLines < this.props.question.output.length)
-            {
-                this.setState({correctOutputLines : this.state.correctOutputLines + 1, enteredAnswer: ''})
-            }
+        this.props.checkInputCb(this.state.output.concat([this.state.enteredAnswer]));
     }
     
     userInputCb(e)
@@ -53,7 +45,8 @@ export default class CodeOutputQuestion extends React.Component
     
     userInputsShouldRender()
     {
-     return (this.state.correctOutputLines < this.props.question.output.length)
+        return true;
+    //  return (this.state.correctOutputLines < this.props.question.output.length)
     }
     
     getCheckAnswerButton()
@@ -95,10 +88,10 @@ export default class CodeOutputQuestion extends React.Component
     {
         var outputLines = [];
                                                               
-        for (let i = 0; i < this.state.correctOutputLines; i++)
-        {
-                outputLines.push(<span> {this.props.question.output[i]} <br/></span>);
-        }
+        // for (let i = 0; i < this.state.correctOutputLines; i++)
+        // {
+        //         outputLines.push(<span> {this.props.question.output[i]} <br/></span>);
+        // }
         
         return outputLines;
     }

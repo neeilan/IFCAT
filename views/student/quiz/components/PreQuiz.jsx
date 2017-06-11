@@ -1,4 +1,6 @@
 import React from 'react'
+import EmptyLine from './EmptyLine.jsx'
+
 var enums = require('../enums')
 
 export default class PreQuiz extends React.Component {
@@ -11,8 +13,12 @@ export default class PreQuiz extends React.Component {
 	render() {
 		return (
 			<div className="row text-center">
+                You are in group:
+                <br/>
+                <h1>{this.props.groupName}</h1>
+                <EmptyLine />
                 This quiz requires a member of your group to serve as the driver, who will submit answers.
-                <br />
+                <EmptyLine />
                 <button 
                     onClick={this.props.setDriverCb.bind(this, true)} 
                     className= {`${this.strings.driverBtnClass} btn-primary`}> 

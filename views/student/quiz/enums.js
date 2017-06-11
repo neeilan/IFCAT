@@ -1,11 +1,15 @@
-export default {
+module.exports =  {
 	questionTypes: {
-		multiSelect: 'multi select',
+		multiSelect: 'multiple select',
 		multipleChoice: 'multiple choice',
-		shortAnswer: 'short answer'
+		shortAnswer: 'short answer',
+		codeTracing : 'code tracing'
 	},
 	allocateMembers : {
 		automatically : 'automatically',
 		selfSelect : 'self-selection'
+	}, 
+	eventNames : {
+		attemptAnswer: 'attemptAnswer',
 	}
 }

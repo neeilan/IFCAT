@@ -21,6 +21,7 @@ export default class QuizApp extends React.Component {
             this.submitChoiceCb = this.submitChoiceCb.bind(this);
             this.selectQuestionCb = this.selectQuestionCb.bind(this);
             this.createGroupCb = this.createGroupCb.bind(this);
+            this.calculateStars = this.calculateStars.bind(this);
 
             this.state = {
                 score: 0,
@@ -34,6 +35,8 @@ export default class QuizApp extends React.Component {
                 active: true,
                 complete: false,
                 inProgress: false,
+                responses : {},
+                numCorrect : 0
 
             }
         }
@@ -44,12 +47,12 @@ export default class QuizApp extends React.Component {
             var socket = this.props.io();
             this.socket = socket;
 
-
+            // Request quiz data
+            socket.emit('requestQuiz', quizId);
 
             socket.on('setGroup', (id) => {
-                console.log('setGroup');
-                console.log(id);
-                window.location.href = window.location.href;
+                if (id != this.state.groupId)
+                    window.location.href = window.location.href;
             })
 
             socket.on('groupsUpdated', (data) => {
@@ -67,6 +70,7 @@ export default class QuizApp extends React.Component {
                     userId: tutorialQuiz.userId || this.state.userId,
                     groupName: tutorialQuiz.groupName,
                     active: tutorialQuiz.quiz.active,
+                    selectedQuestion : tutorialQuiz.quiz.quiz.questions[0],
                 });
             })
 
@@ -77,20 +81,87 @@ export default class QuizApp extends React.Component {
                 if (this.state.groupId != data.groupId) return;
                 this.setState({
                     isDriver: false,
-                    inProgress: true
+                    inProgress : true
                 });
-            })
+            });
 
             socket.on('info', (data) => {
                 console.log('info');
-                swal('', data.message, 'info');
+                swal('Note', data.message, 'info');
             })
 
-            socket.on('postQuiz', (data) => {
-                console.log('postQuiz');
-                console.log(data);
-                if (!this.state.groupId || data.groupId != this.state.groupId) return;
+            socket.on('ctGroupAttempt', (data) => {
+                if (this.state.groupId && data.groupId != this.state.groupId) return;
+                console.log('ctGroupAttempt');
+                var question = this.state.quiz.quiz.questions.filter(q => q._id == data.response.question)[0];
+                question.numCorrectLines = data.linesCorrect;
+
+                if (data.allCodeTracingLinesCorrect) {
+                    swal("Well done!", "The lines entered are correct", "success");
+
+                }
+                else {
+                    swal("Yikes!", "Looks like you made a mistake somewhere", "error");
+                }
+
+                this.setState({quiz : this.state.quiz});
             })
+
+            socket.on('groupAttempt', (data) => {
+                if (this.state.groupId && data.groupId != this.state.groupId) return;
+                console.log('groupAttempt');
+
+                var responsesStore = this.state.responses;
+                responsesStore[data.response.question] = data.response;
+                var question = this.state.quiz.quiz.questions.filter(q => q._id == data.response.question)[0];
+                var maxScore = question.firstTryBonus + question.points;
+
+                if (data.response.correct) {
+
+                    var msg = "Question " + question.number + " was answered correctly!\
+                          Received " + data.response.points + " of " + maxScore + " points ";
+
+                    swal("Good job!", msg, "success");
+
+                    var scoreInc = parseInt(data.response.points, 10);
+                    var numCorrInc = 1;
+
+                    this.setState({ score : this.state.score + scoreInc, numCorrect : this.state.numCorrect + numCorrInc});
+
+                    // All questions completed
+                    if (this.state.quiz.quiz.questions.length == this.state.numCorrect)
+                        socket.emit('quizComplete', { groupId: this.state.groupId, quizId: this.state.quiz.quiz._id });
+                    
+                } else {
+                    swal("Yikes!", "Question " + question.number + " was answered incorrectly!", "error");
+                }
+
+                // Stars
+                var scoreData = this.calculateStars(question);
+                responsesStore[data.response.question].fullStars = scoreData.fullStars;
+                responsesStore[data.response.question].emptyStars = scoreData.emptyStars;
+
+                this.setState({responses: responsesStore});
+            })
+
+            socket.on('updateScores', (data) => {
+                console.log('updateScores');
+                if (this.state.groupId && data.groupId != this.state.groupId) return;
+
+                var responsesStore = this.state.responses;
+                let numCorrectInc = 0;
+                let newScore = 0;
+
+                data.responses.forEach((response, i) => {
+                    responsesStore[response.question] = response;
+                    numCorrectInc += response.correct ? 1 : 0;
+                    newScore += response.points;
+                });
+
+                this.setState({ numCorrect : this.state.numCorrect + numCorrectInc,
+                                responses : responsesStore, 
+                                score : newScore });
+            });
 
             socket.on('assignedAsDriver', (data) => {
                 console.log('assignedAsDriver');
@@ -103,51 +174,72 @@ export default class QuizApp extends React.Component {
                     inProgress: true
                 });
 
+            });
+
+            socket.on('postQuiz', (data) => {
+                console.log('postQuiz');
+                console.log(data);
+                if (!this.state.groupId || data.groupId != this.state.groupId) return;
             })
 
-            socket.emit('requestQuiz', quizId);
+            
+        }
 
+        emit(eventName, data) {
+            data.questionId = this.state.selectedQuestion._id || null;
+            data.groupId = this.state.groupId;
+            console.log(data);
+            this.socket.emit(eventName, data);
+        }
+
+        calculateStars(question) {
+            var result = {};
+            var responses = this.state.responses;
+            var maxScore = question.points + question.firstTryBonus;
+
+            if (question._id in responses) {
+                result.correct = responses[question._id].correct;
+                var emptyStars = (responses[question._id].attempts == 0) ? 0 : responses[question._id].attempts * question.penalty + question.firstTryBonus;
+                result.emptyStars = emptyStars > maxScore ? maxScore : emptyStars;
+                result.fullStars = maxScore - emptyStars > 0 ? (maxScore - emptyStars) : 0;
+            } else {
+                result.emptyStars = 0;
+                result.fullStars = maxScore;
+            }
+            return result;
+        }
+
+        selectQuestion(i) {
+            this.setState({selectedQuestion : i});
         }
 
         getCurrentQuestion() {
+            let selectedQuestion = null;
+            var _quiz = this.state.quiz;
+
+
             if (this.state.selectedQuestion === null) {
-                if (this.state.quiz && this.state.quiz.questions.length > 0) {
-                    this.setState({
-                        selectedQuestion: this.state.quiz.questions[0]
-                    });
-                    let selectedQuestion = this.state.quiz.questions[0];
+                selectedQuestion = _quiz.quiz.questions[0];
+            } else {
+                selectedQuestion = this.state.selectedQuestion;
+            }
                     return ( 
 			<Question 
-				previouslyAnswered = {false}
+                key= {selectedQuestion._id + "questionObj"}
 				isDriver = {this.state.isDriver}
-				question = {selectedQuestion.question}
+                questionRef = {selectedQuestion}
+                response = {this.state.responses[selectedQuestion._id]}
 				questionType = {selectedQuestion.type}
-				choices = {selectedQuestion.choices}
 				attachments = {selectedQuestion.attachments}
 				submitCb = {this.submitChoiceCb}
-                        />
-                    );
-                } else {
-                    return null;
-                }
-            }
-            console.log(this.state.selectedQuestion);
-            return ( 
-		<Question 
-			previouslyAnswered = {false}
-			isDriver = {true}
-			question = {this.state.selectedQuestion.question}
-			questionType = {this.state.selectedQuestion.type}
-			choices = {this.state.selectedQuestion.choices}
-			attachments = {this.state.selectedQuestion.attachments}
-			submitCb = {this.submitChoiceCb}
-                />
+            />
             );
         }
 
         getScoreBar() {
             return (<ScoreBar 
-			questions = {this.state.quiz.questions}
+			questions = {this.state.quiz.quiz.questions}
+            responses = {this.state.responses}
 			selectQuestionCb = {this.selectQuestionCb}
 			selectedQuestion = {this.state.selectedQuestion}
                 />)
@@ -187,30 +279,30 @@ export default class QuizApp extends React.Component {
             }
 
             render() {
-
                 var scoreIndicator = this.state.inProgress ? < span > Score : {this.state.score} < /span> : null;
                 var starScore = this.state.inProgress ? < StarScore full = {3} empty = {5} /> : null;
-                var preQuiz = this.state.inProgress ? null : < PreQuiz setDriverCb = {this.setDriverCb} />;
+                var preQuiz = this.state.inProgress ? null : < PreQuiz setDriverCb = {this.setDriverCb} groupName = {this.state.groupName} />;
                 var scoreBar = this.state.inProgress ? this.getScoreBar() : null;
                 var question = this.state.inProgress ? this.getCurrentQuestion() : null;
                 var postQuiz = this.state.inProgress ? null : this.getPostQuiz();
                 var groupBuilder = this.state.inProgress ? null : this.getGroupBuilder();
 
-                return ( <div> 
-			    {scoreIndicator} 
-			    {starScore} 
-			    {preQuiz} 
-			    {groupBuilder} 
-			    {scoreBar} 
-			    {question} 
-			    {postQuiz}
-                    </div>
-                )
+                return (<div> 
+                    {scoreIndicator} 
+                    {starScore} 
+                    {preQuiz} 
+                    {groupBuilder} 
+                    {scoreBar} 
+                    {question} 
+                    {postQuiz}
+                </div>);
             }
+
+            
 
             setDriverCb(selfIsDriver) {
                 if (selfIsDriver) {
-                    this.socket.emit('assignSelfAsDriver');
+                    this.socket.emit('nominateSelfAsDriver', { groupId : this.state.groupId });
                 } else {
                     this.setState({
                         inProgress: true,
@@ -220,18 +312,21 @@ export default class QuizApp extends React.Component {
             }
 
             createGroupCb() {
-                console.log('creating group');
+                alert('creating group');
             }
 
             awardPointCb(id) {
                 alert('Awarded point to ' + id);
             }
-            submitChoiceCb(choices) {
-                this.socket.emit('groupAttempt', choices);
+
+            submitChoiceCb(answer) {
+                this.emit(enums.eventNames.attemptAnswer, { answer : answer } );
             }
+
             selectQuestionCb(question) {
                 this.setState({
                     selectedQuestion: question
                 });
             }
+
         }

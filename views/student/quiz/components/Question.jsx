@@ -1,42 +1,49 @@
 import EmptyLine from './EmptyLine.jsx'
+import CodeOutputQuestion from './CodeOutputQuestion.jsx'
 
 import React from 'react'
-var enums = require('../enums')
+var enums = require('../enums');
 
 export default class Question extends React.Component {
 	constructor(props) {
 		super(props);
 		this.toggleChoiceSelection = this.toggleChoiceSelection.bind(this);
+		this.submitAnswer = this.submitAnswer.bind(this);
+
 		this.state = {
 			selectedChoices: [],
 			givenAnswer: null
 		}
 	}
 
-	componentWillReceiveProps() {
-		this.setState({
-			selectedChoices: [],
-			givenAnswer: null
-		});
-	}
-
 	render() {
+		var btnText = 'SUBMIT';
+		if (!this.props.isDriver) {
+			btnText = 'NOT DRIVER'
+		}
+		if (this.props.response && this.props.response.correct) {
+			btnText = 'CORRECTLY ANSWERED'
+		}
 		return (
-			<div className="col-xs-10 text-center">
-				{this.props.question}
+			<div className="col-xs-12 col-md-6 text-center">
+				{this.props.questionRef.question}
 				<EmptyLine />
-        {this.getAnswerArea()}
+        		{this.getAnswerArea()}
 				<br/>
 				{this.getAttachmentArea()}
 				<br />
 				<button 
-					disabled = {!!this.props.previouslyAnswered || !this.props.isDriver }
-					onClick={this.props.submitCb.bind(this,   this.state.givenAnswer || this.state.selectedChoices )} 
+					disabled = { !this.props.isDriver || (this.props.response && this.props.response.correct) }
+					onClick={this.submitAnswer} 
 					className="btn btn-success col-xs-10 col-xs-offset-1">
-					Submit
+					{btnText}
 				</button>
 				<br/>
 			</div>);
+	}
+
+	submitAnswer() {
+		this.props.submitCb(this.state.givenAnswer || this.state.selectedChoices);
 	}
 							
 
@@ -53,9 +60,9 @@ export default class Question extends React.Component {
 			case (enums.questionTypes.multipleChoice):
 			case (enums.questionTypes.multiSelect):
 				{
-					return this.props.choices.map(
-						choice =>
-						<span>	
+					return this.props.questionRef.choices.map(
+						(choice, i) =>
+						<span key = {this.props.questionRef._id + 'ch'+ i}>	
 							<button 
 									disabled = {!!this.props.previouslyAnswered || !this.props.isDriver}
 									className = {`btn col-xs-10 col-xs-offset-1 ${ this.state.selectedChoices.indexOf(choice) > -1 ? 'btn-primary' : 'btn-default'} `}
@@ -65,7 +72,7 @@ export default class Question extends React.Component {
 						<br/>
 					</span>);
 				}
-				case (enums.questionTypes.shortAnswer): {
+			case (enums.questionTypes.shortAnswer): {
 						return (
 							<span>
 								<input type = "text" onChange = { (e) => this.setState({givenAnswer : e.target.value})} />
@@ -73,6 +80,9 @@ export default class Question extends React.Component {
 							</span>
 						);
 					}
+			case (enums.questionTypes.codeTracing) : {
+				return <CodeOutputQuestion question={this.props.questionRef} checkInputCb={this.props.submitCb}/>;
+			}
 
 		}
 	}
