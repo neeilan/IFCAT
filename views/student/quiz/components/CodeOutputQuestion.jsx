@@ -15,6 +15,19 @@ export default class CodeOutputQuestion extends React.Component
             enteredAnswer : '',
         }
 	}
+
+    componentDidMount() {
+        this.runCodePrettify();
+    }
+
+    runCodePrettify() {
+        let script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.async = true;
+
+        script.src = 'https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(script);
+    }    
     
 	render()
     {              
@@ -51,14 +64,14 @@ export default class CodeOutputQuestion extends React.Component
     
     getCheckAnswerButton()
     {
-        var text = (this.props.response && this.props.response.correct ? enums.messages.correctlyAnswered : 'CHECK');
+        var text = (this.props.response && this.props.response.correct) ? enums.messages.correctlyAnswered : !this.props.isDriver ? 'NOT DRIVER' : 'CHECK';
         if (!this.userInputsShouldRender())
             return null;
         return (
             <button
                 className="btn btn-success"
                 style={{width:'100%'}}
-                disabled = {this.props.response && this.props.response.correct}
+                disabled = {!this.props.isDriver || (this.props.response && this.props.response.correct)}
                 onClick={this.checkUserInput}>
                 {text}
             </button>);

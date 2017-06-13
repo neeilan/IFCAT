@@ -76,8 +76,7 @@ export default class QuizApp extends React.Component {
 
 
             socket.on('resetDriver', (data) => {
-                console.log('resetDriver');
-                console.log(data);
+                swal('New Driver', 'Your group now has a new driver.', 'info');
                 if (this.state.groupId != data.groupId) return;
                 this.setState({
                     isDriver: false,
@@ -98,7 +97,7 @@ export default class QuizApp extends React.Component {
                 question.output = data.codeOutput;
 
                 if (data.allCodeTracingLinesCorrect) {
-                    swal("Well done!", "The lines entered are correct", "success");
+                    swal("Well done!", "The line(s) entered are correct", "success");
 
                 }
                 else {
@@ -182,7 +181,17 @@ export default class QuizApp extends React.Component {
                 console.log('postQuiz');
                 console.log(data);
                 if (!this.state.groupId || data.groupId != this.state.groupId) return;
-            })
+                this.setState({
+                    inProgress : false,
+                    complete : true,
+                    active : false
+                });
+            });
+
+            socket.on('groupChanged', () => {
+                alert('Group changed');
+                window.location.href = window.location.href;
+            });
 
             
         }

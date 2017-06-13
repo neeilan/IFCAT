@@ -91,7 +91,10 @@ export default class Question extends React.Component {
 						);
 					}
 			case (enums.questionTypes.codeTracing) : {
-				return <CodeOutputQuestion question={this.props.questionRef} response={this.props.response} checkInputCb={this.props.submitCb}/>;
+				return <CodeOutputQuestion question={this.props.questionRef}
+					response={this.props.response} 
+					checkInputCb={this.props.submitCb}
+					isDriver={this.props.isDriver}/>;
 			}
 
 		}
