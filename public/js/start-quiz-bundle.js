@@ -10004,7 +10004,9 @@ var QuizApp = function (_React$Component) {
         }
     }, {
         key: 'calculateStars',
-        value: function calculateStars(question) {
+        value: function calculateStars() {
+            if (!this.state.selectedQuestion) return { fullStars: 0, emptyStars: 0 };
+            var question = this.state.selectedQuestion;
             var result = {};
             var responses = this.state.responses;
             var maxScore = question.points + question.firstTryBonus;
@@ -10094,7 +10096,7 @@ var QuizApp = function (_React$Component) {
                 this.state.score,
                 ' '
             ) : null;
-            var starScore = this.state.inProgress ? _react2.default.createElement(_StarScore2.default, { full: 3, empty: 5 }) : null;
+            var starScore = this.state.inProgress ? _react2.default.createElement(_StarScore2.default, { full: this.calculateStars().fullStars, empty: this.calculateStars().emptyStars }) : null;
             var preQuiz = this.state.inProgress ? null : _react2.default.createElement(_PreQuiz2.default, { setDriverCb: this.setDriverCb, groupName: this.state.groupName });
             var scoreBar = this.state.inProgress ? this.getScoreBar() : null;
             var question = this.state.inProgress ? this.getCurrentQuestion() : null;
