@@ -13,7 +13,6 @@ export default class CodeOutputQuestion extends React.Component
         this.state = {
             correctOutputLines : 0,
             enteredAnswer : '',
-            output : []
         }
 	}
     
@@ -35,7 +34,8 @@ export default class CodeOutputQuestion extends React.Component
     
     checkUserInput()
     {
-        this.props.checkInputCb(this.state.output.concat([this.state.enteredAnswer]));
+        var output = this.props.question.output || [];
+        this.props.checkInputCb(output.concat([this.state.enteredAnswer]));
     }
     
     userInputCb(e)
@@ -51,14 +51,16 @@ export default class CodeOutputQuestion extends React.Component
     
     getCheckAnswerButton()
     {
+        var text = (this.props.response && this.props.response.correct ? enums.messages.correctlyAnswered : 'CHECK');
         if (!this.userInputsShouldRender())
             return null;
         return (
             <button
                 className="btn btn-success"
                 style={{width:'100%'}}
+                disabled = {this.props.response && this.props.response.correct}
                 onClick={this.checkUserInput}>
-                Check
+                {text}
             </button>);
     }
     
@@ -71,7 +73,7 @@ export default class CodeOutputQuestion extends React.Component
             <input 
                 value = {this.state.enteredAnswer}
                 onChange = {this.userInputCb}
-                placeholder = "Enter the next line of output here"
+                placeholder = "Enter the next line of output"
                 type = "text"
                 style = {
                     {
@@ -86,13 +88,8 @@ export default class CodeOutputQuestion extends React.Component
     
     getOutputLines()
     {
-        var outputLines = [];
-                                                              
-        // for (let i = 0; i < this.state.correctOutputLines; i++)
-        // {
-        //         outputLines.push(<span> {this.props.question.output[i]} <br/></span>);
-        // }
-        
-        return outputLines;
+        if (!this.props.question.output)
+            return null;
+        return this.props.question.output.map(line => <span>{line}<br/></span>);
     }
 }

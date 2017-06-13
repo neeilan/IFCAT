@@ -91,10 +91,11 @@ export default class QuizApp extends React.Component {
             })
 
             socket.on('ctGroupAttempt', (data) => {
-                if (this.state.groupId && data.groupId != this.state.groupId) return;
+                if (data.groupId != this.state.groupId) return;
                 console.log('ctGroupAttempt');
+                console.log(data);
                 var question = this.state.quiz.quiz.questions.filter(q => q._id == data.response.question)[0];
-                question.numCorrectLines = data.linesCorrect;
+                question.output = data.codeOutput;
 
                 if (data.allCodeTracingLinesCorrect) {
                     swal("Well done!", "The lines entered are correct", "success");
@@ -115,9 +116,10 @@ export default class QuizApp extends React.Component {
                 responsesStore[data.response.question] = data.response;
                 var question = this.state.quiz.quiz.questions.filter(q => q._id == data.response.question)[0];
                 var maxScore = question.firstTryBonus + question.points;
+                question.output = data.codeOutput;
+                
 
                 if (data.response.correct) {
-
                     var msg = "Question " + question.number + " was answered correctly!\
                           Received " + data.response.points + " of " + maxScore + " points ";
 
@@ -141,7 +143,7 @@ export default class QuizApp extends React.Component {
                 responsesStore[data.response.question].fullStars = scoreData.fullStars;
                 responsesStore[data.response.question].emptyStars = scoreData.emptyStars;
 
-                this.setState({responses: responsesStore});
+                this.setState({responses: responsesStore, quiz: this.state.quiz});
             })
 
             socket.on('updateScores', (data) => {

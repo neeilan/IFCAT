@@ -11,5 +11,8 @@ module.exports =  {
 	}, 
 	eventNames : {
 		attemptAnswer: 'attemptAnswer',
+	},
+	messages : {
+		correctlyAnswered : 'CORRECTLY ANSWERED'
 	}
 }

@@ -147,9 +147,9 @@ module.exports = function(io){
         models.Question.findById(data.questionId)
         .exec()
         .then(function(question){
-            console.log(question);
             var answerIsCorrect;
-            var allCodeTracingLinesCorrect = null;
+            var allCodeTracingLinesCorrect = false;
+            var numCorrectLines = 0;
             var isPartialAnswer = false;
             
             answerIsCorrect = (question.answers.indexOf(data.answer[0]) != -1); // mark
@@ -172,32 +172,34 @@ module.exports = function(io){
                 }
             }
             else if (question.type == 'code tracing') {
-                var numCorrectLines = 0;
+                
                 allCodeTracingLinesCorrect = true;
                 isPartialAnswer = data.answer.length < question.answers.length;
                 for (var i = 0; i < data.answer.length && allCodeTracingLinesCorrect; i++) {
 
                     if (data.answer[i].trim() != question.answers[i].trim()) {
-
-                        console.log(data.answer[i].trim());
                         allCodeTracingLinesCorrect = false;
                     } else {
                         numCorrectLines++;
                     }
                 }
-                answerIsCorrect = allCodeTracingLinesCorrect && (numCorrectLines == question.answers.length);
-                console.log(numCorrectLines);
+                answerIsCorrect = allCodeTracingLinesCorrect && !isPartialAnswer;
+                console.log(answerIsCorrect);
+                console.log(allCodeTracingLinesCorrect);
+                console.log(isPartialAnswer);
             }
             
             models.Response.findOne({ group : data.groupId, question: data.questionId })
             .exec()
             .then(function(response){
+                var answerIsAcceptable = ((answerIsCorrect && question.type != 'code tracing') || allCodeTracingLinesCorrect);
+
                 if (!response){
                     var res = new models.Response();
                     res.group = data.groupId;
                     res.question = data.questionId;
                     res.correct = answerIsCorrect;
-                    res.attempts = answerIsCorrect ? 0 : 1;
+                    res.attempts = answerIsAcceptable ? 0 : 1;
                     res.points = answerIsCorrect ? (question.points + question.firstTryBonus) : 0;
                     return models.TutorialQuiz.findByIdAndUpdate(data.quizId, {
                         $push : { responses : res._id }
@@ -208,15 +210,16 @@ module.exports = function(io){
                     })
                 }
                 else{
-                    // Some logic to prevent students from being dumb and reanswering correct questions and losing points
-                    // Basically, if they get it right once, they can't worsen their score
-                    
-                    var attemptsInc = (response.correct) ? 0 : (answerIsCorrect) ? 0 : 1 ;
-                    var newScore = (response.correct) ? response.points : (answerIsCorrect) ? (question.points - (response.attempts * question.penalty)) : 0;
+                    var attemptsInc = answerIsAcceptable ? 0 : 1 ;
+                    var newScore = (response.correct) ? response.points : answerIsAcceptable ? (question.points - (response.attempts * question.penalty)) : 0;
                     // If they got it correct before, don't increment
+
+                    if (question.type == 'code tracing' && answerIsCorrect && response.attempts == 0) {
+                        newScore += 1;
+                    }
                     
                     return models.Response.findByIdAndUpdate(response._id,
-                    { correct: (response.correct || answerIsCorrect) , $inc : { attempts : attemptsInc },
+                    { correct: answerIsCorrect , $inc : { attempts : attemptsInc },
                     points : (newScore > 0) ? newScore : 0 },
                     { new : true } )
                     .exec()
@@ -229,14 +232,14 @@ module.exports = function(io){
                 } else {
                     event = 'groupAttempt';
                 }
-
+                console.log(event);
                 emitters.emitToGroup(data.groupId, event, {
                     response: response,
-                    questionNumber: data.questionNumber,
                     groupId : data.groupId,
-                    linesCorrect : numCorrectLines,
-                    allCodeTracingLinesCorrect : allCodeTracingLinesCorrect
-                })
+                    codeOutput : question.type != 'code tracing' ? null : question.answers.slice(0, numCorrectLines),
+                    allCodeTracingLinesCorrect : allCodeTracingLinesCorrect,
+                });
+                console.log('emitted')
             })           
             
         })

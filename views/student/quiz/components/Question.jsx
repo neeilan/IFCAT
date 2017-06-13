@@ -16,14 +16,29 @@ export default class Question extends React.Component {
 		}
 	}
 
-	render() {
+	getSubmitBtn() {
 		var btnText = 'SUBMIT';
-		if (!this.props.isDriver) {
+		if (!this.props.isDriver)
 			btnText = 'NOT DRIVER'
+		if (this.props.response && this.props.response.correct)
+			btnText = enums.messages.correctlyAnswered;
+
+		var submitBtn;
+		if (this.props.questionType == enums.questionTypes.codeTracing) {
+			submitBtn = null;
+		} else {
+			submitBtn = <button 
+						disabled = { !this.props.isDriver || (this.props.response && this.props.response.correct) }
+						onClick={this.submitAnswer} 
+						className="btn btn-success col-xs-10 col-xs-offset-1">
+						{btnText}
+					</button>;
 		}
-		if (this.props.response && this.props.response.correct) {
-			btnText = 'CORRECTLY ANSWERED'
-		}
+		return submitBtn;
+	}
+
+	render() {
+	
 		return (
 			<div className="col-xs-12 col-md-6 text-center">
 				{this.props.questionRef.question}
@@ -32,12 +47,7 @@ export default class Question extends React.Component {
 				<br/>
 				{this.getAttachmentArea()}
 				<br />
-				<button 
-					disabled = { !this.props.isDriver || (this.props.response && this.props.response.correct) }
-					onClick={this.submitAnswer} 
-					className="btn btn-success col-xs-10 col-xs-offset-1">
-					{btnText}
-				</button>
+				{this.getSubmitBtn()}
 				<br/>
 			</div>);
 	}
@@ -81,7 +91,7 @@ export default class Question extends React.Component {
 						);
 					}
 			case (enums.questionTypes.codeTracing) : {
-				return <CodeOutputQuestion question={this.props.questionRef} checkInputCb={this.props.submitCb}/>;
+				return <CodeOutputQuestion question={this.props.questionRef} response={this.props.response} checkInputCb={this.props.submitCb}/>;
 			}
 
 		}
