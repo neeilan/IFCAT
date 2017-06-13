@@ -1,10 +1,8 @@
-var mongoose = require('mongoose');
-var models = require('.');
+const mongoose = require('mongoose');
 
-var ResponseSchema = new mongoose.Schema({
-    group: { type: mongoose.Schema.Types.ObjectId, ref : 'Group' },
+let ResponseSchema = new mongoose.Schema({
     question: { type: mongoose.Schema.Types.ObjectId, ref : 'Question' },
-    attempts: { type : Number , default: 0 }, // represents INCORRECT attempts
+    attempts: { type : Number, default: 0 },
     correct: Boolean,
     points: Number
 }, {

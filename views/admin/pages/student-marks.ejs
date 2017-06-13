@@ -1,14 +1,14 @@
 <% include ../partials/header %>
 
 <ol class="breadcrumb">
-    <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li>
-    <li><a href="/admin/courses/<%= course.id %>/tutorials">Tutorials</a> ‐ TUT <%= tutorial.number %></li>
-    <li><a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/students">Students</a> ‐ <%- student.name.full %></li>
+    <li><a href="/admin/courses">Courses</a> ‐ <%= course.code %></li
+    <li><a href="/admin/courses/<%= course._id %>/tutorials">Tutorials</a> ‐ TUT <%= tutorial.number %></li>
+    <li><a href="/admin/courses/<%= course._id %>/tutorials/<%= tutorial._id %>/students">Students</a> ‐ <%- student.name.full %></li>
     <li class="active">Marks</li>
 </ol>
 
 <h1><%- title %></h1>
-<h3><%= student.name.full %> - <%= student.student.number %></h3>
+<h3><%- student.name.full %> - <%= student.student.number %></h3>
 
 <table class="table table-striped">
     <thead>
@@ -19,7 +19,7 @@
             <th class="text-center" style="width: 200px">Teaching Points Awarded</th>
         </tr>
     </thead>
-    <% if (_.isEmpty(marks)) { %>
+    <% if (_.isEmpty(tutorialQuizzes)) { %>
         <tbody>
             <tr><td colspan="4">No marks have been given yet for this student.</td></tr>
         </tbody>
@@ -28,23 +28,16 @@
             <tr class="total-points">
                 <th colspan="2" style="text-align: right">Total</th>
                 <th class="text-center"><%= totalPoints %></th>
-                <th class="text-center"><%= totalTeachingPoints %></th>
+                <th class="text-center"></th>
             </tr>
         </tfoot>
         <tbody>
-        <% _.each(marks, function (mark) { %>
+        <% _.each(tutorialQuizzes, tutorialQuiz => { %>
             <tr>
-                <td><%= mark.tutorialQuiz.quiz.name %>.</td>
-                <td>
-                <% if (mark.group) { %>
-                    <a href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial.id %>/quizzes/<%= mark.tutorialQuiz.quiz.id %>/groups/<%= mark.group.id %>/responses">Group <%= mark.group.name %></a>
-                <% } else { %>
-                    N/A
-                <% } %>      
-                </td>
-                <td class="text-center"><%= mark.points %></td>
-                <td class="text-center"><%= mark.teachingPoints %></td>
-
+                <td><%= tutorialQuiz.quiz.name %>.</td>
+                <td><a href="/admin/courses/<%= course._id %>/tutorials/<%= tutorialQuiz.tutorial._id %>/quizzes/<%= tutorialQuiz.quiz._id %>/groups/<%= tutorialQuiz.group._id %>/responses">Group <%= tutorialQuiz.group.name %></a></td>
+                <td class="text-center"><%= tutorialQuiz.group.totalPoints %></td>
+                <td class="text-center"></td>
             </tr>
         <% }) %>
         </tbody>

@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>IFCAT Admin</title>
+        <title><%= typeof title !== 'undefined' ? `${title} | ` : '' %>IFCAT Admin</title>
         <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="http://bootswatch.com/yeti/bootstrap.css">
 
@@ -17,7 +17,7 @@
         <![endif]-->
         <link href="/css/admin.css" rel="stylesheet">
     </head>
-    <body<%- typeof bodyClass !== 'undefined' ? ' class="' + bodyClass + '"' : '' %>>
+    <body<%- typeof bodyClass !== 'undefined' ? ` class="${bodyClass}"` : '' %>>
         <nav class="navbar navbar-inverse">
             <div class="navbar-header">
                 <% if (typeof user !== 'undefined') { %>

@@ -12,38 +12,34 @@
 
 <div class="nav-actions">
     <div class="btn-group">
-        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-            Bulk Actions<span class="caret"></span>
-        </button>
+        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown"> Bulk Actions<span class="caret"></span></button>
         <ul class="dropdown-menu">
-            <li><a href="#" data-name="published" data-value="1">Publish</a></li>
-            <li><a href="#" data-name="published" data-value="0">Unpublish</a></li>
-            <li><a href="#" data-name="active" data-value="1">Activate</a></li>
-            <li><a href="#" data-name="active" data-value="0">Deactivate</a></li>
-            <li><a href="#" data-name="archived" data-value="1">Archive</a></li>
-            <li><a href="#" data-name="archived" data-value="0">Unarchive</a></li>
-            <li><a href="#" id="btn-export">Export Marks</a></li>
+            <li><a href="/admin/courses/<%= course._id %>/conduct?action[name]=published&action[value]=true">Publish</a></li>
+            <li><a href="/admin/courses/<%= course._id %>/conduct?action[name]=published&action[value]=false">Unpublish</a></li>
+            <li><a href="/admin/courses/<%= course._id %>/conduct?action[name]=active&action[value]=true">Activate</a></li>
+            <li><a href="/admin/courses/<%= course._id %>/conduct?action[name]=active&action[value]=false">Deactivate</a></li>
+            <li><a href="/admin/courses/<%= course._id %>/conduct?action[name]=archived&action[value]=true">Archive</a></li>
+            <li><a href="/admin/courses/<%= course._id %>/conduct?action[name]=archived&action[value]=false">Unarchive</a></li>
+            <li><a href="#!" onclick="form.submit()" id="btn-export">Export Marks</a></li>
         </ul>
     </div>
 </div>
 
-<form method="post">
+<form action="/admin/courses/<%= course._id %>/marks?export=true" method="post" id="form">
     <table class="table table-striped">
         <thead>
             <tr>
                 <th style="width: 10px;"><input type="checkbox"></th>
                 <th>Quiz</th>
                 <th>Tutorial</th>
-                <% _.each(['Published', 'Active', 'Archived'], field => { %>
-                    <th class="text-center"><%- field %></th>
-                <% }) %>
+                <th class="text-center">Published</th>
+                <th class="text-center">Active</th>
+                <th class="text-center">Archived</th>
                 <th class="actions"></th>
             </tr>
         </thead>
         <tfoot>
-            <tr>
-                <td colspan="7" class="clearfix"><% include ../partials/pagination %></td>
-            </tr>
+            <tr><td colspan="7" class="clearfix"><% include ../partials/pagination %></td></tr>
         </tfoot>
         <tbody>
         <% if (_.isEmpty(tutorialQuizzes)) { %>
@@ -54,13 +50,9 @@
                     <td><input type="checkbox" name="tutorialQuizzes[]" value="<%= tutorialQuiz.id %>"></td>
                     <td><%= tutorialQuiz.quiz.name %></td>
                     <td><%= 'TUT ' + tutorialQuiz.tutorial.number %></td>
-                    <% _.each(['published', 'active', 'archived'], field => { %>
-                        <td class="text-center">
-                        <% if (tutorialQuiz[field]) { %>
-                            <span class="glyphicon glyphicon-ok"></span>
-                        <% } %>
-                        </td>
-                    <% }) %>
+                    <td class="text-center"><% if (tutorialQuiz.published) { %><span class="glyphicon glyphicon-ok"></span><% } %></td>
+                    <td class="text-center"><% if (tutorialQuiz.active) { %><span class="glyphicon glyphicon-ok"></span><% } %></td>
+                    <td class="text-center"><% if (tutorialQuiz.archived) { %><span class="glyphicon glyphicon-ok"></span><% } %></td>
                     <td>
                         <div class="dropdown">
                             <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">Actions<span class="caret"></span></button>

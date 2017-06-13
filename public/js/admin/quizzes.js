@@ -2,8 +2,29 @@ $(function () {
     if ($('body').hasClass('quizzes')) {
         $('.btn-copy').click(function (e) {
             e.preventDefault();
-            $.post(this.href, function () {
-                window.location.reload(true);
+            var btn = this;
+            bootbox.dialog({
+                title: 'Copy quiz',
+                message: '<p>You are about to copy quiz and all of its associated questions.</p>\
+                    <p>This does <b>not</b> however copy its tutorial associations.</p>\
+                    <p>Do you want to proceed with this action?</p>',
+                buttons: {
+                    cancel: {
+                        label: 'Cancel',
+                        className: 'btn-sm'
+                    },
+                    copy: {
+                        label: 'Copy',
+                        className: 'btn-sm btn-success',
+                        callback: function (result) {
+                            if (result) {
+                                $.post(btn.href, function () {
+                                    window.location.reload(true);
+                                });
+                            }
+                        }
+                    }
+                }
             });
         });
         $('.btn-delete').click(function (e) {

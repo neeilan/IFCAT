@@ -10,8 +10,7 @@
 <% include ../partials/flash %>
 
 <div class="nav-actions">
-    <a href="/admin/courses/<%= course._id %>/quizzes/new" class="btn btn-default btn-sm"><span 
-        class="glyphicon glyphicon-plus"></span> Add New Quiz</a>
+    <a href="/admin/courses/<%= course._id %>/quizzes/new" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add New Quiz</a>
 </div>
 
 <table class="table table-striped">
@@ -32,19 +31,14 @@
                 <td class="text-center"><%= quiz.questions.length %></td>
                 <td>
                     <div class="dropdown">
-                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                            Actions<span class="caret"></span>
+                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">Actions<span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/edit"><span 
-                                class="glyphicon glyphicon-pencil"></span> Edit Quiz</a></li>
-                            <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/copy"
-                                class="btn-copy"><span class="glyphicon glyphicon-duplicate"></span> Copy Quiz</a></li>
-                            <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/questions"><span 
-                                class="glyphicon glyphicon-question-sign"></span> Manage Questions</a></li>
+                            <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/edit"><span class="glyphicon glyphicon-pencil"></span> Edit Quiz</a></li>
+                            <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/copy" class="btn-copy"><span class="glyphicon glyphicon-duplicate"></span> Copy Quiz</a></li>
+                            <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/questions"><span class="glyphicon glyphicon-question-sign"></span> Manage Questions</a></li>
                             <li class="divider"></li>
-                            <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>" 
-                                class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete Quiz</a></li>
+                            <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>" class="btn-delete"><span class="glyphicon glyphicon-remove"></span> Delete Quiz</a></li>
                         </ul>
                     </div>
                 </td>

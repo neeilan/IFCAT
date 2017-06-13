@@ -1,4 +1,10 @@
 $(function () {
+    
+    bootbox.setDefaults({
+        onEscape: true,
+        size: 'small'
+    });
+    
     // set default AJAX options
     $.ajaxSetup({ cache: false });
 
@@ -97,24 +103,10 @@ $(function () {
         return this;
     };
 
-    // small plugin for creating alerts on the fly
-    // @usage: $.bootstrapAlert(type, msg).after(...)
-    $.bootstrapAlert = function () {
-        if (arguments[0] === 'close') {
-            return $('.alert-dismissible').remove();
-        }
-        return $('<div/>', {
-            class: 'alert alert-' + arguments[0] + ' alert-dismissible',
-            html: '<a href="#" class="close" data-dismiss="alert">&times;</a>' + arguments[1]
-        });
-    };
-
     // small plugin for creating confirm dialogs on the fly
     // @usage: $.deletebox(options)
     $.deletebox = function (options) {
         bootbox.dialog({
-            onEscape: true,
-            size: 'small',
             title: options.title,
             message: options.message,
             buttons: {
@@ -124,9 +116,9 @@ $(function () {
                 },
                 danger: {
                     label: 'Delete',
-                    className: 'btn-danger',
-                    callback: function (res) {
-                        if (res) {
+                    className: 'btn-sm btn-danger',
+                    callback: function (result) {
+                        if (result) {
                             options.callback();
                         }
                     }
@@ -135,15 +127,3 @@ $(function () {
         });
     };
 });
-
-// tinymce.init({
-//     selector: '.tinymce',
-//     menubar: false,
-//     statusbar: false,
-//     plugins: [
-//         'advlist autolink lists link image charmap',
-//         'searchreplace visualblocks code',
-//         'media table contextmenu paste code'
-//     ],
-//     toolbar: 'styleselect | bullist numlist | charmap link image table | undo redo'
-// });
