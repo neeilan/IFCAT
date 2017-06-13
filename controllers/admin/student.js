@@ -8,7 +8,7 @@ exports.getStudentByParam = (req, res, next, id) => {
     models.User.findOne({ _id: id, roles: { $in: ['student'] }}, (err, student) => {
         if (err)
             return next(err);
-        if (!user)
+        if (!student)
             return next(new Error('No student is found.'));
         req.student = student;
         next();
@@ -97,16 +97,15 @@ exports.deleteStudents = (req, res) => {
 };
 // Import list of students
 exports.importStudents = (req, res) => {
-    // read spreadsheet
-    csv.parse(req.file.buffer.toString(), {
-        columns: true,
-        delimiter: ',',
-        skip_empty_lines: true
-    }, (err, rows) => {
+    async.series([
+        done => csv.parse(req.file.buffer.toString(), { columns: true, delimiter: ',', skip_empty_lines: true }, done),
+        done => models.Tutorial.find({ _id: { $in: req.course.tutorials }}, done)
+    ], (err, results) => {
         if (err) {
             req.flash('error', 'An error occurred while trying to perform operation.');
             return res.redirect(`/admin/courses/${req.course.id}/students`);
         }
+        let [rows, tutorials] = results;
         // process records
         async.eachSeries(rows, (row, done) => {
             row.student = {};
@@ -129,40 +128,32 @@ exports.importStudents = (req, res) => {
                 else if (/^tutorial/i.test(key))
                     row.tutorial = val;
             });
+            let student;
             // save
-            async.waterfall([
-                function saveStudent(done) {
-                    models.User.findOne({ 'student.UTORid': row.student.UTORid }, (err, user) => {
+            async.series([
+                done => {
+                    models.User.findOne({ 'student.UTORid': row.student.UTORid }, (err, us3r) => {
                         if (err)
                             return done(err);
-                        if (!user)
-                            user = new models.User();
-                        user.set(row);
-                        user.roles.addToSet('student');
-                        user.save(function (err) {
-                            if (err)
-                                return done(err);
-                            done(null, user);
-                        });
+                        student = us3r || new models.User();
+                        student.set(row);
+                        student.roles.addToSet('student');
+                        student.save(done);
                     });
                 },
-                function addIntoCourse(user, done) {
-                    req.course.withTutorials().execPopulate().then(function () {
-                        req.course.update({ $addToSet: { students: user.id }}, function (err) {
-                            done(err, user);
-                        });
-                    });
+                done => {
+                    req.course.update({ $addToSet: { students: student._id }}, done);
                 },
-                function addIntoTutorial(user, done) {
-                    // skip if no tutorial is given
-                    if (!row.tutorial)
+                done => {
+                    if (row.tutorial) {
+                        async.eachSeries(tutorials, (tutorial, done) => {
+                            if (_.toInteger(tutorial.number) === _.toInteger(row.tutorial))
+                                tutorial.update({ $addToSet: { students: student._id }}, done);
+                            else
+                                tutorial.update({ $pull: { students: student._id }}, done);
+                        }, done);
+                    } else 
                         return done();
-                    async.eachSeries(req.course.tutorials, function (tutorial, done) {
-                        if (_.toInteger(tutorial.number) === _.toInteger(row.tutorial))
-                            tutorial.update({ $addToSet: { students: user.id }}, done);
-                        else
-                            tutorial.update({ $pull: { students: user.id }}, done);
-                    }, done);
                 }
             ], done);
         }, err => {

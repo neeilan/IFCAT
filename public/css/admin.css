@@ -82,6 +82,12 @@ input[type=checkbox][data-label] {
 .dim-wrap.on .dimmer {
     width: 100%;
 }
+/**
+ * Dropdowns
+ */
+.dropdown-menu a {
+    background-color: #fff;
+}
 .dropdown-menu .divider {
     margin: 0;
 }

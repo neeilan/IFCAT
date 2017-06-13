@@ -16,7 +16,7 @@ exports.getQuestionByParam = (req, res, next, id) => {
 };
 // Retrieve list of questions for quiz
 exports.getQuestions = (req, res) => { 
-    req.quiz.withQuestions().execPopulate().then(function (err) {
+    req.quiz.withQuestions().execPopulate().then(function () {
         res.render('admin/pages/quiz-questions', {
             bodyClass: 'questions',
             title: 'Questions',

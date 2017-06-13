@@ -19,7 +19,7 @@
             <th class="text-center">Points awarded</th>
         </tr>
     </thead>
-<% if (_.isEmpty(responses)) { %>
+<% if (_.isEmpty(group.responses)) { %>
     <tbody>
         <tr><td colspan="4">No responses have been given yet.</td></tr>
     </tbody>
@@ -27,11 +27,11 @@
     <tfoot>
         <tr class="total-points">
             <th colspan="3" style="text-align: right">Total Points</th>
-            <th class="text-center"><%= totalPoints %></th>
+            <th class="text-center"><%= group.getTotalPoints() %></th>
         </tr>
     </tfoot>
     <tbody>
-    <% _.each(responses, function (response) { %>
+    <% _.each(group.responses, response => { %>
         <tr>
             <td style="width: 10px;"><%= response.question.number %>.</td>
             <td style="max-width: 250px;"><%= response.question.question %></td>

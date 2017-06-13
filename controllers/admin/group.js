@@ -5,7 +5,6 @@ const _ = require('lodash'),
     mongoose = require('mongoose');
 // Retrieve group
 exports.getGroupByParam = (req, res, next, id) => {
-    console.log('get group')
     models.Group.findById(id, (err, group) => {
         if (err)
             return next(err);
@@ -35,8 +34,6 @@ exports.generateGroups = (req, res) => {
         let groups = _.map(chunks, (members, i) => {
             return group = new models.Group({ name: i + 1, members: members });
         });
-
-        console.log(groups[0])
         res.render('admin/pages/tutorial-quiz', {
             class: 'conduct-quiz',
             title: `Conduct ${req.quiz.name} in TUT ${req.tutorial.number}`,

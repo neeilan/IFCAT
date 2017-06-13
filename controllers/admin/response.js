@@ -5,16 +5,19 @@ const _ = require('lodash'),
     models = require('../../models');
 // Retrieve group responses
 exports.getResponsesByGroup = (req, res) => {
-    req.group.populate('responses').exec(err => {
+    req.group.populate({
+        path: 'responses',
+        populate: {
+            path: 'question'
+        }
+    }, err => {
         res.render('admin/pages/group-responses', {
             bodyClass: 'group-responses',
             title: 'Responses',
             course: req.course,
             tutorial: req.tutorial,
             quiz: req.quiz,
-            tutorialQuiz: tutorialQuiz,
-            group: req.group,
-            responses: req.group.responses
+            group: req.group
         });
     });
 };
@@ -37,11 +40,11 @@ exports.getMarksByStudent = (req, res) => {
     }, {
         $unwind: '$group'
     }, {
-        $match: { 'group.members': { $in: [req.us3r._id] }}
+        $match: { 'group.members': { $in: [req.student._id] }}
     }, {
         $unwind: '$group.responses'
     }, {
-        $lookup: { from: 'responses', localField: 'responses', foreignField: '_id', as: 'response' }
+        $lookup: { from: 'responses', localField: 'group.responses', foreignField: '_id', as: 'response' }
     }, {
         $unwind: '$response'
     }, {
@@ -56,7 +59,7 @@ exports.getMarksByStudent = (req, res) => {
         res.render('admin/pages/student-marks', {
             title: 'Marks',
             course: req.course,
-            student: req.us3r,
+            student: req.student,
             tutorialQuizzes: tutorialQuizzes,
             totalPoints: _.sumBy(tutorialQuizzes, tutorialQuiz => tutorialQuiz.totalPoints)
         });
@@ -75,13 +78,13 @@ exports.getMarksByTutorialQuiz = (req, res) => {
     }, {
         $unwind: '$group.members'
     }, {
-        $lookup: { from: 'users', localField: 'members', foreignField: '_id', as: 'member' }
+        $lookup: { from: 'users', localField: 'group.members', foreignField: '_id', as: 'member' }
     }, {
         $unwind: '$member'
     }, {
         $unwind: '$group.responses'
     }, {
-        $lookup: { from: 'responses', localField: 'responses', foreignField: '_id', as: 'response' }
+        $lookup: { from: 'responses', localField: 'group.responses', foreignField: '_id', as: 'response' }
     }, {
         $unwind: '$response'
     }, {
@@ -93,18 +96,18 @@ exports.getMarksByTutorialQuiz = (req, res) => {
         }
     }, {
         $sort: { _id: 1 }
-    }], (err, members) => { 
-        let data = _.map(members, member => [
-            member.student.UTORid,
-            member.student.number,
-            `${member.name.first} ${member.name.last}`,
-            `TUT ${req.tutorial.number}`,
-            req.quiz.name,
-            `Group ${member.group.name}`,
-            member.group.totalPoints
-        ]);
+    }], (err, data) => {
         // export marks into CSV
         if (req.query.export === '1') {
+            data = _.map(data, d => [
+                d.member.student.UTORid,
+                d.member.student.number,
+                `${d.member.name.first} ${d.member.name.last}`,
+                `TUT ${req.tutorial.number}`,
+                req.quiz.name,
+                `Group ${d.group.name}`,
+                d.totalPoints
+            ]);
             // set headings
             data.unshift(['UTORid', 'Student No.', 'Name', 'Tutorial', 'Quiz', 'Group', 'Mark']);
             // send CSV
@@ -119,7 +122,7 @@ exports.getMarksByTutorialQuiz = (req, res) => {
             course: req.course,
             tutorial: req.tutorial,
             quiz: req.quiz,
-            students: data
+            data: data
         });
     });
 };
@@ -144,13 +147,13 @@ exports.getMarksByCourse = (req, res) => {
     }, {
         $unwind: '$group.members'
     }, {
-        $lookup: { from: 'users', localField: 'members', foreignField: '_id', as: 'member' }
+        $lookup: { from: 'users', localField: 'group.members', foreignField: '_id', as: 'member' }
     }, {
         $unwind: '$member'
     }, {
         $unwind: '$group.responses'
     }, {
-        $lookup: { from: 'responses', localField: 'responses', foreignField: '_id', as: 'response' }
+        $lookup: { from: 'responses', localField: 'group.responses', foreignField: '_id', as: 'response' }
     }, {
         $unwind: '$response'
     }, {
@@ -162,17 +165,17 @@ exports.getMarksByCourse = (req, res) => {
         }
     }, {
         $sort: { '_id.member': 1, '_id.tutorialQuiz': 1 }
-    }], (err, members) => {
+    }], (err, data) => {
         // export marks into CSV
         if (req.query.export === 'true' && members.length) {
-            let data = _.map(members, member => [
-                member.student.UTORid,
-                member.student.number,
-                `${member.name.first} ${member.name.last}`,
+            data = _.map(data, d => [
+                d.member.student.UTORid,
+                d.member.student.number,
+                `${d.member.name.first} ${d.member.name.last}`,
                 `TUT ${req.tutorial.number}`,
                 req.quiz.name,
-                `Group ${member.group.name}`,
-                member.group.totalPoints
+                `Group ${d.group.name}`,
+                d.totalPoints
             ]);
             // set headings
             data.unshift(['UTORid', 'Student No.', 'Name', 'Tutorial', 'Quiz', 'Group', 'Mark']);

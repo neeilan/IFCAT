@@ -28,24 +28,22 @@
         </tr>
     </thead>
     <tbody>
-    <% if (_.isEmpty(students)) { %>
-        <tr>
-            <td colspan="7">No students have been added yet.</td>
-        </tr>
+    <% if (_.isEmpty(data)) { %>
+        <tr><td colspan="7">No students have been added yet.</td></tr>
     <% } else { %>
-        <% _.each(students, student => { %>
+        <% _.each(data, d => { %>
             <tr>
-                <td><%= student.student.UTORid %></td>
-                <td><%= student.student.number %></td>
+                <td><%= d.member.student.UTORid %></td>
+                <td><%= d.member.student.number %></td>
                 <td>
-                    <a href="/admin/courses/<%= course._id %>/tutorials/<%= tutorial._id %>/students/<%= student._id %>/marks"><%= student.name.full %></a>
+                    <a href="/admin/courses/<%= course._id %>/students/<%= d.member._id %>/marks"><%= `${d.member.name.first} ${d.member.name.last}` %></a>
                 </td>
-                <td>TUT <%= student.tutorial.number %></td>
-                <td><%= student.quiz.name %></td>
+                <td>TUT <%= tutorial.number %></td>
+                <td><%= quiz.name %></td>
                 <td>
-                    <a href="/admin/courses/<%= course._id %>/tutorials/<%= tutorial._id %>/quizzes/<%= quiz._id %>/groups/<%= student.group._id %>/responses">Group <%= student.group.name %></a>
+                    <a href="/admin/courses/<%= course._id %>/tutorials/<%= tutorial._id %>/quizzes/<%= quiz._id %>/groups/<%= d.group._id %>/responses">Group <%= d.group.name %></a>
                 </td>
-                <td class="text-center"><%= student.points %></td>
+                <td class="text-center"><%= d.totalPoints %></td>
             </tr>
         <% }) %>
     <% } %>
