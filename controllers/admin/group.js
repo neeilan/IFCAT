@@ -76,8 +76,9 @@ exports.saveGroups = (req, res, next) => {
         done => {
             async.eachSeries(tutorialQuiz.groups, (group, done) => {
                 // update existing group if it is present
-                if (req.body.groups.hasOwnProperty(group._id))
+                if (req.body.groups.hasOwnProperty(group._id)) {
                     return group.update({ $set: { members: req.body.groups[group._id] }}, done);
+                }
                 // otherwise remove the group
                 group.remove(done);
             }, done);
@@ -104,3 +105,22 @@ exports.saveGroups = (req, res, next) => {
         res.redirect(`/admin/courses/${req.course._id}/tutorials/${req.tutorial._id}/quizzes/${req.quiz._id}/conduct`);
     });
 };
+
+// function diffGroup(before, after) {
+//     diffSet = new Set();
+//     for (let member in before) {
+//         let id = member._id || member;
+//         diffSet.add(id);
+//         console.log(id);
+//     }
+//     for (let member in after) {
+//         let id = member._id || member;
+//         if (diffSet.has(id)) {
+//             // was already present, so not part of diff
+//             diffSet.delete(id);
+//         } else {
+//             diffSet.add(id);
+//         }
+//     }
+//     return diffSet;
+// };

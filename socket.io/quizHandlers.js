@@ -201,7 +201,7 @@ module.exports = function(io){
                     res.correct = answerIsCorrect;
                     res.attempts = answerIsAcceptable ? 0 : 1;
                     res.points = answerIsCorrect ? (question.points + question.firstTryBonus) : 0;
-                    return models.TutorialQuiz.findByIdAndUpdate(data.quizId, {
+                    return models.Group.findByIdAndUpdate(data.groupId, {
                         $push : { responses : res._id }
                     })
                     .exec()

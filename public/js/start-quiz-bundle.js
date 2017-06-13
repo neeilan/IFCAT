@@ -4745,6 +4745,21 @@ var CodeOutputQuestion = function (_React$Component) {
     }
 
     _createClass(CodeOutputQuestion, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            this.runCodePrettify();
+        }
+    }, {
+        key: 'runCodePrettify',
+        value: function runCodePrettify() {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.async = true;
+
+            script.src = 'https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(script);
+        }
+    }, {
         key: 'render',
         value: function render() {
             return React.createElement(
@@ -4784,14 +4799,14 @@ var CodeOutputQuestion = function (_React$Component) {
     }, {
         key: 'getCheckAnswerButton',
         value: function getCheckAnswerButton() {
-            var text = this.props.response && this.props.response.correct ? enums.messages.correctlyAnswered : 'CHECK';
+            var text = this.props.response && this.props.response.correct ? enums.messages.correctlyAnswered : !this.props.isDriver ? 'NOT DRIVER' : 'CHECK';
             if (!this.userInputsShouldRender()) return null;
             return React.createElement(
                 'button',
                 {
                     className: 'btn btn-success',
                     style: { width: '100%' },
-                    disabled: this.props.response && this.props.response.correct,
+                    disabled: !this.props.isDriver || this.props.response && this.props.response.correct,
                     onClick: this.checkUserInput },
                 text
             );
@@ -9864,8 +9879,7 @@ var QuizApp = function (_React$Component) {
             });
 
             socket.on('resetDriver', function (data) {
-                console.log('resetDriver');
-                console.log(data);
+                swal('New Driver', 'Your group now has a new driver.', 'info');
                 if (_this2.state.groupId != data.groupId) return;
                 _this2.setState({
                     isDriver: false,
@@ -9888,7 +9902,7 @@ var QuizApp = function (_React$Component) {
                 question.output = data.codeOutput;
 
                 if (data.allCodeTracingLinesCorrect) {
-                    swal("Well done!", "The lines entered are correct", "success");
+                    swal("Well done!", "The line(s) entered are correct", "success");
                 } else {
                     swal("Yikes!", "Looks like you made a mistake somewhere", "error");
                 }
@@ -9968,6 +9982,16 @@ var QuizApp = function (_React$Component) {
                 console.log('postQuiz');
                 console.log(data);
                 if (!_this2.state.groupId || data.groupId != _this2.state.groupId) return;
+                _this2.setState({
+                    inProgress: false,
+                    complete: true,
+                    active: false
+                });
+            });
+
+            socket.on('groupChanged', function () {
+                alert('Group changed');
+                window.location.href = window.location.href;
             });
         }
     }, {
@@ -23055,7 +23079,10 @@ var Question = function (_React$Component) {
 					}
 				case enums.questionTypes.codeTracing:
 					{
-						return _react2.default.createElement(_CodeOutputQuestion2.default, { question: this.props.questionRef, response: this.props.response, checkInputCb: this.props.submitCb });
+						return _react2.default.createElement(_CodeOutputQuestion2.default, { question: this.props.questionRef,
+							response: this.props.response,
+							checkInputCb: this.props.submitCb,
+							isDriver: this.props.isDriver });
 					}
 
 			}
