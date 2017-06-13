@@ -58,7 +58,6 @@ export default class QuizApp extends React.Component {
             socket.on('groupsUpdated', (data) => {
                 console.log('groupsUpdated');
                 console.log(data);
-                // renderGroups(data.groups);
             })
 
             socket.on('quizData', (tutorialQuiz) => {
@@ -76,6 +75,7 @@ export default class QuizApp extends React.Component {
 
 
             socket.on('resetDriver', (data) => {
+                console.log('resetDriver');
                 swal('New Driver', 'Your group now has a new driver.', 'info');
                 if (this.state.groupId != data.groupId) return;
                 this.setState({
@@ -177,21 +177,24 @@ export default class QuizApp extends React.Component {
 
             });
 
-            socket.on('postQuiz', (data) => {
+            socket.on('quizActivated', (data) => {
                 console.log('postQuiz');
                 console.log(data);
+                if (data.active) {
+                    swal('Quiz activated', 'You can pick a driver and start the quiz', 'info');
+                } else {
+                    swal('Quiz de-activated', 'Your answers have been submitted', 'info');
+                }
                 if (!this.state.groupId || data.groupId != this.state.groupId) return;
                 this.setState({
-                    inProgress : false,
-                    complete : true,
-                    active : false
+                    complete : !data.active,
+                    active : data.active,
+                    inProgress : false
                 });
             });
 
-            socket.on('groupChanged', () => {
-                alert('Group changed');
-                window.location.href = window.location.href;
-            });
+
+            
 
             
         }
@@ -203,7 +206,9 @@ export default class QuizApp extends React.Component {
             this.socket.emit(eventName, data);
         }
 
-        calculateStars(question) {
+        calculateStars() {
+            if (!this.state.selectedQuestion) return {fullStars : 0, emptyStars : 0};
+            var question = this.state.selectedQuestion;
             var result = {};
             var responses = this.state.responses;
             var maxScore = question.points + question.firstTryBonus;
@@ -291,7 +296,7 @@ export default class QuizApp extends React.Component {
 
             render() {
                 var scoreIndicator = this.state.inProgress ? < span > Score : {this.state.score} < /span> : null;
-                var starScore = this.state.inProgress ? < StarScore full = {3} empty = {5} /> : null;
+                var starScore = this.state.inProgress ? < StarScore full = {this.calculateStars().fullStars} empty = {this.calculateStars().emptyStars} /> : null;
                 var preQuiz = this.state.inProgress ? null : < PreQuiz setDriverCb = {this.setDriverCb} groupName = {this.state.groupName} />;
                 var scoreBar = this.state.inProgress ? this.getScoreBar() : null;
                 var question = this.state.inProgress ? this.getCurrentQuestion() : null;

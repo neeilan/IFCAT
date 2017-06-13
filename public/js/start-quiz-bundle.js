@@ -9862,7 +9862,6 @@ var QuizApp = function (_React$Component) {
             socket.on('groupsUpdated', function (data) {
                 console.log('groupsUpdated');
                 console.log(data);
-                // renderGroups(data.groups);
             });
 
             socket.on('quizData', function (tutorialQuiz) {
@@ -9879,6 +9878,7 @@ var QuizApp = function (_React$Component) {
             });
 
             socket.on('resetDriver', function (data) {
+                console.log('resetDriver');
                 swal('New Driver', 'Your group now has a new driver.', 'info');
                 if (_this2.state.groupId != data.groupId) return;
                 _this2.setState({
@@ -9978,20 +9978,20 @@ var QuizApp = function (_React$Component) {
                 });
             });
 
-            socket.on('postQuiz', function (data) {
+            socket.on('quizActivated', function (data) {
                 console.log('postQuiz');
                 console.log(data);
+                if (data.active) {
+                    swal('Quiz activated', 'You can pick a driver and start the quiz', 'info');
+                } else {
+                    swal('Quiz de-activated', 'Your answers have been submitted', 'info');
+                }
                 if (!_this2.state.groupId || data.groupId != _this2.state.groupId) return;
                 _this2.setState({
-                    inProgress: false,
-                    complete: true,
-                    active: false
+                    complete: !data.active,
+                    active: data.active,
+                    inProgress: false
                 });
-            });
-
-            socket.on('groupChanged', function () {
-                alert('Group changed');
-                window.location.href = window.location.href;
             });
         }
     }, {
@@ -10004,7 +10004,9 @@ var QuizApp = function (_React$Component) {
         }
     }, {
         key: 'calculateStars',
-        value: function calculateStars(question) {
+        value: function calculateStars() {
+            if (!this.state.selectedQuestion) return { fullStars: 0, emptyStars: 0 };
+            var question = this.state.selectedQuestion;
             var result = {};
             var responses = this.state.responses;
             var maxScore = question.points + question.firstTryBonus;
@@ -10094,7 +10096,7 @@ var QuizApp = function (_React$Component) {
                 this.state.score,
                 ' '
             ) : null;
-            var starScore = this.state.inProgress ? _react2.default.createElement(_StarScore2.default, { full: 3, empty: 5 }) : null;
+            var starScore = this.state.inProgress ? _react2.default.createElement(_StarScore2.default, { full: this.calculateStars().fullStars, empty: this.calculateStars().emptyStars }) : null;
             var preQuiz = this.state.inProgress ? null : _react2.default.createElement(_PreQuiz2.default, { setDriverCb: this.setDriverCb, groupName: this.state.groupName });
             var scoreBar = this.state.inProgress ? this.getScoreBar() : null;
             var question = this.state.inProgress ? this.getCurrentQuestion() : null;
