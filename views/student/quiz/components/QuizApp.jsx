@@ -58,7 +58,6 @@ export default class QuizApp extends React.Component {
             socket.on('groupsUpdated', (data) => {
                 console.log('groupsUpdated');
                 console.log(data);
-                // renderGroups(data.groups);
             })
 
             socket.on('quizData', (tutorialQuiz) => {
@@ -76,6 +75,7 @@ export default class QuizApp extends React.Component {
 
 
             socket.on('resetDriver', (data) => {
+                console.log('resetDriver');
                 swal('New Driver', 'Your group now has a new driver.', 'info');
                 if (this.state.groupId != data.groupId) return;
                 this.setState({
@@ -177,21 +177,24 @@ export default class QuizApp extends React.Component {
 
             });
 
-            socket.on('postQuiz', (data) => {
+            socket.on('quizActivated', (data) => {
                 console.log('postQuiz');
                 console.log(data);
+                if (data.active) {
+                    swal('Quiz activated', 'You can pick a driver and start the quiz', 'info');
+                } else {
+                    swal('Quiz de-activated', 'Your answers have been submitted', 'info');
+                }
                 if (!this.state.groupId || data.groupId != this.state.groupId) return;
                 this.setState({
-                    inProgress : false,
-                    complete : true,
-                    active : false
+                    complete : !data.active,
+                    active : data.active,
+                    inProgress : false
                 });
             });
 
-            socket.on('groupChanged', () => {
-                alert('Group changed');
-                window.location.href = window.location.href;
-            });
+
+            
 
             
         }

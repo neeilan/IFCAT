@@ -9862,7 +9862,6 @@ var QuizApp = function (_React$Component) {
             socket.on('groupsUpdated', function (data) {
                 console.log('groupsUpdated');
                 console.log(data);
-                // renderGroups(data.groups);
             });
 
             socket.on('quizData', function (tutorialQuiz) {
@@ -9879,6 +9878,7 @@ var QuizApp = function (_React$Component) {
             });
 
             socket.on('resetDriver', function (data) {
+                console.log('resetDriver');
                 swal('New Driver', 'Your group now has a new driver.', 'info');
                 if (_this2.state.groupId != data.groupId) return;
                 _this2.setState({
@@ -9978,20 +9978,20 @@ var QuizApp = function (_React$Component) {
                 });
             });
 
-            socket.on('postQuiz', function (data) {
+            socket.on('quizActivated', function (data) {
                 console.log('postQuiz');
                 console.log(data);
+                if (data.active) {
+                    swal('Quiz activated', 'You can pick a driver and start the quiz', 'info');
+                } else {
+                    swal('Quiz de-activated', 'Your answers have been submitted', 'info');
+                }
                 if (!_this2.state.groupId || data.groupId != _this2.state.groupId) return;
                 _this2.setState({
-                    inProgress: false,
-                    complete: true,
-                    active: false
+                    complete: !data.active,
+                    active: data.active,
+                    inProgress: false
                 });
-            });
-
-            socket.on('groupChanged', function () {
-                alert('Group changed');
-                window.location.href = window.location.href;
             });
         }
     }, {
