@@ -18,7 +18,11 @@ let QuestionSchema = new mongoose.Schema({
     useLaTeX: Boolean,
     points: Number,
     firstTryBonus: Number,
-    penalty: Number
+    penalty: Number,
+    votes: {
+        up: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+        down: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    }
 }, {
     timestamps: true 
 });

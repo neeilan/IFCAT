@@ -2,7 +2,8 @@ const _ = require('lodash'),
     async = require('async'),
     config = require('../../lib/config'),
     models = require('../../models'),
-    url = require('url');
+    url = require('url'),
+    wilson = require('../../lib/wilson');
 // Retrieve course
 exports.getQuestionByParam = (req, res, next, id) => {
     models.Question.findById(id, (err, question) => {
@@ -16,7 +17,12 @@ exports.getQuestionByParam = (req, res, next, id) => {
 };
 // Retrieve list of questions for quiz
 exports.getQuestions = (req, res) => { 
-    req.quiz.withQuestions().execPopulate().then(function () {
+    req.quiz.withQuestions().execPopulate().then(() => {
+        if (req.query.sort === 'votes') {
+            req.quiz.questions = _.orderBy(req.quiz.questions, question => {
+                return wilson.lowerBound(question.votes.up.length, question.votes.up.length + question.votes.down.length);
+            }, 'desc');
+        }
         res.render('admin/pages/quiz-questions', {
             bodyClass: 'questions',
             title: 'Questions',

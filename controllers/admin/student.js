@@ -3,7 +3,7 @@ const _ = require('lodash'),
     config = require('../../lib/config'),
     csv = require('csv'),
     models = require('../../models');
-
+    
 exports.getStudentByParam = (req, res, next, id) => {
     models.User.findOne({ _id: id, roles: { $in: ['student'] }}, (err, student) => {
         if (err)

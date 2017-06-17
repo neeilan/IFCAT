@@ -7,6 +7,7 @@ let router = require('express').Router(),
 
 // query single objects
 router.param('course', controllers.Course.getCourseByParam);
+router.param('question', controllers.Question.getQuestionByParam);
 router.param('tutorialQuiz', controllers.TutorialQuiz.getTutorialQuizByParam);
 
 // non-authenticated routes
@@ -35,6 +36,7 @@ router.use((req, res, next) => {
 router.get('/logout', controllers.User.logout);
 router.get('/courses', controllers.Student.getCourses);
 router.get('/courses/:course/quizzes', controllers.Student.getQuizzes);
+router.post('/courses/:course/quizzes/:quiz/questions/:question/votes', controllers.Question.addVote);
 router.get('/courses/:course/quizzes/:tutorialQuiz/start', controllers.TutorialQuiz.startQuiz);
 router.get('/file/:id', controllers.File.getFileLinkById);
 
