@@ -24,10 +24,12 @@ exports.getQuestions = (req, res) => {
         res.render(/* TBD */);
     });
 };
-// Add user's vote to question
-exports.addVote = (req, res) => {
+// Update user's vote to question
+exports.updateVote = (req, res) => {
+    req.question.votes.up.pull(req.user._id);
+    req.question.votes.down.pull(req.user._id);
     // req.body.vote = up|down
-    req.question.votes[req.body.vote].addToSet(req.user._id);
+    req.question.votes[req.body.vote].push(req.user._id);
     req.question.save(err => {
         res.json(/* TBD */);
     });
