@@ -67,38 +67,39 @@
     <!-- options -->
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <a href="#options" data-toggle="collapse" data-target="#options">Show/hide additional options</a>
+            <a href="#options" data-toggle="collapse" data-target="#options" data-text="Hide additional options">Show additional options</a>
         </div>
     </div>
+    
     <div id="options" class="collapse">
         <div class="form-group">
             <label class="col-sm-2 control-label">Shuffle choices?</label>
             <div class="col-sm-6">
-                <input type="checkbox" name="shuffleChoices" value="1" class="bootstrap-switch"<%= _.defaultTo(question.shuffleChoices, quiz.shuffleChoices) == 1 ? ' checked' : '' %> >
+                <input type="checkbox" name="shuffleChoices" value="1" class="bootstrap-switch"<%= question.shuffleChoices == 1 ? ' checked' : '' %> >
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-2 control-label">Format using LaTeX?</label>
             <div class="col-sm-6">
-                <input type="checkbox" name="useLaTeX" value="1"  class="bootstrap-switch"<%= _.defaultTo(question.useLaTeX, quiz.useLaTeX) == 1 ? ' checked' : '' %>>
+                <input type="checkbox" name="useLaTeX" value="1"  class="bootstrap-switch"<%= question.useLaTeX == 1 ? ' checked' : '' %>>
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-2 control-label">Points possible</label>
             <div class="col-sm-6">
-                <input type="number" name="points" value="<%= _.defaultTo(question.points, quiz.points) %>" min="0" max="7" class="form-control">
+                <input type="number" name="points" value="<%= question.points %>" min="0" max="7" class="form-control">
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-2 control-label">First-try bonus</label>
             <div class="col-sm-6">
-                <input type="number" name="firstTryBonus" value="<%= _.defaultTo(question.firstTryBonus, quiz.firstTryBonus) %>" min="0" max="7" class="form-control">
+                <input type="number" name="firstTryBonus" value="<%= question.firstTryBonus %>" min="0" max="7" class="form-control">
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-2 control-label">Penalty per attempt</label>
             <div class="col-sm-6">
-                <input type="number" name="penalty" value="<%= _.defaultTo(question.penalty, quiz.penalty) %>" min="0" max="7" class="form-control">
+                <input type="number" name="penalty" value="<%= question.penalty %>" min="0" max="7" class="form-control">
             </div>
         </div>
         <div class="form-group">

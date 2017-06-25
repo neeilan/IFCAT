@@ -5,7 +5,7 @@ const _ = require('lodash'),
     models = require('../../models');
 // Retrieve course
 exports.getQuizByParam = (req, res, next, id) => {
-    models.Quiz.findById(id, (err, quiz) => {
+    models.Quiz.findById(id).exec((err, quiz) => {
         if (err)
             return next(err);
         if (!quiz)
@@ -26,14 +26,13 @@ exports.getQuizzes = (req, res) => {
 };
 // Retrieve quiz form
 exports.getQuiz = (req, res) => {
-    var quiz = req.quiz || new models.Quiz();
+    let quiz = req.quiz || new models.Quiz();
     req.course.withTutorials().execPopulate().then(() => {
-        models.TutorialQuiz.find({ quiz: quiz.id }, (err, tutorialQuizzes) => {
-            quiz.tutorials = _.map(tutorialQuizzes, tutorialQuiz => tutorialQuiz.tutorial.toString());
+        quiz.populate('tutorialQuizzes').execPopulate().then(() => {
             res.render('admin/pages/course-quiz', {
                 bodyClass: 'quiz',
                 title: quiz.isNew ? 'Add New Quiz' : 'Edit Quiz',
-                course: req.course, 
+                course: req.course,
                 quiz: quiz
             });
         });
@@ -43,13 +42,10 @@ exports.getQuiz = (req, res) => {
 exports.addQuiz = (req, res) => {
     var quiz = new models.Quiz();
     async.series([
-        function add(done) {
-            quiz.store(req.body, done);
-        },
-        function addIntoCourse(done) {
-            req.course.update({ $push: { quizzes: quiz.id }}, done);
-        }
-    ], function (err) {
+        done => quiz.set(req.body).save(done),
+        done => req.course.update({ $push: { quizzes: quiz._id }}, done),
+        done => quiz.linkTutorials(req.body.tutorials, done)
+    ], err => {
         if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
@@ -59,7 +55,10 @@ exports.addQuiz = (req, res) => {
 };
 // Update quiz
 exports.editQuiz = (req, res) => {
-    req.quiz.store(req.body, err => { 
+    async.series([
+        done => req.quiz.set(req.body).save(done),
+        done => req.quiz.linkTutorials(req.body.tutorials, done)
+    ], err => {
         if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
@@ -71,11 +70,11 @@ exports.editQuiz = (req, res) => {
 exports.copyQuiz = (req, res) => {
     async.waterfall([
         done => {
-            req.quiz.withQuestions().execPopulate().then(function () {
-                async.mapSeries(req.quiz.questions, function (question, done) {
+            req.quiz.withQuestions().execPopulate().then(() => {
+                async.mapSeries(req.quiz.questions, (question, done) => {
                     question._id = mongoose.Types.ObjectId();
                     question.isNew = true;
-                    question.save(function (err) {
+                    question.save(err => {
                         if (err) 
                             return done(err);
                         done(null, question._id);

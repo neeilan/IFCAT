@@ -3,8 +3,7 @@ const _ = require('lodash'),
     models = require('.'),
     mongoose = require('mongoose'),
     url = require('url');
-
-let QuestionSchema = new mongoose.Schema({
+const QuestionSchema = new mongoose.Schema({
     number: { type: String, required: true },
     type: { type: String, enum: ['multiple choice', 'multiple select', 'short answer', 'code tracing'] },
     question: { type: String, required: true },
@@ -19,6 +18,7 @@ let QuestionSchema = new mongoose.Schema({
     points: Number,
     firstTryBonus: Number,
     penalty: Number,
+    creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     votes: {
         up: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
         down: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
@@ -29,7 +29,7 @@ let QuestionSchema = new mongoose.Schema({
 // Delete cascade
 QuestionSchema.pre('remove', function (next) {
     let self = this;
-    async.series([
+    async.parallel([
         done => models.Quiz.update({ questions: { $in: [self._id] }}, { $pull: { questions: self._id }}, done),
         done => models.Response.remove({ question: self._id }, done)
     ], next);

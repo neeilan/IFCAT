@@ -48,6 +48,11 @@ exports.sortQuestions = (req, res) => {
 exports.getQuestion = (req, res) => {
     var question = req.question || new models.Question();
     req.course.withFiles().execPopulate().then(function () {
+        // set default options
+        _.forOwn(req.quiz.default.question, (v, k) => {
+            question[k] = _.defaultTo(question[k], req.quiz.default.question[k]);
+        });
+        
         res.render('admin/pages/quiz-question', {
             bodyClass: 'question',
             title: question.isNew ? 'Add New Question' : 'Edit Question',

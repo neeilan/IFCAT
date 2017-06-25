@@ -1,10 +1,9 @@
 const async = require('async'),
+    config = require('../lib/config'),
     fs = require('fs-extra'),
+    models = require('.'),
     mongoose = require('mongoose');
-var config = require('../lib/config'),
-    models = require('.');
-
-var CourseSchema = new mongoose.Schema({
+const CourseSchema = new mongoose.Schema({
     name: { type: String, required: true },
     code: { type: String, required: true, unique: 1, uppercase: 1 },
     instructors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -16,6 +15,7 @@ var CourseSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
 // Delete cascade
 CourseSchema.pre('remove', function (next) {
     let self = this, path = `${config.uploadPath}/${self.id}`;
@@ -85,8 +85,8 @@ CourseSchema.methods.withStudents = function () {
     });
 };
 // Populate tutorials
-CourseSchema.methods.withTutorials = function (deep) {
-    var obj = {
+CourseSchema.methods.withTutorials = function (deep = false) {
+    let obj = {
         path: 'tutorials',
         options: {
             sort: { number: 1 }

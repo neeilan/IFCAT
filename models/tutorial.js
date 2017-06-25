@@ -1,16 +1,22 @@
-var _ = require('lodash'),
+const _ = require('lodash'),
     async = require('async'),
+    models = require('.'),
     mongoose = require('mongoose');
 
-var models = require('.');
-
-var TutorialSchema = new mongoose.Schema({
+const TutorialSchema = new mongoose.Schema({
     number: { type: String, required: true },
     teachingAssistants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, {
     timestamps: true
 });
+
+TutorialSchema.virtual('tutorialQuizzes', {
+    ref: 'TutorialQuiz',
+    localField: '_id',
+    foreignField: 'tutorial'
+});
+
 // Delete cascade
 TutorialSchema.pre('remove', function (next) {
     var self = this;
