@@ -25,7 +25,7 @@
         <div class="col-sm-10">
             <select name="tutorials[]" multiple class="form-control">
             <% _.each(course.tutorials, tutorial => { %>
-                <option value="<%= tutorial._id %>"<%= quiz.isNew || quiz.isLinkedTo(tutorial._id) ? ' selected' : '' %>>TUT <%= tutorial.number %></option> 
+                <option value="<%= tutorial._id %>"<%= quiz.isNew || quiz.isLinkedTo(tutorial) ? ' selected' : '' %>>TUT <%= tutorial.number %></option> 
             <% }) %>
             </select>
             <p class="help-block"><span class="glyphicon glyphicon-info-sign"></span> Tip: Hold down Ctrl or Command key while clicking to select more than one option.</p>
@@ -33,16 +33,16 @@
     </div>
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">Student choice</label>
+        <label class="col-sm-2 control-label">Enable student choice?</label>
         <div class="col-sm-10">
             <input type="checkbox" name="studentChoice" value="1" class="bootstrap-switch"<%= quiz.studentChoice ? ' checked' : '' %>>
         </div>
     </div>
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">Votable</label>
+        <label class="col-sm-2 control-label">Enable voting?</label>
         <div class="col-sm-10">
-            <input type="checkbox" name="votable" value="1" class="bootstrap-switch"<%= quiz.votable ? ' checked' : '' %>>
+            <input type="checkbox" name="studentVoting" value="1" class="bootstrap-switch"<%= quiz.studentVoting ? ' checked' : '' %>>
         </div>
     </div>
 

@@ -15,7 +15,6 @@ const CourseSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-
 // Delete cascade
 CourseSchema.pre('remove', function (next) {
     let self = this, path = `${config.uploadPath}/${self.id}`;

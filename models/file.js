@@ -1,8 +1,7 @@
 const async = require('async'),
     models = require('.'),
     mongoose = require('mongoose');
-
-let FileSchema = new mongoose.Schema({
+const FileSchema = new mongoose.Schema({
     name: { type: String, required: true },
     type: String
 }, {
@@ -10,8 +9,8 @@ let FileSchema = new mongoose.Schema({
 });
 // Delete cascade
 FileSchema.pre('remove', function (next) {
-    var self = this;
-    async.series([
+    let self = this;
+    async.parallel([
         done => models.Course.update({ files: { $in: [self._id] }}, { $pull: { files: self._id }}, done),
         done => models.Question.update({ files: { $in: [self._id] }}, { $pull: { files: self._id }}, { multi: true }, done)
     ], next);

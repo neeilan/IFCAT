@@ -14,8 +14,8 @@ const QuizSchema = new mongoose.Schema({
             penalty: { type : Number, default : 1 }
         }
     },
-    studentChoice: { type: Boolean, default: false },
-    votable: { type: Boolean, default: false }
+    studentChoice: Boolean,
+    studentVoting: Boolean
 }, {
     timestamps: true
 });
@@ -35,8 +35,8 @@ QuizSchema.methods.withQuestions = function () {
     return this.populate({ path: 'questions', options: { sort: { number: 1 }}});
 };
 // 
-QuizSchema.methods.isLinkedTo = function (tutorialId) {
-    return _.some(this.tutorialQuizzes, tutorialQuiz => tutorialQuiz.tutorial.equals(tutorialId));
+QuizSchema.methods.isLinkedTo = function (tutorial) {
+    return _.some(this.tutorialQuizzes, tutorialQuiz => tutorialQuiz.tutorial.equals(tutorial._id));
 }
 // Save quiz
 QuizSchema.methods.linkTutorials = function (tutorials = [], done) {
@@ -51,19 +51,12 @@ QuizSchema.methods.linkTutorials = function (tutorials = [], done) {
             }, done)
         },
         done => {
-            //console.log('deleting', self.tutorialQuizzes)
             models.TutorialQuiz.remove({ _id: { $in: self.tutorialQuizzes }}, done)
         },
         done => {
-            //console.log('adding', tutorials)
             async.eachSeries(tutorials, (tutorial, done) => {
-                models.TutorialQuiz.findOne({ quiz: self._id, tutorial: tutorial }, (err, tutorialQuiz) => {
-                    if (err)
-                        return done(err);
-                    if (tutorialQuiz)
-                        return done();
-                    //console.log('adding', tutorial)
-                    models.TutorialQuiz.create({ quiz: self, tutorial: tutorial }, done);
+                models.TutorialQuiz.create({ tutorial: tutorial, quiz: self }, err => {
+                    done(err && err.code !== 11000 ? err : null);
                 });
             }, done);
         }

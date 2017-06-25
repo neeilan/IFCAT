@@ -6,38 +6,24 @@ const _ = require('lodash'),
 exports.getTutorialQuizzes = (req, res) => {
     let page = parseInt(req.query.page, 10) || 1,
         perPage = parseInt(req.query.perPage, 10) || 10;
+
     let query = { quiz: { $in: req.course.quizzes }};
     if (req.tutorial)
         query = { tutorial: req.tutorial };
-    async.series([
-        done => {
-            models.TutorialQuiz.count(query, done);
-        },
-        done => {
-            models.TutorialQuiz
-                .find(query)
-                .populate('tutorial quiz')
-                .skip((page - 1) * perPage)
-                .limit(perPage)
-                .exec(done);
-        }
-    ], (err, data) => {
-        let pages = _.range(1, _.ceil(data[0] / perPage) + 1);
+
+    models.TutorialQuiz.findAndCount(query, {
+        page: page,
+        perPage: perPage
+    }, (err, tutorialQuizzes, count, pages) => {
         res.render('admin/pages/tutorial-quizzes', {
             bodyClass: 'tutorial-quizzes',
             title: 'Conduct Quizzes',
             course: req.course,
             tutorial: req.tutorial,
-            tutorialQuizzes: data[1].sort((a, b) => {
-                var m = a.quiz.name.toLowerCase(),
-                    n = b.quiz.name.toLowerCase(),
-                    s = a.tutorial.number.toLowerCase(),
-                    t = b.tutorial.number.toLowerCase();
-                return m.localeCompare(n) || s.localeCompare(t);
-            }),
+            tutorialQuizzes: tutorialQuizzes,
             pagination: {
                 page: page,
-                pages: _.filter(pages, p => p >= page - 2 && p <= page + 2),
+                pages: pages,
                 perPage: perPage
             }
         });
@@ -88,8 +74,8 @@ exports.getTutorialQuiz = (req, res) => {
 };
 // Publish quiz for tutorial
 exports.editTutorialQuiz = (req, res) => {
-    models.TutorialQuiz.findOneAndUpdate({ 
-        tutorial: req.tutorial, 
+    models.TutorialQuiz.findOneAndUpdate({
+        tutorial: req.tutorial,
         quiz: req.quiz 
     }, { 
         $set: {

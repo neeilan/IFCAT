@@ -1,23 +1,22 @@
-var _ = require('lodash'),
+const _ = require('lodash'),
+    async = require('async'),
+    models = require('.'),
     mongoose = require('mongoose');
-var models = require('.');
-
-var TutorialQuizSchema = new mongoose.Schema({
+const TutorialQuizSchema = new mongoose.Schema({
     tutorial: { type: mongoose.Schema.Types.ObjectId, ref: 'Tutorial' },
     quiz: { type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' },
     groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
-    responses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Response' }],
     // whether members will be unaided in picking their groups, will be automatically placed into groups,
     // or will manually be placed into groups by the admins
     allocateMembers: { 
         type: String, 
-        enum: ['unaided', 'automatically', 'self-selection'], // incorrect!
+        enum: ['unaided', 'automatically', 'self-selection'],
         default: 'automatically'
     },
     // max # of groups OR members per group
     max: {
         groups: { type : Number, default: 4 },
-        membersPerGroup: { type : Number, default: 3 } 
+        membersPerGroup: { type : Number, default: 3 }
     },
     // make quiz visible to students
     published: Boolean,
@@ -26,7 +25,7 @@ var TutorialQuizSchema = new mongoose.Schema({
     // allow students to see their quiz results
     archived: Boolean
 }, {
-    timestamps: true 
+    timestamps: true
 });
 // Set index
 TutorialQuizSchema.index({ tutorial: 1, quiz: 1 }, { unique: true });
@@ -56,30 +55,44 @@ TutorialQuizSchema.methods.withGroups = function () {
         }]
     });
 };
-// Populate responses
-TutorialQuizSchema.methods.withResponses = function () {
-    return this.populate({
-        path: 'responses',
-        model: models.Response,
-        populate: [{
-            path: 'group',
-            model: models.Group
-        }, {
-            path: 'question',
-            models: models.Question
-        }]
+
+TutorialQuizSchema.statics.findAndCount = function (conditions, options, done) {
+    let self = this;
+    async.series([
+        done => {
+            self.aggregate([{
+                $match: conditions
+            }, {
+                $lookup: { from: 'quizzes', localField: 'quiz', foreignField: '_id', as: 'quiz' }
+            }, {
+                $unwind: '$quiz'
+            }, {
+                $lookup: { from: 'tutorials', localField: 'tutorial', foreignField: '_id', as: 'tutorial' }
+            }, {
+                $unwind: '$tutorial'
+            }, {
+                $project: { quiz: 1, tutorial: 1, published: 1, active: 1, archived: 1 }
+            }, {
+                $sort: { 'quiz.name': 1, 'tutorial.number': 1 }
+            }, {
+                $skip: (options.page - 1) * options.perPage
+            }, {
+                $limit: options.perPage
+            }], done);
+        },
+        done => {
+            self.count(conditions, done);
+        }
+    ], (err, data) => {
+        if (err)
+            return done(err);
+        // build pages
+        let pages = [], p, q;
+        for (p = 1, q = _.ceil(data[1] / options.perPage) + 1; p < q; p++)
+            if (p >= options.page - 2 && p <= options.page + 2)
+                pages.push(p);
+        done(null, ...data, pages);
     });
-};
-// Save tutorial-quiz
-TutorialQuizSchema.methods.store = function (obj, callback) {
-    this.allocateMembers = obj.allocateMembers;
-    this.max = {};
-    this.max[obj.max.key] = obj.max.value;
-    return this.save(callback);
-};
-// Find quizzes within tutorial
-TutorialQuizSchema.statics.findQuizzesByTutorial = function (tutorial) {
-    return this.find({ tutorial: tutorial }).populate('tutorial quiz');
 };
 
 module.exports = mongoose.model('TutorialQuiz', TutorialQuizSchema);

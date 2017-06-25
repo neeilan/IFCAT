@@ -2,8 +2,7 @@ const _ = require('lodash'),
     async = require('async'),
     models = require('.'),
     mongoose = require('mongoose');
-
-let GroupSchema = new mongoose.Schema({
+const GroupSchema = new mongoose.Schema({
     name: { type: String, required: true },
     members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     driver: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -12,8 +11,8 @@ let GroupSchema = new mongoose.Schema({
 });
 // Delete cascade
 GroupSchema.pre('remove', function (next) {
-    var self = this;
-    async.series([
+    let self = this;
+    async.parallel([
         done => models.TutorialQuiz.update({ groups: { $in: [self._id] }}, { $pull: { groups: self._id }}, done)
     ], next);
 });

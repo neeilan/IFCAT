@@ -2,7 +2,6 @@ const _ = require('lodash'),
     async = require('async'),
     models = require('.'),
     mongoose = require('mongoose');
-
 const TutorialSchema = new mongoose.Schema({
     number: { type: String, required: true },
     teachingAssistants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
@@ -10,29 +9,14 @@ const TutorialSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-
-TutorialSchema.virtual('tutorialQuizzes', {
-    ref: 'TutorialQuiz',
-    localField: '_id',
-    foreignField: 'tutorial'
-});
-
+// Populate tutorial-quizzes
+TutorialSchema.virtual('tutorialQuizzes', { ref: 'TutorialQuiz', localField: '_id', foreignField: 'tutorial' });
 // Delete cascade
 TutorialSchema.pre('remove', function (next) {
-    var self = this;
+    let self = this;
     async.parallel([
-        function deleteFromCourse(done) {
-            models.Course.update({ 
-                tutorials: { $in: [self._id] }
-            }, { 
-                $pull: { tutorials: self._id }
-            }, { 
-                multi: true 
-            }).exec(done);
-        },
-        function deleteTutorialQuiz(done) {
-            models.TutorialQuiz.remove({ tutorial: self._id }).exec(done);
-        }
+        done => models.Course.update({ tutorials: { $in: [self._id] }}, { $pull: { tutorials: self._id }}, { multi: true }, done),
+        done => models.TutorialQuiz.remove({ tutorial: self._id }, done)
     ], next);
 });
 // Populate students

@@ -22,9 +22,11 @@
         <li class="next"><a href="<% url %>?page=<%= _.last(pagination.pages) %>&perPage=<%= pagination.perPage %>">&raquo;</a></li>
     <% } %>
     </ul>
+    <% if (pagination.perPage) { %>
     <select class="form-control pull-right per-page" onchange="window.location.href='<% url %>?perPage='+this.value">
     <% _.each([5, 10, 25, 50, 100], rows => { %>
         <option value="<%= rows %>"<%= rows == pagination.perPage ? ' selected' : '' %>><%= rows %> per page</option>
     <% }) %>
     </select>
+    <% } %>
 <% } %>
