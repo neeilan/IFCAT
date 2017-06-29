@@ -36,8 +36,8 @@ export default class CodeOutputQuestion extends React.Component
                 <pre className="prettyprint linenums" style={{border:'none'}}>
                     {this.props.question.code}
                 </pre>
+                {this.getOutputLines()}
                 <pre>
-                    {this.getOutputLines()}
                     {this.getInputBox()}
                 </pre>
                 {this.getCheckAnswerButton()}
@@ -49,6 +49,7 @@ export default class CodeOutputQuestion extends React.Component
     {
         var output = this.props.question.output || [];
         this.props.checkInputCb(output.concat([this.state.enteredAnswer]));
+        this.setState({ enteredAnswer : '' });
     }
     
     userInputCb(e)
@@ -101,8 +102,14 @@ export default class CodeOutputQuestion extends React.Component
     
     getOutputLines()
     {
-        if (!this.props.question.output)
+        if (!this.props.question.output || this.props.question.output.length === 0)
             return null;
-        return this.props.question.output.map(line => <span>{line}<br/></span>);
+        return (<pre> 
+            { this.props.question.output.map((line, i) => (
+                <span>
+                    {line}
+                    { i === this.props.question.output.length - 1 ? null : <br/>}
+                </span>) )
+            } </pre>);
     }
 }
