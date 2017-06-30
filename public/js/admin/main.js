@@ -49,6 +49,14 @@ $(function () {
         size: 'small'
     });
 
+    // $('.collapse').on('hidden.bs.collapse shown.bs.collapse', function (e) {
+    //     console.log(e);
+    //     var link = $('a[data-target="#' + this.id + '"]'),
+    //         text = link.text(), 
+    //         dataText = link.data('text');
+    //     link.text(dataText).attr('data-text', text);
+    // });
+
     // save last opened tab
     $('a[data-toggle=tab]').on('shown.bs.tab', function () {
         localStorage.setItem('tab-open', $(this).attr('href'));

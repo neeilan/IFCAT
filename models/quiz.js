@@ -46,7 +46,7 @@ QuizSchema.methods.linkTutorials = function (tutorials = [], done) {
             self.populate({
                 path: 'tutorialQuizzes',
                 match: {
-                    tutorial: { $nin: tutorials }
+                    tutorial: { $nin: tutorials } // TODO: prevent started TQs
                 }
             }, done)
         },

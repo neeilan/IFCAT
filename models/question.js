@@ -13,6 +13,7 @@ const QuestionSchema = new mongoose.Schema({
     files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
     links: [String],
     caseSensitive: Boolean,
+    maxAttemptsPerLine: { type: Number, default: 1 },
     shuffleChoices: Boolean,
     useLaTeX: Boolean,
     points: Number,
@@ -25,6 +26,10 @@ const QuestionSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true 
+});
+// Get total number of votes
+QuestionSchema.virtual('votes.length').get(function () {
+    return this.votes.up.length + this.votes.down.length;
 });
 // Delete cascade
 QuestionSchema.pre('remove', function (next) {
@@ -124,6 +129,7 @@ QuestionSchema.methods.store = function (obj) {
     } else if (this.isCodeTracing()) {
         self.code = _.trim(obj.code);
         self.answers = obj.answers.split("\n");
+        self.maxAttemptsPerLine = obj.maxAttemptsPerLine;
     }
     return self;
 };
