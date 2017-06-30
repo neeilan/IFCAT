@@ -5,7 +5,6 @@ import PostQuiz from './PostQuiz.jsx'
 import GroupBuilder from './GroupBuilder.jsx'
 import GroupSelect from './GroupSelect.jsx'
 import ScoreBar from './ScoreBar.jsx'
-import StarScore from './StarScore.jsx'
 import EmptyLine from './EmptyLine.jsx'
 
 import enums from '../enums'
@@ -21,7 +20,6 @@ export default class QuizApp extends React.Component {
             this.submitChoiceCb = this.submitChoiceCb.bind(this);
             this.selectQuestionCb = this.selectQuestionCb.bind(this);
             this.createGroupCb = this.createGroupCb.bind(this);
-            this.calculateStars = this.calculateStars.bind(this);
 
             this.state = {
                 score: 0,
@@ -137,11 +135,6 @@ export default class QuizApp extends React.Component {
                     swal("Yikes!", "Question " + question.number + " was answered incorrectly!", "error");
                 }
 
-                // Stars
-                var scoreData = this.calculateStars(question);
-                responsesStore[data.response.question].fullStars = scoreData.fullStars;
-                responsesStore[data.response.question].emptyStars = scoreData.emptyStars;
-
                 this.setState({responses: responsesStore, quiz: this.state.quiz});
             })
 
@@ -206,24 +199,7 @@ export default class QuizApp extends React.Component {
             this.socket.emit(eventName, data);
         }
 
-        calculateStars() {
-            if (!this.state.selectedQuestion) return {fullStars : 0, emptyStars : 0};
-            var question = this.state.selectedQuestion;
-            var result = {};
-            var responses = this.state.responses;
-            var maxScore = question.points + question.firstTryBonus;
 
-            if (question._id in responses) {
-                result.correct = responses[question._id].correct;
-                var emptyStars = (responses[question._id].attempts == 0) ? 0 : responses[question._id].attempts * question.penalty + question.firstTryBonus;
-                result.emptyStars = emptyStars > maxScore ? maxScore : emptyStars;
-                result.fullStars = maxScore - emptyStars > 0 ? (maxScore - emptyStars) : 0;
-            } else {
-                result.emptyStars = 0;
-                result.fullStars = maxScore;
-            }
-            return result;
-        }
 
         selectQuestion(i) {
             this.setState({selectedQuestion : i});
@@ -295,20 +271,17 @@ export default class QuizApp extends React.Component {
             }
 
             render() {
-                var scoreIndicator = this.state.inProgress ? < span > Score : {this.state.score} < /span> : null;
-                var starScore = this.state.inProgress ? < StarScore full = {this.calculateStars().fullStars} empty = {this.calculateStars().emptyStars} /> : null;
-                var preQuiz = this.state.inProgress ? null : < PreQuiz setDriverCb = {this.setDriverCb} groupName = {this.state.groupName} />;
+                var scoreIndicator = this.state.inProgress ? <span> Quiz: {this.state.score} </span> : null;
+                var preQuiz = this.state.inProgress ? null : <PreQuiz setDriverCb = {this.setDriverCb} groupName = {this.state.groupName} />;
                 var scoreBar = this.state.inProgress ? this.getScoreBar() : null;
                 var question = this.state.inProgress ? this.getCurrentQuestion() : null;
                 var postQuiz = this.state.inProgress ? null : this.getPostQuiz();
                 var groupBuilder = this.state.inProgress ? null : this.getGroupBuilder();
 
-                return (<div> 
-                    {scoreIndicator} 
-                    {starScore} 
+                return (<div className="row col-xs-12 col-md-10 col-md-offset-1"> 
                     {preQuiz} 
                     {groupBuilder} 
-                    {scoreBar} 
+                    {scoreBar}
                     {question} 
                     {postQuiz}
                 </div>);
