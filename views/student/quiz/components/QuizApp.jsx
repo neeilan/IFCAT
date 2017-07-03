@@ -186,6 +186,14 @@ export default class QuizApp extends React.Component {
                 });
             });
 
+            socket.on('SYNC_RESPONSE', (data) => {
+                console.log('sync response');
+                console.log(data);
+                var responses = this.state.responses;
+                responses[data.questionId] = data.response;
+                this.setState({responses: responses});
+            })
+
 
             
 
@@ -308,8 +316,13 @@ export default class QuizApp extends React.Component {
                 alert('Awarded point to ' + id);
             }
 
-            submitChoiceCb(answer) {
-                this.emit(enums.eventNames.attemptAnswer, { answer : answer } );
+            submitChoiceCb(answer, isCodeTracingQuestion) {
+                if (isCodeTracingQuestion) {
+                    this.emit('CODE_TRACING_ANSWER_ATTEMPT', { answer: answer });
+                }
+                else {
+                    this.emit(enums.eventNames.attemptAnswer, { answer : answer } );
+                }
             }
 
             selectQuestionCb(question) {

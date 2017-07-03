@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "/js";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 192);
+/******/ 	return __webpack_require__(__webpack_require__.s = 193);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -794,7 +794,7 @@ module.exports = ExecutionEnvironment;
 
 var _prodInvariant = __webpack_require__(18);
 
-var ReactCurrentOwner = __webpack_require__(11);
+var ReactCurrentOwner = __webpack_require__(12);
 
 var invariant = __webpack_require__(1);
 var warning = __webpack_require__(2);
@@ -1193,6 +1193,16 @@ module.exports = emptyFunction;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+module.exports = __webpack_require__(21);
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /* WEBPACK VAR INJECTION */(function(process) {/**
  * Copyright 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -1446,7 +1456,7 @@ module.exports = ReactUpdates;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1480,16 +1490,6 @@ var ReactCurrentOwner = {
 };
 
 module.exports = ReactCurrentOwner;
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = __webpack_require__(21);
-
 
 /***/ }),
 /* 13 */
@@ -2144,7 +2144,7 @@ module.exports = PooledClass;
 
 var _assign = __webpack_require__(4);
 
-var ReactCurrentOwner = __webpack_require__(11);
+var ReactCurrentOwner = __webpack_require__(12);
 
 var warning = __webpack_require__(2);
 var canDefineProperty = __webpack_require__(33);
@@ -4770,20 +4770,20 @@ var CodeOutputQuestion = function (_React$Component) {
                     { className: 'prettyprint linenums', style: { border: 'none' } },
                     this.props.question.code
                 ),
-                React.createElement(
-                    'pre',
-                    null,
-                    this.getOutputLines(),
-                    this.getInputBox()
-                ),
+                this.getOutputLines(),
+                this.getInputBox(),
                 this.getCheckAnswerButton()
             );
         }
     }, {
         key: 'checkUserInput',
         value: function checkUserInput() {
-            var output = this.props.question.output || [];
-            this.props.checkInputCb(output.concat([this.state.enteredAnswer]));
+            var existingOutput = [];
+            if (this.props.response && this.props.response.codeTracingAnswers) {
+                existingOutput = this.props.response.codeTracingAnswers;
+            }
+            this.props.checkInputCb(existingOutput.concat([this.state.enteredAnswer]), true);
+            this.setState({ enteredAnswer: '' });
         }
     }, {
         key: 'userInputCb',
@@ -4793,8 +4793,10 @@ var CodeOutputQuestion = function (_React$Component) {
     }, {
         key: 'userInputsShouldRender',
         value: function userInputsShouldRender() {
+            // if (this.props.response) {
+            //     return !this.props.response.correct;
+            // }
             return true;
-            //  return (this.state.correctOutputLines < this.props.question.output.length)
         }
     }, {
         key: 'getCheckAnswerButton',
@@ -4816,31 +4818,47 @@ var CodeOutputQuestion = function (_React$Component) {
         value: function getInputBox() {
             if (!this.userInputsShouldRender()) return null;
 
-            return React.createElement('input', {
-                value: this.state.enteredAnswer,
-                onChange: this.userInputCb,
-                placeholder: 'Enter the next line of output',
-                type: 'text',
-                style: {
-                    width: '100%',
-                    border: 'none',
-                    padding: '5px',
-                    background: 'none'
-                }
-            });
+            return React.createElement(
+                'pre',
+                null,
+                React.createElement('input', {
+                    value: this.state.enteredAnswer,
+                    onChange: this.userInputCb,
+                    placeholder: 'Enter the next line of output',
+                    type: 'text',
+                    style: {
+                        width: '100%',
+                        border: 'none',
+                        padding: '5px',
+                        background: 'none'
+                    }
+                })
+            );
         }
     }, {
         key: 'getOutputLines',
         value: function getOutputLines() {
-            if (!this.props.question.output) return null;
-            return this.props.question.output.map(function (line) {
-                return React.createElement(
-                    'span',
-                    null,
-                    line,
-                    React.createElement('br', null)
-                );
-            });
+            var _this2 = this;
+
+            if (!this.props.response || !this.props.response.codeTracingAnswers || this.props.response.codeTracingAnswers.length == 0) return null;
+            return React.createElement(
+                'pre',
+                null,
+                this.props.response.codeTracingAnswers.map(function (line, i) {
+                    return React.createElement(
+                        'span',
+                        null,
+                        line,
+                        React.createElement(
+                            'span',
+                            { style: { float: 'right' } },
+                            ' (' + _this2.props.response.lineByLineSummary[i].attempts + ' attempt' + (_this2.props.response.lineByLineSummary[i].attempts > 1 ? 's' : '') + ')'
+                        ),
+                        i === _this2.props.response.codeTracingAnswers.length - 1 ? null : React.createElement('br', null)
+                    );
+                }),
+                ' '
+            );
         }
     }]);
 
@@ -5771,10 +5789,10 @@ module.exports = ReactErrorUtils;
 
 var _prodInvariant = __webpack_require__(3);
 
-var ReactCurrentOwner = __webpack_require__(11);
+var ReactCurrentOwner = __webpack_require__(12);
 var ReactInstanceMap = __webpack_require__(25);
 var ReactInstrumentation = __webpack_require__(8);
-var ReactUpdates = __webpack_require__(10);
+var ReactUpdates = __webpack_require__(11);
 
 var invariant = __webpack_require__(1);
 var warning = __webpack_require__(2);
@@ -7675,7 +7693,7 @@ var _assign = __webpack_require__(4);
 
 var LinkedValueUtils = __webpack_require__(41);
 var ReactDOMComponentTree = __webpack_require__(5);
-var ReactUpdates = __webpack_require__(10);
+var ReactUpdates = __webpack_require__(11);
 
 var warning = __webpack_require__(2);
 
@@ -8148,7 +8166,7 @@ var DOMLazyTree = __webpack_require__(19);
 var DOMProperty = __webpack_require__(15);
 var React = __webpack_require__(21);
 var ReactBrowserEventEmitter = __webpack_require__(28);
-var ReactCurrentOwner = __webpack_require__(11);
+var ReactCurrentOwner = __webpack_require__(12);
 var ReactDOMComponentTree = __webpack_require__(5);
 var ReactDOMContainerInfo = __webpack_require__(117);
 var ReactDOMFeatureFlags = __webpack_require__(119);
@@ -8158,7 +8176,7 @@ var ReactInstrumentation = __webpack_require__(8);
 var ReactMarkupChecksum = __webpack_require__(139);
 var ReactReconciler = __webpack_require__(20);
 var ReactUpdateQueue = __webpack_require__(44);
-var ReactUpdates = __webpack_require__(10);
+var ReactUpdates = __webpack_require__(11);
 
 var emptyObject = __webpack_require__(22);
 var instantiateReactComponent = __webpack_require__(76);
@@ -9209,7 +9227,7 @@ module.exports = setTextContent;
 
 var _prodInvariant = __webpack_require__(3);
 
-var ReactCurrentOwner = __webpack_require__(11);
+var ReactCurrentOwner = __webpack_require__(12);
 var REACT_ELEMENT_TYPE = __webpack_require__(133);
 
 var getIteratorFn = __webpack_require__(167);
@@ -9421,7 +9439,7 @@ module.exports = REACT_ELEMENT_TYPE;
 
 
 
-var ReactCurrentOwner = __webpack_require__(11);
+var ReactCurrentOwner = __webpack_require__(12);
 var ReactComponentTreeHook = __webpack_require__(7);
 var ReactElement = __webpack_require__(17);
 
@@ -9784,10 +9802,6 @@ var _ScoreBar = __webpack_require__(190);
 
 var _ScoreBar2 = _interopRequireDefault(_ScoreBar);
 
-var _StarScore = __webpack_require__(191);
-
-var _StarScore2 = _interopRequireDefault(_StarScore);
-
 var _EmptyLine = __webpack_require__(34);
 
 var _EmptyLine2 = _interopRequireDefault(_EmptyLine);
@@ -9796,7 +9810,7 @@ var _enums = __webpack_require__(14);
 
 var _enums2 = _interopRequireDefault(_enums);
 
-var _react = __webpack_require__(12);
+var _react = __webpack_require__(10);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -9821,7 +9835,6 @@ var QuizApp = function (_React$Component) {
         _this.submitChoiceCb = _this.submitChoiceCb.bind(_this);
         _this.selectQuestionCb = _this.selectQuestionCb.bind(_this);
         _this.createGroupCb = _this.createGroupCb.bind(_this);
-        _this.calculateStars = _this.calculateStars.bind(_this);
 
         _this.state = {
             score: 0,
@@ -9939,11 +9952,6 @@ var QuizApp = function (_React$Component) {
                     swal("Yikes!", "Question " + question.number + " was answered incorrectly!", "error");
                 }
 
-                // Stars
-                var scoreData = _this2.calculateStars(question);
-                responsesStore[data.response.question].fullStars = scoreData.fullStars;
-                responsesStore[data.response.question].emptyStars = scoreData.emptyStars;
-
                 _this2.setState({ responses: responsesStore, quiz: _this2.state.quiz });
             });
 
@@ -9993,6 +10001,14 @@ var QuizApp = function (_React$Component) {
                     inProgress: false
                 });
             });
+
+            socket.on('SYNC_RESPONSE', function (data) {
+                console.log('sync response');
+                console.log(data);
+                var responses = _this2.state.responses;
+                responses[data.questionId] = data.response;
+                _this2.setState({ responses: responses });
+            });
         }
     }, {
         key: 'emit',
@@ -10001,26 +10017,6 @@ var QuizApp = function (_React$Component) {
             data.groupId = this.state.groupId;
             console.log(data);
             this.socket.emit(eventName, data);
-        }
-    }, {
-        key: 'calculateStars',
-        value: function calculateStars() {
-            if (!this.state.selectedQuestion) return { fullStars: 0, emptyStars: 0 };
-            var question = this.state.selectedQuestion;
-            var result = {};
-            var responses = this.state.responses;
-            var maxScore = question.points + question.firstTryBonus;
-
-            if (question._id in responses) {
-                result.correct = responses[question._id].correct;
-                var emptyStars = responses[question._id].attempts == 0 ? 0 : responses[question._id].attempts * question.penalty + question.firstTryBonus;
-                result.emptyStars = emptyStars > maxScore ? maxScore : emptyStars;
-                result.fullStars = maxScore - emptyStars > 0 ? maxScore - emptyStars : 0;
-            } else {
-                result.emptyStars = 0;
-                result.fullStars = maxScore;
-            }
-            return result;
         }
     }, {
         key: 'selectQuestion',
@@ -10092,11 +10088,10 @@ var QuizApp = function (_React$Component) {
             var scoreIndicator = this.state.inProgress ? _react2.default.createElement(
                 'span',
                 null,
-                ' Score : ',
+                ' Quiz: ',
                 this.state.score,
                 ' '
             ) : null;
-            var starScore = this.state.inProgress ? _react2.default.createElement(_StarScore2.default, { full: this.calculateStars().fullStars, empty: this.calculateStars().emptyStars }) : null;
             var preQuiz = this.state.inProgress ? null : _react2.default.createElement(_PreQuiz2.default, { setDriverCb: this.setDriverCb, groupName: this.state.groupName });
             var scoreBar = this.state.inProgress ? this.getScoreBar() : null;
             var question = this.state.inProgress ? this.getCurrentQuestion() : null;
@@ -10105,9 +10100,7 @@ var QuizApp = function (_React$Component) {
 
             return _react2.default.createElement(
                 'div',
-                null,
-                scoreIndicator,
-                starScore,
+                { className: 'row col-xs-12 col-md-10 col-md-offset-1' },
                 preQuiz,
                 groupBuilder,
                 scoreBar,
@@ -10139,8 +10132,12 @@ var QuizApp = function (_React$Component) {
         }
     }, {
         key: 'submitChoiceCb',
-        value: function submitChoiceCb(answer) {
-            this.emit(_enums2.default.eventNames.attemptAnswer, { answer: answer });
+        value: function submitChoiceCb(answer, isCodeTracingQuestion) {
+            if (isCodeTracingQuestion) {
+                this.emit('CODE_TRACING_ANSWER_ATTEMPT', { answer: answer });
+            } else {
+                this.emit(_enums2.default.eventNames.attemptAnswer, { answer: answer });
+            }
         }
     }, {
         key: 'selectQuestionCb',
@@ -12218,7 +12215,7 @@ var EventPluginHub = __webpack_require__(23);
 var EventPropagators = __webpack_require__(24);
 var ExecutionEnvironment = __webpack_require__(6);
 var ReactDOMComponentTree = __webpack_require__(5);
-var ReactUpdates = __webpack_require__(10);
+var ReactUpdates = __webpack_require__(11);
 var SyntheticEvent = __webpack_require__(13);
 
 var getEventTarget = __webpack_require__(48);
@@ -13296,7 +13293,7 @@ var _prodInvariant = __webpack_require__(3),
 
 var React = __webpack_require__(21);
 var ReactComponentEnvironment = __webpack_require__(42);
-var ReactCurrentOwner = __webpack_require__(11);
+var ReactCurrentOwner = __webpack_require__(12);
 var ReactErrorUtils = __webpack_require__(43);
 var ReactInstanceMap = __webpack_require__(25);
 var ReactInstrumentation = __webpack_require__(8);
@@ -14205,7 +14202,7 @@ var ReactDOMComponentTree = __webpack_require__(5);
 var ReactDefaultInjection = __webpack_require__(132);
 var ReactMount = __webpack_require__(68);
 var ReactReconciler = __webpack_require__(20);
-var ReactUpdates = __webpack_require__(10);
+var ReactUpdates = __webpack_require__(11);
 var ReactVersion = __webpack_require__(147);
 
 var findDOMNode = __webpack_require__(164);
@@ -15496,7 +15493,7 @@ var _prodInvariant = __webpack_require__(3),
 var DOMPropertyOperations = __webpack_require__(61);
 var LinkedValueUtils = __webpack_require__(41);
 var ReactDOMComponentTree = __webpack_require__(5);
-var ReactUpdates = __webpack_require__(10);
+var ReactUpdates = __webpack_require__(11);
 
 var invariant = __webpack_require__(1);
 var warning = __webpack_require__(2);
@@ -16450,7 +16447,7 @@ var _prodInvariant = __webpack_require__(3),
 
 var LinkedValueUtils = __webpack_require__(41);
 var ReactDOMComponentTree = __webpack_require__(5);
-var ReactUpdates = __webpack_require__(10);
+var ReactUpdates = __webpack_require__(11);
 
 var invariant = __webpack_require__(1);
 var warning = __webpack_require__(2);
@@ -17238,7 +17235,7 @@ module.exports = ReactDebugTool;
 
 var _assign = __webpack_require__(4);
 
-var ReactUpdates = __webpack_require__(10);
+var ReactUpdates = __webpack_require__(11);
 var Transaction = __webpack_require__(30);
 
 var emptyFunction = __webpack_require__(9);
@@ -17469,7 +17466,7 @@ var EventListener = __webpack_require__(54);
 var ExecutionEnvironment = __webpack_require__(6);
 var PooledClass = __webpack_require__(16);
 var ReactDOMComponentTree = __webpack_require__(5);
-var ReactUpdates = __webpack_require__(10);
+var ReactUpdates = __webpack_require__(11);
 
 var getEventTarget = __webpack_require__(48);
 var getUnboundedScrollPosition = __webpack_require__(92);
@@ -17669,7 +17666,7 @@ var ReactComponentEnvironment = __webpack_require__(42);
 var ReactEmptyComponent = __webpack_require__(64);
 var ReactBrowserEventEmitter = __webpack_require__(28);
 var ReactHostComponent = __webpack_require__(66);
-var ReactUpdates = __webpack_require__(10);
+var ReactUpdates = __webpack_require__(11);
 
 var ReactInjection = {
   Component: ReactComponentEnvironment.injection,
@@ -17805,7 +17802,7 @@ var ReactComponentEnvironment = __webpack_require__(42);
 var ReactInstanceMap = __webpack_require__(25);
 var ReactInstrumentation = __webpack_require__(8);
 
-var ReactCurrentOwner = __webpack_require__(11);
+var ReactCurrentOwner = __webpack_require__(12);
 var ReactReconciler = __webpack_require__(20);
 var ReactChildReconciler = __webpack_require__(112);
 
@@ -20384,7 +20381,7 @@ module.exports = dangerousStyleValue;
 
 var _prodInvariant = __webpack_require__(3);
 
-var ReactCurrentOwner = __webpack_require__(11);
+var ReactCurrentOwner = __webpack_require__(12);
 var ReactDOMComponentTree = __webpack_require__(5);
 var ReactInstanceMap = __webpack_require__(25);
 
@@ -22480,7 +22477,7 @@ module.exports = onlyChild;
 
 var _prodInvariant = __webpack_require__(18);
 
-var ReactCurrentOwner = __webpack_require__(11);
+var ReactCurrentOwner = __webpack_require__(12);
 var REACT_ELEMENT_TYPE = __webpack_require__(80);
 
 var getIteratorFn = __webpack_require__(83);
@@ -22656,7 +22653,7 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _react = __webpack_require__(12);
+var _react = __webpack_require__(10);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -22744,7 +22741,7 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _react = __webpack_require__(12);
+var _react = __webpack_require__(10);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -22788,7 +22785,7 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _react = __webpack_require__(12);
+var _react = __webpack_require__(10);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -22863,7 +22860,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _react = __webpack_require__(12);
+var _react = __webpack_require__(10);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -22957,7 +22954,7 @@ var _CodeOutputQuestion = __webpack_require__(35);
 
 var _CodeOutputQuestion2 = _interopRequireDefault(_CodeOutputQuestion);
 
-var _react = __webpack_require__(12);
+var _react = __webpack_require__(10);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -22984,7 +22981,8 @@ var Question = function (_React$Component) {
 
 		_this.state = {
 			selectedChoices: [],
-			givenAnswer: null
+			givenAnswer: null,
+			showAttachments: false
 		};
 		return _this;
 	}
@@ -23017,12 +23015,15 @@ var Question = function (_React$Component) {
 
 			return _react2.default.createElement(
 				'div',
-				{ className: 'col-xs-12 col-md-6 text-center' },
+				{ className: 'col-xs-12 col-md-9 text-center' },
+				_react2.default.createElement('br', null),
 				this.props.questionRef.question,
 				_react2.default.createElement(_EmptyLine2.default, null),
-				this.getAnswerArea(),
+				this.getAttachmentBtn(),
 				_react2.default.createElement('br', null),
-				this.getAttachmentArea(),
+				this.getAttachments(),
+				_react2.default.createElement('br', null),
+				this.getAnswerArea(),
 				_react2.default.createElement('br', null),
 				this.getSubmitBtn(),
 				_react2.default.createElement('br', null)
@@ -23034,9 +23035,83 @@ var Question = function (_React$Component) {
 			this.props.submitCb(this.state.givenAnswer || this.state.selectedChoices);
 		}
 	}, {
+		key: 'getAttachmentBtn',
+		value: function getAttachmentBtn() {
+			var _this2 = this;
+
+			if (this.props.questionRef.files && this.props.questionRef.files.length > 0 || this.props.questionRef.links && this.props.questionRef.links.length > 0) return _react2.default.createElement(
+				'span',
+				{ className: 'btn btn-default', onClick: function onClick() {
+						return _this2.setState({ showAttachments: !_this2.state.showAttachments });
+					} },
+				_react2.default.createElement('i', { className: 'fa fa-paperclip', 'aria-hidden': 'true' }),
+				(this.state.showAttachments ? ' Hide' : ' Show') + ' attachments'
+			);
+		}
+	}, {
+		key: 'getAttachments',
+		value: function getAttachments() {
+			if (!this.state.showAttachments) return null;
+			var attachments = [];
+			var url = window.location.href;
+			if (this.props.questionRef.files) {
+				this.props.questionRef.files.forEach(function (file) {
+					var courseId = url.slice(url.indexOf('/courses/') + 9, url.indexOf('/quizzes'));
+					var fileUrl = '/upl/' + courseId + '/' + file.name;
+					if (file.type.includes('image')) {
+						attachments.push(_react2.default.createElement(
+							'div',
+							null,
+							_react2.default.createElement('img', { className: 'attachedImg', src: fileUrl }),
+							_react2.default.createElement('br', null),
+							_react2.default.createElement(
+								'a',
+								{ target: '_blank', href: fileUrl },
+								'Direct link'
+							),
+							_react2.default.createElement('br', null)
+						));
+					} else if (file.type.includes('audio')) {
+						attachments.push(_react2.default.createElement(
+							'div',
+							null,
+							_react2.default.createElement(
+								'audio',
+								{ controls: true },
+								_react2.default.createElement('source', { src: fileUrl, type: file.type })
+							),
+							_react2.default.createElement('br', null),
+							_react2.default.createElement(
+								'a',
+								{ target: '_blank', href: fileUrl },
+								'Direct link'
+							),
+							_react2.default.createElement('br', null)
+						));
+					}
+				});
+			}
+			if (this.props.questionRef.links) {
+				this.props.questionRef.links.forEach(function (link) {
+					attachments.push(_react2.default.createElement(
+						'div',
+						null,
+						_react2.default.createElement('br', null),
+						_react2.default.createElement(
+							'a',
+							{ target: '_blank', href: link },
+							link
+						),
+						_react2.default.createElement('br', null)
+					));
+				});
+			}
+			return attachments;
+		}
+	}, {
 		key: 'getAnswerArea',
 		value: function getAnswerArea() {
-			var _this2 = this;
+			var _this3 = this;
 
 			switch (this.props.questionType) {
 				case enums.questionTypes.shortAnswer:
@@ -23046,7 +23121,7 @@ var Question = function (_React$Component) {
 							style: { padding: '10px' },
 							placeholder: 'Your answer',
 							onChange: function onChange(e) {
-								return _this2.setState({ givenAnswer: e.target.value });
+								return _this3.setState({ givenAnswer: e.target.value });
 							} });
 					}
 				case enums.questionTypes.multipleChoice:
@@ -23055,13 +23130,13 @@ var Question = function (_React$Component) {
 						return this.props.questionRef.choices.map(function (choice, i) {
 							return _react2.default.createElement(
 								'span',
-								{ key: _this2.props.questionRef._id + 'ch' + i },
+								{ key: _this3.props.questionRef._id + 'ch' + i },
 								_react2.default.createElement(
 									'button',
 									{
-										disabled: !!_this2.props.previouslyAnswered || !_this2.props.isDriver,
-										className: 'btn col-xs-10 col-xs-offset-1 ' + (_this2.state.selectedChoices.indexOf(choice) > -1 ? 'btn-primary' : 'btn-default') + ' ',
-										onClick: _this2.toggleChoiceSelection.bind(_this2, choice) },
+										disabled: !!_this3.props.previouslyAnswered || !_this3.props.isDriver,
+										className: 'btn col-xs-10 col-xs-offset-1 ' + (_this3.state.selectedChoices.indexOf(choice) > -1 ? 'btn-primary' : 'btn-default') + ' ',
+										onClick: _this3.toggleChoiceSelection.bind(_this3, choice) },
 									choice
 								),
 								_react2.default.createElement('br', null)
@@ -23074,14 +23149,15 @@ var Question = function (_React$Component) {
 							'span',
 							null,
 							_react2.default.createElement('input', { type: 'text', onChange: function onChange(e) {
-									return _this2.setState({ givenAnswer: e.target.value });
+									return _this3.setState({ givenAnswer: e.target.value });
 								} }),
 							_react2.default.createElement('br', null)
 						);
 					}
 				case enums.questionTypes.codeTracing:
 					{
-						return _react2.default.createElement(_CodeOutputQuestion2.default, { question: this.props.questionRef,
+						return _react2.default.createElement(_CodeOutputQuestion2.default, {
+							question: this.props.questionRef,
 							response: this.props.response,
 							checkInputCb: this.props.submitCb,
 							isDriver: this.props.isDriver });
@@ -23141,13 +23217,17 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _react = __webpack_require__(12);
+var _react = __webpack_require__(10);
 
 var _react2 = _interopRequireDefault(_react);
 
 var _EmptyLine = __webpack_require__(34);
 
 var _EmptyLine2 = _interopRequireDefault(_EmptyLine);
+
+var _StarScore = __webpack_require__(192);
+
+var _StarScore2 = _interopRequireDefault(_StarScore);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23163,10 +23243,33 @@ var ScoreBar = function (_React$Component) {
 	function ScoreBar(props) {
 		_classCallCheck(this, ScoreBar);
 
-		return _possibleConstructorReturn(this, Object.getPrototypeOf(ScoreBar).call(this, props));
+		var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ScoreBar).call(this, props));
+
+		_this.calculateStars = _this.calculateStars.bind(_this);
+
+		return _this;
 	}
 
 	_createClass(ScoreBar, [{
+		key: 'calculateStars',
+		value: function calculateStars(question) {
+			if (!question) return { fullStars: 0, emptyStars: 0 };
+			var result = {};
+			var responses = this.props.responses;
+			var maxScore = question.points + question.firstTryBonus;
+
+			if (question._id in responses) {
+				result.correct = responses[question._id].correct;
+				var emptyStars = responses[question._id].attempts == 0 ? 0 : responses[question._id].attempts * question.penalty + question.firstTryBonus;
+				result.emptyStars = emptyStars > maxScore ? maxScore : emptyStars;
+				result.fullStars = maxScore - emptyStars > 0 ? maxScore - emptyStars : 0;
+			} else {
+				result.emptyStars = 0;
+				result.fullStars = maxScore;
+			}
+			return result;
+		}
+	}, {
 		key: 'render',
 		value: function render() {
 			var _this2 = this;
@@ -23181,17 +23284,19 @@ var ScoreBar = function (_React$Component) {
 					_react2.default.createElement(
 						'button',
 						{
-							className: 'btn btn-default ' + (_this2.props.selectedQuestion && _this2.props.selectedQuestion._id === q._id ? 'btn-primary' : btnClass) + ' ',
+							className: 'btn btn-default col-md-12 col-xs-4 ' + (_this2.props.selectedQuestion && _this2.props.selectedQuestion._id === q._id ? 'btn-primary' : btnClass) + ' ',
 							onClick: _this2.props.selectQuestionCb.bind(_this2, q)
 						},
-						q.number
+						q.number,
+						_react2.default.createElement('br', null),
+						_react2.default.createElement(_StarScore2.default, { full: _this2.calculateStars(q).fullStars, empty: _this2.calculateStars(q).emptyStars })
 					)
 				);
 			});
 
 			return _react2.default.createElement(
 				'div',
-				{ className: 'col-xs-10 col-xs-offset-1 col-md-2' },
+				{ className: 'col-xs-12 col-md-3' },
 				buttons,
 				_react2.default.createElement(_EmptyLine2.default, null)
 			);
@@ -23216,9 +23321,64 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _react = __webpack_require__(12);
+var _react = __webpack_require__(10);
 
 var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Star = function (_React$Component) {
+	_inherits(Star, _React$Component);
+
+	function Star(props) {
+		_classCallCheck(this, Star);
+
+		return _possibleConstructorReturn(this, Object.getPrototypeOf(Star).call(this, props));
+	}
+
+	_createClass(Star, [{
+		key: 'render',
+		value: function render() {
+			var starClass = this.props.full ? 'fa-star' : 'fa-star-o';
+			return _react2.default.createElement(
+				'span',
+				null,
+				_react2.default.createElement('i', { className: "fa " + starClass, 'aria-hidden': 'true' })
+			);
+		}
+	}]);
+
+	return Star;
+}(_react2.default.Component);
+
+exports.default = Star;
+
+/***/ }),
+/* 192 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _react = __webpack_require__(10);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _Star = __webpack_require__(191);
+
+var _Star2 = _interopRequireDefault(_Star);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23240,15 +23400,28 @@ var StarScore = function (_React$Component) {
 	_createClass(StarScore, [{
 		key: 'render',
 		value: function render() {
+			var totalStars = this.props.full + this.props.empty;
+			if (totalStars > 5) {
+				return _react2.default.createElement(
+					'span',
+					null,
+					' ',
+					this.props.full + '/' + totalStars,
+					' '
+				);
+			}
+
 			var stars = [];
 			for (var i = 0; i < this.props.full; i++) {
-				stars.push('F');
+				stars.push(_react2.default.createElement(_Star2.default, { full: true, key: 'fullStar' + i }));
 			}for (var i = 0; i < this.props.empty; i++) {
-				stars.push('E');
+				stars.push(_react2.default.createElement(_Star2.default, { full: false, key: 'emptyStar' + i }));
 			}return _react2.default.createElement(
-				'div',
+				'span',
 				null,
-				stars.join()
+				' ',
+				stars,
+				' '
 			);
 		}
 	}]);
@@ -23259,7 +23432,7 @@ var StarScore = function (_React$Component) {
 exports.default = StarScore;
 
 /***/ }),
-/* 192 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -23273,7 +23446,7 @@ var _CodeOutputQuestion = __webpack_require__(35);
 
 var _CodeOutputQuestion2 = _interopRequireDefault(_CodeOutputQuestion);
 
-var _react = __webpack_require__(12);
+var _react = __webpack_require__(10);
 
 var _react2 = _interopRequireDefault(_react);
 

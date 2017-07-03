@@ -28,27 +28,28 @@ export default class CodeOutputQuestion extends React.Component
         script.src = 'https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(script);
     }    
-    
+
 	render()
-    {              
+    {            
 		return (
 			<div style={{width : '100%', textAlign: 'left'}} >
                 <pre className="prettyprint linenums" style={{border:'none'}}>
                     {this.props.question.code}
                 </pre>
                 {this.getOutputLines()}
-                <pre>
-                    {this.getInputBox()}
-                </pre>
+                {this.getInputBox()}
                 {this.getCheckAnswerButton()}
 			</div>
 		);
-	}    
-    
+	}
+
     checkUserInput()
-    {
-        var output = this.props.question.output || [];
-        this.props.checkInputCb(output.concat([this.state.enteredAnswer]));
+    {   
+        var existingOutput = [];
+        if (this.props.response && this.props.response.codeTracingAnswers) {
+            existingOutput = this.props.response.codeTracingAnswers;
+        }
+        this.props.checkInputCb(existingOutput.concat([this.state.enteredAnswer]), true);
         this.setState({ enteredAnswer : '' });
     }
     
@@ -59,8 +60,10 @@ export default class CodeOutputQuestion extends React.Component
     
     userInputsShouldRender()
     {
+        // if (this.props.response) {
+        //     return !this.props.response.correct;
+        // }
         return true;
-    //  return (this.state.correctOutputLines < this.props.question.output.length)
     }
     
     getCheckAnswerButton()
@@ -84,6 +87,7 @@ export default class CodeOutputQuestion extends React.Component
             return null;  
         
         return (
+            <pre>
             <input 
                 value = {this.state.enteredAnswer}
                 onChange = {this.userInputCb}
@@ -97,18 +101,20 @@ export default class CodeOutputQuestion extends React.Component
                         background : 'none'
                     }
                 }
-            />);
+            />
+            </pre>);
     }
     
     getOutputLines()
     {
-        if (!this.props.question.output || this.props.question.output.length === 0)
+        if (!this.props.response || !this.props.response.codeTracingAnswers || this.props.response.codeTracingAnswers.length == 0)
             return null;
         return (<pre> 
-            { this.props.question.output.map((line, i) => (
+            { this.props.response.codeTracingAnswers.map((line, i) => (
                 <span>
                     {line}
-                    { i === this.props.question.output.length - 1 ? null : <br/>}
+                    <span style={{float:'right'}}>{ ' (' + this.props.response.lineByLineSummary[i].attempts + ' attempt' + (this.props.response.lineByLineSummary[i].attempts > 1 ? 's': '') + ')'}</span>
+                    { i === this.props.response.codeTracingAnswers.length - 1 ? null : <br/>}
                 </span>) )
             } </pre>);
     }

@@ -12,7 +12,8 @@ export default class Question extends React.Component {
 
 		this.state = {
 			selectedChoices: [],
-			givenAnswer: null
+			givenAnswer: null,
+			showAttachments : false
 		}
 	}
 
@@ -43,10 +44,12 @@ export default class Question extends React.Component {
 			<div className="col-xs-12 col-md-9 text-center">
 				<br/>
 				{this.props.questionRef.question}
-				<EmptyLine />
-        		{this.getAnswerArea()}
+				<EmptyLine/>
+				{this.getAttachmentBtn()}
 				<br/>
-				{this.getAttachmentArea()}
+				{this.getAttachments()}
+				<br/>
+        		{this.getAnswerArea()}
 				<br />
 				{this.getSubmitBtn()}
 				<br/>
@@ -55,6 +58,52 @@ export default class Question extends React.Component {
 
 	submitAnswer() {
 		this.props.submitCb(this.state.givenAnswer || this.state.selectedChoices);
+	}
+
+	getAttachmentBtn() {
+		if ((this.props.questionRef.files && this.props.questionRef.files.length > 0) || (this.props.questionRef.links && this.props.questionRef.links.length > 0))
+			return (<span className="btn btn-default" onClick={()=>this.setState({showAttachments : !this.state.showAttachments})}> 
+				<i className="fa fa-paperclip" aria-hidden="true"></i>
+				{(this.state.showAttachments ? ' Hide' : ' Show') + ' attachments'}
+				</span>);
+	}
+
+	getAttachments() {
+		if (!this.state.showAttachments)
+			return null;
+		var attachments = [];
+		var url = window.location.href;
+		if (this.props.questionRef.files)
+		{
+			this.props.questionRef.files.forEach(function(file){
+				var courseId = url.slice(url.indexOf('/courses/') + 9, url.indexOf('/quizzes'));
+				var fileUrl = '/upl/' + courseId + '/' + file.name;
+				if (file.type.includes('image')) {
+					attachments.push(
+						<div>
+							<img className='attachedImg' src={fileUrl} /><br/>
+							<a target='_blank' href={fileUrl}>Direct link</a><br/>
+						</div>
+					);
+				} else if (file.type.includes('audio')){
+					attachments.push(
+						<div>
+							<audio controls>
+								<source src={fileUrl} type={file.type}/>
+							</audio>
+							<br/>
+							<a target='_blank' href={fileUrl}>Direct link</a><br/>
+						</div>
+					);
+				} 
+			})
+		} 
+		if (this.props.questionRef.links) {
+			this.props.questionRef.links.forEach(function(link){
+				attachments.push(<div><br/><a target='_blank' href={link}>{link}</a><br/></div>);
+			})
+		}
+		return attachments;
 	}
 							
 
@@ -92,7 +141,8 @@ export default class Question extends React.Component {
 						);
 					}
 			case (enums.questionTypes.codeTracing) : {
-				return <CodeOutputQuestion question={this.props.questionRef}
+				return <CodeOutputQuestion 
+					question={this.props.questionRef}
 					response={this.props.response} 
 					checkInputCb={this.props.submitCb}
 					isDriver={this.props.isDriver}/>;

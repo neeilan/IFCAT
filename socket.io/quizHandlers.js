@@ -141,23 +141,122 @@ module.exports = function(io){
             emitters.emitToGroup(data.groupId, 'startQuiz', {});
         })
     })
+
+    function buildCodeTracingAnswerSummary(question, existingResponseObject, answer) {
+        existingResponseObject = existingResponseObject || { lineByLineSummary : [] };
+        var lineByLineSummary = [];
+        for (var i = 0; i < answer.length; i++) {
+            var existingAnswer = existingResponseObject.lineByLineSummary[i];
+            if (answer[i].trim() != question.answers[i].trim()) {
+                lineByLineSummary.push({
+                    attempts :  (existingAnswer) ? existingAnswer.attempts + 1 : 1,
+                    correct : false
+                }); 
+                if (lineByLineSummary[i].attempts == question.maxAttemptsPerLine) {
+                    lineByLineSummary[i].correct = true;
+                }   
+            } else {
+                lineByLineSummary.push({
+                    attempts :  existingAnswer ? existingAnswer.attempts + (existingAnswer.correct ? 0 : 1) : 1,
+                    correct : true
+                });
+            }
+        }
+        return lineByLineSummary;
+    }
+            
+    socket.on('CODE_TRACING_ANSWER_ATTEMPT', function(data){
+        models.Question.findById(data.questionId)
+        .exec()
+        .then(function(question) {
+            models.Response.findOne({ group : data.groupId, question: data.questionId })
+            .exec()
+            .then(function(response){
+                console.log('question');
+                console.log(question);
+                console.log('response');
+                console.log(response);
+
+
+
+                var lineByLineSummary = buildCodeTracingAnswerSummary(question, response, data.answer);
+                console.log(lineByLineSummary);
+                var totalAttempts = lineByLineSummary.reduce((pre, curr) => pre.attempts + curr.attempts, {attempts:0});
+                console.log(totalAttempts);
+                var numLinesCorrect = lineByLineSummary.reduce((acc, curr) => (acc + (curr.correct ? 1 : 0)), 0);
+                console.log(numLinesCorrect);
+                var questionComplete = (numLinesCorrect == question.answers.length);
+                console.log(questionComplete);
+                var revealedLines = question.answers.slice(0, numLinesCorrect);
+                console.log(revealedLines);
+
+                var points = 0;
+                lineByLineSummary.forEach(function(line){
+                    if (line.correct) {
+                        points += Math.max(0, question.penalty * (2 - line.attempts));
+                    }
+                })
+                points += (questionComplete && totalAttempts == numLinesCorrect ? question.firstTryBonus : 0);
+                console.log('Points: ' + points);
+
+                if (response) { 
+                    console.log('response 2');
+                    console.log(response);
+                    response.lineByLineSummary = lineByLineSummary;
+                    response.correct = questionComplete;
+                    response.codeTracingAnswers = revealedLines;
+                    console.log('res3')
+                    console.log(response);
+                    response.points = points;
+                    console.log('res4')
+                    console.log(response);
+                    return response.save();                      
+                } else {
+                    // only for first line of input
+                    console.log("new response")
+                    var res = new models.Response();
+                    res.group = data.groupId;
+                    res.question = data.questionId;
+                    res.lineByLineSummary = lineByLineSummary;
+                    res.correct = questionComplete;
+                    res.codeTracingAnswers = revealedLines;
+                    res.points = points;
+                    res.attempts = totalAttempts;
+                    return res.save();  
+                }
+            })
+            .then(function(response) {
+                console.log('saved');
+                console.log(response);
+
+                emitters.emitToGroup(data.groupId, 'SYNC_RESPONSE', {
+                    response: response,
+                    questionId: data.questionId,
+                    groupId : data.groupId
+                })
+
+
+            })
+            .catch(function(err){
+                console.log('err');
+                console.log(err);
+            })
+        })
+
+    });
     
-    socket.on('attemptAnswer', function(data) {
-        console.log('attemptAnswer');
+    socket.on('attemptAnswer', function(data){
         models.Question.findById(data.questionId)
         .exec()
         .then(function(question){
             var answerIsCorrect;
-            var allCodeTracingLinesCorrect = false;
-            var numCorrectLines = 0;
-            var isPartialAnswer = false;
             
             answerIsCorrect = (question.answers.indexOf(data.answer[0]) != -1); // mark
             
             if (question.type == 'multiple select'){
                 answerIsCorrect = false;
                 if (data.answer.length == question.answers.length){
-                     answerIsCorrect = true;
+                    answerIsCorrect = true;
                     data.answer.forEach((ans)=>{ if (question.answers.indexOf(ans)==-1) answerIsCorrect = false; })
                 }
             }
@@ -171,37 +270,18 @@ module.exports = function(io){
                     answerIsCorrect = (question.answers.indexOf(data.answer[0]) > -1);
                 }
             }
-            else if (question.type == 'code tracing') {
-                
-                allCodeTracingLinesCorrect = true;
-                isPartialAnswer = data.answer.length < question.answers.length;
-                for (var i = 0; i < data.answer.length && allCodeTracingLinesCorrect; i++) {
-
-                    if (data.answer[i].trim() != question.answers[i].trim()) {
-                        allCodeTracingLinesCorrect = false;
-                    } else {
-                        numCorrectLines++;
-                    }
-                }
-                answerIsCorrect = allCodeTracingLinesCorrect && !isPartialAnswer;
-                console.log(answerIsCorrect);
-                console.log(allCodeTracingLinesCorrect);
-                console.log(isPartialAnswer);
-            }
             
             models.Response.findOne({ group : data.groupId, question: data.questionId })
             .exec()
             .then(function(response){
-                var answerIsAcceptable = ((answerIsCorrect && question.type != 'code tracing') || allCodeTracingLinesCorrect);
-
                 if (!response){
                     var res = new models.Response();
                     res.group = data.groupId;
                     res.question = data.questionId;
                     res.correct = answerIsCorrect;
-                    res.attempts = answerIsAcceptable ? 0 : 1;
+                    res.attempts = answerIsCorrect ? 0 : 1;
                     res.points = answerIsCorrect ? (question.points + question.firstTryBonus) : 0;
-                    return models.Group.findByIdAndUpdate(data.groupId, {
+                    return models.TutorialQuiz.findByIdAndUpdate(data.quizId, {
                         $push : { responses : res._id }
                     })
                     .exec()
@@ -210,41 +290,31 @@ module.exports = function(io){
                     })
                 }
                 else{
-                    var attemptsInc = answerIsAcceptable ? 0 : 1 ;
-                    var newScore = (response.correct) ? response.points : answerIsAcceptable ? (question.points - (response.attempts * question.penalty)) : 0;
+                    // Some logic to prevent students from being dumb and reanswering correct questions and losing points
+                    // Basically, if they get it right once, they can't worsen their score
+                    
+                    var attemptsInc = (response.correct) ? 0 : (answerIsCorrect) ? 0 : 1 ;
+                    var newScore = (response.correct) ? response.points : (answerIsCorrect) ? (question.points - (response.attempts * question.penalty)) : 0;
                     // If they got it correct before, don't increment
-
-                    if (question.type == 'code tracing' && answerIsCorrect && response.attempts == 0) {
-                        newScore += 1;
-                    }
                     
                     return models.Response.findByIdAndUpdate(response._id,
-                    { correct: answerIsCorrect , $inc : { attempts : attemptsInc },
+                    { correct: (response.correct || answerIsCorrect) , $inc : { attempts : attemptsInc },
                     points : (newScore > 0) ? newScore : 0 },
                     { new : true } )
                     .exec()
                 }
             })
             .then(function(response){
-                var event;
-                if (isPartialAnswer && question.type == 'code tracing') {
-                    event = 'ctGroupAttempt';
-                } else {
-                    event = 'groupAttempt';
-                }
-                console.log(event);
-                emitters.emitToGroup(data.groupId, event, {
+                emitters.emitToGroup(data.groupId, 'groupAttempt', {
                     response: response,
-                    groupId : data.groupId,
-                    codeOutput : question.type != 'code tracing' ? null : question.answers.slice(0, numCorrectLines),
-                    allCodeTracingLinesCorrect : allCodeTracingLinesCorrect,
-                });
-                console.log('emitted')
+                    questionNumber: data.questionNumber,
+                    groupId : data.groupId
+                })
             })           
             
         })
-  
-    })
+
+        })
 
     socket.on('quizComplete', function(data){
         models.Group.findById(data.groupId).populate('members').exec()
