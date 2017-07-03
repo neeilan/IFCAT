@@ -13,7 +13,7 @@ exports.getInstructorsByCourse = (req, res) => {
 exports.getInstructorsBySearchQuery = (req, res) => {
     let page = parseInt(req.query.page, 10) || 1,
         perPage = parseInt(req.query.perPage, 10) || 5,
-        re = new RegExp(`(${req.query.q.replace(/\s/, '|').trim()})`, 'i');
+        re = new RegExp(`(${req.query.q.replace(/\s/g, '|').trim()})`, 'i');
     models.User.findAndCount({
         $and: [
             { $or: [{ 'name.first': re },{ 'name.last': re },{ 'local.email': re }] },

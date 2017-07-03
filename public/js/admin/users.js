@@ -19,7 +19,7 @@ $(function () {
     if (body.hasClass('instructors') || body.hasClass('teaching-assistants') || body.hasClass('students')) {
         $('#modal-find-users form').submit(function (e) {
             e.preventDefault();
-            $('#search-results').load(this.action + '?q=' + this.elements.q.value);
+            $('#search-results').load(this.action + '?q=' + encodeURIComponent(this.elements.q.value));
         });
         $('#search-results').on('click', 'a', function (e) {
             e.preventDefault();
