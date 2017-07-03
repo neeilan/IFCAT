@@ -1,6 +1,4 @@
-/*jslint node: true*/
-
-var bodyParser = require('body-parser'),
+const bodyParser = require('body-parser'),
     cookieParser = require('cookie-parser'),
     express = require('express'),
     flash = require('connect-flash'),
@@ -11,10 +9,10 @@ var bodyParser = require('body-parser'),
     MongoStore = require('connect-mongo')(session),
     passportSocketIo = require('passport.socketio');
 
-var config = require('./lib/config'),
+const config = require('./lib/config'),
     routes = require('./routes');
 
-var app = express(),
+const app = express(),
     http = require('http').Server(app),
     io = require('socket.io')(http);
 
@@ -43,14 +41,13 @@ app.use('/socketioclient', express.static(__dirname + '/node_modules/socket.io-c
 app.use('/sweetalert', express.static(__dirname + '/node_modules/sweetalert/dist'));
 app.use(express.static(__dirname + '/public'));
 
-
 app.use(morgan('dev'));
 app.use(methodOverride('_method'));
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 app.use(cookieParser());
 
-var sessionStore = new MongoStore({ mongooseConnection : mongoose.connection });
+const sessionStore = new MongoStore({ mongooseConnection : mongoose.connection });
 
 app.use(session({ 
     secret: config.session.secret, 
@@ -67,7 +64,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // pass the user object to all responses
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
     res.locals.flash = req.flash();
     res.locals.url = req.originalUrl;
     res.locals.user = req.user;
@@ -78,7 +75,7 @@ app.use('/', routes.guest);
 app.use('/student', routes.student);
 app.use('/admin', routes.admin);
 
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
     res.status(err.status || 500).render('error', { error: err });
 });
 
@@ -93,8 +90,7 @@ io.use(passportSocketIo.authorize({
 // Socket io handler for quizzes
 io.on('connection', require('./socket.io/quizHandlers.js')(io));
 
-// start server
-http.listen(app.get('port'), function () {
+// Start server
+http.listen(app.get('port'), () => {
     console.log('Express server listening on port %d in %s mode', app.get('port'), app.get('env'));
 });
-

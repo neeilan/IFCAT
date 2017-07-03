@@ -1,5 +1,6 @@
 $(function () {
-    if ($('body').hasClass('tutorial-quizzes')) {
+    var body = $(document.body);
+    if (body.hasClass('tutorial-quizzes')) {
         // update selected tutorial quizzes
         $('.nav-actions a:not(#btn-export)').click(function (e) {
             e.preventDefault();
@@ -8,7 +9,7 @@ $(function () {
             });
         });
     }
-    if ($('body').hasClass('tutorial-quiz')) {
+    if (body.hasClass('tutorial-quiz')) {
         var tab = $('#groups'), table = $('table', tab), tr0 = $('tbody > tr:first-child', table);
         var nextNumber = function () {
             // get used numbers

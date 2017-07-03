@@ -1,5 +1,6 @@
 $(function () {
-    if ($('body').hasClass('questions')) {
+    var body = $(document.body);
+    if (body.hasClass('questions')) {
         var heading = $('> h1'),
             table = $('table:eq(0)'),
             dim = table.closest('.dim-wrap');
@@ -39,7 +40,7 @@ $(function () {
         });
     }
 
-    if ($('body').hasClass('question')) {
+    if (body.hasClass('question')) {
         // Change DOM upon changing question type
         $('select[name=type]').change(function () {
             var select = this;

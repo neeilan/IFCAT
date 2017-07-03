@@ -1,5 +1,6 @@
 $(function () {
-    if ($('body').hasClass('courses')) {
+    var body = $(document.body);
+    if (body.hasClass('courses')) {
         // Confirm and delete selected row
         $('.btn-delete').click(function (e) {
             e.preventDefault();

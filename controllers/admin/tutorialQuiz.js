@@ -74,22 +74,7 @@ exports.getTutorialQuiz = (req, res) => {
 };
 // Publish quiz for tutorial
 exports.editTutorialQuiz = (req, res) => {
-    models.TutorialQuiz.findOneAndUpdate({
-        tutorial: req.tutorial,
-        quiz: req.quiz 
-    }, { 
-        $set: {
-            allocateMembers: req.body.allocateMembers,
-            max: {
-                membersPerGroup: req.body.max.membersPerGroup
-            },
-            published: req.body.published,
-            active: req.body.active,
-            archived: req.body.archived
-        }
-    }, {
-        new: true
-    }, (err, tutorialQuiz) => {
+    models.TutorialQuiz.findOneAndUpdate({ tutorial: req.tutorial, quiz: req.quiz }, { $set: req.body }, { new: true }, (err, tutorialQuiz) => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else {
