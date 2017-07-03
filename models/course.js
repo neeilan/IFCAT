@@ -131,13 +131,5 @@ CourseSchema.methods.hasTeachingAssistant = function (userId) {
 CourseSchema.methods.hasStudent = function (userId) {
     return this.students.indexOf(userId) > -1;
 };
-// Find courses enrolled by student
-CourseSchema.statics.findByStudent = function (userId) {
-    return this.find({ 
-        'students': { 
-            $in: [userId] 
-        } 
-    }).sort('code');
-};
 
 module.exports = mongoose.model('Course', CourseSchema);
