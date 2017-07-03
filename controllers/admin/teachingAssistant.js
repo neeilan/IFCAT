@@ -13,10 +13,31 @@ exports.getTeachingAssistantsByCourse = (req, res) => {
 };
 // Retrieve list of teaching assistants matching search query
 exports.getTeachingAssistantsBySearchQuery = (req, res) => {
-    models.User.findBySearchQuery({ q: req.query.q, roles: ['teachingAssistant'] }, (err, teachingAssistants) => {
+    let page = parseInt(req.query.page, 10) || 1,
+        perPage = parseInt(req.query.perPage, 10) || 5,
+        re = new RegExp(`(${req.query.q.replace(/\s/, '|').trim()})`, 'i');
+    models.User.findAndCount({
+        $and: [
+            { $or: [{ 'name.first': re },{ 'name.last': re },{ 'local.email': re }] },
+            { roles: { $in: ['teachingAssistant'] }}
+        ]
+    }, {
+        select: 'name local.email',
+        page: page,
+        perPage: perPage,
+        sort: 'name.first name.last'
+    }, (err, users, count, pages) => {
         res.render('admin/partials/course-teaching-assistants-search-results', { 
             course: req.course, 
-            teachingAssistants: teachingAssistants
+            teachingAssistants: users,
+            pagination: {
+                count: `${count} user${count !== 1 ? 's' : ''} matched`,
+                page: page,
+                pages: pages,
+                params: {
+                    q: req.query.q
+                }
+            }
         });
     });
 };

@@ -1,32 +1,38 @@
 <% if (typeof pagination !== 'undefined') { %>
+
+    <% pagination.params = _.param(pagination.params) %>
+
     <ul class="pagination pull-right">
     <% if (pagination.page <= 1) { %>
         <li class="previous disabled"><span>&laquo;</span></li>
         <li class="previous disabled"><span>&lsaquo;</span></li>
     <% } else { %>
-        <li class="previous"><a href="<% url %>?perPage=<%= pagination.perPage %>">&laquo;</a></li>
-        <li class="previous"><a href="<% url %>?page=<%= pagination.page - 1 %>&perPage=<%= pagination.perPage %>">&lsaquo;</a></li>
+        <li class="previous"><a href="<%= path %>?<%= pagination.params %>&perPage=<%= pagination.perPage %>">&laquo;</a></li>
+        <li class="previous"><a href="<%= path %>?<%= pagination.params %>&page=<%= pagination.page - 1 %>&perPage=<%= pagination.perPage %>">&lsaquo;</a></li>
     <% } %>
     <% _.each(pagination.pages, p => { %>
         <% if (pagination.page == p) { %>
             <li class="active"><span><%= p %></span></li>
         <% } else { %>
-            <li><a href="<% url %>?page=<%= p %>&perPage=<%= pagination.perPage %>"><%= p %></a></li>
+            <li><a href="<%= path %>?<%= pagination.params %>&page=<%= p %>&perPage=<%= pagination.perPage %>"><%= p %></a></li>
         <% } %>
     <% }) %>
     <% if (pagination.page >= _.last(pagination.pages)) { %>
         <li class="next disabled"><span>&rsaquo;</span></li>
         <li class="next disabled"><span>&raquo;</span></li>
     <% } else { %>
-        <li class="next"><a href="<% url %>?page=<%= pagination.page + 1 %>&perPage=<%= pagination.perPage %>">&rsaquo;</a></li>
-        <li class="next"><a href="<% url %>?page=<%= _.last(pagination.pages) %>&perPage=<%= pagination.perPage %>">&raquo;</a></li>
+        <li class="next"><a href="<%= path %>?<%= pagination.params %>&page=<%= pagination.page + 1 %>&perPage=<%= pagination.perPage %>">&rsaquo;</a></li>
+        <li class="next"><a href="<%= path %>?<%= pagination.params %>&page=<%= _.last(pagination.pages) %>&perPage=<%= pagination.perPage %>">&raquo;</a></li>
     <% } %>
     </ul>
     <% if (pagination.perPage) { %>
-    <select class="form-control pull-right per-page" onchange="window.location.href='<% url %>?perPage='+this.value">
+    <select class="form-control pull-right per-page" onchange="window.location.href='<%= path %>?<%= pagination.params %>&perPage='+this.value">
     <% _.each([5, 10, 25, 50, 100], rows => { %>
         <option value="<%= rows %>"<%= rows == pagination.perPage ? ' selected' : '' %>><%= rows %> per page</option>
     <% }) %>
     </select>
+    <% } %>
+    <% if (pagination.count) { %>
+        <div class="form-control-static pull-left count"><%= pagination.count %></div>
     <% } %>
 <% } %>

@@ -102,12 +102,6 @@ input[type=checkbox][data-label] {
     margin-left: -12px;
     top: 5px;
 }
-/**
- * TinyMCE
- */
-.mce-tinymce {
-    box-sizing: border-box !important;
-}
 .nav-actions {
     padding: 10px 0;
 }
@@ -132,9 +126,21 @@ input[type=checkbox][data-label] {
 /**
  * Pagination
  */
-.per-page {
-    margin: 20px;
+tfoot .count {
+    display: inline-block;
+    font-weight: bold;
+    margin: 10px;
+    padding: 0;
+}
+tfoot .per-page {
+    margin: 10px;
     width: auto;
+}
+tfoot .pagination {
+    margin: 10px 0;
+}
+.modal .pagination {
+    margin: 0;
 }
 .pagination > li > a, .pagination > li > span {
     color: #333;

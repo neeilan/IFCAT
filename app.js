@@ -17,7 +17,7 @@ const app = express(),
     io = require('socket.io')(http);
 
 // locals
-app.locals._ = require('lodash');
+app.locals._ = require('./lib/lodash.mixin');
 app.locals.dateFormat = 'MMMM Do YYYY @ h:mm a';
 app.locals.io = io;
 app.locals.moment = require('moment');  
@@ -66,7 +66,7 @@ app.use(passport.session());
 // pass the user object to all responses
 app.use((req, res, next) => {
     res.locals.flash = req.flash();
-    res.locals.url = req.originalUrl;
+    res.locals.path = req.path;
     res.locals.user = req.user;
     next();
 });

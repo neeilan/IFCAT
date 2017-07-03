@@ -7,16 +7,16 @@
             <th>Student Number</th>
         </tr>
     </thead>
+    <tfoot>
+        <tr><td colspan="4" class="clearfix"><% include pagination %></td></tr>
+    </tfoot>
     <tbody>
     <% if (_.isEmpty(students)) { %>
-        <tr>
-            <td colspan="4">No students were found matching the given query.</td>
-        </tr>
+        <tr><td colspan="4">No students were found matching the given query.</td></tr>
     <% } else { %> 
-        <% _.each(students, function (student) { %>
+        <% _.each(students, student => { %>
             <tr>
-                <td class="text-center"><input type="checkbox" name="students[]" value="<%= 
-                    student.id %>"<%= course.hasStudent(student.id) ? ' checked disabled' : '' %>></td>
+                <td class="text-center"><input type="checkbox" name="students[]" value="<%= student._id %>"<%= course.hasStudent(student._id) ? ' checked disabled' : '' %>></td>
                 <td><%= student.name.full %></td>
                 <td><%= student.student.UTORid %></td>
                 <td><%= student.student.number %></td>

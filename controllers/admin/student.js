@@ -27,10 +27,31 @@ exports.getStudentsByCourse = (req, res) => {
 };
 // Retrieve list of students matching search query
 exports.getStudentsBySearchQuery = (req, res) => {
-    models.User.findBySearchQuery({ q: req.query.q, roles: ['student'] }, (err, students) => {
+    let page = parseInt(req.query.page, 10) || 1,
+        perPage = parseInt(req.query.perPage, 10) || 5,
+        re = new RegExp(`(${req.query.q.replace(/\s/, '|').trim()})`, 'i');
+    models.User.findAndCount({
+        $and: [
+            { $or: [{ 'name.first': re },{ 'name.last': re },{ 'student.UTORid': re },{ 'student.number': re }] },
+            { roles: { $in: ['student'] }}
+        ]
+    }, {
+        select: 'name student',
+        page: page,
+        perPage: perPage,
+        sort: 'name.first name.last'
+    }, (err, users, count, pages) => {
         res.render('admin/partials/course-students-search-results', { 
             course: req.course, 
-            students: students 
+            students: users,
+            pagination: {
+                count: `${count} user${count !== 1 ? 's' : ''} matched`,
+                page: page,
+                pages: pages,
+                params: {
+                    q: req.query.q
+                }
+            }
         });
     });
 };

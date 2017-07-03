@@ -3,8 +3,7 @@ const _ = require('lodash'),
     bcrypt = require('bcryptjs'),
     models = require('.'),
     mongoose = require('mongoose');
-
-let UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     local: {
         email: { 
             type: String,
@@ -78,12 +77,11 @@ UserSchema.pre('save', function (next) {
         return next();
     }
 });
-
 // hook: delete cascade
 UserSchema.pre('remove', function (next) {
     let self = this;
     async.series([
-        function deleteFromCourse(done) {
+        done => {
             models.Course.update({
                 $or: [
                     { instructors: { $in: [self._id] }},
@@ -96,7 +94,7 @@ UserSchema.pre('remove', function (next) {
                 multi: true
             }).exec(done);
         },
-        function deleteFromTutorials(done) {
+        done => {
             models.Tutorial.update({
                 $or: [{ teachingAssistants: { $in: [self._id] }}, { students: { $in: [self._id] }}]
             }, { 
@@ -105,7 +103,7 @@ UserSchema.pre('remove', function (next) {
                 multi: true
             }).exec(done);
         },
-        function deleteFromGroups(done) {
+        done => {
             models.Group.find().or([{
                 members: { $in: [self._id] }
             }, {
@@ -127,39 +125,39 @@ UserSchema.pre('remove', function (next) {
 UserSchema.methods.checkPassword = function (password, callback) {
     bcrypt.compare(password, this.local.password, callback);
 };
-// check user's role
+// Check if user has given role
 UserSchema.methods.hasRole = function (role) {
     return this.roles.indexOf(role) > -1;
 };
-//
+// Check if user has any of the given roles
 UserSchema.methods.hasAnyRole = function (roles) {
     return !!_.intersection(this.roles, roles).length;
 };
-// find instructors
-UserSchema.statics.findByRole = function (role) {
-    return this.find({ roles: { $in: [role] }}).sort({ 'name.first': 1, 'name.last': 1 });
-};
-// Find users by search query
-UserSchema.statics.findBySearchQuery = function (query, done) {
-    let $and = [];
-    if (query.q) {
-        let re = new RegExp('(' + query.q.replace(/\s/, '|').trim() + ')', 'i');
-        $and.push({
-            $or: [
-                { 'name.first': re },
-                { 'name.last': re },
-                { 'student.UTORid': re },
-                { 'student.number': re },
-                { 'local.email': re }
-            ]
-        });
-    }
-    if (query.roles) {
-        $and.push({ 
-            roles: { $in: query.roles }
-        });
-    }
-    return this.find().and($and).sort({ 'name.first': 1, 'name.last': 1 }).exec(done);
+// Find users 
+UserSchema.statics.findAndCount = function (conditions, options, done) {
+    let self = this;
+    async.series([
+        done => {
+            self.find(conditions)
+                .select(options.select)
+                .sort(options.sort)
+                .skip((options.page - 1) * options.perPage)
+                .limit(options.perPage)
+                .exec(done);
+        },
+        done => {
+            self.count(conditions, done);
+        }
+    ], (err, data) => {
+        if (err)
+            return done(err);
+        // build pages
+        let pages = [], p, q;
+        for (p = 1, q = _.ceil(data[1] / options.perPage) + 1; p < q; p++)
+            if (p >= options.page - 2 && p <= options.page + 2)
+                pages.push(p);
+        done(null, ...data, pages);
+    });
 };
 
 module.exports = mongoose.model('User', UserSchema);
