@@ -7,14 +7,15 @@ exports.getCourses = (req, res) => {
 };
 // Retrieve quizzes within course
 exports.getQuizzes = (req, res) => {
-    req.course.withTutorials().execPopulate().then(() => {
-        // find tutorial that student is in
-        let tutorial = req.course.tutorials.find(tutorial => tutorial.hasStudent(req.user.id));
-        //console.log('tutorial', tutorial);
+    req.course.populate({ 
+        path: 'tutorials',
+        match: {
+            students: { $in: [req.user._id] }
+        }
+    }).execPopulate().then(() => {
         // TODO: handle this better
-        if (!tutorial)
+        if (!req.course.tutorials.length)
             return res.redirect('student/courses');
-        //console.log('find tutorial quizzes');
         // find tutorial quizzes
         model.TutorialQuizzes.find({ tutorial: tutorial._id, published: true }).populate('quiz').exec((err, tutorialQuizzes) => {
             //console.log('err', err);
