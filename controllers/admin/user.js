@@ -31,31 +31,21 @@ exports.logout = (req, res) => {
 exports.getUsers = (req, res) => {
     let page = parseInt(req.query.page, 10) || 1,
         perPage = parseInt(req.query.perPage, 10) || 10,
-        sortBy = JSON.parse(req.query.sortBy || '{ "createdAt": -1 }');
-    let query = {};
-
-    async.series([
-        done => {
-            models.User.count(query, done);
-        },
-        done => {
-            models.User
-                .find(query)
-                .select('local.email student oauth.id name roles')
-                .sort(sortBy)
-                .skip((page - 1) * perPage)
-                .limit(perPage)
-                .exec(done);
-        }
-    ], (err, data) => {
-        let pages = _.range(1, _.ceil(data[0] / perPage) + 1);
+        sort = req.query.sort || 'name.first name.last';
+    models.User.findAndCount({}, {
+        select: 'local.email student oauth.id name roles',
+        page: page,
+        perPage: perPage,
+        sort: sort
+    }, (err, users, count, pages) => {
         res.render('admin/pages/users', {
             bodyClass: 'users',
             title: 'Users',
-            users: data[1],
+            users: users,
             pagination: {
+                count: `${count} user${count !== 1 ? 's' : ''}`,
                 page: page,
-                pages: _.filter(pages, p => p >= page - 2 && p <= page + 2),
+                pages: pages,
                 perPage: perPage
             }
         });

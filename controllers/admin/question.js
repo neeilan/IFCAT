@@ -1,9 +1,8 @@
-const _ = require('lodash'),
+const _ = require('../../lib/lodash.mixin'),
     async = require('async'),
     config = require('../../lib/config'),
     models = require('../../models'),
-    url = require('url'),
-    wilson = require('../../lib/wilson');
+    url = require('url');
 // Retrieve course
 exports.getQuestionByParam = (req, res, next, id) => {
     models.Question.findById(id, (err, question) => {
@@ -20,7 +19,7 @@ exports.getQuestions = (req, res) => {
     req.quiz.withQuestions().execPopulate().then(() => {
         if (req.query.sort === 'votes') {
             req.quiz.questions = _.orderBy(req.quiz.questions, question => {
-                return wilson.lowerBound(question.votes.up.length, question.votes.up.length + question.votes.down.length);
+                return _.lowerBound(question.votes.up.length, question.votes.length);
             }, 'desc');
         }
         res.render('admin/pages/quiz-questions', {
@@ -46,7 +45,7 @@ exports.sortQuestions = (req, res) => {
 };
 // Retrieve specific question for quiz
 exports.getQuestion = (req, res) => {
-    var question = req.question || new models.Question();
+    let question = req.question || new models.Question();
     req.course.withFiles().execPopulate().then(function () {
         // set default options
         _.forOwn(req.quiz.default.question, (v, k) => {

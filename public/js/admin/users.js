@@ -1,5 +1,5 @@
 $(function () {
-    var body = $('body');
+    var body = $(document.body);
     if (body.hasClass('users')) {
         $('.btn-delete').click(function (e) {
             e.preventDefault();
@@ -17,9 +17,22 @@ $(function () {
         });
     }
     if (body.hasClass('instructors') || body.hasClass('teaching-assistants') || body.hasClass('students')) {
-        $('#btn-search').click(function () {
-            var input = $(this);
-            $('#search-results').load(input.closest('form')[0].action + '/search?q=' + input.prev('[name=q]').val());
+        $('#modal-find-users form').submit(function (e) {
+            e.preventDefault();
+            $('#search-results').load(this.action + '?q=' + encodeURIComponent(this.elements.q.value));
+        });
+        $('#search-results').on('click', 'a', function (e) {
+            e.preventDefault();
+            $(e.delegateTarget).load(this.href);
+        });
+        $('#btn-add').click(function (e) {
+            e.preventDefault();
+            var inputs = $('#modal-find-users input');
+            if (inputs.length) {
+                $.post(this.href, inputs.serialize(), function () {
+                    window.location.reload(true);
+                });
+            }
         });
         $('#btn-delete').click(function (e) {
             e.preventDefault();

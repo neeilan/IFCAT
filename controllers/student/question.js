@@ -1,6 +1,5 @@
-const _ = require('lodash'),
-    models = require('../../models'),
-    wilson = require('../../lib/wilson');
+const _ = require('../../lib/lodash.mixin'),
+    models = require('../../models');
 // Retrieve course
 exports.getQuestionByParam = (req, res, next, id) => {
     models.Question.findById(id, (err, question) => {
@@ -18,7 +17,7 @@ exports.getQuestions = (req, res) => {
         if (req.query.sort === 'votes') {
             // sort questions based on votes
             req.quiz.questions = _.orderBy(req.quiz.questions, question => {
-                return wilson.lowerBound(question.votes.up.length, question.votes.up.length + question.votes.down.length);
+                return _.lowerBound(question.votes.up.length, question.votes.length);
             }, 'desc');
         }
         res.render(/* TBD */);

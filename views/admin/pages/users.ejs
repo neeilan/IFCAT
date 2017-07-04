@@ -35,9 +35,7 @@
         </tbody>
     <% } else { %>
         <tfoot>
-            <tr>
-                <td colspan="4" class="clearfix"><% include ../partials/pagination %></td>
-            </tr>
+            <tr><td colspan="4" class="clearfix"><% include ../partials/pagination %></td></tr>
         </tfoot>
         <tbody>
         <% _.each(users, user => { %>

@@ -115,7 +115,7 @@ exports.getMarksByTutorialQuiz = (req, res) => {
             res.set('Content-Type', 'text/csv');
             return csv.stringify(data, (err, output) => res.send(output));
         }
-        // display marks
+
         res.render('admin/pages/tutorial-quiz-marks', {
             bodyClass: 'marks',
             title: 'Marks',
@@ -164,7 +164,7 @@ exports.getMarksByCourse = (req, res) => {
             totalPoints: { $sum: '$response.points' }
         }
     }, {
-        $sort: { '_id.member': 1, '_id.tutorialQuiz': 1 }
+        $sort: { 'member.student.UTORid': 1, 'tutorialQuiz.quiz.name': 1 }
     }], (err, data) => {
         // export marks into CSV
         if (req.query.export === 'true' && members.length) {

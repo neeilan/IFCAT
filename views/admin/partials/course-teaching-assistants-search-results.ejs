@@ -6,17 +6,16 @@
             <th style="width: 50%">Email</th>
         </tr>
     </thead>
+    <tfoot>
+        <tr><td colspan="3" class="clearfix"><% include pagination %></td></tr>
+    </tfoot>
     <tbody>
     <% if (_.isEmpty(teachingAssistants)) { %>
-        <tr>
-            <td colspan="3">No teaching assistants were found matching the given query.</td>
-        </tr>
+        <tr><td colspan="3">No teaching assistants were found matching the given query.</td></tr>
     <% } else { %>
-        <% _.each(teachingAssistants, function (teachingAssistant) { %> 
+        <% _.each(teachingAssistants, teachingAssistant => { %> 
             <tr>
-                <td class="text-center"><input type="checkbox" name="teachingAssistants[]" value="<%= 
-                    teachingAssistant.id %>"<%= course.hasTeachingAssistant(teachingAssistant.id) ? 
-                        ' checked disabled' : '' %>></td>
+                <td class="text-center"><input type="checkbox" name="teachingAssistants[]" value="<%= teachingAssistant._id %>"<%= course.hasTeachingAssistant(teachingAssistant._id) ? ' checked disabled' : '' %>></td>
                 <td><%= teachingAssistant.name.full %></td>
                 <td><%= teachingAssistant.local.email %></td>
             </tr>
