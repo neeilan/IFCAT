@@ -4825,6 +4825,7 @@ var CodeOutputQuestion = function (_React$Component) {
                     value: this.state.enteredAnswer,
                     onChange: this.userInputCb,
                     placeholder: 'Enter the next line of output',
+                    disabled: !this.props.isDriver || this.props.response && this.props.response.correct,
                     type: 'text',
                     style: {
                         width: '100%',
@@ -9838,7 +9839,9 @@ var QuizApp = function (_React$Component) {
 
         _this.state = {
             score: 0,
-            quiz: { allocateMembers: null },
+            quiz: {
+                allocateMembers: null
+            },
             groupId: null,
             groupName: null,
             userId: null,
@@ -9866,7 +9869,7 @@ var QuizApp = function (_React$Component) {
             this.socket = socket;
 
             // Request quiz data
-            socket.emit('requestQuiz', quizId);
+            socket.emit('REQUEST_QUIZ', quizId);
 
             socket.on('setGroup', function (id) {
                 if (id != _this2.state.groupId) window.location.href = window.location.href;
@@ -9920,7 +9923,9 @@ var QuizApp = function (_React$Component) {
                     swal("Yikes!", "Looks like you made a mistake somewhere", "error");
                 }
 
-                _this2.setState({ quiz: _this2.state.quiz });
+                _this2.setState({
+                    quiz: _this2.state.quiz
+                });
             });
 
             socket.on('groupAttempt', function (data) {
@@ -9944,20 +9949,31 @@ var QuizApp = function (_React$Component) {
                     var scoreInc = parseInt(data.response.points, 10);
                     var numCorrInc = 1;
 
-                    _this2.setState({ score: _this2.state.score + scoreInc, numCorrect: _this2.state.numCorrect + numCorrInc });
+                    _this2.setState({
+                        score: _this2.state.score + scoreInc,
+                        numCorrect: _this2.state.numCorrect + numCorrInc
+                    });
 
                     // All questions completed
-                    if (_this2.state.quiz.quiz.questions.length == _this2.state.numCorrect) socket.emit('quizComplete', { groupId: _this2.state.groupId, quizId: _this2.state.quiz.quiz._id });
+                    if (_this2.state.quiz.quiz.questions.length == _this2.state.numCorrect) socket.emit('quizComplete', {
+                        groupId: _this2.state.groupId,
+                        quizId: _this2.state.quiz.quiz._id
+                    });
                 } else {
                     swal("Yikes!", "Question " + question.number + " was answered incorrectly!", "error");
                 }
 
-                _this2.setState({ responses: responsesStore, quiz: _this2.state.quiz });
+                _this2.setState({
+                    responses: responsesStore,
+                    quiz: _this2.state.quiz
+                });
             });
 
             socket.on('updateScores', function (data) {
                 console.log('updateScores');
+
                 if (_this2.state.groupId && data.groupId != _this2.state.groupId) return;
+                console.log(data);
 
                 var responsesStore = _this2.state.responses;
                 var numCorrectInc = 0;
@@ -9969,9 +9985,13 @@ var QuizApp = function (_React$Component) {
                     newScore += response.points;
                 });
 
-                _this2.setState({ numCorrect: _this2.state.numCorrect + numCorrectInc,
+                console.log(responsesStore);
+
+                _this2.setState({
+                    numCorrect: _this2.state.numCorrect + numCorrectInc,
                     responses: responsesStore,
-                    score: newScore });
+                    score: newScore
+                });
             });
 
             socket.on('assignedAsDriver', function (data) {
@@ -10007,7 +10027,9 @@ var QuizApp = function (_React$Component) {
                 console.log(data);
                 var responses = _this2.state.responses;
                 responses[data.questionId] = data.response;
-                _this2.setState({ responses: responses });
+                _this2.setState({
+                    responses: responses
+                });
             });
         }
     }, {
@@ -10021,7 +10043,9 @@ var QuizApp = function (_React$Component) {
     }, {
         key: 'selectQuestion',
         value: function selectQuestion(i) {
-            this.setState({ selectedQuestion: i });
+            this.setState({
+                selectedQuestion: i
+            });
         }
     }, {
         key: 'getCurrentQuestion',
@@ -10040,7 +10064,6 @@ var QuizApp = function (_React$Component) {
                 questionRef: selectedQuestion,
                 response: this.state.responses[selectedQuestion._id],
                 questionType: selectedQuestion.type,
-                attachments: selectedQuestion.attachments,
                 submitCb: this.submitChoiceCb
             });
         }
@@ -10112,7 +10135,9 @@ var QuizApp = function (_React$Component) {
         key: 'setDriverCb',
         value: function setDriverCb(selfIsDriver) {
             if (selfIsDriver) {
-                this.socket.emit('nominateSelfAsDriver', { groupId: this.state.groupId });
+                this.socket.emit('NOMINATE_SELF_AS_DRIVER', {
+                    groupId: this.state.groupId
+                });
             } else {
                 this.setState({
                     inProgress: true,
@@ -10134,9 +10159,13 @@ var QuizApp = function (_React$Component) {
         key: 'submitChoiceCb',
         value: function submitChoiceCb(answer, isCodeTracingQuestion) {
             if (isCodeTracingQuestion) {
-                this.emit('CODE_TRACING_ANSWER_ATTEMPT', { answer: answer });
+                this.emit('CODE_TRACING_ANSWER_ATTEMPT', {
+                    answer: answer
+                });
             } else {
-                this.emit(_enums2.default.eventNames.attemptAnswer, { answer: answer });
+                this.emit(_enums2.default.eventNames.attemptAnswer, {
+                    answer: answer
+                });
             }
         }
     }, {
@@ -23020,9 +23049,7 @@ var Question = function (_React$Component) {
 				this.props.questionRef.question,
 				_react2.default.createElement(_EmptyLine2.default, null),
 				this.getAttachmentBtn(),
-				_react2.default.createElement('br', null),
 				this.getAttachments(),
-				_react2.default.createElement('br', null),
 				this.getAnswerArea(),
 				_react2.default.createElement('br', null),
 				this.getSubmitBtn(),
@@ -23040,12 +23067,18 @@ var Question = function (_React$Component) {
 			var _this2 = this;
 
 			if (this.props.questionRef.files && this.props.questionRef.files.length > 0 || this.props.questionRef.links && this.props.questionRef.links.length > 0) return _react2.default.createElement(
-				'span',
-				{ className: 'btn btn-default', onClick: function onClick() {
-						return _this2.setState({ showAttachments: !_this2.state.showAttachments });
-					} },
-				_react2.default.createElement('i', { className: 'fa fa-paperclip', 'aria-hidden': 'true' }),
-				(this.state.showAttachments ? ' Hide' : ' Show') + ' attachments'
+				'div',
+				null,
+				_react2.default.createElement(
+					'span',
+					{ className: 'btn btn-default',
+						onClick: function onClick() {
+							return _this2.setState({ showAttachments: !_this2.state.showAttachments });
+						} },
+					_react2.default.createElement('i', { className: 'fa fa-paperclip', 'aria-hidden': 'true' }),
+					(this.state.showAttachments ? ' Hide' : ' Show') + ' attachments'
+				),
+				_react2.default.createElement(_EmptyLine2.default, null)
 			);
 		}
 	}, {
@@ -23106,7 +23139,12 @@ var Question = function (_React$Component) {
 					));
 				});
 			}
-			return attachments;
+			return _react2.default.createElement(
+				'div',
+				null,
+				_react2.default.createElement('br', null),
+				attachments
+			);
 		}
 	}, {
 		key: 'getAnswerArea',
@@ -23164,18 +23202,6 @@ var Question = function (_React$Component) {
 					}
 
 			}
-		}
-	}, {
-		key: 'getAttachmentArea',
-		value: function getAttachmentArea() {
-			if (!this.props.attachments || this.props.attachments.length == 0) {
-				return;
-			}
-			var attachments = [];
-			this.props.attachments.map(function (at) {
-				switch (at.type) {}
-			});
-			return attachments;
 		}
 	}, {
 		key: 'toggleChoiceSelection',
@@ -23263,6 +23289,11 @@ var ScoreBar = function (_React$Component) {
 				var emptyStars = responses[question._id].attempts == 0 ? 0 : responses[question._id].attempts * question.penalty + question.firstTryBonus;
 				result.emptyStars = emptyStars > maxScore ? maxScore : emptyStars;
 				result.fullStars = maxScore - emptyStars > 0 ? maxScore - emptyStars : 0;
+
+				if (question.type == 'code tracing') {
+					result.fullStars = responses[question._id].points;
+					result.emptyStars = maxScore - responses[question._id].points;
+				}
 			} else {
 				result.emptyStars = 0;
 				result.fullStars = maxScore;

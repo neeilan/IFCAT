@@ -46,9 +46,7 @@ export default class Question extends React.Component {
 				{this.props.questionRef.question}
 				<EmptyLine/>
 				{this.getAttachmentBtn()}
-				<br/>
 				{this.getAttachments()}
-				<br/>
         		{this.getAnswerArea()}
 				<br />
 				{this.getSubmitBtn()}
@@ -62,10 +60,14 @@ export default class Question extends React.Component {
 
 	getAttachmentBtn() {
 		if ((this.props.questionRef.files && this.props.questionRef.files.length > 0) || (this.props.questionRef.links && this.props.questionRef.links.length > 0))
-			return (<span className="btn btn-default" onClick={()=>this.setState({showAttachments : !this.state.showAttachments})}> 
-				<i className="fa fa-paperclip" aria-hidden="true"></i>
-				{(this.state.showAttachments ? ' Hide' : ' Show') + ' attachments'}
-				</span>);
+			return (<div>
+						<span className="btn btn-default" 
+								onClick={()=>this.setState({showAttachments : !this.state.showAttachments})}> 
+							<i className="fa fa-paperclip" aria-hidden="true"></i>
+							{(this.state.showAttachments ? ' Hide' : ' Show') + ' attachments'}
+						</span>
+						<EmptyLine/>
+					</div>);
 	}
 
 	getAttachments() {
@@ -103,7 +105,7 @@ export default class Question extends React.Component {
 				attachments.push(<div><br/><a target='_blank' href={link}>{link}</a><br/></div>);
 			})
 		}
-		return attachments;
+		return <div><br/>{attachments}</div>;
 	}
 							
 
@@ -149,19 +151,6 @@ export default class Question extends React.Component {
 			}
 
 		}
-	}
-							
-	getAttachmentArea(){
-		if (!this.props.attachments || this.props.attachments.length == 0){
-			return;
-		}
-		var attachments = [];
-		this.props.attachments.map( at => {
-			switch (at.type){
-					
-		 }			
-		})
-		return attachments;
 	}
 
 	toggleChoiceSelection(choice) {

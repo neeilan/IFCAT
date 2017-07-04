@@ -21,6 +21,11 @@ export default class ScoreBar extends React.Component {
 			var emptyStars = (responses[question._id].attempts == 0) ? 0 : responses[question._id].attempts * question.penalty + question.firstTryBonus;
 			result.emptyStars = emptyStars > maxScore ? maxScore : emptyStars;
 			result.fullStars = maxScore - emptyStars > 0 ? (maxScore - emptyStars) : 0;
+
+			if (question.type == 'code tracing') {
+				result.fullStars = responses[question._id].points;
+				result.emptyStars = maxScore - responses[question._id].points;
+			}
 		} else {
 			result.emptyStars = 0;
 			result.fullStars = maxScore;

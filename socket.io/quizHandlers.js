@@ -19,7 +19,7 @@ module.exports = function(io){
         socket.disconnect();
     }
     
-    socket.on('requestQuiz', function(tutQuizId){
+    socket.on('REQUEST_QUIZ', function(tutQuizId){
         models.TutorialQuiz.findById(tutQuizId)
         .populate([{
             path : 'quiz',
@@ -127,7 +127,7 @@ module.exports = function(io){
     })
     
     
-    socket.on('nominateSelfAsDriver', function(data){
+    socket.on('NOMINATE_SELF_AS_DRIVER', function(data){
         models.Group.findById(data.groupId)
         .exec()
         .then(function(group){
@@ -164,6 +164,25 @@ module.exports = function(io){
         }
         return lineByLineSummary;
     }
+
+    function calculateCTQPoints(lineByLineSummary, question) {
+
+        var points = 0;
+        var totalAttempts = 0;
+        lineByLineSummary.forEach(function(line){
+            if (line.correct) {
+                points += Math.max(0, question.penalty * (2 - line.attempts));
+                totalAttempts += line.attempts;
+            }
+        });
+        if (totalAttempts == lineByLineSummary.length)
+            points += question.firstTryBonus;
+        return points;
+    }
+
+    function calculateMaxPoints(question) {
+        return question.points + question.firstTryBonus;
+    }
             
     socket.on('CODE_TRACING_ANSWER_ATTEMPT', function(data){
         models.Question.findById(data.questionId)
@@ -172,77 +191,51 @@ module.exports = function(io){
             models.Response.findOne({ group : data.groupId, question: data.questionId })
             .exec()
             .then(function(response){
-                console.log('question');
-                console.log(question);
-                console.log('response');
-                console.log(response);
-
-
 
                 var lineByLineSummary = buildCodeTracingAnswerSummary(question, response, data.answer);
-                console.log(lineByLineSummary);
-                var totalAttempts = lineByLineSummary.reduce((pre, curr) => pre.attempts + curr.attempts, {attempts:0});
-                console.log(totalAttempts);
                 var numLinesCorrect = lineByLineSummary.reduce((acc, curr) => (acc + (curr.correct ? 1 : 0)), 0);
-                console.log(numLinesCorrect);
                 var questionComplete = (numLinesCorrect == question.answers.length);
-                console.log(questionComplete);
                 var revealedLines = question.answers.slice(0, numLinesCorrect);
-                console.log(revealedLines);
 
-                var points = 0;
-                lineByLineSummary.forEach(function(line){
-                    if (line.correct) {
-                        points += Math.max(0, question.penalty * (2 - line.attempts));
-                    }
-                })
-                points += (questionComplete && totalAttempts == numLinesCorrect ? question.firstTryBonus : 0);
-                console.log('Points: ' + points);
 
-                if (response) { 
-                    console.log('response 2');
-                    console.log(response);
-                    response.lineByLineSummary = lineByLineSummary;
-                    response.correct = questionComplete;
-                    response.codeTracingAnswers = revealedLines;
-                    console.log('res3')
-                    console.log(response);
-                    response.points = points;
-                    console.log('res4')
-                    console.log(response);
-                    return response.save();                      
-                } else {
-                    // only for first line of input
-                    console.log("new response")
-                    var res = new models.Response();
-                    res.group = data.groupId;
-                    res.question = data.questionId;
-                    res.lineByLineSummary = lineByLineSummary;
-                    res.correct = questionComplete;
-                    res.codeTracingAnswers = revealedLines;
-                    res.points = points;
-                    res.attempts = totalAttempts;
-                    return res.save();  
+                if (!response) {
+                    response =  new models.Response();
+                    response.group = data.groupId;
+                    response.question = data.questionId;
                 }
+                response.lineByLineSummary = lineByLineSummary;
+                response.correct = questionComplete;
+                response.codeTracingAnswers = revealedLines;
+                response.points = questionComplete ? calculateCTQPoints(lineByLineSummary, question) : calculateMaxPoints(question);
+                return response.save();                      
+
             })
             .then(function(response) {
                 console.log('saved');
                 console.log(response);
-
                 emitters.emitToGroup(data.groupId, 'SYNC_RESPONSE', {
                     response: response,
                     questionId: data.questionId,
                     groupId : data.groupId
                 })
 
+                // if (response.codeTracingAnswers.length != question.answers.length)
+                //     return;
 
+                // return models.Response.find({ group : data.groupId })
+                // .exec()
+                // .then(function(responses){
+                //     emitters.emitToGroup(data.groupId, 'updateScores', {
+                //         responses: responses,
+                //         groupId : data.groupId
+                //     })
+                // })
             })
             .catch(function(err){
                 console.log('err');
                 console.log(err);
             })
         })
-
     });
     
     socket.on('attemptAnswer', function(data){

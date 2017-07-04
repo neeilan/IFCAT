@@ -92,6 +92,7 @@ export default class CodeOutputQuestion extends React.Component
                 value = {this.state.enteredAnswer}
                 onChange = {this.userInputCb}
                 placeholder = "Enter the next line of output"
+                disabled = {!this.props.isDriver || (this.props.response && this.props.response.correct)}
                 type = "text"
                 style = {
                     {
