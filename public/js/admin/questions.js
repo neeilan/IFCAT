@@ -44,8 +44,8 @@ $(function () {
         // Change DOM upon changing question type
         $('select[name=type]').change(function () {
             var select = this;
-            $('div[data-type]').each(function () {
-                $(this).enableToggle(this.dataset.type === select.value);
+            $('.form-group[data-type]').each(function () {
+                $(this).enableToggle(this.dataset.type.indexOf(select.value) > -1);
             });
         }).change();
         // Toggle checkboxes for selecting/unselecting files

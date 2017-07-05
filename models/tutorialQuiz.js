@@ -6,18 +6,13 @@ const TutorialQuizSchema = new mongoose.Schema({
     tutorial: { type: mongoose.Schema.Types.ObjectId, ref: 'Tutorial' },
     quiz: { type: mongoose.Schema.Types.ObjectId, ref: 'Quiz' },
     groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
-    // whether members will be unaided in picking their groups, will be automatically placed into groups,
-    // or will manually be placed into groups by the admins
-    allocateMembers: { 
-        type: String, 
-        enum: ['unaided', 'automatically', 'self-selection'],
+    // whether members will be automatically placed into groups or manually pick their groups
+    allocateMembers: {
+        type: String,
+        enum: ['automatically', 'self-selection'],
         default: 'automatically'
     },
-    // max # of groups OR members per group
-    max: {
-        groups: { type : Number, default: 4 },
-        membersPerGroup: { type : Number, default: 3 }
-    },
+    maxMembersPerGroup: { type : Number, default: 4 },
     // make quiz visible to students
     published: Boolean,
     // allow students to do quiz

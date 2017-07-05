@@ -33,16 +33,14 @@
             <tr>
                 <td style="width: 10px;">
                     <span class="glyphicon glyphicon-option-vertical handle" title="Hold and drag to new location"></span>
-                    <input type="hidden" name="questions[]" value="<%- question._id %>">
+                    <input type="hidden" name="questions[]" value="<%= question._id %>">
                 </td>
                 <td style="width: 10px;"><%= question.number %>.</td>
                 <td style="width: 130px;"><%= question.type %></td>
-                <td><%= question.question %></td>
+                <td style="white-space: pre-wrap"><%= question.question %></td>
                 <td class="actions">
                     <div class="dropdown">
-                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                            Actions<span class="caret"></span>
-                        </button>
+                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">Actions<span class="caret"></span></button>
                         <ul class="dropdown-menu">
                             <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz.id %>/questions/<%= question._id %>/edit"><span class="glyphicon glyphicon-pencil"></span> Edit Question</a></li>
                             <li class="divider"></li>

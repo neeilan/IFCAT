@@ -104,10 +104,9 @@ $(function () {
     });
 
     // small plugin for showing/hiding selector and enabling/disabling its children
-    // @usage: $(selector).enableToggle([display])
-    $.fn.enableToggle = function () {
-        this.toggle.apply(this, arguments);
-        this.find(':input').prop('disabled', this.is(':hidden'));
+    // @usage: $(selector).enableToggle(true|false)
+    $.fn.enableToggle = function (display) {
+        this.toggle(display).find(':input').prop('disabled', !display);
         return this;
     };
 

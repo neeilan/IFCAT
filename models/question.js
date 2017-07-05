@@ -1,10 +1,10 @@
-const _ = require('lodash'),
+const _ = require('../lib/lodash.mixin'),
     async = require('async'),
     models = require('.'),
     mongoose = require('mongoose'),
     url = require('url');
 const QuestionSchema = new mongoose.Schema({
-    number: { type: String, required: true },
+    number: String,
     type: { type: String, enum: ['multiple choice', 'multiple select', 'short answer', 'code tracing'] },
     question: { type: String, required: true },
     code: String,
@@ -13,6 +13,7 @@ const QuestionSchema = new mongoose.Schema({
     files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
     links: [String],
     caseSensitive: Boolean,
+    maxPointsPerLine: { type: Number, default: 1 },
     maxAttemptsPerLine: { type: Number, default: 1 },
     shuffleChoices: Boolean,
     useLaTeX: Boolean,
@@ -72,16 +73,20 @@ QuestionSchema.methods.store = function (obj) {
     this.number = _.trim(obj.number);
     this.type = obj.type;
     this.question = _.trim(obj.question);
+    this.code = _.trim(obj.code);
     this.choices = []; 
     this.answers = [];
     // multimedia options
     this.files = obj.files || [];
     this.links = [];
     // additional options
-    this.shuffleChoices = !!obj.shuffleChoices;
-    this.useLaTeX = !!obj.useLaTeX;
+    this.caseSensitive = obj.caseSensitive;
+    this.shuffleChoices = obj.shuffleChoices;
+    this.useLaTeX = obj.useLaTeX;
     this.points = obj.points;
     this.firstTryBonus = obj.firstTryBonus;
+    this.maxPointsPerLine = obj.maxPointsPerLine
+    this.maxAttemptsPerLine = obj.maxAttemptsPerLine;
     this.penalty = obj.penalty;
 
     let selected, self = this;
@@ -125,11 +130,9 @@ QuestionSchema.methods.store = function (obj) {
                 self.answers.push(answer);
             }
         });
-        self.caseSensitive = !!obj.caseSensitive;
+        
     } else if (this.isCodeTracing()) {
-        self.code = _.trim(obj.code);
         self.answers = obj.answers.split("\n");
-        self.maxAttemptsPerLine = obj.maxAttemptsPerLine;
     }
     return self;
 };

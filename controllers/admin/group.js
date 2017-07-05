@@ -27,7 +27,7 @@ exports.generateGroups = (req, res) => {
         // shuffle students
         let students = _.shuffle(req.tutorial.students.map(String));
         // get # of members per group
-        let size = tutorialQuiz.max.membersPerGroup;
+        let size = tutorialQuiz.maxMembersPerGroup;
         // split into chunks of size + shuffle chunks
         let chunks = _.shuffle(_.chunk(students, size));
         // map chunks to groups
