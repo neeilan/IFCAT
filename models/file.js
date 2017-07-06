@@ -1,5 +1,4 @@
 const async = require('async'),
-    models = require('.'),
     mongoose = require('mongoose');
 const FileSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -11,8 +10,8 @@ const FileSchema = new mongoose.Schema({
 FileSchema.pre('remove', function (next) {
     let self = this;
     async.parallel([
-        done => models.Course.update({ files: { $in: [self._id] }}, { $pull: { files: self._id }}, done),
-        done => models.Question.update({ files: { $in: [self._id] }}, { $pull: { files: self._id }}, { multi: true }, done)
+        done => self.model('Course').update({ files: { $in: [self._id] }}, { $pull: { files: self._id }}, done),
+        done => self.model('Question').update({ files: { $in: [self._id] }}, { $pull: { files: self._id }}, { multi: true }, done)
     ], next);
 });
 // Check if file is an audio

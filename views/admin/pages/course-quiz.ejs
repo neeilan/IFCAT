@@ -6,23 +6,22 @@
     <li class="active"><%= quiz.isNew ? 'New' : 'Edit' %></li>
 </ol>
 
-<h1><%- title %></h1>
+<h3><%- title %></h3>
 
 <% include ../partials/flash %>
 
 <form action="/admin/courses/<%= course._id %>/quizzes/<%= quiz.isNew ? '' : `${quiz._id}?_method=put` %>" method="post" autocomplete="off" class="form-horizontal">
 
     <div class="form-group required">
-        <label class="col-sm-2 control-label">Name</label>
-        <div class="col-sm-10">
+        <label class="col-sm-3 control-label">Name</label>
+        <div class="col-sm-9">
             <input type="text" name="name" value="<%= quiz.name %>" class="form-control">
-            <p class="help-block"><span class="glyphicon glyphicon-info-sign"></span> Ex: Quiz 1</p>
         </div>
     </div>
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">Available to</label>
-        <div class="col-sm-10">
+        <label class="col-sm-3 control-label">Available to</label>
+        <div class="col-sm-9">
             <select name="tutorials[]" multiple class="form-control">
             <% _.each(course.tutorials, tutorial => { %>
                 <option value="<%= tutorial._id %>"<%= quiz.isNew || quiz.isLinkedTo(tutorial) ? ' selected' : '' %>>TUT <%= tutorial.number %></option> 
@@ -32,61 +31,59 @@
         </div>
     </div>
 
-    <div class="form-group">
-        <label class="col-sm-2 control-label">Enable student choice?</label>
-        <div class="col-sm-10">
-            <input type="checkbox" name="studentChoice" value="1" class="bootstrap-switch"<%= quiz.studentChoice ? ' checked' : '' %>>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label class="col-sm-2 control-label">Enable student voting?</label>
-        <div class="col-sm-10">
-            <input type="checkbox" name="studentVoting" value="1" class="bootstrap-switch"<%= quiz.studentVoting ? ' checked' : '' %>>
-        </div>
-    </div>
-
     <!-- default question options -->
 
     <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
+        <div class="col-sm-offset-3 col-sm-9">
             <a href="#options" data-toggle="collapse" data-target="#options">Show default question options</a>
         </div>
     </div>
     <div id="options" class="collapse">
         <div class="form-group">
-            <label class="col-sm-2 control-label">Shuffle choices?</label>
-            <div class="col-sm-10">
+            <label class="col-xs-7 col-sm-3 control-label">Enable student choice?</label>
+            <div class="col-xs-5 col-sm-9">
+                <input type="checkbox" name="studentChoice" value="1" class="bootstrap-switch"<%= quiz.studentChoice ? ' checked' : '' %>>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-7 col-sm-3 control-label">Enable student voting?</label>
+            <div class="col-xs-5 col-sm-9">
+                <input type="checkbox" name="studentVoting" value="1" class="bootstrap-switch"<%= quiz.studentVoting ? ' checked' : '' %>>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-7 col-sm-3 control-label">Shuffle choices?</label>
+            <div class="col-xs-5 col-sm-2">
                 <input type="checkbox" name="default[question][shuffleChoices]" value="1" class="bootstrap-switch"<%= quiz.default.question.shuffleChoices ? ' checked' : '' %>>
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-2 control-label">Format questions using LaTeX?</label>
-            <div class="col-sm-10">
+            <label class="col-xs-7 col-sm-3 control-label">Format questions using LaTeX?</label>
+            <div class="col-xs-5 col-sm-2">
                 <input type="checkbox" name="default[question][useLaTeX]" value="1" class="bootstrap-switch"<%= quiz.default.question.useLaTeX ? ' checked' : '' %>>
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-2 control-label">Points possible</label>
-            <div class="col-sm-6">
-                <input type="number" name="default[question][points]" value="<%= quiz.default.question.points %>" min="0" max="7" class="form-control">
+            <label class="col-xs-7 col-sm-3 control-label">Points possible</label>
+            <div class="col-xs-5 col-sm-2">
+                <input type="number" name="default[question][points]" value="<%= quiz.default.question.points %>" min="0" class="form-control">
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-2 control-label">First-try bonus</label>
-            <div class="col-sm-6">
-                <input type="number" name="default[question][firstTryBonus]" value="<%= quiz.default.question.firstTryBonus %>" min="0" max="7" class="form-control">
+            <label class="col-xs-7 col-sm-3 control-label">First-try bonus</label>
+            <div class="col-xs-5 col-sm-2">
+                <input type="number" name="default[question][firstTryBonus]" value="<%= quiz.default.question.firstTryBonus %>" min="0" class="form-control">
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-2 control-label">Penalty per attempt</label>
-            <div class="col-sm-6">
-                <input type="number" name="default[question][penalty]" value="<%= quiz.default.question.penalty %>" min="0" max="7" class="form-control">
+            <label class="col-xs-7 col-sm-3 control-label">Penalty per attempt</label>
+            <div class="col-xs-5 col-sm-2">
+                <input type="number" name="default[question][penalty]" value="<%= quiz.default.question.penalty %>" min="0" class="form-control">
             </div>
         </div>
     </div>
     <div class="form-group" style="margin-top: 30px;">
-        <div class="col-sm-offset-2 col-sm-10">
+        <div class="col-sm-offset-3 col-sm-9">
             <a href="/admin/courses/<%= course._id %>/quizzes" class="btn btn-default btn-sm">Cancel</a>
             <button type="submit" class="btn btn-primary btn-sm">Save</button>
         </div>

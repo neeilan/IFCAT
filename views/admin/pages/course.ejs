@@ -5,7 +5,7 @@
     <li class="active"><%= course.isNew ? 'New' : 'Edit' %></li>
 </ol>
 
-<h1><%= title %></h1>
+<h3><%= title %></h3>
 
 <% include ../partials/flash %>
 
@@ -15,7 +15,7 @@
         <label class="col-sm-2 control-label">Code</label>
         <div class="col-sm-10">
             <input type="text" name="code" value="<%= course.code %>" class="form-control" maxlength="8">
-            <p class="help-block"><span class="glyphicon glyphicon-info-sign"></span> Ex: CSCA48H1</p>
+            <p class="help-block"><span class="glyphicon glyphicon-info-sign"></span> Ex: CSCA48</p>
         </div>
     </div>
     <div class="form-group required">

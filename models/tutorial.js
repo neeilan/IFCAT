@@ -1,6 +1,5 @@
 const _ = require('lodash'),
     async = require('async'),
-    models = require('.'),
     mongoose = require('mongoose');
 const TutorialSchema = new mongoose.Schema({
     number: { type: String, required: true },
@@ -15,8 +14,8 @@ TutorialSchema.virtual('tutorialQuizzes', { ref: 'TutorialQuiz', localField: '_i
 TutorialSchema.pre('remove', function (next) {
     let self = this;
     async.parallel([
-        done => models.Course.update({ tutorials: { $in: [self._id] }}, { $pull: { tutorials: self._id }}, { multi: true }, done),
-        done => models.TutorialQuiz.remove({ tutorial: self._id }, done)
+        done => self.model('Course').update({ tutorials: { $in: [self._id] }}, { $pull: { tutorials: self._id }}, { multi: true }, done),
+        done => self.model('TutorialQuiz').remove({ tutorial: self._id }, done)
     ], next);
 });
 // Populate students

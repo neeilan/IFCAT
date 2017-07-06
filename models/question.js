@@ -1,6 +1,5 @@
 const _ = require('../lib/lodash.mixin'),
     async = require('async'),
-    models = require('.'),
     mongoose = require('mongoose'),
     url = require('url');
 const QuestionSchema = new mongoose.Schema({
@@ -36,8 +35,8 @@ QuestionSchema.virtual('votes.length').get(function () {
 QuestionSchema.pre('remove', function (next) {
     let self = this;
     async.parallel([
-        done => models.Quiz.update({ questions: { $in: [self._id] }}, { $pull: { questions: self._id }}, done),
-        done => models.Response.remove({ question: self._id }, done)
+        done => self.model('Quiz').update({ questions: { $in: [self._id] }}, { $pull: { questions: self._id }}, done),
+        done => self.model('Response').remove({ question: self._id }, done)
     ], next);
 });
 // Populate files

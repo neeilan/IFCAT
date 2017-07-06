@@ -1,6 +1,5 @@
 const _ = require('lodash'),
     async = require('async'),
-    models = require('.'),
     mongoose = require('mongoose');
 const QuizSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -23,9 +22,9 @@ const QuizSchema = new mongoose.Schema({
 QuizSchema.pre('remove', function (next) {
     let self = this;
     async.parallel([
-        done => models.Course.update({ quizzes: { $in: [self._id] }}, { $pull: { quizzes: self._id }}, done),
-        done => models.Question.remove({ _id: { $in: self.questions }}, done),
-        done => models.TutorialQuiz.remove({ quiz: self._id }, done)
+        done => self.model('Course').update({ quizzes: { $in: [self._id] }}, { $pull: { quizzes: self._id }}, done),
+        done => self.model('Question').remove({ _id: { $in: self.questions }}, done),
+        done => self.model('TutorialQuiz').remove({ quiz: self._id }, done)
     ], next);
 });
 // Populate tutorial-quizzes
@@ -51,11 +50,11 @@ QuizSchema.methods.linkTutorials = function (tutorials = [], done) {
             }, done)
         },
         done => {
-            models.TutorialQuiz.remove({ _id: { $in: self.tutorialQuizzes }}, done)
+            self.model('TutorialQuiz').remove({ _id: { $in: self.tutorialQuizzes }}, done)
         },
         done => {
             async.eachSeries(tutorials, (tutorial, done) => {
-                models.TutorialQuiz.create({ tutorial: tutorial, quiz: self }, err => {
+                self.model('TutorialQuiz').create({ tutorial: tutorial, quiz: self }, err => {
                     done(err && err.code !== 11000 ? err : null);
                 });
             }, done);
@@ -66,7 +65,7 @@ QuizSchema.methods.linkTutorials = function (tutorials = [], done) {
 // Load quiz' tutorials (deprecated)
 QuizSchema.methods.loadTutorials = function () {
     let quiz = this;
-    return models.TutorialQuiz.find({ quiz: quiz }).populate('tutorial').exec(function (err, tutorialQuizzes) {
+    return self.model('TutorialQuiz').find({ quiz: quiz }).populate('tutorial').exec(function (err, tutorialQuizzes) {
         quiz.tutorials = tutorialQuizzes.map(function (tutorialQuiz) { 
             return tutorialQuiz.tutorial.id;
         });

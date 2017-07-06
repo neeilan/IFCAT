@@ -1,6 +1,5 @@
 const _ = require('lodash'),
     async = require('async'),
-    models = require('.'),
     mongoose = require('mongoose');
 const GroupSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -13,7 +12,7 @@ const GroupSchema = new mongoose.Schema({
 GroupSchema.pre('remove', function (next) {
     let self = this;
     async.parallel([
-        done => models.TutorialQuiz.update({ groups: { $in: [self._id] }}, { $pull: { groups: self._id }}, done)
+        done => self.model('TutorialQuiz').update({ groups: { $in: [self._id] }}, { $pull: { groups: self._id }}, done)
     ], next);
 });
 // Methods

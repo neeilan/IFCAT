@@ -1,6 +1,5 @@
 const _ = require('lodash'),
     async = require('async'),
-    models = require('.'),
     mongoose = require('mongoose');
 const TutorialQuizSchema = new mongoose.Schema({
     tutorial: { type: mongoose.Schema.Types.ObjectId, ref: 'Tutorial' },
@@ -28,7 +27,7 @@ TutorialQuizSchema.index({ tutorial: 1, quiz: 1 }, { unique: true });
 TutorialQuizSchema.methods.withStudents = function () {
     return this.populate({
         path: 'tutorial.students',
-        model: models.User,
+        model: this.model('User'),
         options: {
             sort: { 'name.first': 1, 'name.last': 1 }
         }
@@ -38,10 +37,10 @@ TutorialQuizSchema.methods.withStudents = function () {
 TutorialQuizSchema.methods.withGroups = function () {
     return this.populate({
         path: 'groups',
-        model: models.Group,
+        model: this.model('Group'),
         populate: [{
             path: 'members',
-            model: models.User,
+            model: this.model('User'),
             options: {
                 sort: { 'name.first': 1, 'name.last': 1 }
             }

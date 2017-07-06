@@ -1,7 +1,6 @@
 const _ = require('lodash'),
     async = require('async'),
     bcrypt = require('bcryptjs'),
-    models = require('.'),
     mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({
     local: {
@@ -82,7 +81,7 @@ UserSchema.pre('remove', function (next) {
     let self = this;
     async.series([
         done => {
-            models.Course.update({
+            self.model('Course').update({
                 $or: [
                     { instructors: { $in: [self._id] }},
                     { teachingAssistants: { $in: [self._id] }}, 
@@ -95,7 +94,7 @@ UserSchema.pre('remove', function (next) {
             }).exec(done);
         },
         done => {
-            models.Tutorial.update({
+            self.model('Tutorial').update({
                 $or: [{ teachingAssistants: { $in: [self._id] }}, { students: { $in: [self._id] }}]
             }, { 
                 $pull: { teachingAssistants: self._id, students: self._id }
@@ -104,7 +103,7 @@ UserSchema.pre('remove', function (next) {
             }).exec(done);
         },
         done => {
-            models.Group.find().or([{
+            self.model('Group').find().or([{
                 members: { $in: [self._id] }
             }, {
                 driver: self._id

@@ -1,7 +1,6 @@
 const async = require('async'),
     config = require('../lib/config'),
     fs = require('fs-extra'),
-    models = require('.'),
     mongoose = require('mongoose');
 const CourseSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -21,21 +20,21 @@ CourseSchema.pre('remove', function (next) {
     async.series([
         // delete documents
         done => {
-            models.Tutorial.find({ _id: { $in: self.tutorials }}, (err, docs) => {
+            self.model('Tutorial').find({ _id: { $in: self.tutorials }}, (err, docs) => {
                 if (err)
                     return done(err);
                 async.eachSeries(docs, (doc, done) => doc.remove(done), done);
             });
         },
         done => {
-            models.Quiz.find({ _id: { $in: self.quizzes }}, (err, docs) => {
+            self.model('Quiz').find({ _id: { $in: self.quizzes }}, (err, docs) => {
                 if (err)
                     return done(err);
                 async.eachSeries(docs, (doc, done) => doc.remove(done), done);
             });
         },
         done => {
-            models.File.find({ _id: { $in: self.files }}, (err, docs) => {
+            self.model('File').find({ _id: { $in: self.files }}, (err, docs) => {
                 if (err)
                     return done(err);
                 async.eachSeries(docs, (doc, done) => doc.remove(done), done);

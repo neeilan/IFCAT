@@ -26,14 +26,11 @@ exports.generateGroups = (req, res) => {
     }).exec((err, tutorialQuiz) => {
         // shuffle students
         let students = _.shuffle(req.tutorial.students.map(String));
-        // get # of members per group
-        let size = tutorialQuiz.maxMembersPerGroup;
         // split into chunks of size + shuffle chunks
-        let chunks = _.shuffle(_.chunk(students, size));
+        let chunks = _.chunk(students, tutorialQuiz.maxMembersPerGroup);
         // map chunks to groups
-        let groups = _.map(chunks, (members, i) => {
-            return group = new models.Group({ name: i + 1, members: members });
-        });
+        let groups = _.map(chunks, (members, i) => new models.Group({ name: i + 1, members: members }));
+
         res.render('admin/pages/tutorial-quiz', {
             class: 'conduct-quiz',
             title: `Conduct ${req.quiz.name} in TUT ${req.tutorial.number}`,
@@ -71,26 +68,24 @@ exports.saveGroups = (req, res, next) => {
             });
         },
         done => {
-            async.eachSeries(tutorialQuiz.groups, (group, done) => {
-                // update existing group if it is present
-                if (req.body.groups.hasOwnProperty(group._id)) {
-                    return group.update({ $set: { members: req.body.groups[group._id] }}, done);
-                }
-                // otherwise remove the group
-                group.remove(done);
+            async.eachSeries(tutorialQuiz.groups, (self, done) => {
+                // remove existing group if it is not present
+                if (!req.body.groups.hasOwnProperty(self._id))
+                    return self.remove(done);
+                // otherwise update existing group
+                self.update({ $set: { members: req.body.groups[self._id] }}, done);
             }, done);
         },
         done => {
-            async.eachOfSeries(req.body.groups, function (members, name, done) {
+            async.eachOfSeries(req.body.groups, (members, name, done) => {
+                if (!name.startsWith('$'))
+                    return done();
                 // add new group
-                if (name.startsWith('$')) {
-                    return models.Group.create({ name: name.slice(1), members: members }, (err, group) => {
-                        if (err)
-                            return done(err);
-                        tutorialQuiz.update({ $addToSet: { groups: group._id }}, done);
-                    });
-                }
-                done();
+                models.Group.create({ name: name.slice(1), members: members }, (err, group) => {
+                    if (err)
+                        return done(err);
+                    tutorialQuiz.update({ $addToSet: { groups: group._id }}, done);
+                });
             }, done);
         }
     ], err => {

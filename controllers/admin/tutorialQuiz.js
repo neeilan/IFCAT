@@ -51,24 +51,24 @@ exports.editTutorialQuizzes = (req, res) => {
 };
 // Retrieve quiz for tutorial
 exports.getTutorialQuiz = (req, res) => {
-    models.TutorialQuiz.findOne({ tutorial: req.tutorial, quiz: req.quiz }).populate([{
-        path: 'tutorial',
-        populate: {
-            path: 'students',
-            sort: { 'name.first': 1, 'name.last': 1 }
-        }
-    }, {
-        path: 'groups'
-    }]).exec((err, tutorialQuiz) => {
-        res.render('admin/pages/tutorial-quiz', {
-            bodyClass: 'tutorial-quiz',
-            title: `Conduct ${req.quiz.name} in tutorial ${req.tutorial.number}`,
-            course: req.course, 
-            tutorial: req.tutorial,
-            quiz: req.quiz,
-            tutorialQuiz: tutorialQuiz,
-            students: tutorialQuiz.tutorial.students,
-            groups: tutorialQuiz.groups
+    req.tutorial.withStudents().execPopulate().then(() => {
+        models.TutorialQuiz.findOne({ tutorial: req.tutorial, quiz: req.quiz }).populate({
+            path: 'groups',
+            options: {
+                sort: { name: 1 }
+            }
+        }).exec((err, tutorialQuiz) => {
+            console.log(tutorialQuiz.groups)
+            res.render('admin/pages/tutorial-quiz', {
+                bodyClass: 'tutorial-quiz',
+                title: `Conduct ${req.quiz.name} in tutorial ${req.tutorial.number}`,
+                course: req.course, 
+                tutorial: req.tutorial,
+                quiz: req.quiz,
+                tutorialQuiz: tutorialQuiz,
+                students: req.tutorial.students,
+                groups: tutorialQuiz.groups
+            });
         });
     });
 };
