@@ -15,8 +15,8 @@
 
     <% if (question.submitter) { %>
     <div class="form-group" style="margin-top: 10px">
-        <label class="col-xs-7 col-sm-2 control-label">Submitted By</label>
-        <div class="col-xs-5 col-sm-2">
+        <label class="col-xs-7 col-sm-3 control-label">Submitted By</label>
+        <div class="col-xs-5 col-sm-9">
             <p class="form-control-static"><%= question.submitter.name.full %></p>
         </div>
     </div>
@@ -24,16 +24,16 @@
 
     <!-- number -->
     <div class="form-group help">
-        <label class="col-sm-2 control-label" title="Ex: 1, A or 1a">Number</label>
-        <div class="col-sm-2">
+        <label class="col-xs-7 col-sm-3 control-label" title="Ex: 1, A or 1a">Number</label>
+        <div class="col-xs-5 col-sm-2">
             <input name="number" value="<%= question.number %>" maxlength="6" class="form-control">
         </div>
     </div>
 
     <!-- type -->
     <div class="form-group required">
-        <label class="col-sm-2 control-label">Type</label>
-        <div class="col-sm-3">
+        <label class="col-xs-7 col-sm-3 control-label">Type</label>
+        <div class="col-xs-5 col-sm-3">
             <select name="type" class="form-control"<%= question.submitter ? ' disabled' : '' %>>
             <% _.each(question.schema.path('type').enumValues, type => { %>
                 <option value="<%= type %>"<%= question.type === type ? ' selected' : '' %>><%= _.upperFirst(type) %></option>
@@ -44,16 +44,16 @@
 
     <!-- question -->
     <div class="form-group required">
-        <label class="col-sm-2 control-label">Question</label>
-        <div class="col-sm-10">
+        <label class="col-sm-3 control-label">Question</label>
+        <div class="col-sm-9">
             <textarea name="question" class="form-control" rows="3"><%= question.question %></textarea>
         </div>
     </div>
 
     <!-- files -->
     <div class="form-group">
-        <label class="col-sm-2 control-label">Files</label>
-        <div class="col-sm-10">
+        <label class="col-xs-7 col-sm-3 control-label">Files</label>
+        <div class="col-xs-5 col-sm-9">
             <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-show-files">
                 <span class="glyphicon glyphicon-file"></span> Show files</a>
             <a href="#" class="counter files" data-toggle="modal" data-target="#modal-show-files"><%= question.files.length != 1 ? question.files.length + ' files selected' : '1 file selected' %></a>
@@ -62,8 +62,8 @@
 
     <!-- links -->
     <div class="form-group">
-        <label class="col-sm-2 control-label">Links</label>
-        <div class="col-sm-10">
+        <label class="col-xs-7 col-sm-3 control-label">Links</label>
+        <div class="col-xs-5 col-sm-9">
             <a href="#" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-show-links">
                 <span class="glyphicon glyphicon-link"></span> Show links</a>
             <a href="#" class="counter links" data-toggle="modal" data-target="#modal-show-links"><%= question.links.length != 1 ? question.links.length + ' links added' : '1 link added' %></a>
@@ -72,8 +72,8 @@
 
     <!-- multiple choice -->
     <div class="form-group required" data-type="multiple choice">
-        <label class="col-sm-2 control-label">Choices &amp; Answer</label>
-        <div class="col-sm-10">
+        <label class="col-sm-3 control-label">Choices &amp; Answer</label>
+        <div class="col-sm-9">
             <% if (question.isNew || !question.isMultipleChoice()) { %>
                 <% for (var i = 0, len = 3; i < 3; i++) { %> 
                     <div class="form-group">
@@ -122,8 +122,8 @@
 
     <!-- multiple select -->
     <div class="form-group required" data-type="multiple select">
-        <label class="col-sm-2 control-label">Choices &amp; Answers</label>
-        <div class="col-sm-10">
+        <label class="col-sm-3 control-label">Choices &amp; Answers</label>
+        <div class="col-sm-9">
             <% if (question.isNew || !question.isMultipleSelect()) { %>
                 <% for (var i = 0, len = 3; i < 3; i++) { %>
                     <div class="form-group">
@@ -170,8 +170,8 @@
 
     <!-- short-answer -->
     <div class="form-group required" data-type="short answer">
-        <label class="col-sm-2 control-label">Acceptable Answers</label>
-        <div class="col-sm-10">
+        <label class="col-sm-3 control-label">Acceptable Answers</label>
+        <div class="col-sm-9">
             <% if (question.isNew || !question.isShortAnswer()) { %>
                 <% for (var i = 0, len = 3; i < 3; i++) { %>
                     <div class="form-group">
@@ -215,15 +215,15 @@
 
     <!-- code-tracing -->
     <div class="form-group required" data-type="code tracing">
-        <label class="col-sm-2 control-label">Code</label>
-        <div class="col-sm-10">
+        <label class="col-sm-3 control-label">Code</label>
+        <div class="col-sm-9">
             <textarea name="code" class="form-control" rows="5"><%= question.code %></textarea>
         </div>
     </div>
 
     <div class="form-group required" data-type="code tracing">
-        <label class="col-sm-2 control-label">Answers</label>
-        <div class="col-sm-10">
+        <label class="col-sm-3 control-label">Answers</label>
+        <div class="col-sm-9">
         <% if (question.isNew || !question.isCodeTracing()) { %> 
             <textarea name="_answers" class="form-control" rows="5"></textarea>
         <% } else { %>
@@ -234,56 +234,56 @@
 
     <!-- options -->
     <div class="form-group" data-type="short answer">
-        <label class="col-xs-7 col-sm-2 control-label">Case-sensitive</label>
+        <label class="col-xs-7 col-sm-3 control-label">Case-sensitive</label>
         <div class="col-xs-5 col-sm-2">
             <input type="checkbox" name="caseSensitive" value="1" class="bootstrap-switch"<%= question.caseSensitive ? ' checked' : '' %>>
         </div>
     </div>
 
     <div class="form-group" data-type="multiple choice|multiple select|short answer">
-        <label class="col-xs-7 col-sm-2 control-label">Shuffle choices?</label>
+        <label class="col-xs-7 col-sm-3 control-label">Shuffle choices?</label>
         <div class="col-xs-5 col-sm-2">
             <input type="checkbox" name="shuffleChoices" value="1" class="bootstrap-switch"<%= question.shuffleChoices ? ' checked' : '' %> >
         </div>
     </div>
 
     <div class="form-group">
-        <label class="col-xs-7 col-sm-2 control-label">Format using LaTeX?</label>
-        <div class="col-xs-5 col-sm-6 col-md-2">
+        <label class="col-xs-7 col-sm-3 control-label">Format using LaTeX?</label>
+        <div class="col-xs-5 col-sm-2 col-md-2">
             <input type="checkbox" name="useLaTeX" value="1" class="bootstrap-switch"<%= question.useLaTeX ? ' checked' : '' %>>
         </div>
     </div>
 
     <div class="form-group" data-type="multiple choice|multiple select|short answer">
-        <label class="col-xs-7 col-sm-2 control-label">Points possible</label>
+        <label class="col-xs-7 col-sm-3 control-label">Points possible</label>
         <div class="col-xs-5 col-sm-2">
             <input type="number" name="points" value="<%= question.points %>" min="0" class="form-control">
         </div>
     </div>
 
     <div class="form-group" data-type="multiple choice|multiple select|short answer">
-        <label class="col-xs-7 col-sm-2 control-label">Penalty per attempt</label>
+        <label class="col-xs-7 col-sm-3 control-label">Penalty per attempt</label>
         <div class="col-xs-5 col-sm-2">
             <input type="number" name="penalty" value="<%= question.penalty %>" min="0" class="form-control">
         </div>
     </div>
 
     <div class="form-group" data-type="code tracing">
-        <label class="col-xs-7 col-sm-2 control-label">Points per line</label>
+        <label class="col-xs-7 col-sm-3 control-label">Points per line</label>
         <div class="col-xs-5 col-sm-2">
             <input type="number" name="maxPointsPerLine" value="<%= question.maxPointsPerLine %>" min="0" class="form-control">
         </div>
     </div>
 
     <div class="form-group" data-type="code tracing">
-        <label class="col-xs-7 col-sm-2 control-label">Maximum attempts per line</label>
+        <label class="col-xs-7 col-sm-3 control-label">Maximum attempts per line</label>
         <div class="col-xs-5 col-sm-2">
             <input type="number" name="maxAttemptsPerLine" value="<%= question.maxAttemptsPerLine %>" min="1" class="form-control">
         </div>
     </div>
 
     <div class="form-group">
-        <label class="col-xs-7 col-sm-2 control-label">First-try bonus</label>
+        <label class="col-xs-7 col-sm-3 control-label">First-try bonus</label>
         <div class="col-xs-5 col-sm-2">
             <input type="number" name="firstTryBonus" value="<%= question.firstTryBonus %>" min="0" class="form-control">
         </div>
@@ -291,8 +291,8 @@
 
     <% if (question.submitter) { %>
     <div class="form-group required">
-        <label class="col-xs-7 col-sm-2 control-label">Approved?</label>
-        <div class="col-xs-5 col-sm-6 col-md-2">
+        <label class="col-xs-7 col-sm-3 control-label">Approved?</label>
+        <div class="col-xs-5 col-sm-2">
             <input type="checkbox" name="approved" value="1" class="bootstrap-switch"<%= question.approved ? ' checked' : '' %>>
         </div>
     </div>
@@ -302,7 +302,7 @@
 
     <!-- buttons -->
     <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
+        <div class="col-sm-offset-3 col-sm-10">
             <a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/questions" class="btn btn-default btn-sm">Cancel</a>
             <button type="button" class="btn btn-default btn-sm" id="btn-preview">Preview</button>
             <% if (question.isNew) { %>
