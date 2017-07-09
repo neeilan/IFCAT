@@ -30,15 +30,6 @@
             <p class="form-control-static"><%= question.submitter.name.full %></p>
         </div>
     </div>
-
-    <!-- approval -->
-    <div class="form-group required">
-        <label class="col-xs-7 col-sm-2 control-label">Approved?</label>
-        <div class="col-xs-5 col-sm-6 col-md-2">
-            <input type="checkbox" name="approved" value="1" class="bootstrap-switch"<%= question.approved ? ' checked' : '' %>>
-        </div>
-    </div>
-    <hr>
     <% } %>
 
     <!-- number -->
@@ -53,7 +44,7 @@
     <div class="form-group required">
         <label class="col-sm-2 control-label">Type</label>
         <div class="col-sm-3">
-            <select name="type" class="form-control">
+            <select name="type" class="form-control"<%= question.submitter ? ' disabled' : '' %>>
             <% _.each(question.schema.path('type').enumValues, type => { %>
                 <option value="<%= type %>"<%= question.type === type ? ' selected' : '' %>><%= _.upperFirst(type) %></option>
             <% }) %>
@@ -252,74 +243,75 @@
     </div>
 
     <!-- options -->
+    <div class="form-group" data-type="short answer">
+        <label class="col-xs-7 col-sm-2 control-label">Case-sensitive</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="checkbox" name="caseSensitive" value="1" class="bootstrap-switch"<%= question.caseSensitive ? ' checked' : '' %>>
+        </div>
+    </div>
+
+    <div class="form-group" data-type="multiple choice|multiple select|short answer">
+        <label class="col-xs-7 col-sm-2 control-label">Shuffle choices?</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="checkbox" name="shuffleChoices" value="1" class="bootstrap-switch"<%= question.shuffleChoices ? ' checked' : '' %> >
+        </div>
+    </div>
+
     <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <a href="#options" data-toggle="collapse" data-target="#options">Toggle additional options</a>
+        <label class="col-xs-7 col-sm-2 control-label">Format using LaTeX?</label>
+        <div class="col-xs-5 col-sm-6 col-md-2">
+            <input type="checkbox" name="useLaTeX" value="1" class="bootstrap-switch"<%= question.useLaTeX ? ' checked' : '' %>>
         </div>
     </div>
-    
-    <div id="options" class="collapse">
 
-        <div class="form-group" data-type="short answer">
-            <label class="col-xs-7 col-sm-2 control-label">Case-sensitive</label>
-            <div class="col-xs-5 col-sm-2">
-                <input type="checkbox" name="caseSensitive" value="1" class="bootstrap-switch"<%= question.caseSensitive ? ' checked' : '' %>>
-            </div>
+    <div class="form-group" data-type="multiple choice|multiple select|short answer">
+        <label class="col-xs-7 col-sm-2 control-label">Points possible</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="number" name="points" value="<%= question.points %>" min="0" class="form-control">
         </div>
-
-        <div class="form-group" data-type="multiple choice|multiple select|short answer">
-            <label class="col-xs-7 col-sm-2 control-label">Shuffle choices?</label>
-            <div class="col-xs-5 col-sm-2">
-                <input type="checkbox" name="shuffleChoices" value="1" class="bootstrap-switch"<%= question.shuffleChoices ? ' checked' : '' %> >
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="col-xs-7 col-sm-2 control-label">Format using LaTeX?</label>
-            <div class="col-xs-5 col-sm-6 col-md-2">
-                <input type="checkbox" name="useLaTeX" value="1" class="bootstrap-switch"<%= question.useLaTeX ? ' checked' : '' %>>
-            </div>
-        </div>
-
-        <div class="form-group" data-type="multiple choice|multiple select|short answer">
-            <label class="col-xs-7 col-sm-2 control-label">Points possible</label>
-            <div class="col-xs-5 col-sm-2">
-                <input type="number" name="points" value="<%= question.points %>" min="0" class="form-control">
-            </div>
-        </div>
-
-        <div class="form-group" data-type="multiple choice|multiple select|short answer">
-            <label class="col-xs-7 col-sm-2 control-label">Penalty per attempt</label>
-            <div class="col-xs-5 col-sm-2">
-                <input type="number" name="penalty" value="<%= question.penalty %>" min="0" class="form-control">
-            </div>
-        </div>
-
-        <div class="form-group" data-type="code tracing">
-            <label class="col-xs-7 col-sm-2 control-label">Points per line</label>
-            <div class="col-xs-5 col-sm-2">
-                <input type="number" name="maxPointsPerLine" value="<%= question.maxPointsPerLine %>" min="0" class="form-control">
-            </div>
-        </div>
-
-        <div class="form-group" data-type="code tracing">
-            <label class="col-xs-7 col-sm-2 control-label">Maximum attempts per line</label>
-            <div class="col-xs-5 col-sm-2">
-                <input type="number" name="maxAttemptsPerLine" value="<%= question.maxAttemptsPerLine %>" min="1" class="form-control">
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="col-xs-7 col-sm-2 control-label">First-try bonus</label>
-            <div class="col-xs-5 col-sm-2">
-                <input type="number" name="firstTryBonus" value="<%= question.firstTryBonus %>" min="0" class="form-control">
-            </div>
-        </div>
-
     </div>
+
+    <div class="form-group" data-type="multiple choice|multiple select|short answer">
+        <label class="col-xs-7 col-sm-2 control-label">Penalty per attempt</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="number" name="penalty" value="<%= question.penalty %>" min="0" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group" data-type="code tracing">
+        <label class="col-xs-7 col-sm-2 control-label">Points per line</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="number" name="maxPointsPerLine" value="<%= question.maxPointsPerLine %>" min="0" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group" data-type="code tracing">
+        <label class="col-xs-7 col-sm-2 control-label">Maximum attempts per line</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="number" name="maxAttemptsPerLine" value="<%= question.maxAttemptsPerLine %>" min="1" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-7 col-sm-2 control-label">First-try bonus</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="number" name="firstTryBonus" value="<%= question.firstTryBonus %>" min="0" class="form-control">
+        </div>
+    </div>
+
+    <% if (question.submitter) { %>
+    <div class="form-group required">
+        <label class="col-xs-7 col-sm-2 control-label">Approved?</label>
+        <div class="col-xs-5 col-sm-6 col-md-2">
+            <input type="checkbox" name="approved" value="1" class="bootstrap-switch"<%= question.approved ? ' checked' : '' %>>
+        </div>
+    </div>
+    <% } %>
+
+    <hr>
 
     <!-- buttons -->
-    <div class="form-group" style="margin-top: 30px;">
+    <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/questions" class="btn btn-default btn-sm">Cancel</a>
             <button type="button" class="btn btn-default btn-sm" id="btn-preview">Preview</button>
