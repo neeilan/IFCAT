@@ -217,7 +217,7 @@
     <div class="form-group required" data-type="code tracing">
         <label class="col-sm-3 control-label">Code</label>
         <div class="col-sm-9">
-            <textarea name="code" class="form-control" rows="5"><%= question.code %></textarea>
+            <textarea name="code" class="form-control code" rows="7"><%= question.code %></textarea>
         </div>
     </div>
 
@@ -225,9 +225,9 @@
         <label class="col-sm-3 control-label">Answers</label>
         <div class="col-sm-9">
         <% if (question.isNew || !question.isCodeTracing()) { %> 
-            <textarea name="_answers" class="form-control" rows="5"></textarea>
+            <textarea name="_answers" class="form-control code" rows="7"></textarea>
         <% } else { %>
-            <textarea name="_answers" class="form-control" rows="5"><%= question.answers.join("\n") %></textarea>
+            <textarea name="_answers" class="form-control code" rows="7"><%= question.answers.join("\n") %></textarea>
         <% } %>
         </div>
     </div>

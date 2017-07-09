@@ -258,7 +258,9 @@ tfoot .pagination {
 .questions .approval {
     color: #a00;
 }
-
+.question .form-control.code {
+    font-family: Courier;
+}
 a.counter {
     margin-left: 10px;
 }
