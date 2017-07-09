@@ -9,16 +9,6 @@
 
 <h3><%- title %></h3>
 
-<% if (question.submitter) { %>
-<div class="alert alert-info">
-    <ul>
-        <li>This question requires approval in order to be published.</li>
-        <li>Review the information shown below and update where necessary.</li>
-    </ul>
-</div>
-<br>
-<% } %>
-
 <% include ../partials/flash %>
 
 <form action="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/questions/<%= question.isNew ? '' : `${question._id}?_method=put` %>" method="post" autocomplete="off" class="form-horizontal">
@@ -308,7 +298,7 @@
     </div>
     <% } %>
 
-    <hr>
+    <br>
 
     <!-- buttons -->
     <div class="form-group">

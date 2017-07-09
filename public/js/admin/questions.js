@@ -1,11 +1,8 @@
 $(function () {
     var body = $(document.body);
     if (body.hasClass('questions')) {
-        var heading = $('> h1'),
-            table = $('table:eq(0)'),
-            dim = table.closest('.dim-wrap');
         // Confirm and delete selected row
-        $('.btn-delete', table).click(function (e) {
+        $('.btn-delete').click(function (e) {
             e.preventDefault();
             var btn = this;
             $.deletebox({
@@ -20,21 +17,21 @@ $(function () {
             });
         });
         // Drag and drop rows
-        $('tbody', table).sortable({ 
+        $('tbody').sortable({ 
             axis: 'y', 
             cancel: false,
             handle: '.handle',
-            update: function () {
-                dim.addClass('on');
-                $.ajax(window.location.href.split(/[?#]/)[0] + '/sort', {
-                    type: 'put',
-                    data: $('input[name^=questions]', table).serialize(),
-                    error: function (xhr) {
-                        heading.after('<div class="alert alert-danger alert-dismissible"><a href="#" class="close" data-dismiss="alert">&times;</a>' + xhr.responseText + '</div>')
-                    },
-                    complete: function () {
-                        dim.removeClass('on');
-                    }
+            update: function (e, ui) {
+                var self = $(this),
+                    url = window.location.href.split(/[?#]/)[0] + '/sort',
+                    data = $('input[name^=questions]', ui.item).serialize();
+                $.put(url, data, function () {
+                    // do nothing
+                }).fail(function (xhr) {
+                    $('.alert-danger').remove();
+                    $('#title').after('<div class="alert alert-danger alert-dismissible"><a href="#" class="close" data-dismiss="alert">&times;</a>' + xhr.responseText + '</div>');
+                    // undo change
+                    self.sortable('cancel');
                 });
             }
         });

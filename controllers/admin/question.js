@@ -32,11 +32,9 @@ exports.getQuestions = (req, res) => {
 };
 // Sort list of questions
 exports.sortQuestions = (req, res) => {
-    var newOrder = req.body.questions || [];
+    var o = req.body.questions || [];
     // sort questions based off order given
-    req.quiz.questions.sort((a, b) => {
-        return newOrder.indexOf(a.toString()) < newOrder.indexOf(b.toString()) ? -1 : 1;
-    });
+    req.quiz.questions.sort((a, b) => o.indexOf(a.toString()) < o.indexOf(b.toString()) ? -1 : 1);
     req.quiz.save(err => {
         if (err)
             return res.status(500).send('An error has occurred while trying to perform operation.');
