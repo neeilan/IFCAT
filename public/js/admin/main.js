@@ -45,8 +45,7 @@ $(function () {
     $(":checkbox.bootstrap-switch").bootstrapSwitch({
         inverse: true,
         offText: 'No',
-        onText: 'Yes',
-        size: 'small'
+        onText: 'Yes'
     });
 
     // $('.collapse').on('hidden.bs.collapse shown.bs.collapse', function (e) {
@@ -83,6 +82,40 @@ $(function () {
             .wrap('<div class="btn-circle' + (this.checked ? ' active' : '') + '"></div>')
             .before('<label>' + this.dataset.label + '</label>');
     });
+
+    // $('.container').radioCheckbox({ delegate: ':checkbox' })
+
+    // $.fn.radioCheckbox = function (options) {
+
+    //     this.on('click', options.delegate, function (e) {
+    //         var btn = $(this).toggleClass('active'), 
+    //             input = $('input', btn).prop('checked', btn.hasClass('active'));
+    //         // inactivate other checkbox-radios if they belong to the same group
+    //         if (input.data('group')) {
+    //             $(e.delegateTarget).find('.btn-circle').has('[data-group=' + input.data('group') + ']').not(btn).each(function () {
+    //                 $(this).removeClass('active').find('input').prop('checked', false);
+    //             });
+    //         }
+    //     });
+
+    //     return this.each(function () {
+    //         // var btn = $(this), input = $('input', btn);
+
+    //         // btn.toggleClass('active');
+    //         // input.prop('checked', btn.hasClass('active'));
+
+    //         // // inactivate other checkbox-radios if they belong to the same group
+    //         // if (input.data('group')) {
+    //         //     $(e.delegateTarget).find('.btn-circle').has('[data-group=' + input.data('group') + ']').not(btn).each(function () {
+    //         //         $(this).removeClass('active').find('input').prop('checked', false);
+    //         //     });
+    //         // }
+
+    //         var input = $(this);
+    //         input.before('<label>' + this.dataset.label + '</label>');
+    //         input.wrap('<div class="btn-circle' + (this.checked ? ' active' : '') + '"></div>');
+    //     });
+    // };
 
     // small plugins for making PUT and DELETE requests
     // @usage: $.put(url, data, callback) or $.delete(url, callback)

@@ -9,16 +9,43 @@
 
 <h3><%- title %></h3>
 
+<% if (question.submitter) { %>
+<div class="alert alert-info">
+    <ul>
+        <li>This question requires approval in order to be published.</li>
+        <li>Review the information shown below and update where necessary.</li>
+    </ul>
+</div>
+<br>
+<% } %>
+
 <% include ../partials/flash %>
 
 <form action="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/questions/<%= question.isNew ? '' : `${question._id}?_method=put` %>" method="post" autocomplete="off" class="form-horizontal">
 
+    <% if (question.submitter) { %>
+    <div class="form-group" style="margin-top: 10px">
+        <label class="col-xs-7 col-sm-2 control-label">Submitted By</label>
+        <div class="col-xs-5 col-sm-2">
+            <p class="form-control-static"><%= question.submitter.name.full %></p>
+        </div>
+    </div>
+
+    <!-- approval -->
+    <div class="form-group required">
+        <label class="col-xs-7 col-sm-2 control-label">Approved?</label>
+        <div class="col-xs-5 col-sm-6 col-md-2">
+            <input type="checkbox" name="approved" value="1" class="bootstrap-switch"<%= question.approved ? ' checked' : '' %>>
+        </div>
+    </div>
+    <hr>
+    <% } %>
+
     <!-- number -->
-    <div class="form-group">
-        <label class="col-sm-2 control-label">Number</label>
+    <div class="form-group help">
+        <label class="col-sm-2 control-label" title="Ex: 1, A or 1a">Number</label>
         <div class="col-sm-2">
             <input name="number" value="<%= question.number %>" maxlength="6" class="form-control">
-            <p class="help-block"><span class="glyphicon glyphicon-info-sign"></span> Ex: 1, A or 1a</p>
         </div>
     </div>
 
@@ -70,10 +97,10 @@
                 <% for (var i = 0, len = 3; i < 3; i++) { %> 
                     <div class="form-group">
                         <div class="col-xs-8">
-                            <textarea name="choices[<%= i %>]" class="form-control" rows="1"></textarea>
+                            <textarea name="_choices[<%= i %>]" class="form-control" rows="1"></textarea>
                         </div>
                         <div class="col-xs-4 radio">
-                            <label><input type="radio" name="answer" value="<%= i %>"<%= !i ? ' checked' : '' %>></label>
+                            <label><input type="radio" name="_answer" value="<%= i %>"<%= !i ? ' checked' : '' %>></label>
                             <span class="glyphicon glyphicon-remove"></span> 
                         </div>
                     </div>
@@ -82,10 +109,10 @@
                 <% _.each(question.choices, (choice, i) => { %>
                     <div class="form-group">
                         <div class="col-xs-8"> 
-                            <textarea name="choices[<%= i %>]" class="form-control" rows="1"><%= choice %></textarea>
+                            <textarea name="_choices[<%= i %>]" class="form-control" rows="1"><%= choice %></textarea>
                         </div>
                         <div class="col-xs-4 radio">
-                            <label><input type="radio" name="answer" value="<%= i %>"<%= question.isAnswer(choice) ? ' checked' : '' %>></label>
+                            <label><input type="radio" name="_answer" value="<%= i %>"<%= question.isAnswer(choice) ? ' checked' : '' %>></label>
                             <span class="glyphicon glyphicon-remove"></span> 
                         </div>
                     </div>
@@ -93,11 +120,11 @@
             <% } %>
             <div class="form-group" style="display: none">
                 <div class="col-xs-8"> 
-                    <textarea name="choices[new]" class="form-control" rows="1"></textarea>
+                    <textarea name="_choices[]" class="form-control" rows="1"></textarea>
                 </div>
                 <div class="col-xs-4 radio">
                     <label>
-                        <input type="radio" name="answer" value="new">
+                        <input type="radio" name="_answer" value="">
                         <span class="glyphicon glyphicon-remove"></span>
                     </label>
                 </div>
@@ -120,10 +147,10 @@
                 <% for (var i = 0, len = 3; i < 3; i++) { %>
                     <div class="form-group">
                         <div class="col-xs-8 pr10"> 
-                            <textarea name="choices[<%= i %>]" class="form-control" rows="1"></textarea>
+                            <textarea name="_choices[<%= i %>]" class="form-control" rows="1"></textarea>
                         </div>
                         <div class="col-xs-4 checkbox">
-                            <label><input type="checkbox" name="answers[]" value="<%= i %>"></label>
+                            <label><input type="checkbox" name="_answers[]" value="<%= i %>"></label>
                             <span class="glyphicon glyphicon-remove"></span>
                         </div>
                     </div>
@@ -132,10 +159,10 @@
                 <% _.each(question.choices, (choice, i) => { %>
                     <div class="form-group">
                         <div class="col-xs-8"> 
-                            <textarea name="choices[<%= i %>]" class="form-control" rows="1"><%= choice %></textarea>
+                            <textarea name="_choices[<%= i %>]" class="form-control" rows="1"><%= choice %></textarea>
                         </div>
                         <div class="col-xs-4 checkbox">
-                            <label><input type="checkbox" name="answers[]" value="<%= i %>"<%= question.isAnswer(choice) ? ' checked' : '' %>></label>
+                            <label><input type="checkbox" name="_answers[]" value="<%= i %>"<%= question.isAnswer(choice) ? ' checked' : '' %>></label>
                             <span class="glyphicon glyphicon-remove"></span>
                         </div>
                     </div>
@@ -143,10 +170,10 @@
             <% } %>
             <div class="form-group" style="display: none">
                 <div class="col-xs-8"> 
-                    <textarea name="choices[new]" class="form-control" rows="1"></textarea>
+                    <textarea name="_choices[]" class="form-control" rows="1"></textarea>
                 </div>
                 <div class="col-xs-4 checkbox">
-                    <label><input type="checkbox" name="answers[]" value="new"></label>
+                    <label><input type="checkbox" name="_answers[]" value=""></label>
                     <span class="glyphicon glyphicon-remove"></span>
                 </div>
             </div>
@@ -168,7 +195,7 @@
                 <% for (var i = 0, len = 3; i < 3; i++) { %>
                     <div class="form-group">
                         <div class="col-xs-8"> 
-                            <textarea name="answers[<%= i %>]" class="form-control" rows="1"></textarea>
+                            <textarea name="_answers[<%= i %>]" class="form-control" rows="1"></textarea>
                         </div>
                         <div class="col-xs-4">
                             <span class="glyphicon glyphicon-remove"></span>
@@ -179,7 +206,7 @@
                 <% _.each(question.answers, (answer, i) => { %>
                     <div class="form-group">
                         <div class="col-xs-8"> 
-                            <textarea name="answers[<%= i %>]" class="form-control" rows="1"><%= answer %></textarea>
+                            <textarea name="_answers[<%= i %>]" class="form-control" rows="1"><%= answer %></textarea>
                         </div>
                         <div class="col-xs-4">
                             <span class="glyphicon glyphicon-remove"></span>
@@ -189,7 +216,7 @@
             <% } %>
             <div class="form-group" style="display: none">
                 <div class="col-xs-8"> 
-                    <textarea name="answers[new]" class="form-control" rows="1"></textarea>
+                    <textarea name="_answers[]" class="form-control" rows="1"></textarea>
                 </div>
                 <div class="col-xs-4">
                     <span class="glyphicon glyphicon-remove"></span>
@@ -217,9 +244,9 @@
         <label class="col-sm-2 control-label">Answers</label>
         <div class="col-sm-10">
         <% if (question.isNew || !question.isCodeTracing()) { %> 
-            <textarea name="answers" class="form-control" rows="5"></textarea>
+            <textarea name="_answers" class="form-control" rows="5"></textarea>
         <% } else { %>
-            <textarea name="answers" class="form-control" rows="5"><%= question.answers.join("\n") %></textarea>
+            <textarea name="_answers" class="form-control" rows="5"><%= question.answers.join("\n") %></textarea>
         <% } %>
         </div>
     </div>

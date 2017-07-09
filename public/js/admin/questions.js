@@ -87,13 +87,12 @@ $(function () {
             var template = $(this).closest('.form-group').prev(),
                 clone = template.clone().toggle(true),
                 id = _.toNumber(_.uniqueId()) + 999;
-            // replace [new]
-            $('textarea', clone).attr('name', function () {
-                return this.name.replace(/new/, id);
+
+            clone.find('textarea').attr('name', function () {
+                return this.name.replace(/\[\]$/, '[' + id + ']');
             });
-            $(':radio, :checkbox', clone).val(function () {
-                return this.value.replace(/new/, id);
-            });
+            clone.find(':radio, :checkbox').val(id);
+            
             template.before(clone);
         });
         //

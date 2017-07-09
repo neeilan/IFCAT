@@ -15,8 +15,8 @@ exports.getQuestionByParam = (req, res, next, id) => {
     });
 };
 // Retrieve list of questions for quiz
-exports.getQuestions = (req, res) => { 
-    req.quiz.withQuestions().execPopulate().then(() => {
+exports.getQuestions = (req, res) => {
+    req.quiz.withQuestions(true).execPopulate().then(() => {
         if (req.query.sort === 'votes') {
             req.quiz.questions = _.orderBy(req.quiz.questions, question => {
                 return _.lowerBound(question.votes.up.length, question.votes.length);
@@ -46,34 +46,36 @@ exports.sortQuestions = (req, res) => {
 // Retrieve specific question for quiz
 exports.getQuestion = (req, res) => {
     let question = req.question || new models.Question();
-    req.course.withFiles().execPopulate().then(function () {
-        // set default options
-        _.forOwn(req.quiz.default.question, (v, k) => {
-            question[k] = _.defaultTo(question[k], req.quiz.default.question[k]);
-        });
-        
-        res.render('admin/pages/quiz-question', {
-            bodyClass: 'question',
-            title: question.isNew ? 'Add New Question' : 'Edit Question',
-            course: req.course, 
-            quiz: req.quiz, 
-            question: question
+    // set default options
+    _.forOwn(req.quiz.default, (v, k) => {
+        question[k] = _.defaultTo(question[k], v);
+    });
+
+    req.course.withFiles().execPopulate().then(() => {
+        question.populate('submitter').execPopulate().then(() => {
+            res.render('admin/pages/quiz-question', {
+                bodyClass: 'question',
+                title: question.isNew ? 'Add New Question' : 'Edit Question',
+                course: req.course, 
+                quiz: req.quiz, 
+                question: question
+            });
         });
     });
 };
 // Add new question for quiz
 exports.addQuestion = (req, res) => {
-    var question = new models.Question();
+    let question = new models.Question();
+    let url = `/admin/courses/${req.course._id}/quizzes/${req.quiz._id}/questions`;
     async.series([
         done => question.store(req.body).save(done),
-        done => req.quiz.update({ $addToSet: { questions: question.id }}, done)
+        done => req.quiz.update({ $addToSet: { questions: question._id }}, done)
     ], function (err) {
         if (err)
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', 'Question <b>%s</b> has been created.', question.number);
-        let backUrl = `/admin/courses/${req.course.id}/quizzes/${req.quiz.id}/questions`;
-        res.redirect(req.body.back === '1' ? backUrl : backUrl + '/new');
+        res.redirect(req.body.back === '1' ? url : `${url}/new`);
     });
 };
 // Update specific question for quiz
@@ -83,7 +85,7 @@ exports.editQuestion = (req, res) => {
             req.flash('error', 'An error has occurred while trying to perform operation.');
         else
             req.flash('success', 'Question <b>%s</b> has been updated.', req.question.number);
-        res.redirect(`/admin/courses/${req.course.id}/quizzes/${req.quiz.id}/questions/${req.question.id}/edit`);
+        res.redirect(`/admin/courses/${req.course._id}/quizzes/${req.quiz._id}/questions/${req.question._id}/edit`);
     });
 };
 // Delete specific question for quiz
@@ -98,42 +100,42 @@ exports.deleteQuestion = (req, res) => {
 };
 // Preview question
 exports.previewQuestion = (req, res) => {
-    var question = new models.Question();
-        question.number = _.trim(req.body.number)
-        question.question = _.trim(req.body.question);
-        question.type = req.body.type;
-        question.useLaTeX = !!req.body.useLaTeX;
+    // var question = new models.Question();
+    //     question.number = _.trim(req.body.number)
+    //     question.question = _.trim(req.body.question);
+    //     question.type = req.body.type;
+    //     question.useLaTeX = !!req.body.useLaTeX;
 
-    req.course.withFiles().execPopulate().then(function () {
-        var files = req.body.files || [];
-        // add files
-        question.files = _.filter(req.course.files, function (file) {
-            return files.indexOf(file.id) > -1;
-        });
-        // add unique links
-        _.each(req.body.links, function (link) {
-            link = _.trim(link);
-            if (link) {
-                if (!url.parse(link).protocol)
-                    link = 'http://' + link;
-                if (question.links.indexOf(link) === -1)
-                    question.links.push(link);
-            }
-        });
-        // add unique choices
-        _.forOwn(req.body.choices, function (choice) {
-            choice = _.trim(choice);
-            if (choice && question.choices.indexOf(choice) === -1)
-                question.choices.push(choice);
-        });
-        // shuffle choices
-        if (!!req.body.shuffleChoices)
-            question.choices = _.shuffle(question.choices);
+    // req.course.withFiles().execPopulate().then(function () {
+    //     var files = req.body.files || [];
+    //     // add files
+    //     question.files = _.filter(req.course.files, function (file) {
+    //         return files.indexOf(file.id) > -1;
+    //     });
+    //     // add unique links
+    //     _.each(req.body.links, function (link) {
+    //         link = _.trim(link);
+    //         if (link) {
+    //             if (!url.parse(link).protocol)
+    //                 link = 'http://' + link;
+    //             if (question.links.indexOf(link) === -1)
+    //                 question.links.push(link);
+    //         }
+    //     });
+    //     // add unique choices
+    //     _.forOwn(req.body.choices, function (choice) {
+    //         choice = _.trim(choice);
+    //         if (choice && question.choices.indexOf(choice) === -1)
+    //             question.choices.push(choice);
+    //     });
+    //     // shuffle choices
+    //     if (!!req.body.shuffleChoices)
+    //         question.choices = _.shuffle(question.choices);
 
-        res.render('admin/pages/quiz-question-preview', { 
-            title: 'Preview Question', 
-            course: req.course, 
-            question: question 
-        });
-    });
+    //     res.render('admin/pages/quiz-question-preview', { 
+    //         title: 'Preview Question', 
+    //         course: req.course, 
+    //         question: question 
+    //     });
+    // });
 };

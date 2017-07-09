@@ -5,7 +5,7 @@ const _ = require('lodash'),
     models = require('../../models');
 // Retrieve course
 exports.getQuizByParam = (req, res, next, id) => {
-    models.Quiz.findById(id).exec((err, quiz) => {
+    models.Quiz.findById(id, (err, quiz) => {
         if (err)
             return next(err);
         if (!quiz)

@@ -19,7 +19,8 @@ const QuestionSchema = new mongoose.Schema({
     points: Number,
     firstTryBonus: Number,
     penalty: Number,
-    creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    submitter: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    approved: Boolean,
     votes: {
         up: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
         down: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
@@ -69,69 +70,53 @@ QuestionSchema.methods.isAnswer = function (choice) {
 };
 // Set question
 QuestionSchema.methods.store = function (obj) {
-    this.number = _.trim(obj.number);
-    this.type = obj.type;
-    this.question = _.trim(obj.question);
-    this.code = _.trim(obj.code);
-    this.choices = []; 
-    this.answers = [];
-    // multimedia options
-    this.files = obj.files || [];
-    this.links = [];
-    // additional options
-    this.caseSensitive = obj.caseSensitive;
-    this.shuffleChoices = obj.shuffleChoices;
-    this.useLaTeX = obj.useLaTeX;
-    this.points = obj.points;
-    this.firstTryBonus = obj.firstTryBonus;
-    this.maxPointsPerLine = obj.maxPointsPerLine
-    this.maxAttemptsPerLine = obj.maxAttemptsPerLine;
-    this.penalty = obj.penalty;
+    let self = this;
 
-    let selected, self = this;
+    self.choices = self.answers = [];
+    self.caseSensitive = !!obj.caseSensitive;
+    self.shuffleChoices = !!obj.shuffleChoices;
+    self.useLaTeX = !!obj.useLaTeX;
+    self.approved = !!obj.approved;
+    self.set(obj);
 
-    _.each(obj.links, link => {
+    _.each(obj._links, link => {
         link = _.trim(link);
         if (link) {
             if (!url.parse(link).protocol)
-                link = 'http://' + link;
+                link = `http://${link}`;
             if (self.links.indexOf(link) === -1)
                 self.links.push(link);
         }
     });
 
-    // type-specific options
-    if (this.isMultipleChoice()) {
-        _.forOwn(obj.choices, (choice, i) => {
+    let selected;
+    if (self.isMultipleChoice()) {
+        _.forOwn(obj._choices, (choice, i) => {
             choice = _.trim(choice);
             if (choice && self.choices.indexOf(choice) === -1) {
                 self.choices.push(choice);
-                // mark as the answer if selected
-                if (i === obj.answer)
+                if (i === obj._answer)
                     self.answers = [choice];
             }
         });
-    } else if (this.isMultipleSelect()) {
-        selected = _.isObject(obj.answers) ? obj.answers : [];
-        _.forOwn(obj.choices, (choice, i) => {
+    } else if (self.isMultipleSelect()) {
+        selected = _.isObject(obj._answers) ? obj._answers : [];
+        _.forOwn(obj._choices, (choice, i) => {
             choice = _.trim(choice);
             if (choice && self.choices.indexOf(choice) === -1) {
                 self.choices.push(choice);
-                // mark as one of answers if selected
                 if (selected.indexOf(i) > -1)
                     self.answers.push(choice);
             }
         });
-    } else if (this.isShortAnswer()) {
-        _.forOwn(obj.answers, answer => {
+    } else if (self.isShortAnswer()) {
+        _.forOwn(obj._answers, answer => {
             answer = _.trim(answer);
-            if (answer && self.answers.indexOf(answer) === -1) {
+            if (answer && self.answers.indexOf(answer) === -1)
                 self.answers.push(answer);
-            }
         });
-        
-    } else if (this.isCodeTracing()) {
-        self.answers = obj.answers.split("\n");
+    } else if (self.isCodeTracing()) {
+        self.answers = obj._answers.split("\n");
     }
     return self;
 };

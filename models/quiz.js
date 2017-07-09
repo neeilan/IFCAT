@@ -5,13 +5,11 @@ const QuizSchema = new mongoose.Schema({
     name: { type: String, required: true },
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
     default: {
-        question: {
-            shuffleChoices: Boolean,
-            useLaTeX: Boolean,
-            points: { type: Number, default : 4 },
-            firstTryBonus: { type : Number, default : 1 },
-            penalty: { type : Number, default : 1 }
-        }
+        shuffleChoices: Boolean,
+        useLaTeX: Boolean,
+        points: { type: Number, default : 4 },
+        firstTryBonus: { type : Number, default : 1 },
+        penalty: { type : Number, default : 1 }
     },
     studentChoice: Boolean,
     studentVoting: Boolean
@@ -30,8 +28,18 @@ QuizSchema.pre('remove', function (next) {
 // Populate tutorial-quizzes
 QuizSchema.virtual('tutorialQuizzes', { ref: 'TutorialQuiz', localField: '_id', foreignField: 'quiz' });
 // Populate questions
-QuizSchema.methods.withQuestions = function () {
-    return this.populate({ path: 'questions', options: { sort: { number: 1 }}});
+QuizSchema.methods.withQuestions = function (deep = false) {
+    let obj = {
+        path: 'questions',
+        model: 'Question'
+    };
+    if (deep) {
+        obj.populate = {
+            path: 'submitter',
+            model: 'User'
+        }
+    }
+    return this.populate(obj);
 };
 // 
 QuizSchema.methods.isLinkedTo = function (tutorial) {

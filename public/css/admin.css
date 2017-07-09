@@ -4,23 +4,46 @@ body {
 body > .navbar {
     border-radius: 0px;
 }
-
-textarea.form-control {
-    max-width: 100%;
-}
-input[type=checkbox][data-label] {
-    display: none;
-}
 /**
  * Alert
  */
 .alert {
     display: inline-block;
     font-size: 14px;
+    margin-bottom: 0;
+    overflow: hidden;
+}
+.alert ul {
+    padding-left: 15px;
+}
+.alert li {
+    font-weight: bold;
 }
 /**
- * Numbered circles
+ * Forms
  */
+textarea.form-control {
+    max-width: 100%;
+}
+input[type=checkbox][data-label] {
+    display: none;
+}
+.form-group .control-label {
+    font-size: 14px;
+}
+.form-group.required .control-label:before {
+    color: red;
+    content: "*";
+    font-size: 120%;
+    margin-right: 2px;
+}
+/**
+ * Buttons
+ */
+.btn-default {
+    background-color: #fff;
+    font-size: 13px;
+}
 .btn-circle {
     background: #fff;
     border-color: #ddd;
@@ -87,6 +110,7 @@ input[type=checkbox][data-label] {
  */
 .dropdown-menu a {
     background-color: #fff;
+    font-size: 13px;
 }
 .dropdown-menu .divider {
     margin: 0;
@@ -94,14 +118,7 @@ input[type=checkbox][data-label] {
 .handle {
     cursor: pointer;
 }
-.form-group.required .control-label:before {
-    color: red;
-    content: "*";
-    font-size: 120%;
-    position: absolute;
-    margin-left: -12px;
-    top: 5px;
-}
+
 .nav-actions {
     padding: 10px 0;
 }
@@ -117,6 +134,9 @@ input[type=checkbox][data-label] {
 /**
  * Tables
  */
+.table > thead > tr > th, .table > tbody > tr > td {
+    font-size: 13px;
+}
 .table > tfoot > tr > th {
     border-top: 2px solid #ddd;
 }
@@ -223,8 +243,22 @@ tfoot .pagination {
     margin: 0 auto;
 }
 /**
- * Question form
+ * Question pages
  */
+.questions .question {
+    white-space: pre-wrap;
+}
+.questions .submitter, .questions .approval {
+    text-transform: lowercase;
+}
+.questions .submitter {
+    color: #007196;
+    margin-top: 5px;
+}
+.questions .approval {
+    color: #a00;
+}
+
 a.counter {
     margin-left: 10px;
 }
@@ -318,4 +352,10 @@ a.counter {
         min-width: auto;
         width: 100%;
     }
+}
+/**
+ * Bootstrap Switch
+ */
+.bootstrap-switch-wrapper {
+    
 }

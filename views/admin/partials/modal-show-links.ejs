@@ -1,5 +1,5 @@
 
-<div class="modal fade" id="modal-show-links" tabindex="-1" style="display: none">
+<div class="modal fade" id="modal-show-links" tabindex="-1" style="display:none">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -9,7 +9,7 @@
                 <% if (_.isEmpty(question.links)) { %>
                     <div class="form-group">
                         <div class="col-xs-8"> 
-                            <input type="text" name="links[]" value="" class="form-control" placeholder="http://www.example.com">
+                            <input type="text" name="_links[]" value="" class="form-control" placeholder="http://www.example.com">
                         </div>
                         <div class="col-xs-2">
                             <span class="glyphicon glyphicon-remove"></span>
@@ -19,7 +19,7 @@
                     <% _.each(question.links, link => { %>
                         <div class="form-group">
                             <div class="col-xs-8"> 
-                                <input type="text" name="links[]" value="<%= link %>" class="form-control" placeholder="http://www.example.com">
+                                <input type="text" name="_links[]" value="<%= link %>" class="form-control" placeholder="http://www.example.com">
                             </div>
                             <div class="col-xs-2">
                                 <span class="glyphicon glyphicon-remove"></span>
@@ -29,7 +29,7 @@
                 <% } %>
                 <div class="form-group" style="display: none">
                     <div class="col-xs-8"> 
-                        <input type="text" name="links[]" value="" class="form-control" placeholder="http://www.example.com">
+                        <input type="text" name="_links[]" value="" class="form-control" placeholder="http://www.example.com">
                     </div>
                     <div class="col-xs-2">
                         <span class="glyphicon glyphicon-remove"></span>
