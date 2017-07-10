@@ -123,22 +123,16 @@ $(function () {
         });
         // Preview question
         var win;
-        $('#btn-preview').click(function () {
-            // close previous window
+        $('#btn-preview').click(function (e) {
+            e.preventDefault();
             if (win) {
                 win.close();
             }
-            $.ajax('/admin/courses/<%- course.id %>/quizzes/<%- quiz.id %>/questions/preview', {
-                type: 'post',
-                data: $(this).closest('form').serialize(),
-                dataType: 'html',
-                success: function (res) {
-                    // open new window
-                    win = window.open('', '_preview', 'width=800, height=600');
-                    win.document.write(res);
-                    win.document.close();
-                }
-            });
+            $.post(this.href, $(this).closest('form').serialize(), function (res) {
+                win = window.open('', '_preview', 'width=800, height=600');
+                win.document.write(res);
+                win.document.close();
+            }, 'html');
         });
     }
 });

@@ -29,22 +29,31 @@ QuizSchema.pre('remove', function (next) {
 QuizSchema.virtual('tutorialQuizzes', { ref: 'TutorialQuiz', localField: '_id', foreignField: 'quiz' });
 // Populate questions
 QuizSchema.methods.withQuestions = function (deep = false) {
-    let obj = {
+    let opts = {
         path: 'questions',
         model: 'Question'
     };
     if (deep) {
-        obj.populate = {
+        opts.populate = {
             path: 'submitter',
             model: 'User'
         }
     }
-    return this.populate(obj);
+    return this.populate(opts);
 };
-// 
+// Set quiz
+QuizSchema.methods.store = function (opts) {
+    this.studentChoice = !!opts.studentChoice;
+    this.studentVoting = !!opts.studentVoting;
+    this.default.shuffleChoices = !!opts.default.shuffleChoices;
+    this.default.useLaTeX = !!opts.default.useLaTeX;
+    this.set(opts);
+    return this;
+};
+// Check if quiz is linked with tutorial
 QuizSchema.methods.isLinkedTo = function (tutorial) {
     return _.some(this.tutorialQuizzes, tutorialQuiz => tutorialQuiz.tutorial.equals(tutorial._id));
-}
+};
 // Save quiz
 QuizSchema.methods.linkTutorials = function (tutorials = [], done) {
     let self = this;

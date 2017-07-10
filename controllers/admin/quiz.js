@@ -40,9 +40,9 @@ exports.getQuiz = (req, res) => {
 };
 // Add quiz to course
 exports.addQuiz = (req, res) => {
-    var quiz = new models.Quiz();
+    let quiz = new models.Quiz();
     async.series([
-        done => quiz.set(req.body).save(done),
+        done => quiz.store(req.body).save(done),
         done => req.course.update({ $push: { quizzes: quiz._id }}, done),
         done => quiz.linkTutorials(req.body.tutorials, done)
     ], err => {
@@ -56,7 +56,7 @@ exports.addQuiz = (req, res) => {
 // Update quiz
 exports.editQuiz = (req, res) => {
     async.series([
-        done => req.quiz.set(req.body).save(done),
+        done => req.quiz.store(req.body).save(done),
         done => req.quiz.linkTutorials(req.body.tutorials, done)
     ], err => {
         if (err)

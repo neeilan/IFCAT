@@ -69,17 +69,17 @@ QuestionSchema.methods.isAnswer = function (choice) {
     return this.answers.indexOf(choice) > -1;
 };
 // Set question
-QuestionSchema.methods.store = function (obj) {
+QuestionSchema.methods.store = function (opts) {
     let self = this;
 
     self.choices = self.answers = [];
-    self.caseSensitive = !!obj.caseSensitive;
-    self.shuffleChoices = !!obj.shuffleChoices;
-    self.useLaTeX = !!obj.useLaTeX;
-    self.approved = !!obj.approved;
-    self.set(obj);
+    self.caseSensitive = !!opts.caseSensitive;
+    self.shuffleChoices = !!opts.shuffleChoices;
+    self.useLaTeX = !!opts.useLaTeX;
+    self.approved = !!opts.approved;
+    self.set(opts);
 
-    _.each(obj._links, link => {
+    _.each(opts._links, link => {
         link = _.trim(link);
         if (link) {
             if (!url.parse(link).protocol)
@@ -91,17 +91,17 @@ QuestionSchema.methods.store = function (obj) {
 
     let selected;
     if (self.isMultipleChoice()) {
-        _.forOwn(obj._choices, (choice, i) => {
+        _.forOwn(opts._choices, (choice, i) => {
             choice = _.trim(choice);
             if (choice && self.choices.indexOf(choice) === -1) {
                 self.choices.push(choice);
-                if (i === obj._answer)
+                if (i === opts._answer)
                     self.answers = [choice];
             }
         });
     } else if (self.isMultipleSelect()) {
-        selected = _.isObject(obj._answers) ? obj._answers : [];
-        _.forOwn(obj._choices, (choice, i) => {
+        selected = _.isoptsect(opts._answers) ? opts._answers : [];
+        _.forOwn(opts._choices, (choice, i) => {
             choice = _.trim(choice);
             if (choice && self.choices.indexOf(choice) === -1) {
                 self.choices.push(choice);
@@ -110,13 +110,13 @@ QuestionSchema.methods.store = function (obj) {
             }
         });
     } else if (self.isShortAnswer()) {
-        _.forOwn(obj._answers, answer => {
+        _.forOwn(opts._answers, answer => {
             answer = _.trim(answer);
             if (answer && self.answers.indexOf(answer) === -1)
                 self.answers.push(answer);
         });
     } else if (self.isCodeTracing()) {
-        self.answers = obj._answers.split("\n");
+        self.answers = opts._answers.split("\n");
     }
     return self;
 };
