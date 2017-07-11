@@ -217,18 +217,20 @@
     <div class="form-group required" data-type="code tracing">
         <label class="col-sm-3 control-label">Code</label>
         <div class="col-sm-9">
-            <textarea name="code" class="form-control code" rows="7"><%= question.code %></textarea>
+            <div contenteditable class="form-control"><%= question.code %></div>
+            <input type="hidden" name="code" value="<%= question.code %>">
         </div>
     </div>
 
     <div class="form-group required" data-type="code tracing">
         <label class="col-sm-3 control-label">Answers</label>
         <div class="col-sm-9">
-        <% if (question.isNew || !question.isCodeTracing()) { %> 
-            <textarea name="_answers" class="form-control code" rows="7"></textarea>
+        <% if (question.isNew || !question.isCodeTracing()) { %>
+            <div contenteditable class="form-control"></div>
         <% } else { %>
-            <textarea name="_answers" class="form-control code" rows="7"><%= question.answers.join("\n") %></textarea>
+            <div contenteditable class="form-control"><%= question.answers.join("\n") %></div>
         <% } %>
+            <input type="hidden" name="_answers" value="<%= question.answers.join("\n") %>">
         </div>
     </div>
 
@@ -243,7 +245,7 @@
     <div class="form-group" data-type="multiple choice|multiple select|short answer">
         <label class="col-xs-7 col-sm-3 control-label">Shuffle choices?</label>
         <div class="col-xs-5 col-sm-2">
-            <input type="checkbox" name="shuffleChoices" value="1" class="bootstrap-switch"<%= question.shuffleChoices ? ' checked' : '' %> >
+            <input type="checkbox" name="shuffleChoices" value="1" class="bootstrap-switch"<%= question.shuffleChoices ? ' checked' : '' %>>
         </div>
     </div>
 
@@ -304,7 +306,7 @@
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-10">
             <a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/questions" class="btn btn-default btn-sm">Cancel</a>
-            <a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/questions/preview" class="btn btn-default btn-sm" id="btn-preview">Preview</button>
+            <a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/questions/preview" class="btn btn-default btn-sm" id="btn-preview">Preview</a>
             <% if (question.isNew) { %>
                 <input type="hidden" id="back" name="back" value="1">
                 <button type="submit" class="btn btn-primary btn-sm" onclick="back.value=0">Save &amp; Add Another New Question</button>

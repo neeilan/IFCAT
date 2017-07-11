@@ -75,6 +75,10 @@ $(function () {
             });
             $('.counter.links').text(count + ' link' + (count !== 1 ? 's' : '') + ' added');
         });
+        // Resize code-tracing fields
+        $('div[contenteditable]').on('input', function () {
+            $(this).next().val(this.innerText);
+        });
         // Remove choice input
         $(document).on('click', '.glyphicon-remove', function () {
             $(this).closest('.form-group').remove();
