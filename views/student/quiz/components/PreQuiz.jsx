@@ -13,7 +13,7 @@ export default class PreQuiz extends React.Component {
 	render() {
         var driverSelect;
         if (this.props.active && this.props.groupName) { 
-        driverSelect = (<div>
+        driverSelect = (<div className="col-xs-12 col-md-10 col-md-offset-1">
                 This quiz requires a member of your group to serve as the driver, who will submit answers.
                 <EmptyLine />
                 <button 

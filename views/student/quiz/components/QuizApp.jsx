@@ -297,7 +297,7 @@ export default class QuizApp extends React.Component {
         var postQuiz = this.state.inProgress ? null : this.getPostQuiz();
         var groupBuilder = this.state.inProgress ? null : this.getGroupBuilder();
 
-        return (<div className="row col-xs-12 col-md-10 col-md-offset-1"> 
+        return (<div> 
                     {preQuiz} 
                     {groupBuilder} 
                     {scoreBar}

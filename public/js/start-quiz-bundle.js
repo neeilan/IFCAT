@@ -10120,7 +10120,7 @@ var QuizApp = function (_React$Component) {
 
             return _react2.default.createElement(
                 'div',
-                { className: 'row col-xs-12 col-md-10 col-md-offset-1' },
+                null,
                 preQuiz,
                 groupBuilder,
                 scoreBar,
@@ -22925,7 +22925,7 @@ var PreQuiz = function (_React$Component) {
       if (this.props.active && this.props.groupName) {
         driverSelect = _react2.default.createElement(
           'div',
-          null,
+          { className: 'col-xs-12 col-md-10 col-md-offset-1' },
           'This quiz requires a member of your group to serve as the driver, who will submit answers.',
           _react2.default.createElement(_EmptyLine2.default, null),
           _react2.default.createElement(
