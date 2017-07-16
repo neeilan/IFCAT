@@ -9955,7 +9955,7 @@ var QuizApp = function (_React$Component) {
                     });
 
                     // All questions completed
-                    if (_this2.state.quiz.quiz.questions.length == _this2.state.numCorrect) socket.emit('quizComplete', {
+                    if (_this2.state.quiz.quiz.questions.length == _this2.state.numCorrect) socket.emit('QUIZ_COMPLETE', {
                         groupId: _this2.state.groupId,
                         quizId: _this2.state.quiz.quiz._id
                     });

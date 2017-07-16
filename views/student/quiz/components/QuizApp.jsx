@@ -135,7 +135,7 @@ export default class QuizApp extends React.Component {
 
                 // All questions completed
                 if (this.state.quiz.quiz.questions.length == this.state.numCorrect)
-                    socket.emit('quizComplete', {
+                    socket.emit('QUIZ_COMPLETE', {
                         groupId: this.state.groupId,
                         quizId: this.state.quiz.quiz._id
                     });
