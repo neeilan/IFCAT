@@ -4,16 +4,14 @@ var models = require('../models'),
 
 
 module.exports = (io) => (function (socket) {   
+    if (socket.request.user && socket.request.user.logged_in)
+        console.log('authenticated socket');
+    else
+        socket.disconnect();
+
     const emitters = require('./emitters')(io);
     const fetchHandler = (handlerName) => (controllers.TutorialQuiz[handlerName])(socket, emitters);
 
-    if (socket.request.user && socket.request.user.logged_in) {
-        console.log('authenticated socket');
-        // var referringUrl = socket.request.headers.referrer;
-    }
-    else {
-        socket.disconnect();
-    }
 
     socket.on('NOMINATE_SELF_AS_DRIVER', fetchHandler('nominateDriver'));
     socket.on('AWARD_POINT', fetchHandler('awardPoint'));
@@ -21,7 +19,6 @@ module.exports = (io) => (function (socket) {
     socket.on('JOIN_GROUP', fetchHandler('joinGroup'));
     socket.on('CREATE_GROUP', fetchHandler('createGroup'));
     socket.on('CODE_TRACING_ANSWER_ATTEMPT', fetchHandler('codeTracingAttempt'));
-
     
     socket.on('REQUEST_QUIZ', function(tutQuizId){
         models.TutorialQuiz.findById(tutQuizId)

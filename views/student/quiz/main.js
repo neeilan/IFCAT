@@ -77,7 +77,7 @@ const mock_io = () => ({
 			}
 			case 'assignSelfAsDriver' : {
 				this._emit('resetDriver', { groupId: currGroupId });
-				this._emit('assignedAsDriver', { groupId: currGroupId });
+				this._emit('ASSIGNED_AS_DRIVER', { groupId: currGroupId });
 			}
 		}
 	},

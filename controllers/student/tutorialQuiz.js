@@ -85,7 +85,7 @@ exports.nominateDriver = (socket, emitters) => (function(data) {
     })
     .then(function(){
         emitters.emitToGroup(data.groupId, 'resetDriver', { groupId : data.groupId });
-        socket.emit('assignedAsDriver', { groupId : data.groupId } );
+        socket.emit('ASSIGNED_AS_DRIVER', { groupId : data.groupId } );
         emitters.emitToGroup(data.groupId, 'startQuiz', {});
     })
 });

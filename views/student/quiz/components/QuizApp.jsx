@@ -175,17 +175,13 @@ export default class QuizApp extends React.Component {
             });
         });
 
-        socket.on('assignedAsDriver', (data) => {
-            console.log('assignedAsDriver');
-            console.log(data);
-
+        socket.on('ASSIGNED_AS_DRIVER', (data) => {
             if (!this.state.groupId || data.groupId != this.state.groupId) return;
             // enable choices and submit buttons (disabled by default)
             this.setState({
                 isDriver: true,
                 inProgress: true
             });
-
         });
 
         socket.on('quizActivated', (data) => {
@@ -193,13 +189,14 @@ export default class QuizApp extends React.Component {
             console.log(data);
             if (data.active) {
                 swal('Quiz activated', 'You can pick a driver and start the quiz', 'info');
+                this.setState({active : true});
             } else {
                 swal('Quiz de-activated', 'Your answers have been submitted', 'info');
+                this.setState({active : false});
+
             }
-            if (!this.state.groupId || data.groupId != this.state.groupId) return;
             this.setState({
                 complete: !data.active,
-                active: data.active,
                 inProgress: false
             });
         });
@@ -212,11 +209,7 @@ export default class QuizApp extends React.Component {
             this.setState({
                 responses: responses
             });
-        })
-
-
-
-
+        });
     }
 
     emit(eventName, data) {
@@ -298,7 +291,7 @@ export default class QuizApp extends React.Component {
 
     render() {
         var scoreIndicator = this.state.inProgress ? <span> Quiz: {this.state.score} </span> : null;
-        var preQuiz = this.state.inProgress ? null : <PreQuiz setDriverCb = {this.setDriverCb} groupName = {this.state.groupName} />;
+        var preQuiz = this.state.inProgress ? null : <PreQuiz setDriverCb = {this.setDriverCb} groupName = {this.state.groupName} active={this.state.active}/>;
         var scoreBar = this.state.inProgress ? this.getScoreBar() : null;
         var question = this.state.inProgress ? this.getCurrentQuestion() : null;
         var postQuiz = this.state.inProgress ? null : this.getPostQuiz();

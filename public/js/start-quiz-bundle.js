@@ -9994,10 +9994,7 @@ var QuizApp = function (_React$Component) {
                 });
             });
 
-            socket.on('assignedAsDriver', function (data) {
-                console.log('assignedAsDriver');
-                console.log(data);
-
+            socket.on('ASSIGNED_AS_DRIVER', function (data) {
                 if (!_this2.state.groupId || data.groupId != _this2.state.groupId) return;
                 // enable choices and submit buttons (disabled by default)
                 _this2.setState({
@@ -10011,13 +10008,13 @@ var QuizApp = function (_React$Component) {
                 console.log(data);
                 if (data.active) {
                     swal('Quiz activated', 'You can pick a driver and start the quiz', 'info');
+                    _this2.setState({ active: true });
                 } else {
                     swal('Quiz de-activated', 'Your answers have been submitted', 'info');
+                    _this2.setState({ active: false });
                 }
-                if (!_this2.state.groupId || data.groupId != _this2.state.groupId) return;
                 _this2.setState({
                     complete: !data.active,
-                    active: data.active,
                     inProgress: false
                 });
             });
@@ -10115,7 +10112,7 @@ var QuizApp = function (_React$Component) {
                 this.state.score,
                 ' '
             ) : null;
-            var preQuiz = this.state.inProgress ? null : _react2.default.createElement(_PreQuiz2.default, { setDriverCb: this.setDriverCb, groupName: this.state.groupName });
+            var preQuiz = this.state.inProgress ? null : _react2.default.createElement(_PreQuiz2.default, { setDriverCb: this.setDriverCb, groupName: this.state.groupName, active: this.state.active });
             var scoreBar = this.state.inProgress ? this.getScoreBar() : null;
             var question = this.state.inProgress ? this.getCurrentQuestion() : null;
             var postQuiz = this.state.inProgress ? null : this.getPostQuiz();
@@ -22924,6 +22921,31 @@ var PreQuiz = function (_React$Component) {
   _createClass(PreQuiz, [{
     key: 'render',
     value: function render() {
+      var driverSelect;
+      if (this.props.active && this.props.groupName) {
+        driverSelect = _react2.default.createElement(
+          'div',
+          null,
+          'This quiz requires a member of your group to serve as the driver, who will submit answers.',
+          _react2.default.createElement(_EmptyLine2.default, null),
+          _react2.default.createElement(
+            'button',
+            {
+              onClick: this.props.setDriverCb.bind(this, true),
+              className: this.strings.driverBtnClass + ' btn-primary' },
+            'I will be driver'
+          ),
+          _react2.default.createElement('br', null),
+          _react2.default.createElement(
+            'button',
+            {
+              onClick: this.props.setDriverCb.bind(this, false),
+              className: this.strings.driverBtnClass + ' btn-danger' },
+            'I will not be the driver'
+          )
+        );
+      }
+
       return _react2.default.createElement(
         'div',
         { className: 'row text-center' },
@@ -22932,26 +22954,10 @@ var PreQuiz = function (_React$Component) {
         _react2.default.createElement(
           'h1',
           null,
-          this.props.groupName
+          this.props.groupName || '?'
         ),
         _react2.default.createElement(_EmptyLine2.default, null),
-        'This quiz requires a member of your group to serve as the driver, who will submit answers.',
-        _react2.default.createElement(_EmptyLine2.default, null),
-        _react2.default.createElement(
-          'button',
-          {
-            onClick: this.props.setDriverCb.bind(this, true),
-            className: this.strings.driverBtnClass + ' btn-primary' },
-          'I will be driver'
-        ),
-        _react2.default.createElement('br', null),
-        _react2.default.createElement(
-          'button',
-          {
-            onClick: this.props.setDriverCb.bind(this, false),
-            className: this.strings.driverBtnClass + ' btn-danger' },
-          'I will not be the driver'
-        ),
+        driverSelect,
         _react2.default.createElement('br', null)
       );
     }
@@ -23564,7 +23570,7 @@ var mock_io = function mock_io() {
 				case 'assignSelfAsDriver':
 					{
 						this._emit('resetDriver', { groupId: currGroupId });
-						this._emit('assignedAsDriver', { groupId: currGroupId });
+						this._emit('ASSIGNED_AS_DRIVER', { groupId: currGroupId });
 					}
 			}
 		},

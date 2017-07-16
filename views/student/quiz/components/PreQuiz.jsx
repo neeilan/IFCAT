@@ -11,12 +11,9 @@ export default class PreQuiz extends React.Component {
 		}
 	}
 	render() {
-		return (
-			<div className="row text-center">
-                You are in group:
-                <br/>
-                <h1>{this.props.groupName}</h1>
-                <EmptyLine />
+        var driverSelect;
+        if (this.props.active && this.props.groupName) { 
+        driverSelect = (<div>
                 This quiz requires a member of your group to serve as the driver, who will submit answers.
                 <EmptyLine />
                 <button 
@@ -30,6 +27,16 @@ export default class PreQuiz extends React.Component {
                     className= {`${this.strings.driverBtnClass} btn-danger`}>                    
                         I will not be the driver
                 </button>
+            </div>);
+        }
+
+		return (
+			<div className="row text-center">
+                You are in group:
+                <br/>
+                <h1>{this.props.groupName || '?'}</h1>
+                <EmptyLine />
+                {driverSelect}
 				<br/>
             </div>
 		);
