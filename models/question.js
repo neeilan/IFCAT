@@ -100,7 +100,7 @@ QuestionSchema.methods.store = function (opts) {
             }
         });
     } else if (self.isMultipleSelect()) {
-        selected = _.isoptsect(opts._answers) ? opts._answers : [];
+        selected = _.isObject(opts._answers) ? opts._answers : [];
         _.forOwn(opts._choices, (choice, i) => {
             choice = _.trim(choice);
             if (choice && self.choices.indexOf(choice) === -1) {
