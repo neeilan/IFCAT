@@ -53,12 +53,12 @@ export default class QuizApp extends React.Component {
         socket.on('setGroup', (id) => {
             if (id != this.state.groupId)
                 window.location.href = window.location.href;
-        })
+        });
 
         socket.on('groupsUpdated', (data) => {
             console.log('groupsUpdated');
             console.log(data);
-        })
+        });
 
         socket.on('quizData', (tutorialQuiz) => {
             console.log('quizData');
@@ -71,7 +71,7 @@ export default class QuizApp extends React.Component {
                 active: tutorialQuiz.quiz.active,
                 selectedQuestion: tutorialQuiz.quiz.quiz.questions[0],
             });
-        })
+        });
 
 
         socket.on('resetDriver', (data) => {
@@ -109,8 +109,8 @@ export default class QuizApp extends React.Component {
         })
 
         socket.on('groupAttempt', (data) => {
-            if (this.state.groupId && data.groupId != this.state.groupId) return;
             console.log('groupAttempt');
+            if (this.state.groupId && data.groupId != this.state.groupId) return;
 
             var responsesStore = this.state.responses;
             responsesStore[data.response.question] = data.response;
@@ -330,6 +330,8 @@ export default class QuizApp extends React.Component {
     }
 
     submitChoiceCb(answer, isCodeTracingQuestion) {
+        console.log(isCodeTracingQuestion);
+        console.log(answer);
         if (isCodeTracingQuestion) {
             this.emit('CODE_TRACING_ANSWER_ATTEMPT', {
                 answer: answer

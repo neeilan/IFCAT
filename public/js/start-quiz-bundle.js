@@ -9929,8 +9929,8 @@ var QuizApp = function (_React$Component) {
             });
 
             socket.on('groupAttempt', function (data) {
-                if (_this2.state.groupId && data.groupId != _this2.state.groupId) return;
                 console.log('groupAttempt');
+                if (_this2.state.groupId && data.groupId != _this2.state.groupId) return;
 
                 var responsesStore = _this2.state.responses;
                 responsesStore[data.response.question] = data.response;
@@ -10155,6 +10155,8 @@ var QuizApp = function (_React$Component) {
     }, {
         key: 'submitChoiceCb',
         value: function submitChoiceCb(answer, isCodeTracingQuestion) {
+            console.log(isCodeTracingQuestion);
+            console.log(answer);
             if (isCodeTracingQuestion) {
                 this.emit('CODE_TRACING_ANSWER_ATTEMPT', {
                     answer: answer
@@ -23043,6 +23045,22 @@ var Question = function (_React$Component) {
 				);
 			}
 			return submitBtn;
+		}
+	}, {
+		key: 'componentWillMount',
+		value: function componentWillMount() {
+			if (this.props.questionType != enums.questionTypes.multiSelect && this.props.questionType != enums.questionTypes.multipleChoice) {
+				return;
+			}
+			var choices = this.props.questionRef.choices;
+			if (this.props.questionRef.shuffleChoices || true) {
+				for (var i = 0; i < choices.length; i++) {
+					var randomIndex = Math.floor(Math.random() * choices.length);
+					var temp = choices[randomIndex];
+					choices[randomIndex] = choices[i];
+					choices[i] = temp;
+				}
+			}
 		}
 	}, {
 		key: 'render',

@@ -191,7 +191,7 @@ socket.on('attemptAnswer', function(data){
             })
         })           
         
-    })
+    });
 
     })
 });
