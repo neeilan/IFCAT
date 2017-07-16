@@ -11,6 +11,7 @@ const QuestionSchema = new mongoose.Schema({
     answers: [String],
     files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
     links: [String],
+    tags: [String],
     caseSensitive: Boolean,
     maxPointsPerLine: { type: Number, default: 1 },
     maxAttemptsPerLine: { type: Number, default: 1 },
@@ -73,11 +74,14 @@ QuestionSchema.methods.store = function (opts) {
     let self = this;
 
     self.choices = self.answers = [];
+    self.tags = opts._tags.trim().split(/[,;]/g).map(tag => tag.trim());
     self.caseSensitive = !!opts.caseSensitive;
     self.shuffleChoices = !!opts.shuffleChoices;
     self.useLaTeX = !!opts.useLaTeX;
     self.approved = !!opts.approved;
     self.set(opts);
+
+    console.log(opts)
 
     _.each(opts._links, link => {
         link = _.trim(link);
@@ -117,6 +121,7 @@ QuestionSchema.methods.store = function (opts) {
         });
     } else if (self.isCodeTracing()) {
         self.answers = opts._answers.split("\n");
+        self.points = self.maxPointsPerLine * self.answers.length + self.firstTryBonus;
     }
     return self;
 };
