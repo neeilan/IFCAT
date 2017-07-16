@@ -78,16 +78,15 @@ exports.startQuiz = (req, res) => {
 exports.nominateDriver = (socket, emitters) => (function(data) {
     models.Group.findById(data.groupId)
     .exec()
-    .then(function(group){
-        if (!group.driver || group.driver == socket.request.user)
-            return models.Group.findByIdAndUpdate(data.groupId, { driver : socket.request.user })
-            .exec()
-    })
-    .then(function(){
-        emitters.emitToGroup(data.groupId, 'resetDriver', { groupId : data.groupId });
-        socket.emit('ASSIGNED_AS_DRIVER', { groupId : data.groupId } );
-        emitters.emitToGroup(data.groupId, 'startQuiz', {});
-    })
+    .then(function(group) {
+        models.Group.findByIdAndUpdate(data.groupId, { driver : socket.request.user })
+        .exec()
+        .then(function() {
+            emitters.emitToGroup(data.groupId, 'resetDriver', { groupId : data.groupId });
+            socket.emit('ASSIGNED_AS_DRIVER', { groupId : data.groupId } );
+            emitters.emitToGroup(data.groupId, 'startQuiz', {});
+        });
+    });
 });
 
 exports.joinGroup = (socket, emitters) => (function(data) {
