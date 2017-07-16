@@ -41,7 +41,6 @@ input[type=checkbox][data-label] {
  * Buttons
  */
 .btn-default {
-    background-color: #fff;
     font-size: 13px;
 }
 .btn-circle {

@@ -32,7 +32,7 @@ exports.generateGroups = (req, res) => {
         let groups = _.map(chunks, (members, i) => new models.Group({ name: i + 1, members: members }));
 
         res.render('admin/pages/tutorial-quiz', {
-            class: 'conduct-quiz',
+            bodyClass: 'tutorial-quiz',
             title: `Conduct ${req.quiz.name} in TUT ${req.tutorial.number}`,
             course: req.course, 
             tutorial: req.tutorial,
@@ -78,7 +78,7 @@ exports.saveGroups = (req, res, next) => {
         },
         done => {
             async.eachOfSeries(req.body.groups, (members, name, done) => {
-                if (!name.startsWith('$'))
+                if (!name.startsWith('_'))
                     return done();
                 // add new group
                 models.Group.create({ name: name.slice(1), members: members }, (err, group) => {

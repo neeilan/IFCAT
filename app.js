@@ -23,7 +23,7 @@ app.locals.io = io;
 app.locals.moment = require('moment');  
 
 mongoose.connect(config.db.url, { useMongoClient: true });
-mongoose.set('debug', true);
+//mongoose.set('debug', true);
 
 app.set('env', process.env.NODE_ENV || 'development');
 app.set('port', process.env.PORT || 8080);

@@ -84,9 +84,9 @@
                             <td class="student"><%= student.name.full %></td>
                             <td class="groups">
                             <% _.each(groups, group => { %>
-                                <input type="checkbox" name="groups[<%= group.isNew ? `$${group.name}` : group._id %>][]" value="<%= student._id %>" data-label="<%= group.name %>" data-group="<%= student._id %>"<%= group.hasMember(student._id) ? ' checked' : '' %>>
+                                <input type="checkbox" name="groups[<%= group.isNew ? `_${group.name}` : group._id %>][]" value="<%= student._id %>" data-label="<%= group.name %>" data-group="<%= student._id %>"<%= group.hasMember(student._id) ? ' checked' : '' %>>
                             <% }) %>
-                                <input type="checkbox" name="groups[$?][]" value="<%= student._id %>" data-label="?" data-group="<%= student._id %>">
+                                <input type="checkbox" name="groups[_?][]" value="<%= student._id %>" data-label="?" data-group="<%= student._id %>">
                             </td>
                         </tr>
                     <% }) %>
