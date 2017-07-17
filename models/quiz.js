@@ -12,7 +12,7 @@ const QuizSchema = new mongoose.Schema({
         penalty: { type : Number, default : 1 }
     },
     studentChoice: Boolean,
-    studentVoting: Boolean
+    voting: Boolean
 }, {
     timestamps: true
 });
@@ -44,7 +44,7 @@ QuizSchema.methods.withQuestions = function (deep = false) {
 // Set quiz
 QuizSchema.methods.store = function (opts) {
     this.studentChoice = !!opts.studentChoice;
-    this.studentVoting = !!opts.studentVoting;
+    this.voting = !!opts.voting;
     this.default.shuffleChoices = !!opts.default.shuffleChoices;
     this.default.useLaTeX = !!opts.default.useLaTeX;
     this.set(opts);

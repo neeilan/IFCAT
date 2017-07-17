@@ -247,15 +247,24 @@ tfoot .pagination {
 .questions .question {
     white-space: pre-wrap;
 }
-.questions .submitter, .questions .approval {
+.questions .submitter {
+    background-color: #DFF6AA;
+    margin-top: 5px;
+    text-indent: 5px;
     text-transform: lowercase;
 }
-.questions .submitter {
-    color: #007196;
-    margin-top: 5px;
+.questions .approved {
+    background-color: #F6B2AA;
+    text-indent: 5px;
+    text-transform: lowercase;
 }
-.questions .approval {
-    color: #a00;
+.questions .voting {
+    background-color: #F6E0AA;
+    text-indent: 5px;
+    text-transform: lowercase;
+}
+.questions .voting .down {
+    padding-left: 10px;
 }
 .question div[contenteditable] {
     background-color: #eff0f1;
@@ -358,10 +367,4 @@ a.counter {
         min-width: auto;
         width: 100%;
     }
-}
-/**
- * Bootstrap Switch
- */
-.bootstrap-switch-wrapper {
-    
 }
