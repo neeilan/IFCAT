@@ -46,7 +46,7 @@
                             <div class="approved">requires approval</div>
                         <% } %>
                     <% } %>
-                    <% if (quiz.voting || quiz.votes.length) { %>
+                    <% if (quiz.voting || question.votes.length) { %>
                         <div class="voting">
                             <span class="up"><%= question.votes.up.length %> up votes</span>
                             <span class="down"><%= question.votes.down.length %> down votes</span>

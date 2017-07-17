@@ -248,7 +248,7 @@ tfoot .pagination {
     white-space: pre-wrap;
 }
 .questions .submitter {
-    background-color: #DFF6AA;
+    background-color: #ddd;
     margin-top: 5px;
     text-indent: 5px;
     text-transform: lowercase;
@@ -259,7 +259,7 @@ tfoot .pagination {
     text-transform: lowercase;
 }
 .questions .voting {
-    background-color: #F6E0AA;
+    background-color: #ddd;
     text-indent: 5px;
     text-transform: lowercase;
 }
