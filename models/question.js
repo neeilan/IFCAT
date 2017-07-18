@@ -120,7 +120,7 @@ QuestionSchema.methods.store = function (opts) {
                 self.answers.addToSet(answer);
         });
     } else if (self.isCodeTracing()) {
-        self.answers = opts._answers.split("\n");
+        self.answers = opts._answers.trim().split("\n");
         self.points = self.maxPointsPerLine * self.answers.length + self.firstTryBonus;
     }
     return self;
