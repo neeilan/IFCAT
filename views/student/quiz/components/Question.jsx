@@ -44,7 +44,7 @@ export default class Question extends React.Component {
 			return;
 		}
 		var choices = this.props.questionRef.choices;
-		if (this.props.questionRef.shuffleChoices || true) {
+		if (this.props.questionRef.shuffleChoices) {
 			for (var i = 0; i < choices.length; i++) {
 				var randomIndex = Math.floor(Math.random() * choices.length);
 				var temp = choices[randomIndex];
