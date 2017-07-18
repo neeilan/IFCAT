@@ -206,7 +206,6 @@ exports.codeTracingAttempt = (socket, emitters) => (function(data) {
 
         })
         .then(function(response) {
-            console.log(response);
             emitters.emitToGroup(data.groupId, 'SYNC_RESPONSE', {
                 response: response,
                 questionId: data.questionId,
@@ -270,12 +269,12 @@ function buildCodeTracingAnswerSummary(question, existingResponseObject, answer)
 }
 
 function calculateCTQPoints(lineByLineSummary, question) {
-
     var points = 0;
     var totalAttempts = 0;
     lineByLineSummary.forEach(function(line){
         if (line.correct) {
-            points += Math.max(0, question.penalty * (2 - line.attempts));
+            points += Math.max(0, question.maxPointsPerLine - (line.attempts - 1));
+
             totalAttempts += line.attempts;
         }
     });
@@ -285,5 +284,5 @@ function calculateCTQPoints(lineByLineSummary, question) {
 }
 
 function calculateMaxPoints(question) {
-    return question.points + question.firstTryBonus;
+    return question.points;
 }

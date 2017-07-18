@@ -71,7 +71,7 @@ const mock_io = () => ({
 				this._emit('quizData', _quizData);
 				break;
 			}
-			case 'groupAttempt' : {
+			case 'GROUP_ATTEMPT' : {
 				console.log(data);
 				break;
 			}

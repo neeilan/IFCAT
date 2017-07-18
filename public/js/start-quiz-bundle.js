@@ -9928,8 +9928,7 @@ var QuizApp = function (_React$Component) {
                 });
             });
 
-            socket.on('groupAttempt', function (data) {
-                console.log('groupAttempt');
+            socket.on('GROUP_ATTEMPT', function (data) {
                 if (_this2.state.groupId && data.groupId != _this2.state.groupId) return;
 
                 var responsesStore = _this2.state.responses;
@@ -23303,6 +23302,7 @@ var ScoreBar = function (_React$Component) {
 	_createClass(ScoreBar, [{
 		key: 'calculateStars',
 		value: function calculateStars(question) {
+			console.log(question);
 			if (!question) return { fullStars: 0, emptyStars: 0 };
 			var result = {};
 			var responses = this.props.responses;
@@ -23580,7 +23580,7 @@ var mock_io = function mock_io() {
 						this._emit('quizData', _quizData);
 						break;
 					}
-				case 'groupAttempt':
+				case 'GROUP_ATTEMPT':
 					{
 						console.log(data);
 						break;

@@ -11,6 +11,7 @@ export default class ScoreBar extends React.Component {
 
 
 	calculateStars(question) {
+		console.log(question);
 		if (!question) return {fullStars : 0, emptyStars : 0};
 		var result = {};
 		var responses = this.props.responses;

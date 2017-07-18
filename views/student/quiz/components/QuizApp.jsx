@@ -108,8 +108,7 @@ export default class QuizApp extends React.Component {
             });
         })
 
-        socket.on('groupAttempt', (data) => {
-            console.log('groupAttempt');
+        socket.on('GROUP_ATTEMPT', (data) => {
             if (this.state.groupId && data.groupId != this.state.groupId) return;
 
             var responsesStore = this.state.responses;

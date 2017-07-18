@@ -124,23 +124,25 @@ module.exports = (io) => (function (socket) {
     })
 })
 
-socket.on('attemptAnswer', function(data){
+socket.on('attemptAnswer', function(data) {
     models.Question.findById(data.questionId)
     .exec()
-    .then(function(question){
+    .then(function(question) {
+
         var answerIsCorrect;
-        
-        answerIsCorrect = (question.answers.indexOf(data.answer[0]) != -1); // mark
-        
-        if (question.type == 'multiple select'){
+
+        if (question.type == 'multiple choice') {
+            answerIsCorrect = (question.answers.indexOf(data.answer[0]) != -1); // mark
+        }
+        else if (question.type == 'multiple select') {
             answerIsCorrect = false;
             if (data.answer.length == question.answers.length){
                 answerIsCorrect = true;
-                data.answer.forEach((ans)=>{ if (question.answers.indexOf(ans)==-1) answerIsCorrect = false; })
+                data.answer.forEach((ans)=>{ if (question.answers.indexOf(ans) == -1) answerIsCorrect = false; })
             }
         }
-        else if (question.isShortAnswer()){
-            if (!question.caseSensitive){
+        else if (question.isShortAnswer()) {
+            if (!question.caseSensitive) {
                 var answer = data.answer[0].toLowerCase();
                 var correctAnswers = question.answers.map(ans => ans.toLowerCase())
                 answerIsCorrect = (correctAnswers.indexOf(answer) > -1);
@@ -153,20 +155,14 @@ socket.on('attemptAnswer', function(data){
         models.Response.findOne({ group : data.groupId, question: data.questionId })
         .exec()
         .then(function(response){
-            if (!response){
+            if (!response) {
                 var res = new models.Response();
                 res.group = data.groupId;
                 res.question = data.questionId;
                 res.correct = answerIsCorrect;
                 res.attempts = answerIsCorrect ? 0 : 1;
                 res.points = answerIsCorrect ? (question.points + question.firstTryBonus) : 0;
-                return models.TutorialQuiz.findByIdAndUpdate(data.quizId, {
-                    $push : { responses : res._id }
-                })
-                .exec()
-                .then(function(){
-                    return res.save()
-                })
+                return res.save();
             }
             else {
                 // Some logic to prevent students from being dumb and reanswering correct questions and losing points
@@ -184,7 +180,7 @@ socket.on('attemptAnswer', function(data){
             }
         })
         .then(function(response){
-            emitters.emitToGroup(data.groupId, 'groupAttempt', {
+            emitters.emitToGroup(data.groupId, 'GROUP_ATTEMPT', {
                 response: response,
                 questionNumber: data.questionNumber,
                 groupId : data.groupId
