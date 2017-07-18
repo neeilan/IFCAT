@@ -1,2 +1,11 @@
+        </main>
+        <script src="/jquery/jquery.min.js"></script>
+        <script src="/bootstrap/js/bootstrap.min.js"></script>
+        <script src="/sweetalert/sweetalert.min.js"></script>
+        <% if (typeof initSocket !== 'undefined') { %>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.5.4/react.min.js"></script>
+            <script src="/socketioclient/socket.io.js"></script>
+            <script src="/js/start-quiz-bundle.js"></script>
+        <% } %>
     </body>
 </html>

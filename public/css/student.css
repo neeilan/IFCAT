@@ -98,3 +98,10 @@ h4.bold #text, .quizBtn.choice {
 #questionScore .fa {
   font-size : 30px;
 }
+
+input:focus{
+  outline: none;
+}
+.prettyprint ol.linenums > li { 
+  list-style-type: decimal; 
+}
