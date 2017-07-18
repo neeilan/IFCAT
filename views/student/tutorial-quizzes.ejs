@@ -1,10 +1,18 @@
 <% include ./header %>
 
-<h3><%= course.name + ' - TUT ' + tutorial.number %></h3>
+<h3><%= course.name + ' - Tutorial ' + tutorial.number %></h3>
 
-<div class="list-group">
+<br>
+
+<div class="list-group" style="max-width: 600px">
 <% _.each(tutorialQuizzes, tutorialQuiz => { %>
-    <a href="/student/courses/<%= course._id %>/quizzes/<%= tutorialQuiz._id %>/start" class="list-group-item"><%= tutorialQuiz.quiz.name %></a>
+    <div class="list-group-item clearfix">
+        <div class="pull-left" style="line-height: 36px; height: 36px"><%= tutorialQuiz.quiz.name %></div>
+        <a class="btn btn-primary btn-sm pull-right" href="/student/courses/<%= course._id %>/quizzes/<%= tutorialQuiz._id %>/start">Start Quiz</a>
+        <% if (tutorialQuiz.quiz.studentChoice) { %>
+        <a class="btn btn-warning btn-sm pull-right" href="/student/courses/<%= course._id %>/quizzes/<%= tutorialQuiz._id %>/submit-question" style="margin-right: 5px">Submit Questions</a>
+        <% } %>
+    </div>
 <% }) %>
 </div>
 

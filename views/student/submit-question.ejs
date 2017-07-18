@@ -1,0 +1,213 @@
+<% include ./header %>
+
+<h3>Submit Question</h3>
+
+<!-- TBF -->
+<% if (_.isObject(flash)) { %>
+    <% _.forOwn(flash, (messages, type) => { %>
+        <% _.each(messages, msg => { %>
+            <div class="alert alert-<%= type !== 'error' ? type : 'danger' %> alert-dismissible"><a href="#" class="close" data-dismiss="alert">&times;</a><%- msg %></div>
+        <% }) %>
+    <% }) %>
+<% } %>
+
+<form action="/student/courses/<%= course._id %>/quizzes/<%= tutorialQuiz._id %>/submit-question" method="post" autocomplete="off" class="form-horizontal">
+
+    <!-- type -->
+    <div class="form-group required">
+        <label class="col-xs-7 col-sm-3 control-label">Type</label>
+        <div class="col-xs-5 col-sm-3">
+            <select name="type" class="form-control"<%= question.submitter ? ' disabled' : '' %>>
+            <% _.each(question.schema.path('type').enumValues, type => { %>
+                <option value="<%= type %>"<%= question.type === type ? ' selected' : '' %>><%= _.upperFirst(type) %></option>
+            <% }) %>
+            </select>
+        </div>
+    </div>
+
+    <!-- question -->
+    <div class="form-group required">
+        <label class="col-sm-3 control-label">Question</label>
+        <div class="col-sm-9">
+            <textarea name="question" class="form-control" rows="3"><%= question.question %></textarea>
+        </div>
+    </div>
+
+    <!-- multiple choice -->
+    <div class="form-group required" data-type="multiple choice">
+        <label class="col-sm-3 control-label">Choices &amp; Answer</label>
+        <div class="col-sm-9">
+            <% if (question.isNew || !question.isMultipleChoice()) { %>
+                <% for (var i = 0, len = 3; i < 3; i++) { %> 
+                    <div class="form-group">
+                        <div class="col-xs-8">
+                            <textarea name="_choices[<%= i %>]" class="form-control" rows="1"></textarea>
+                        </div>
+                        <div class="col-xs-4 radio">
+                            <label><input type="radio" name="_answer" value="<%= i %>"<%= !i ? ' checked' : '' %>></label>
+                            <span class="glyphicon glyphicon-remove"></span> 
+                        </div>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <% _.each(question.choices, (choice, i) => { %>
+                    <div class="form-group">
+                        <div class="col-xs-8"> 
+                            <textarea name="_choices[<%= i %>]" class="form-control" rows="1"><%= choice %></textarea>
+                        </div>
+                        <div class="col-xs-4 radio">
+                            <label><input type="radio" name="_answer" value="<%= i %>"<%= question.isAnswer(choice) ? ' checked' : '' %>></label>
+                            <span class="glyphicon glyphicon-remove"></span> 
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+            <div class="form-group" style="display: none">
+                <div class="col-xs-8"> 
+                    <textarea name="_choices[]" class="form-control" rows="1"></textarea>
+                </div>
+                <div class="col-xs-4 radio">
+                    <label>
+                        <input type="radio" name="_answer" value="">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-10">
+                    <button type="button" class="btn btn-default btn-sm btn-add-choice">
+                        <span class="glyphicon glyphicon-plus"></span> Add another choice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- multiple select -->
+    <div class="form-group required" data-type="multiple select">
+        <label class="col-sm-3 control-label">Choices &amp; Answers</label>
+        <div class="col-sm-9">
+            <% if (question.isNew || !question.isMultipleSelect()) { %>
+                <% for (var i = 0, len = 3; i < 3; i++) { %>
+                    <div class="form-group">
+                        <div class="col-xs-8 pr10"> 
+                            <textarea name="_choices[<%= i %>]" class="form-control" rows="1"></textarea>
+                        </div>
+                        <div class="col-xs-4 checkbox">
+                            <label><input type="checkbox" name="_answers[]" value="<%= i %>"></label>
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </div>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <% _.each(question.choices, (choice, i) => { %>
+                    <div class="form-group">
+                        <div class="col-xs-8"> 
+                            <textarea name="_choices[<%= i %>]" class="form-control" rows="1"><%= choice %></textarea>
+                        </div>
+                        <div class="col-xs-4 checkbox">
+                            <label><input type="checkbox" name="_answers[]" value="<%= i %>"<%= question.isAnswer(choice) ? ' checked' : '' %>></label>
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </div>
+                    </div>
+                <% }) %> 
+            <% } %>
+            <div class="form-group" style="display: none">
+                <div class="col-xs-8"> 
+                    <textarea name="_choices[]" class="form-control" rows="1"></textarea>
+                </div>
+                <div class="col-xs-4 checkbox">
+                    <label><input type="checkbox" name="_answers[]" value=""></label>
+                    <span class="glyphicon glyphicon-remove"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-10">
+                    <button type="button" class="btn btn-default btn-sm btn-add-choice">
+                        <span class="glyphicon glyphicon-plus"></span> Add another choice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- short-answer -->
+    <div class="form-group required" data-type="short answer">
+        <label class="col-sm-3 control-label">Acceptable Answers</label>
+        <div class="col-sm-9">
+            <% if (question.isNew || !question.isShortAnswer()) { %>
+                <% for (var i = 0, len = 3; i < 3; i++) { %>
+                    <div class="form-group">
+                        <div class="col-xs-8"> 
+                            <textarea name="_answers[<%= i %>]" class="form-control" rows="1"></textarea>
+                        </div>
+                        <div class="col-xs-4">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </div>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <% _.each(question.answers, (answer, i) => { %>
+                    <div class="form-group">
+                        <div class="col-xs-8"> 
+                            <textarea name="_answers[<%= i %>]" class="form-control" rows="1"><%= answer %></textarea>
+                        </div>
+                        <div class="col-xs-4">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </div>
+                    </div>
+                <% }) %> 
+            <% } %>
+            <div class="form-group" style="display: none">
+                <div class="col-xs-8"> 
+                    <textarea name="_answers[]" class="form-control" rows="1"></textarea>
+                </div>
+                <div class="col-xs-4">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-10">
+                    <button type="button" class="btn btn-default btn-sm btn-add-choice">
+                        <span class="glyphicon glyphicon-plus"></span> Add another correct answer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- code-tracing -->
+    <div class="form-group required" data-type="code tracing">
+        <label class="col-sm-3 control-label">Code</label>
+        <div class="col-sm-9">
+            <div contenteditable class="form-control"><%= question.code %></div>
+            <input type="hidden" name="code" value="<%= question.code %>">
+        </div>
+    </div>
+
+    <div class="form-group required" data-type="code tracing">
+        <label class="col-sm-3 control-label">Answers</label>
+        <div class="col-sm-9">
+        <% if (question.isNew || !question.isCodeTracing()) { %>
+            <div contenteditable class="form-control"></div>
+        <% } else { %>
+            <div contenteditable class="form-control"><%= question.answers.join("\n") %></div>
+        <% } %>
+            <input type="hidden" name="_answers" value="<%= question.answers.join("\n") %>">
+        </div>
+    </div>
+
+    <br>
+
+    <!-- buttons -->
+    <div class="form-group">
+        <div class="col-sm-offset-3 col-sm-10">
+            <a href="/student/courses/<%= course._id %>/quizzes" class="btn btn-default btn-sm">Back to Quizzes</a>
+            <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+        </div>
+    </div>
+
+</form>
+
+
+<% include ./footer %>

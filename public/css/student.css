@@ -105,3 +105,13 @@ input:focus{
 .prettyprint ol.linenums > li { 
   list-style-type: decimal; 
 }
+
+
+form div[contenteditable] {
+    background-color: #eff0f1;
+    color: #000;
+    font-family: Courier;
+    height: auto;
+    min-height: 90px;
+    white-space: pre-wrap;
+}

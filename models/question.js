@@ -80,19 +80,23 @@ QuestionSchema.methods.store = function (opts) {
     self.approved = !!opts.approved;
     self.set(opts);
 
-    _.each(opts._links, link => {
-        if (link = link.trim()) {
-            if (!url.parse(link).protocol)
-                link = `http://${link}`;
-            self.links.addToSet(link);
-        }
-    });
+    if (opts._links) {
+        _.each(opts._links, link => {
+            if (link = link.trim()) {
+                if (!url.parse(link).protocol)
+                    link = `http://${link}`;
+                self.links.addToSet(link);
+            }
+        });
+    }
 
-    _.each(opts._tags.trim().toLowerCase().split(/[,;]/g), tag => {
-        if (tag = tag.trim()) {
-            self.tags.addToSet(tag);
-        }
-    });
+    if (opts._tags) {
+        _.each(opts._tags.trim().toLowerCase().split(/[,;]/g), tag => {
+            if (tag = tag.trim()) {
+                self.tags.addToSet(tag);
+            }
+        });
+    }
 
     let selected;
     if (self.isMultipleChoice()) {
