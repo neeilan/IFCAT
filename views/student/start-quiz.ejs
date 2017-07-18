@@ -1,25 +1,12 @@
-<%- include ./header -%>
+<% include ./header %>
+
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full"></script>
 <script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
+MathJax.Hub.Config({
     tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
-  });
+});
 </script>
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.5.4/react.min.js"></script>
-<link href="/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 
-<div id = "quizAppDiv"></div>
+<div id="quizAppDiv"></div>
 
-<%- include ./body-js -%>
-<script src="/sweetalert/sweetalert.min.js"></script>
-<script src="/socketioclient/socket.io.js"></script>
-<script src="/js/start-quiz-bundle.js"></script>
-
-<style>
-input:focus{
-  outline: none;
-}
-.prettyprint ol.linenums > li { list-style-type: decimal; }
-</style>
-
-<%- include ./footer -%>
+<% include ./footer %>

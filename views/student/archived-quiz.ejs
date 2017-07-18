@@ -1,8 +1,10 @@
-<%- include ./header -%>
+<% include ./header %>
+
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full"></script>
 <script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
+MathJax.Hub.Config({
     tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
-  });
+});
 </script>
 
 <div>
@@ -56,9 +58,6 @@
             </div>
         <% }) %>
     </div>
-    
 </div>
 
-<%- include ./body-js -%>
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full"></script>
-<%- include ./footer -%>
+<% include ./footer %>

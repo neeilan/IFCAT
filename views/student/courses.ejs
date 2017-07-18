@@ -1,11 +1,11 @@
-<%- include ./header -%>
+<% include ./header %>
 
-<h1>Your Courses</h1>
+<h3>Your Courses</h3>
 
 <% if (!_.isEmpty(courses)) { %>
     <div class="list-group">
-    <% _.each(courses, function (course) { %>
-        <a href="/student/courses/<%= course.id %>/quizzes" class="list-group-item">
+    <% _.each(courses, course => { %>
+        <a href="/student/courses/<%= course._id %>/quizzes" class="list-group-item">
             <span class="code"><%= course.code %></span> -
             <span class="name"><%= course.name %></span>
         </a>
@@ -13,5 +13,4 @@
     </div>
 <% } %>
 
-<%- include ./body-js -%>
-<%- include ./footer -%>
+<% include ./footer %>

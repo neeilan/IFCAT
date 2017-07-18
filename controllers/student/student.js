@@ -20,7 +20,7 @@ exports.getQuizzes = (req, res) => {
         models.TutorialQuiz.find({ tutorial: req.course.tutorials[0]._id, published: true }).populate('quiz').exec((err, tutorialQuizzes) => {
             res.render('student/tutorial-quizzes', { 
                 course: req.course,
-                tutorial: tutorial,
+                tutorial: req.course.tutorials[0],
                 tutorialQuizzes: tutorialQuizzes
             });
         });

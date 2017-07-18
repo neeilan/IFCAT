@@ -11,6 +11,7 @@ const QuestionSchema = new mongoose.Schema({
     answers: [String],
     files: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }],
     links: [String],
+    tags: [String],
     caseSensitive: Boolean,
     maxPointsPerLine: { type: Number, default: 1 },
     maxAttemptsPerLine: { type: Number, default: 1 },
@@ -72,7 +73,7 @@ QuestionSchema.methods.isAnswer = function (choice) {
 QuestionSchema.methods.store = function (opts) {
     let self = this;
 
-    self.choices = self.answers = [];
+    self.links = self.choices = self.answers = self.tags = [];
     self.caseSensitive = !!opts.caseSensitive;
     self.shuffleChoices = !!opts.shuffleChoices;
     self.useLaTeX = !!opts.useLaTeX;
@@ -80,19 +81,23 @@ QuestionSchema.methods.store = function (opts) {
     self.set(opts);
 
     _.each(opts._links, link => {
-        link = _.trim(link);
-        if (link) {
+        if (link = link.trim()) {
             if (!url.parse(link).protocol)
                 link = `http://${link}`;
-            if (self.links.indexOf(link) === -1)
-                self.links.push(link);
+            self.links.addToSet(link);
+        }
+    });
+
+    _.each(opts._tags.trim().toLowerCase().split(/[,;]/g), tag => {
+        if (tag = tag.trim()) {
+            self.tags.addToSet(tag);
         }
     });
 
     let selected;
     if (self.isMultipleChoice()) {
         _.forOwn(opts._choices, (choice, i) => {
-            choice = _.trim(choice);
+            choice = choice.trim();
             if (choice && self.choices.indexOf(choice) === -1) {
                 self.choices.push(choice);
                 if (i === opts._answer)
@@ -102,7 +107,7 @@ QuestionSchema.methods.store = function (opts) {
     } else if (self.isMultipleSelect()) {
         selected = _.isObject(opts._answers) ? opts._answers : [];
         _.forOwn(opts._choices, (choice, i) => {
-            choice = _.trim(choice);
+            choice = choice.trim();
             if (choice && self.choices.indexOf(choice) === -1) {
                 self.choices.push(choice);
                 if (selected.indexOf(i) > -1)
@@ -111,12 +116,12 @@ QuestionSchema.methods.store = function (opts) {
         });
     } else if (self.isShortAnswer()) {
         _.forOwn(opts._answers, answer => {
-            answer = _.trim(answer);
-            if (answer && self.answers.indexOf(answer) === -1)
-                self.answers.push(answer);
+            if (answer = answer.trim())
+                self.answers.addToSet(answer);
         });
     } else if (self.isCodeTracing()) {
         self.answers = opts._answers.split("\n");
+        self.points = self.maxPointsPerLine * self.answers.length + self.firstTryBonus;
     }
     return self;
 };

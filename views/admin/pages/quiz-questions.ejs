@@ -21,13 +21,14 @@
             <th style="width: 10px"></th>
             <th style="text-align: right;width: 40px">No.</th>
             <th style="width: 130px;">Type</th>
-            <th style="min-width: 400px">Question</th>
+            <th style="min-width: 300px">Question</th>
+            <th style="width: 200px">Tags</th>
             <th class="actions"></th>
         </tr>
     </thead>
     <tbody>
     <% if (_.isEmpty(quiz.questions)) { %>
-        <tr><td colspan="5">No questions have been added yet.</td></tr> 
+        <tr><td colspan="6">No questions have been added yet.</td></tr> 
     <% } else { %>
         <% _.each(quiz.questions, question => { %>
             <tr>
@@ -36,16 +37,23 @@
                     <input type="hidden" name="questions[]" value="<%= question._id %>">
                 </td>
                 <td style="text-align: right;width: 40px"><%= question.number %></td>
-                <td style="width: 130px;"><%= question.type %></td>
-                <td style="min-width: 400px">
+                <td style="width: 130px"><%= question.type %></td>
+                <td style="min-width: 300px">
                     <div class="question"><%= question.question %></div>
                     <% if (question.submitter) { %>
                         <div class="submitter">submitted by <%= question.submitter.name.full %></div>
                         <% if (!question.approved) { %>
-                            <div class="approval">requires approval</div>
+                            <div class="approved">requires approval</div>
                         <% } %>
                     <% } %>
+                    <% if (quiz.voting || question.votes.length) { %>
+                        <div class="voting">
+                            <span class="up"><%= question.votes.up.length %> up votes</span>
+                            <span class="down"><%= question.votes.down.length %> down votes</span>
+                        </div>
+                    <% } %>
                 </td>
+                <td style="width: 200px"><%= question.tags.join(', ') %></td>
                 <td class="actions">
                     <div class="dropdown">
                         <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">Actions<span class="caret"></span></button>

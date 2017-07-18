@@ -64,10 +64,11 @@ exports.startQuiz = (req, res) => {
         
     }
     else{
-     res.render('student/start-quiz.ejs', {
+        res.render('student/start-quiz.ejs', {
             course: req.course,
             tutorialQuiz: req.tutorialQuiz,
-            quiz: req.tutorialQuiz.quiz
+            quiz: req.tutorialQuiz.quiz,
+            initSocket: true
         });
     }
 };
