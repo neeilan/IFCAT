@@ -42,9 +42,7 @@ exports.getMarksByStudent = (req, res) => {
     }, {
         $match: { 'group.members': { $in: [req.student._id] }}
     }, {
-        $unwind: '$group.responses'
-    }, {
-        $lookup: { from: 'responses', localField: 'group.responses', foreignField: '_id', as: 'response' }
+        $lookup: { from: 'responses', localField: 'group._id', foreignField: 'group', as: 'response' }
     }, {
         $unwind: '$response'
     }, {
@@ -82,9 +80,7 @@ exports.getMarksByTutorialQuiz = (req, res) => {
     }, {
         $unwind: '$member'
     }, {
-        $unwind: '$group.responses'
-    }, {
-        $lookup: { from: 'responses', localField: 'group.responses', foreignField: '_id', as: 'response' }
+        $lookup: { from: 'responses', localField: 'group._id', foreignField: 'group', as: 'response' }
     }, {
         $unwind: '$response'
     }, {
@@ -151,9 +147,7 @@ exports.getMarksByCourse = (req, res) => {
     }, {
         $unwind: '$member'
     }, {
-        $unwind: '$group.responses'
-    }, {
-        $lookup: { from: 'responses', localField: 'group.responses', foreignField: '_id', as: 'response' }
+        $lookup: { from: 'responses', localField: 'group._id', foreignField: 'group', as: 'response' }
     }, {
         $unwind: '$response'
     }, {

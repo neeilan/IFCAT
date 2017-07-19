@@ -5,9 +5,11 @@ const GroupSchema = new mongoose.Schema({
     name: { type: String, required: true },
     members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     driver: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    responses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Response' }],
+    //responses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Response' }],
     teachingPoints: [String]
 });
+// Populate tutorial-quizzes
+GroupSchema.virtual('responses', { ref: 'Response', localField: '_id', foreignField: 'group' });
 // Delete cascade
 GroupSchema.pre('remove', function (next) {
     let self = this;
