@@ -50,7 +50,7 @@
                             <li><a href="/admin/courses/<%= course._id %>/files"><span 
                                 class="glyphicon glyphicon-picture"></span> Manage Files</a></li>
                         <% if (user.hasAnyRole(['admin', 'instructor'])) { %>
-                            <li><a href="/admin/courses/<%= course._id %>/conduct"><span 
+                            <li><a href="/admin/courses/<%= course._id %>/tutorials-quizzes"><span 
                                 class="glyphicon glyphicon-play-circle"></span> Conduct Quizzes</a></li>
                         <% } %>
                         <% if (user.hasRole('admin')) { %>

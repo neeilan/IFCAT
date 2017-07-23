@@ -2,8 +2,7 @@
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%- course.code %></li>
-    <li><a href="/admin/courses/<%- course._id %>/tutorials">Tutorials</a> ‐ TUT <%- tutorial.number %></li>
-    <li><a href="/admin/courses/<%- course._id %>/tutorials/<%- tutorial._id %>/quizzes">Quizzes</a> ‐ <%- quiz.name %></li>
+    <li><a href="/admin/courses/<%= course._id %>/tutorials-quizzes">Tutorials &amp; Quizzes</a></li>
     <li class="active">Marks</li>
 </ol>
 
@@ -11,7 +10,7 @@
 
 <div class="nav-actions">
     <a class="btn btn-default btn-sm" 
-        href="/admin/courses/<%= course.id %>/tutorials/<%= tutorial._id %>/quizzes/<%= quiz._id %>/marks?export=1"><span 
+        href="/admin/courses/<%= course.id %>/tutorials-quizzes/<%= tutorialQuiz._id %>/marks?export=1"><span 
         class="glyphicon glyphicon-save"></span> Export</a>
 </div>
 
@@ -41,7 +40,7 @@
                 <td>TUT <%= tutorial.number %></td>
                 <td><%= quiz.name %></td>
                 <td>
-                    <a href="/admin/courses/<%= course._id %>/tutorials/<%= tutorial._id %>/quizzes/<%= quiz._id %>/groups/<%= d.group._id %>/responses">Group <%= d.group.name %></a>
+                    <a href="/admin/courses/<%= course._id %>/tutorials-quizzes/<%= tutorialQuiz._id %>/groups/<%= d.group._id %>/responses">Group <%= d.group.name %></a>
                 </td>
                 <td class="text-center"><%= d.totalPoints %></td>
             </tr>

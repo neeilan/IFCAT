@@ -30,13 +30,14 @@
     <% } else { %>
         <% _.each(course.teachingAssistants, assistant => { %>
             <tr>
-                <td><input type="checkbox" name="teachingAssistants[]" value="<%= assistant._id %>"></td>
+                <td><input type="checkbox" name="-users[]" value="<%= assistant._id %>"></td>
                 <td><%= assistant.name.full %></td>
                 <td><%= assistant.local.email %></td>
                 <td>
-                <% _.each(course.tutorials, tutorial => { %>
-                    <input type="checkbox" name="tutorials[<%= tutorial._id %>][]" value="<%= assistant._id %>" data-label="<%= tutorial.number %>"<%= tutorial.hasTeachingAssistant(assistant._id) ? ' checked' : '' %>>
-                <% }) %>
+                    <input type="hidden" name="users[]" value="<%= assistant._id %>"> 
+                    <% _.each(course.tutorials, tutorial => { %>
+                        <input type="checkbox" name="+users[<%= assistant._id %>][]" value="<%= tutorial._id %>" data-label="<%= tutorial.number %>"<%= tutorial.hasTA(assistant._id) ? ' checked' : '' %>>
+                    <% }) %>
                 </td>
             </tr>
         <% }) %>

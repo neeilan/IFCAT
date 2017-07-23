@@ -5,7 +5,7 @@
     <% if (tutorial) { %>
         <li><a href="/admin/courses/<%= course.id %>/tutorials">Tutorials</a> ‐ TUT <%= tutorial.number %></li>
     <% } %>
-    <li class="active">Quizzes</li>
+    <li class="active">Tutorials &amp; Quizzes</li>
 </ol>
 
 <h3><%- title %></h3>
@@ -16,12 +16,12 @@
     <div class="btn-group">
         <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown"> Bulk Actions<span class="caret"></span></button>
         <ul class="dropdown-menu">
-            <li><a href="/admin/courses/<%= course._id %>/conduct?action[name]=published&action[value]=true">Publish</a></li>
-            <li><a href="/admin/courses/<%= course._id %>/conduct?action[name]=published&action[value]=false">Unpublish</a></li>
-            <li><a href="/admin/courses/<%= course._id %>/conduct?action[name]=active&action[value]=true">Activate</a></li>
-            <li><a href="/admin/courses/<%= course._id %>/conduct?action[name]=active&action[value]=false">Deactivate</a></li>
-            <li><a href="/admin/courses/<%= course._id %>/conduct?action[name]=archived&action[value]=true">Archive</a></li>
-            <li><a href="/admin/courses/<%= course._id %>/conduct?action[name]=archived&action[value]=false">Unarchive</a></li>
+            <li><a href="/admin/courses/<%= course._id %>/tutorials-quizzes">Publish</a></li>
+            <li><a href="/admin/courses/<%= course._id %>/tutorials-quizzes">Unpublish</a></li>
+            <li><a href="/admin/courses/<%= course._id %>/tutorials-quizzes">Activate</a></li>
+            <li><a href="/admin/courses/<%= course._id %>/tutorials-quizzes">Deactivate</a></li>
+            <li><a href="/admin/courses/<%= course._id %>/tutorials-quizzes">Archive</a></li>
+            <li><a href="/admin/courses/<%= course._id %>/tutorials-quizzes">Unarchive</a></li>
             <li><a href="#!" onclick="form.submit()" id="btn-export">Export Marks</a></li>
         </ul>
     </div>
@@ -59,8 +59,8 @@
                         <div class="dropdown">
                             <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">Actions<span class="caret"></span></button>
                             <ul class="dropdown-menu">
-                                <li><a href="/admin/courses/<%= course._id %>/tutorials/<%= tutorialQuiz.tutorial._id %>/quizzes/<%= tutorialQuiz.quiz._id %>/conduct"><span class="glyphicon glyphicon-play-circle"></span> Conduct quiz</a></li>
-                                <li><a href="/admin/courses/<%= course._id %>/tutorials/<%= tutorialQuiz.tutorial._id %>/quizzes/<%= tutorialQuiz.quiz._id %>/marks"><span class="glyphicon glyphicon-signal"></span> View Results</a></li>
+                                <li><a href="/admin/courses/<%= course._id %>/tutorials-quizzes/<%= tutorialQuiz._id %>"><span class="glyphicon glyphicon-play-circle"></span> Conduct quiz</a></li>
+                                <li><a href="/admin/courses/<%= course._id %>/tutorials-quizzes/<%= tutorialQuiz._id %>/marks"><span class="glyphicon glyphicon-signal"></span> View Results</a></li>
                             </ul>
                         </div>
                     </td>

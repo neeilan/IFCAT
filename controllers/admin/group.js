@@ -1,6 +1,5 @@
-const _ = require('lodash'),
+const _ = require('../../lib/lodash.mixin'),
     async = require('async'),
-    config = require('../../lib/config'),
     models = require('../../models'),
     mongoose = require('mongoose');
 // Retrieve group
@@ -16,103 +15,85 @@ exports.getGroupByParam = (req, res, next, id) => {
 };
 // Temporarily generate groups
 exports.generateGroups = (req, res) => {
-    models.TutorialQuiz.findOne({ tutorial: req.tutorial, quiz: req.quiz }).populate({
+    req.tutorialQuiz.populate([{
         path: 'tutorial',
+        model: 'Tutorial',
         populate: {
             path: 'students',
-            model: models.User,
-            sort: { 'name.first': 1, 'name.last': 1 }
+            model: 'User',
+            options: {
+                sort: { 'name.first': 1, 'name.last': 1 }
+            }
         }
-    }).exec((err, tutorialQuiz) => {
+    }, {
+        path: 'quiz',
+        model: 'Quiz'
+    }]).execPopulate().then(() => {
         // shuffle students
-        let students = _.shuffle(req.tutorial.students.map(String));
+        let students = _.shuffle(_.map(req.tutorialQuiz.tutorial.students, '_id'));
         // split into chunks of size + shuffle chunks
-        let chunks = _.chunk(students, tutorialQuiz.maxMembersPerGroup);
+        let chunks = _.chunk(students, req.tutorialQuiz.maxMembersPerGroup);
         // map chunks to groups
         let groups = _.map(chunks, (members, i) => new models.Group({ name: i + 1, members: members }));
+        // add warning
+        req.flash('warning', 'Below is an <b><u>unsaved</u></b> list of new groups.');
+        res.locals.flash = req.flash();
+
+        console.log('students', req.tutorialQuiz.tutorial.students.length)
+        console.log('chunks', chunks.length)
 
         res.render('admin/pages/tutorial-quiz', {
             bodyClass: 'tutorial-quiz',
-            title: `Conduct ${req.quiz.name} in TUT ${req.tutorial.number}`,
-            course: req.course, 
-            tutorial: req.tutorial,
-            quiz: req.quiz,
-            tutorialQuiz: tutorialQuiz,
-            students: tutorialQuiz.tutorial.students,
-            groups: groups,
-            flash: {
-                'warning': ['Below is an <b><u>unsaved</u></b> list of new groups.']
-            }
+            title: `Conduct ${req.tutorialQuiz.quiz.name} in Tutorial ${req.tutorialQuiz.tutorial.number}`,
+            course: req.course,
+            tutorialQuiz: req.tutorialQuiz,
+            tutorial: req.tutorialQuiz.tutorial,
+            quiz: req.tutorialQuiz.quiz,
+            students: req.tutorialQuiz.tutorial.students,
+            groups: groups
         });
     });
 };
 // Save groups for tutorial
 exports.saveGroups = (req, res, next) => {
-    console.log(req.body.groups)
-
-    req.body.groups = req.body.groups || {};
-
-    let tutorialQuiz;
-
+    let dict = _.transpose(req.body['+users'] || {});
     async.series([
         done => {
-            models.TutorialQuiz.findOne({ tutorial: req.tutorial, quiz: req.quiz }).populate('groups').exec((err, doc) => {
-                if (err)
-                    return done(err);
-                if (!doc)
-                    return done(new Error('No tutorial quiz'));
-                if (doc.archived)
-                    return done(new Error('Cannot update archived tutorial quiz'));
-                tutorialQuiz = doc;
-                done();
-            });
+            req.tutorialQuiz.populate('tutorial quiz groups', done);
         },
         done => {
-            async.eachSeries(tutorialQuiz.groups, (self, done) => {
-                // remove existing group if it is not present
-                if (!req.body.groups.hasOwnProperty(self._id))
-                    return self.remove(done);
-                // otherwise update existing group
-                self.update({ $set: { members: req.body.groups[self._id] }}, done);
+            // update existing groups
+            async.eachSeries(req.tutorialQuiz.groups, (group, done) => {
+                let members = group.members.map(String);
+                    members = _.difference(members, req.body.users);
+                    members = _.union(members, dict[group._id]);
+                    delete dict[group._id];
+                group.members = members;
+                console.log(group.name, members);
+                if (!group.members.length) {
+                    return group.remove(err => {
+                        if (err)
+                            return done(err);
+                        req.tutorialQuiz.update({ $pull: { groups: group._id }}, done);
+                    });
+                }
+                group.save(done);
             }, done);
         },
         done => {
-            async.eachOfSeries(req.body.groups, (members, name, done) => {
-                if (!name.startsWith('_'))
-                    return done();
-                // add new group
-                models.Group.create({ name: name.slice(1), members: members }, (err, group) => {
+            // add new groups
+            async.eachOfSeries(dict, (members, name, done) => {
+                models.Group.create({ name: name, members: members }, (err, group) => {
                     if (err)
                         return done(err);
-                    tutorialQuiz.update({ $addToSet: { groups: group._id }}, done);
+                    req.tutorialQuiz.update({ $push: { groups: group._id }}, done);
                 });
             }, done);
         }
     ], err => {
-        console.log(err)
         if (err)
-            req.flash('error', 'An error occurred while trying to perform action.');
-        else
-            req.flash('success', '<b>%s</b> groups have been updated for <b>TUT %s</b>.', req.quiz.name, req.tutorial.number);
-        res.redirect(`/admin/courses/${req.course._id}/tutorials/${req.tutorial._id}/quizzes/${req.quiz._id}/conduct`);
+            return req.status(400).send('An error occurred while trying to perform operation.');
+        req.flash('success', '<b>%s</b> groups have been updated for <b>TUT %s</b>.', req.tutorialQuiz.quiz.name, req.tutorialQuiz.tutorial.number);
+        res.send(`/admin/courses/${req.course._id}/tutorials-quizzes/${req.tutorialQuiz._id}`);
     });
 };
-
-// function diffGroup(before, after) {
-//     diffSet = new Set();
-//     for (let member in before) {
-//         let id = member._id || member;
-//         diffSet.add(id);
-//         console.log(id);
-//     }
-//     for (let member in after) {
-//         let id = member._id || member;
-//         if (diffSet.has(id)) {
-//             // was already present, so not part of diff
-//             diffSet.delete(id);
-//         } else {
-//             diffSet.add(id);
-//         }
-//     }
-//     return diffSet;
-// };

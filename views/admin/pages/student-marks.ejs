@@ -41,7 +41,7 @@
                 <td>Group <%= tutorialQuiz.group.name %></td>
                 <td class="text-center"><%= tutorialQuiz.totalPoints %></td>
                 <td class="text-center"></td>
-                <td><a href="/admin/courses/<%= course._id %>/tutorials/<%= tutorialQuiz.tutorial._id %>/quizzes/<%= tutorialQuiz.quiz._id %>/groups/<%= tutorialQuiz.group._id %>/responses" class="btn btn-default btn-sm">View Responses</a></td>
+                <td><a href="/admin/courses/<%= course._id %>/tutorials-quizzes/<%= tutorialQuiz._id %>/groups/<%= tutorialQuiz.group._id %>/responses" class="btn btn-default btn-sm">View Responses</a></td>
             </tr>
         <% }) %>
         </tbody>

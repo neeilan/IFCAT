@@ -67,7 +67,8 @@ exports.getStudentsByTutorial = (req, res) => {
 };
 // Add student to course
 exports.addStudents = (req, res) => {
-    req.course.update({ $addToSet: { students: { $each: req.body.students || [] }}}, err => {
+    let users = req.body.users || [];
+    req.course.update({ $addToSet: { students: { $each: users }}}, err => {
         if (err)
             req.flash('error', 'An error has occurred while trying perform operation.');
         else
@@ -77,43 +78,40 @@ exports.addStudents = (req, res) => {
 };
 // Update students in tutorials
 exports.editStudents = (req, res) => {
-    req.body.tutorials = req.body.tutorials || {};
-    req.course.withTutorials().execPopulate().then(() => {
-        async.eachSeries(req.course.tutorials, (tutorial, done) => {
-            tutorial.update({ $set: { students: req.body.tutorials[tutorial.id] || [] }}, done);
+    let dict = _.transpose(req.body['+users'] || {});
+    models.Tutorial.find({ _id: req.course.tutorials }, (err, tutorials) => {
+        async.eachSeries(tutorials, (tutorial, done) => {
+            let students = tutorial.students.map(String);
+                students = _.difference(students, req.body.users);
+                students = _.union(students, dict[tutorial._id]);
+            tutorial.update({ students: students }, done);
         }, err => {
             if (err)
-                req.flash('error', 'An error occurred while trying to perform operation.');
-            else
-                req.flash('success', 'The list of tutorials has been updated.');
-            res.sendStatus(200);
+                return res.status(400).send('An error occurred while trying to perform operation.');
+            res.send('The list of tutorials has been updated.');
         });
     });
 };
 // Delete students from course and associated tutorials
 exports.deleteStudents = (req, res) => {
-    let students = req.body.students || [];
+    let users = req.body['-users'] || [];
     async.series([
         done => {
-            req.course.update({ 
-                $pull: { students: { $in: students }}
-            }, done);
+            req.course.update({ $pull: { students: { $in: users }}}, done);
         },
         done => {
             models.Tutorial.update({ 
                 _id: { $in: req.course.tutorials }
             }, { 
-                $pull: { students: { $in: students }}
+                $pull: { students: { $in: users }}
             }, {
                 multi: true
             }, done);
         }
     ], err => {
         if (err)
-            req.flash('error', 'An error has occurred while trying perform operation.');
-        else
-            req.flash('success', 'The list of students has been updated.');
-        res.sendStatus(200);
+            return res.status(400).send('error', 'An error has occurred while trying perform operation.');
+        res.send('The list of students has been updated.');
     });
 };
 // Import list of students

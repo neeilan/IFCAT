@@ -1,5 +1,5 @@
-const async = require('async'),
-    config = require('../../lib/config'),
+const _ = require('../../lib/lodash.mixin'),
+    async = require('async'),
     models = require('../../models');
 // Retrieve list of teaching assistants for course
 exports.getTeachingAssistantsByCourse = (req, res) => {
@@ -43,7 +43,8 @@ exports.getTeachingAssistantsBySearchQuery = (req, res) => {
 };
 // Add teaching assistants into course
 exports.addTeachingAssistants = (req, res) => {
-    req.course.update({ $addToSet: { teachingAssistants: { $each: req.body.teachingAssistants || [] }}}, err => {
+    let users = req.body.users || [];
+    req.course.update({ $addToSet: { teachingAssistants: { $each: users }}}, err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
@@ -53,42 +54,39 @@ exports.addTeachingAssistants = (req, res) => {
 };
 // Update teaching assistants in tutorials
 exports.editTeachingAssistants = (req, res) => {
-    req.body.tutorials = req.body.tutorials || {};
-    req.course.withTutorials().execPopulate().then(() => {
-        async.eachSeries(req.course.tutorials, (tutorial, done) => {
-            tutorial.update({ $set: { teachingAssistants: req.body.tutorials[tutorial._id] || [] }}, done);
+    let dict = _.transpose(req.body['+users'] || {});
+    models.Tutorial.find({ _id: req.course.tutorials }, (err, tutorials) => {
+        async.eachSeries(tutorials, (tutorial, done) => {
+            let assistants = tutorial.teachingAssistants.map(String);
+                assistants = _.difference(assistants, req.body.users);
+                assistants = _.union(assistants, dict[tutorial._id]);
+            tutorial.update({ teachingAssistants: assistants }, done);
         }, err => {
             if (err)
-                req.flash('error', 'An error occurred while trying to perform operation.');
-            else
-                req.flash('success', 'The list of tutorials has been updated.');
-            res.sendStatus(200);
+                return res.status(400).send('An error occurred while trying to perform operation.');
+            res.send('The list of tutorials has been updated.');
         });
     });
 };
 // Delete teaching assistants from course and associated tutorials
 exports.deleteTeachingAssistants = (req, res) => {
-    let teachingAssistants = req.body.teachingAssistants || [];
+    let users = req.body['-users'] || [];
     async.series([
         done => {
-            req.course.update({ 
-                $pull: { teachingAssistants: { $in: teachingAssistants }}
-            }, done);
+            req.course.update({ $pull: { teachingAssistants: { $in: users }}}, done);
         },
         done => {
             models.Tutorial.update({ 
                 _id: { $in: req.course.tutorials }
             }, { 
-                $pull: { teachingAssistants: { $in: teachingAssistants }}
+                $pull: { teachingAssistants: { $in: users }}
             }, {
                 multi: true
             }, done);
         }
     ], err => {
         if (err)
-            req.flash('error', 'An error occurred while trying to perform operation.');
-        else
-            req.flash('success', 'List of teaching assistants has been updated.');
-        res.sendStatus(200);
+            return res.status(400).send('An error occurred while trying to perform operation.');
+        res.send('List of teaching assistants has been updated.');
     });
 };

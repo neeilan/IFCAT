@@ -41,7 +41,8 @@ exports.getInstructorsBySearchQuery = (req, res) => {
 };
 // Add instructor to course
 exports.addInstructors = (req, res) => {
-    req.course.update({ $addToSet: { instructors: { $each: req.body.instructors || [] }}}, err => {
+    let users = req.body.users || [];
+    req.course.update({ $addToSet: { instructors: { $each: users }}}, err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else
@@ -51,11 +52,10 @@ exports.addInstructors = (req, res) => {
 };
 // Delete instructor from course
 exports.deleteInstructors = (req, res) => {
-    req.course.update({ $pull: { instructors: { $in: req.body.instructors || [] }}}, err => {
+    let users = req.body['-users'] || [];
+    req.course.update({ $pull: { instructors: { $in: users }}}, err => {
         if (err)
-            req.flash('error', 'An error occurred while trying to perform operation.');
-        else
-            req.flash('success', 'The list of instructors has been updated for the course.');
-        res.sendStatus(200);
+            return res.status(400).send('An error occurred while trying to perform operation.');
+        res.send('The list of instructors has been updated for the course.');
     }); 
 };

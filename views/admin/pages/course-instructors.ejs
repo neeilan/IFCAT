@@ -28,7 +28,7 @@
     <% } else { %>
         <% _.each(course.instructors, instructor => { %>
             <tr>
-                <td><input type="checkbox" name="instructors[]" value="<%= instructor._id %>"></td>
+                <td><input type="checkbox" name="-users[]" value="<%= instructor._id %>"></td>
                 <td><%= instructor.name.full %></td>
                 <td><%= instructor.local.email %></td>
             </tr>

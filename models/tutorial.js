@@ -32,7 +32,7 @@ TutorialSchema.methods.hasStudent = function (userId) {
     return this.students.indexOf(userId) > -1;
 };
 // Check if teaching assistant belongs to tutorial
-TutorialSchema.methods.hasTeachingAssistant = function (userId) {
+TutorialSchema.methods.hasTA = function (userId) {
     return this.teachingAssistants.indexOf(userId) > -1;
 };
 

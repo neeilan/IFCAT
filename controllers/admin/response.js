@@ -15,8 +15,7 @@ exports.getResponsesByGroup = (req, res) => {
             bodyClass: 'group-responses',
             title: 'Responses',
             course: req.course,
-            tutorial: req.tutorial,
-            quiz: req.quiz,
+            tutorialQuiz: req.tutorialQuiz,
             group: req.group
         });
     });
@@ -66,7 +65,15 @@ exports.getMarksByStudent = (req, res) => {
 // Retrieve students' marks by tutorial quiz
 exports.getMarksByTutorialQuiz = (req, res) => {
     models.TutorialQuiz.aggregate([{
-        $match: { tutorial: req.tutorial._id, quiz: req.quiz._id }
+        $match: { _id: req.tutorialQuiz._id }
+    }, {
+        $lookup: { from: 'tutorials', localField: 'tutorial', foreignField: '_id', as: 'tutorial' }
+    }, {
+        $unwind: '$tutorial'
+    }, {
+        $lookup: { from: 'quizzes', localField: 'quiz', foreignField: '_id', as: 'quiz' }
+    }, {
+        $unwind: '$quiz'
     }, {
         $unwind: '$groups'
     }, {
@@ -86,6 +93,8 @@ exports.getMarksByTutorialQuiz = (req, res) => {
     }, {
         $group: {
             _id: '$student._id',
+            tutorial: { $first: '$tutorial' },
+            quiz: { $first: '$quiz' },
             member: { $first: '$member' },
             group: { $first: '$group' },
             totalPoints: { $sum: '$response.points' }
@@ -99,8 +108,8 @@ exports.getMarksByTutorialQuiz = (req, res) => {
                 d.member.student.UTORid,
                 d.member.student.number,
                 `${d.member.name.first} ${d.member.name.last}`,
-                `TUT ${req.tutorial.number}`,
-                req.quiz.name,
+                `TUT ${d.tutorial.number}`,
+                d.quiz.name,
                 `Group ${d.group.name}`,
                 d.totalPoints
             ]);
@@ -116,8 +125,7 @@ exports.getMarksByTutorialQuiz = (req, res) => {
             bodyClass: 'marks',
             title: 'Marks',
             course: req.course,
-            tutorial: req.tutorial,
-            quiz: req.quiz,
+            tutorialQuiz: req.tutorialQuiz,
             data: data
         });
     });
@@ -153,6 +161,8 @@ exports.getMarksByCourse = (req, res) => {
     }, {
         $group: {
             _id: { tutorialQuiz: '_id', member: '$member._id' },
+            tutorial: { $first: '$tutorial' },
+            quiz: { $first: '$quiz' },
             group: { $first: '$group' },
             member: { $first: '$member' },
             totalPoints: { $sum: '$response.points' }
@@ -166,8 +176,8 @@ exports.getMarksByCourse = (req, res) => {
                 d.member.student.UTORid,
                 d.member.student.number,
                 `${d.member.name.first} ${d.member.name.last}`,
-                `TUT ${req.tutorial.number}`,
-                req.quiz.name,
+                `TUT ${d.tutorial.number}`,
+                d.quiz.name,
                 `Group ${d.group.name}`,
                 d.totalPoints
             ]);
@@ -178,7 +188,7 @@ exports.getMarksByCourse = (req, res) => {
             res.set('Content-Type', 'text/csv'); 
             return csv.stringify(data, (err, output) => res.send(output));
         }
-        res.redirect(`/admin/courses/${req.course._id}/conduct`);
+        res.redirect(`/admin/courses/${req.course._id}/tutorial-quizzes`);
     });
 };
 

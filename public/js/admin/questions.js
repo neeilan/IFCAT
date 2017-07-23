@@ -1,5 +1,6 @@
 $(function () {
     var body = $(document.body);
+
     if (body.hasClass('questions')) {
         // Confirm and delete selected row
         $('.btn-delete').click(function (e) {
@@ -84,16 +85,14 @@ $(function () {
             $(this).closest('.form-group').remove();
         });
         // Add choice input
+        var id = 999;
         $('.btn-add-choice').click(function () {
             var template = $(this).closest('.form-group').prev(),
-                clone = template.clone().toggle(true),
-                id = _.toNumber(_.uniqueId()) + 999;
-
+                clone = template.clone().toggle(true);
             clone.find('textarea').attr('name', function () {
-                return this.name.replace(/\[\]$/, '[' + id + ']');
+                return this.name.replace(/\[\]$/, '[' + (++id) + ']');
             });
             clone.find(':radio, :checkbox').val(id);
-            
             template.before(clone);
         });
         //

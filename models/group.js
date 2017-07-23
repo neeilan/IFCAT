@@ -1,22 +1,13 @@
 const _ = require('lodash'),
-    async = require('async'),
     mongoose = require('mongoose');
 const GroupSchema = new mongoose.Schema({
     name: { type: String, required: true },
     members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     driver: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    //responses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Response' }],
     teachingPoints: [String]
 });
 // Populate tutorial-quizzes
 GroupSchema.virtual('responses', { ref: 'Response', localField: '_id', foreignField: 'group' });
-// Delete cascade
-GroupSchema.pre('remove', function (next) {
-    let self = this;
-    async.parallel([
-        done => self.model('TutorialQuiz').update({ groups: { $in: [self._id] }}, { $pull: { groups: self._id }}, done)
-    ], next);
-});
 // Methods
 GroupSchema.methods.hasMember = function (userId) {
     return this.members.indexOf(userId) > -1;

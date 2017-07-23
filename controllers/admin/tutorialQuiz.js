@@ -2,6 +2,17 @@ const _ = require('lodash'),
     async = require('async'),
     config = require('../../lib/config'),
     models = require('../../models');
+// Retrieve tutorial quiz
+exports.getTutorialQuizByParam = (req, res, next, id) => {
+    models.TutorialQuiz.findById(id).exec((err, tutorialQuiz) => {
+        if (err)
+            return next(err);
+        if (!tutorialQuiz)
+            return next(new Error('No tutorial quiz is found.'));
+        req.tutorialQuiz = tutorialQuiz;
+        next();
+    });
+};
 // Retrieve quizzes within course OR by tutorial
 exports.getTutorialQuizzes = (req, res) => {
     let page = parseInt(req.query.page, 10) || 1,
@@ -31,69 +42,74 @@ exports.getTutorialQuizzes = (req, res) => {
 };
 // Edit quizzes 
 exports.editTutorialQuizzes = (req, res) => {
-    if (req.query.action && req.query.action.name && req.query.action.value) {
-        // update property
-        return models.TutorialQuiz.update({ 
-            _id: { $in: req.body.tutorialQuizzes || [] }
-        }, { 
-            $set: { [req.query.action.name]: req.query.action.value }
-        }, {
-            multi: true
-        }, err => {
-            if (err)
-                req.flash('error', 'An error occurred while trying to perform operation.');
-            else
-                req.flash('success', 'Quizzes have been updated.');
-            res.sendStatus(200);
+    let op = {
+        publish: ['published', true],
+        unpublish: ['published', false],
+        activate: ['active', true],
+        deactivate: ['active', false],
+        archive: ['archived', true],
+        unarchive: ['archived', false]
+    }[req.body.op];
+
+    async.mapSeries(req.body.tutorialQuizzes || [], (id, done) => {
+        models.TutorialQuiz.findByIdAndUpdate(id, { [op[0]]: op[1] }, { new: true }, done);
+    }, (err, tutorialQuizzes) => {
+        if (err) 
+            return res.status(500).send('An error occurred while trying to perform operation.');
+        // notify students
+        _.each(tutorialQuizzes, tutorialQuiz => {
+            console.log(tutorialQuiz)
+            req.app.locals.io.in(`tutorialQuiz:${tutorialQuiz._id}`).emit('quizActivated', tutorialQuiz);
         });
-    }
-    res.sendStatus(200);
+        res.sendStatus(200);
+    });
 };
 // Retrieve quiz for tutorial
 exports.getTutorialQuiz = (req, res) => {
-    req.tutorial.withStudents().execPopulate().then(() => {
-        models.TutorialQuiz.findOne({ tutorial: req.tutorial, quiz: req.quiz }).populate({
-            path: 'groups',
-            options: {
-                sort: { name: 1 }
-            }
-        }).exec((err, tutorialQuiz) => {
-            console.log(tutorialQuiz.groups)
-            res.render('admin/pages/tutorial-quiz', {
-                bodyClass: 'tutorial-quiz',
-                title: `Conduct ${req.quiz.name} in tutorial ${req.tutorial.number}`,
-                course: req.course, 
-                tutorial: req.tutorial,
-                quiz: req.quiz,
-                tutorialQuiz: tutorialQuiz,
-                students: req.tutorial.students,
-                groups: tutorialQuiz.groups
-            });
+    req.tutorialQuiz.populate([{
+        path: 'tutorial',
+        populate: {
+            path: 'students'
+        }
+    }, {
+        path: 'quiz'
+    }, {
+        path: 'groups'
+    }]).execPopulate().then(() => {
+        res.render('admin/pages/tutorial-quiz', {
+            bodyClass: 'tutorial-quiz',
+            title: `Conduct ${req.tutorialQuiz.quiz.name} in Tutorial ${req.tutorialQuiz.tutorial.number}`,
+            course: req.course,
+            tutorialQuiz: req.tutorialQuiz,
+            tutorial: req.tutorialQuiz.tutorial,
+            quiz: req.tutorialQuiz.quiz,
+            students: req.tutorialQuiz.tutorial.students,
+            groups: _.sortBy(req.tutorialQuiz.groups, group => _.toInteger(group.name))
         });
     });
 };
-// Publish quiz for tutorial
-exports.editTutorialQuiz = (req, res) => {
-    models.TutorialQuiz.findOneAndUpdate({ 
-        tutorial: req.tutorial, 
-        quiz: req.quiz 
-    }, { 
-        $set: {
-            allocateMembers: req.body.allocateMembers,
-            maxMembersPerGroup: req.body.maxMembersPerGroup,
-            published: req.body.published,
-            active: req.body.active,
-            archived: req.body.archived
+// Edit settings for tutorial quiz
+exports.editTutorialQuizSettings = (req, res) => {
+    async.series([
+        done => {
+            req.tutorialQuiz.populate('tutorial quiz', done);
+        },
+        done => {
+            req.tutorialQuiz.set({
+                allocateMembers: req.body.allocateMembers,
+                maxMembersPerGroup: req.body.maxMembersPerGroup,
+                published: !!req.body.published,
+                active: !!req.body.active,
+                archived: !!req.body.archived
+            }).save(done);
         }
-    }, {
-        new: true
-    }, (err, tutorialQuiz) => {
+    ], err => {
         if (err)
             req.flash('error', 'An error occurred while trying to perform operation.');
         else {
-            req.app.locals.io.in('tutorialQuiz:' + tutorialQuiz.id).emit('quizActivated', tutorialQuiz);
-            req.flash('success', '<b>%s</b> settings have been updated for <b>TUT %s</b>.', req.quiz.name, req.tutorial.number);
+            req.app.locals.io.in(`tutorialQuiz:${req.tutorialQuiz._id}`).emit('quizActivated', req.tutorialQuiz);
+            req.flash('success', '<b>%s</b> settings have been updated for <b>TUT %s</b>.', req.tutorialQuiz.quiz.name, req.tutorialQuiz.tutorial.number);
         }
-        res.redirect(`/admin/courses/${req.course.id}/tutorials/${req.tutorial.id}/quizzes/${req.quiz.id}/conduct`);
+        res.redirect(`/admin/courses/${req.course._id}/tutorials-quizzes/${req.tutorialQuiz._id}`);
     });
 };

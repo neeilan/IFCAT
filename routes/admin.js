@@ -28,6 +28,7 @@ router.param('student', controllers.Student.getStudentByParam);
 router.param('course', controllers.Course.getCourseByParam);
 router.param('tutorial', controllers.Tutorial.getTutorialByParam);
 router.param('quiz', controllers.Quiz.getQuizByParam);
+router.param('tutorialQuiz', controllers.TutorialQuiz.getTutorialQuizByParam);
 router.param('question', controllers.Question.getQuestionByParam);
 router.param('fil3', controllers.File.getFileByParam);
 router.param('group', controllers.Group.getGroupByParam);
@@ -87,30 +88,30 @@ router.delete('/courses/:course/instructors', controllers.Instructor.deleteInstr
 router.get('/courses/:course/teaching-assistants', controllers.TeachingAssistant.getTeachingAssistantsByCourse);
 router.get('/courses/:course/teaching-assistants/search', controllers.TeachingAssistant.getTeachingAssistantsBySearchQuery);
 router.post('/courses/:course/teaching-assistants', controllers.TeachingAssistant.addTeachingAssistants);
-router.put('/courses/:course/teaching-assistants', controllers.TeachingAssistant.editTeachingAssistants);
+router.patch('/courses/:course/teaching-assistants', controllers.TeachingAssistant.editTeachingAssistants);
 router.delete('/courses/:course/teaching-assistants', controllers.TeachingAssistant.deleteTeachingAssistants);
 
 router.get('/courses/:course/students', controllers.Student.getStudentsByCourse);
 router.get('/courses/:course/students/search', controllers.Student.getStudentsBySearchQuery);
 router.post('/courses/:course/students/import', upload.csv.single('file'), controllers.Student.importStudents);
 router.post('/courses/:course/students', controllers.Student.addStudents);
-router.put('/courses/:course/students', controllers.Student.editStudents);
+router.patch('/courses/:course/students', controllers.Student.editStudents);
 router.delete('/courses/:course/students', controllers.Student.deleteStudents);
 
-router.get('/courses/:course/tutorials/:tutorial/quizzes', controllers.TutorialQuiz.getTutorialQuizzes);
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/conduct', controllers.TutorialQuiz.getTutorialQuiz);
-router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz', controllers.TutorialQuiz.editTutorialQuiz);
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/generate', controllers.Group.generateGroups);
-router.put('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups', controllers.Group.saveGroups);
+router.get('/courses/:course/tutorials-quizzes', controllers.TutorialQuiz.getTutorialQuizzes);
+router.patch('/courses/:course/tutorials-quizzes', controllers.TutorialQuiz.editTutorialQuizzes);
+router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz', controllers.TutorialQuiz.getTutorialQuiz);
+router.patch('/courses/:course/tutorials-quizzes/:tutorialQuiz/settings', controllers.TutorialQuiz.editTutorialQuizSettings);
+router.patch('/courses/:course/tutorials-quizzes/:tutorialQuiz/groups', controllers.Group.saveGroups);
+router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroups);
+
+router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz/groups/:group/responses', controllers.Response.getResponsesByGroup);
+router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz/marks', controllers.Response.getMarksByTutorialQuiz);
 
 // ugly routes begin here...
-router.get('/courses/:course/conduct', controllers.TutorialQuiz.getTutorialQuizzes);
-router.put('/courses/:course/conduct', controllers.TutorialQuiz.editTutorialQuizzes);
 
 router.post('/courses/:course/marks', controllers.Response.getMarksByCourse);
 router.get('/courses/:course/students/:student/marks', controllers.Response.getMarksByStudent);
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/marks', controllers.Response.getMarksByTutorialQuiz);
-router.get('/courses/:course/tutorials/:tutorial/quizzes/:quiz/groups/:group/responses', controllers.Response.getResponsesByGroup);
 
 
 module.exports = router;

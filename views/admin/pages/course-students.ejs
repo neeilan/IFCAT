@@ -32,14 +32,15 @@
     <% } else { %>
         <% _.each(students, student => { %>
             <tr>
-                <td><input type="checkbox" name="students[]" value="<%= student._id %>"></td>
+                <td><input type="checkbox" name="-users[]" value="<%= student._id %>"></td>
                 <td><%= student.name.full %></td>
                 <td><%= student.student.UTORid %></td>
                 <td><%= student.student.number %></td>
                 <td>
-                <% _.each(course.tutorials, tutorial => { %>
-                    <input type="checkbox" name="tutorials[<%= tutorial._id %>][]" value="<%= student._id %>" data-label="<%= tutorial.number %>" data-group="<%= student._id %>"<%= tutorial.hasStudent(student._id) ? ' checked' : '' %>>
-                <% }) %>
+                    <input type="hidden" name="users[]" value="<%= student._id %>"> 
+                    <% _.each(course.tutorials, tutorial => { %>
+                        <input type="checkbox" name="+users[<%= student._id %>]" value="<%= tutorial._id %>" data-label="<%= tutorial.number %>"<%= tutorial.hasStudent(student._id) ? ' checked' : '' %>>
+                    <% }) %>
                 </td>
             </tr>
         <% }) %>

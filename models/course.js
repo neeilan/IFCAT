@@ -123,7 +123,7 @@ CourseSchema.methods.hasInstructor = function (userId) {
     return this.instructors.indexOf(userId) > -1;
 };
 // Check if teaching assistant belongs to course
-CourseSchema.methods.hasTeachingAssistant = function (userId) {
+CourseSchema.methods.hasTA = function (userId) {
     return this.teachingAssistants.indexOf(userId) > -1;
 };
 // Check if student belongs to course

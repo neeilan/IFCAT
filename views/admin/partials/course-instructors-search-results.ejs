@@ -15,7 +15,7 @@
     <% } else { %>
         <% _.each(instructors, instructor => { %>
             <tr>
-                <td class="text-center"><input type="checkbox" name="instructors[]" value="<%= instructor._id %>"<%= course.hasInstructor(instructor._id) ? ' checked disabled' : '' %>></td>
+                <td class="text-center"><input type="checkbox" name="users[]" value="<%= instructor._id %>"<%= course.hasInstructor(instructor._id) ? ' checked disabled' : '' %>></td>
                 <td><%= instructor.name.full %></td>
                 <td><%= instructor.local.email %></td>
             </tr>

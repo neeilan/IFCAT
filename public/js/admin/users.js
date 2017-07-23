@@ -1,5 +1,6 @@
 $(function () {
     var body = $(document.body);
+
     if (body.hasClass('users')) {
         $('.btn-delete').click(function (e) {
             e.preventDefault();
@@ -16,15 +17,21 @@ $(function () {
             });
         });
     }
+
     if (body.hasClass('instructors') || body.hasClass('teaching-assistants') || body.hasClass('students')) {
+        // create buttons
+        $('tbody').buttonCircle();
+
         $('#modal-find-users form').submit(function (e) {
             e.preventDefault();
             $('#search-results').load(this.action + '?q=' + encodeURIComponent(this.elements.q.value));
         });
+
         $('#search-results').on('click', 'a', function (e) {
             e.preventDefault();
             $(e.delegateTarget).load(this.href);
         });
+
         $('#btn-add').click(function (e) {
             e.preventDefault();
             var inputs = $('#modal-find-users input');
@@ -34,26 +41,22 @@ $(function () {
                 });
             }
         });
+
+        $('#btn-update').click(function (e) {
+            e.preventDefault();
+            $.patch(this.href, $(':not(.modal) input').serialize(), function () { 
+                window.location.reload(true);
+            });
+        });
+
         $('#btn-delete').click(function (e) {
             e.preventDefault();
-            var inputs = $(
-                ':not(.modal) input[name^=instructors]:checked,' +
-                ':not(.modal) input[name^=teachingAssistants]:checked,' +
-                ':not(.modal) input[name^=students]:checked'
-            );
+            var inputs = $(':not(.modal) input[name="-users\[\]"]:checked');
             if (inputs.length) {
                 $.delete(this.href, inputs.serialize(), function () { 
                     window.location.reload(true);
                 });
             }
-        });
-    }
-    if (body.hasClass('teaching-assistants') || body.hasClass('students')) {
-        $('#btn-update').click(function (e) {
-            e.preventDefault();
-            $.put(this.href, $(':not(.modal) input[name^=tutorials]:checked').serialize(), function () { 
-                window.location.reload(true);
-            });
         });
     }
 });
