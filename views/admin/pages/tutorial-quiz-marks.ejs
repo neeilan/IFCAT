@@ -37,8 +37,8 @@
                 <td>
                     <a href="/admin/courses/<%= course._id %>/students/<%= d.member._id %>/marks"><%= `${d.member.name.first} ${d.member.name.last}` %></a>
                 </td>
-                <td>TUT <%= tutorial.number %></td>
-                <td><%= quiz.name %></td>
+                <td>TUT <%= d.tutorial.number %></td>
+                <td><%= d.quiz.name %></td>
                 <td>
                     <a href="/admin/courses/<%= course._id %>/tutorials-quizzes/<%= tutorialQuiz._id %>/groups/<%= d.group._id %>/responses">Group <%= d.group.name %></a>
                 </td>

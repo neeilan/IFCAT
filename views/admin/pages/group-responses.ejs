@@ -2,17 +2,19 @@
 
 <ol class="breadcrumb">
     <li><a href="/admin/courses">Courses</a> ‐ <%- course.code %></li>
-    <li><a href="/admin/courses/<%= course.id %>/tutorials-quizzes">Tutorials &amp; Quizzes</li>
-    <li>Groups ‐ Group <%- group.name %></li>
+    <li><a href="/admin/courses/<%= course.id %>/tutorials-quizzes">Tutorials &amp; Quizzes</a></li>
+    <li>Groups ‐ <%- group.name %></li>
     <li class="active">Responses</li>
 </ol>
 
 <h3><%- title %></h3>
 
+
 <table class="table table-striped">
     <thead>
         <tr>
             <th style="width: 10px;">No.</th>
+            <th>Type</th>
             <th style="max-width: 250px;">Question</th>
             <th class="text-center"># of incorrect attempts</th>
             <th class="text-center">Points awarded</th>
@@ -20,12 +22,12 @@
     </thead>
 <% if (_.isEmpty(group.responses)) { %>
     <tbody>
-        <tr><td colspan="4">No responses have been given yet.</td></tr>
+        <tr><td colspan="5">No responses have been given yet.</td></tr>
     </tbody>
 <% } else { %>
     <tfoot>
         <tr class="total-points">
-            <th colspan="3" style="text-align: right">Total Points</th>
+            <th colspan="4" style="text-align: right">Total Points</th>
             <th class="text-center"><%= group.getTotalPoints() %></th>
         </tr>
     </tfoot>
@@ -33,6 +35,7 @@
     <% _.each(group.responses, response => { %>
         <tr>
             <td style="width: 10px;"><%= response.question.number %>.</td>
+            <td><%= response.question.type %></td>
             <td style="max-width: 250px;"><%= response.question.question %></td>
             <td class="text-center"><%= response.attempts %></td>
             <td class="text-center"><%= response.points %></td>

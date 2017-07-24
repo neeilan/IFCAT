@@ -31,55 +31,75 @@
         </div>
     </div>
 
-    <!-- default question options -->
-
     <div class="form-group">
-        <div class="col-sm-offset-3 col-sm-9">
-            <a href="#options" data-toggle="collapse" data-target="#options">Show default question options</a>
+        <label class="col-xs-7 col-sm-3 control-label">Enable student choice?</label>
+        <div class="col-xs-5 col-sm-9">
+            <input type="checkbox" name="studentChoice" value="1" class="bootstrap-switch"<%= quiz.studentChoice ? ' checked' : '' %>>
         </div>
     </div>
-    <div id="options" class="collapse">
-        <div class="form-group">
-            <label class="col-xs-7 col-sm-3 control-label">Enable student choice?</label>
-            <div class="col-xs-5 col-sm-9">
-                <input type="checkbox" name="studentChoice" value="1" class="bootstrap-switch"<%= quiz.studentChoice ? ' checked' : '' %>>
-            </div>
+
+    <div class="form-group">
+        <label class="col-xs-7 col-sm-3 control-label">Enable student voting?</label>
+        <div class="col-xs-5 col-sm-9">
+            <input type="checkbox" name="voting" value="1" class="bootstrap-switch"<%= quiz.voting ? ' checked' : '' %>>
         </div>
-        <div class="form-group">
-            <label class="col-xs-7 col-sm-3 control-label">Enable student voting?</label>
-            <div class="col-xs-5 col-sm-9">
-                <input type="checkbox" name="voting" value="1" class="bootstrap-switch"<%= quiz.voting ? ' checked' : '' %>>
-            </div>
+    </div>
+
+    <!-- default options -->
+
+    <div class="form-group">
+        <label class="col-xs-7 col-sm-3 control-label">Shuffle choices? (MC/MS)</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="checkbox" name="default[shuffleChoices]" value="1" class="bootstrap-switch"<%= quiz.default.shuffleChoices ? ' checked' : '' %>>
         </div>
-        <div class="form-group">
-            <label class="col-xs-7 col-sm-3 control-label">Shuffle choices?</label>
-            <div class="col-xs-5 col-sm-2">
-                <input type="checkbox" name="default[shuffleChoices]" value="1" class="bootstrap-switch"<%= quiz.default.shuffleChoices ? ' checked' : '' %>>
-            </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-7 col-sm-3 control-label">Format questions using LaTeX?</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="checkbox" name="default[useLaTeX]" value="1" class="bootstrap-switch"<%= quiz.default.useLaTeX ? ' checked' : '' %>>
         </div>
-        <div class="form-group">
-            <label class="col-xs-7 col-sm-3 control-label">Format questions using LaTeX?</label>
-            <div class="col-xs-5 col-sm-2">
-                <input type="checkbox" name="default[useLaTeX]" value="1" class="bootstrap-switch"<%= quiz.default.useLaTeX ? ' checked' : '' %>>
-            </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-7 col-sm-3 control-label">Case-sensitive (SA)</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="checkbox" name="default[caseSensitive]" value="1" class="bootstrap-switch"<%= quiz.default.shuffleChoices ? ' checked' : '' %>>
         </div>
-        <div class="form-group">
-            <label class="col-xs-7 col-sm-3 control-label">Points possible</label>
-            <div class="col-xs-5 col-sm-2">
-                <input type="number" name="default[points]" value="<%= quiz.default.points %>" min="0" class="form-control">
-            </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-7 col-sm-3 control-label">Points per line (CT)</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="number" name="default[maxPointsPerLine]" value="<%= quiz.default.maxPointsPerLine %>" min="1" class="form-control">
         </div>
-        <div class="form-group">
-            <label class="col-xs-7 col-sm-3 control-label">First-try bonus</label>
-            <div class="col-xs-5 col-sm-2">
-                <input type="number" name="default[firstTryBonus]" value="<%= quiz.default.firstTryBonus %>" min="0" class="form-control">
-            </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-7 col-sm-3 control-label">Maximum attempts per line (CT)</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="number" name="default[maxAttemptsPerLine]" value="<%= quiz.default.maxAttemptsPerLine %>" min="1" class="form-control">
         </div>
-        <div class="form-group">
-            <label class="col-xs-7 col-sm-3 control-label">Penalty per attempt</label>
-            <div class="col-xs-5 col-sm-2">
-                <input type="number" name="default[penalty]" value="<%= quiz.default.penalty %>" min="0" class="form-control">
-            </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-7 col-sm-3 control-label">Points possible (MC/MS/SA)</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="number" name="default[points]" value="<%= quiz.default.points %>" min="0" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-7 col-sm-3 control-label">First-try bonus (MC/MS/SA)</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="number" name="default[firstTryBonus]" value="<%= quiz.default.firstTryBonus %>" min="0" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-xs-7 col-sm-3 control-label">Penalty per attempt (MC/MS/SA)</label>
+        <div class="col-xs-5 col-sm-2">
+            <input type="number" name="default[penalty]" value="<%= quiz.default.penalty %>" min="0" class="form-control">
         </div>
     </div>
     <div class="form-group" style="margin-top: 30px;">

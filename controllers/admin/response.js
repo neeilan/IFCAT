@@ -92,7 +92,7 @@ exports.getMarksByTutorialQuiz = (req, res) => {
         $unwind: '$response'
     }, {
         $group: {
-            _id: '$student._id',
+            _id: '$member._id',
             tutorial: { $first: '$tutorial' },
             quiz: { $first: '$quiz' },
             member: { $first: '$member' },

@@ -5,6 +5,9 @@ const QuizSchema = new mongoose.Schema({
     name: { type: String, required: true },
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
     default: {
+        caseSensitive: Boolean,
+        maxPointsPerLine: { type: Number, default: 1 },
+        maxAttemptsPerLine: { type: Number, default: 1 },
         shuffleChoices: Boolean,
         useLaTeX: Boolean,
         points: { type: Number, default : 4 },
@@ -45,6 +48,7 @@ QuizSchema.methods.withQuestions = function (deep = false) {
 QuizSchema.methods.store = function (opts) {
     this.studentChoice = !!opts.studentChoice;
     this.voting = !!opts.voting;
+    this.default.caseSensitive = !!opts.default.caseSensitive;
     this.default.shuffleChoices = !!opts.default.shuffleChoices;
     this.default.useLaTeX = !!opts.default.useLaTeX;
     this.set(opts);
