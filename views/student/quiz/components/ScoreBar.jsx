@@ -1,6 +1,7 @@
 import React from 'react'
 import EmptyLine from './EmptyLine.jsx'
 import StarScore from './StarScore.jsx'
+const MediaQuery = require('react-responsive');
 
 export default class ScoreBar extends React.Component {
 	constructor(props) {
@@ -35,6 +36,10 @@ export default class ScoreBar extends React.Component {
 	}	
 
 	render() {
+
+
+
+
 		var buttons = this.props.questions.map( (q, i) =>
 			{
 			var response = this.props.responses[q._id];
@@ -53,10 +58,34 @@ export default class ScoreBar extends React.Component {
             </span>);
 			});
 
+		var smallButtons = this.props.questions.map( (q, i) =>
+			{
+			var response = this.props.responses[q._id];
+			var btnClass = (response && response.correct) ? 'btn-success' : '';
+
+			return (<span key = {q.id + 'scbtn' + i}>
+				<button 
+					className = {`btn btn-default col-md-12 col-xs-1 col-xs-offset-1 ${ (this.props.selectedQuestion && 
+												     (this.props.selectedQuestion._id === q._id)) ? 'btn-primary' : btnClass} `}
+					onClick={this.props.selectQuestionCb.bind(this, q)}
+					style={{textAlign:'center'}}> 		
+							{q.number}
+							<br/>
+				</button>
+            </span>);
+			});
+
 		return (
 			<div className="col-xs-12 col-md-3">
-				 {buttons}
-				 <EmptyLine/>
+				<MediaQuery minWidth={992}>
+					{buttons}
+				 	<EmptyLine/>
+          		</MediaQuery>
+				<MediaQuery maxWidth={992}>
+					{smallButtons}
+				 	<EmptyLine/>
+          		</MediaQuery>
+				 
 			</div>);
 	}
 }
