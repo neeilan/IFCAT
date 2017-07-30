@@ -9936,7 +9936,7 @@ var QuizApp = function (_React$Component) {
                 var question = _this2.state.quiz.quiz.questions.filter(function (q) {
                     return q._id == data.response.question;
                 })[0];
-                var maxScore = question.firstTryBonus + question.points;
+                var maxScore = question.type == "code tracing" ? question.points : question.points + question.firstTryBonus;
                 question.output = data.codeOutput;
 
                 if (data.response.correct) {
@@ -10054,6 +10054,12 @@ var QuizApp = function (_React$Component) {
             } else {
                 selectedQuestion = this.state.selectedQuestion;
             }
+
+            if (!selectedQuestion) {
+                swal("Yikes!", "No questions were found for this quiz.", "error");
+                return null;
+            }
+
             return _react2.default.createElement(_Question2.default, {
                 key: selectedQuestion._id + "questionObj",
                 isDriver: this.state.isDriver,
@@ -10067,7 +10073,7 @@ var QuizApp = function (_React$Component) {
         key: 'getScoreBar',
         value: function getScoreBar() {
             return _react2.default.createElement(_ScoreBar2.default, {
-                questions: this.state.quiz.quiz.questions,
+                questions: this.state.quiz.quiz.questions || [],
                 responses: this.state.responses,
                 selectQuestionCb: this.selectQuestionCb,
                 selectedQuestion: this.state.selectedQuestion
@@ -25040,7 +25046,7 @@ var ScoreBar = function (_React$Component) {
 			if (!question) return { fullStars: 0, emptyStars: 0 };
 			var result = {};
 			var responses = this.props.responses;
-			var maxScore = question.points + question.firstTryBonus;
+			var maxScore = question.type == "code tracing" ? question.points : question.points + question.firstTryBonus;
 
 			if (question._id in responses) {
 				result.correct = responses[question._id].correct;
@@ -25096,7 +25102,8 @@ var ScoreBar = function (_React$Component) {
 							className: 'btn btn-default col-md-12 col-xs-1 col-xs-offset-1 ' + (_this2.props.selectedQuestion && _this2.props.selectedQuestion._id === q._id ? 'btn-primary' : btnClass) + ' ',
 							onClick: _this2.props.selectQuestionCb.bind(_this2, q),
 							style: { textAlign: 'center' } },
-						q.number
+						q.number,
+						_react2.default.createElement('br', null)
 					)
 				);
 			});

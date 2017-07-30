@@ -16,7 +16,7 @@ export default class ScoreBar extends React.Component {
 		if (!question) return {fullStars : 0, emptyStars : 0};
 		var result = {};
 		var responses = this.props.responses;
-		var maxScore = question.points + question.firstTryBonus;
+		var maxScore = question.type == "code tracing" ? question.points : question.points + question.firstTryBonus;
 
 		if (question._id in responses) {
 			result.correct = responses[question._id].correct;

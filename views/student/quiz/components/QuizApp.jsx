@@ -114,7 +114,7 @@ export default class QuizApp extends React.Component {
             var responsesStore = this.state.responses;
             responsesStore[data.response.question] = data.response;
             var question = this.state.quiz.quiz.questions.filter(q => q._id == data.response.question)[0];
-            var maxScore = question.firstTryBonus + question.points;
+            var maxScore = question.type == "code tracing" ? question.points : question.points + question.firstTryBonus;
             question.output = data.codeOutput;
 
 
@@ -236,6 +236,12 @@ export default class QuizApp extends React.Component {
         } else {
             selectedQuestion = this.state.selectedQuestion;
         }
+
+        if (!selectedQuestion) {
+            swal("Yikes!", "No questions were found for this quiz.", "error");
+            return null;
+        }
+
         return (
             <Question 
                 key= {selectedQuestion._id + "questionObj"}
@@ -250,7 +256,7 @@ export default class QuizApp extends React.Component {
 
     getScoreBar() {
         return (<ScoreBar 
-			questions = {this.state.quiz.quiz.questions}
+			questions = {this.state.quiz.quiz.questions || []}
             responses = {this.state.responses}
 			selectQuestionCb = {this.selectQuestionCb}
 			selectedQuestion = {this.state.selectedQuestion}
