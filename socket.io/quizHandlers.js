@@ -162,6 +162,7 @@ socket.on('attemptAnswer', function(data) {
                 res.correct = answerIsCorrect;
                 res.attempts = answerIsCorrect ? 0 : 1;
                 res.points = answerIsCorrect ? (question.points + question.firstTryBonus) : 0;
+                res.answer = data.answer;
                 return res.save();
             }
             else {
@@ -174,7 +175,7 @@ socket.on('attemptAnswer', function(data) {
                 
                 return models.Response.findByIdAndUpdate(response._id,
                 { correct: (response.correct || answerIsCorrect) , $inc : { attempts : attemptsInc },
-                points : (newScore > 0) ? newScore : 0 },
+                points : (newScore > 0) ? newScore : 0 ,answer : data.answer}, 
                 { new : true } )
                 .exec()
             }

@@ -5,6 +5,7 @@ const ResponseSchema = new mongoose.Schema({
     attempts: { type : Number, default: 0 },
     lineByLineSummary : [{ attempts : { type : Number, default : 1 }, correct : Boolean}],
     codeTracingAnswers : [{type : String}],
+    answer : [{type : String}],
     correct: Boolean,
     points: Number
 }, {
