@@ -25,7 +25,7 @@ $(function () {
             update: function (e, ui) {
                 var self = $(this),
                     url = window.location.href.split(/[?#]/)[0] + '/sort',
-                    data = $('input[name^=questions]', ui.item).serialize();
+                    data = $('input[name^=questions]', this).serialize();
                 $.put(url, data, function () {
                     // do nothing
                 }).fail(function (xhr) {
@@ -95,7 +95,7 @@ $(function () {
             clone.find(':radio, :checkbox').val(id);
             template.before(clone);
         });
-        //
+        // @todo: fix points previewer
         $(document).on('change', '[name=points], [name=firstTryBonus], [name=penalty]', function () {
             var points = _.defaultTo(_.toNumber($('[name=points]').val()), 0), 
                 firstTryBonus = _.defaultTo(_.toNumber($('[name=firstTryBonus]').val()), 0),
@@ -124,7 +124,7 @@ $(function () {
             // add table
             $('#points-calculator').html(table);
         });
-        // Preview question
+        // @todo: fix preview question
         var win;
         $('#btn-preview').click(function (e) {
             e.preventDefault();
