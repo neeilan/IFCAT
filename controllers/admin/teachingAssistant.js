@@ -2,17 +2,17 @@ const _ = require('../../lib/lodash.mixin'),
     async = require('async'),
     models = require('../../models');
 // Retrieve list of teaching assistants for course
-exports.getTeachingAssistantsByCourse = (req, res) => {
-    req.course.withTutorials().withTeachingAssistants().execPopulate().then(err => {
+exports.getTeachingAssistantsByCourse = (req, res, next) => {
+    req.course.withTutorials().withTeachingAssistants().execPopulate().then(() => {
         res.render('admin/pages/course-teaching-assistants', {
             bodyClass: 'teaching-assistants',
             title: 'Teaching Assistants',
             course: req.course
         });
-    });
+    }, next);
 };
 // Retrieve list of teaching assistants matching search query
-exports.getTeachingAssistantsBySearchQuery = (req, res) => {
+exports.getTeachingAssistantsBySearchQuery = (req, res, next) => {
     let page = parseInt(req.query.page, 10) || 1,
         perPage = parseInt(req.query.perPage, 10) || 5,
         re = new RegExp(`(${req.query.q.replace(/\s/g, '|').trim()})`, 'i');
@@ -27,6 +27,7 @@ exports.getTeachingAssistantsBySearchQuery = (req, res) => {
         perPage: perPage,
         sort: 'name.first name.last'
     }, (err, users, count, pages) => {
+        if (err) return next(err);
         res.render('admin/partials/course-teaching-assistants-search-results', { 
             course: req.course, 
             teachingAssistants: users,
@@ -42,34 +43,31 @@ exports.getTeachingAssistantsBySearchQuery = (req, res) => {
     });
 };
 // Add teaching assistants into course
-exports.addTeachingAssistants = (req, res) => {
+exports.addTeachingAssistants = (req, res, next) => {
     let users = req.body.users || [];
     req.course.update({ $addToSet: { teachingAssistants: { $each: users }}}, err => {
-        if (err)
-            req.flash('error', 'An error occurred while trying to perform operation.');
-        else
-            req.flash('success', 'List of teaching assistants has been updated.');
+        if (err) return next(err);
+        req.flash('success', 'List of teaching assistants has been updated.');
         res.redirect(`/admin/courses/${req.course.id}/teaching-assistants`);
     });
 };
 // Update teaching assistants in tutorials
-exports.editTeachingAssistants = (req, res) => {
+exports.editTeachingAssistants = (req, res, next) => {
     let dict = _.transpose(req.body['+users'] || {});
-    models.Tutorial.find({ _id: req.course.tutorials }, (err, tutorials) => {
-        async.eachSeries(tutorials, (tutorial, done) => {
-            let assistants = tutorial.teachingAssistants.map(String);
-                assistants = _.difference(assistants, req.body.users);
-                assistants = _.union(assistants, dict[tutorial._id]);
-            tutorial.update({ teachingAssistants: assistants }, done);
+    req.course.withTutorials().execPopulate().then(() => {
+        async.eachSeries(req.course.tutorials, (tutorial, done) => {
+            let users = tutorial.teachingAssistants.map(String);
+                users = _.difference(users, req.body.users);
+                users = _.union(users, dict[tutorial._id]);
+            tutorial.update({ teachingAssistants: users }, done);
         }, err => {
-            if (err)
-                return res.status(400).send('An error occurred while trying to perform operation.');
+            if (err) return next(err);
             res.send('The list of tutorials has been updated.');
         });
-    });
+    }, next);
 };
 // Delete teaching assistants from course and associated tutorials
-exports.deleteTeachingAssistants = (req, res) => {
+exports.deleteTeachingAssistants = (req, res, next) => {
     let users = req.body['-users'] || [];
     async.series([
         done => {
@@ -85,8 +83,7 @@ exports.deleteTeachingAssistants = (req, res) => {
             }, done);
         }
     ], err => {
-        if (err)
-            return res.status(400).send('An error occurred while trying to perform operation.');
+        if (err) return next(err);
         res.send('List of teaching assistants has been updated.');
     });
 };

@@ -5,19 +5,18 @@ var _ = require('lodash'),
 // Retrieve tutorial
 exports.getTutorialByParam = (req, res, next, id) => {
     models.Tutorial.findById(id, (err, tutorial) => {
-        if (err)
-            return next(err);
-        if (!tutorial)
-            return next(new Error('No tutorial is found.'));
+        if (err) return next(err);
+        if (!tutorial) return next(new Error('No tutorial is found.'));
         req.tutorial = tutorial;
         next();
     });
 };
 // Retrieve list of tutorials for course
-exports.getTutorials = (req, res) => {
+exports.getTutorials = (req, res, next) => {
     models.Tutorial.find({ 
         _id: { $in: req.course.tutorials }
     }).populate('teachingAssistants').exec((err, tutorials) => {
+        if (err) return next(err);
         res.render('admin/pages/course-tutorials', {
             bodyClass: 'tutorials',
             title: 'Tutorials',
@@ -27,7 +26,7 @@ exports.getTutorials = (req, res) => {
     });
 };
 // Add multiple tutorials for course
-exports.addTutorials = (req, res) => {
+exports.addTutorials = (req, res, next) => {
     let len = Math.abs(_.toInteger(req.body.len)),
         start = Math.abs(_.toInteger(req.body.start)),
         range = _.range(start, len + start);
@@ -41,21 +40,18 @@ exports.addTutorials = (req, res) => {
                 return done();
             // check whether tutorial has already been
             models.Tutorial.create({ number: n }, (err, tutorial) => {
-                if (err)
-                    return done(err);
+                if (err) return done(err);
                 req.course.update({ $addToSet: { tutorials: tutorial.id }}, done);
             });
         }, err => {
-            if (err)
-                req.flash('error', 'An error has occurred while trying to perform operation.');
-            else
-                req.flash('success', 'List of tutorials has been updated.');
+            if (err) return next(err);
+            req.flash('success', 'List of tutorials has been updated.');
             res.redirect(`/admin/courses/${req.course.id}/tutorials`);
         });
     });
 };
 // Retrieve specific tutorial for tutorial
-exports.getTutorial = (req, res) => {
+exports.getTutorial = (req, res, next) => {
     res.render('admin/pages/course-tutorial', {
         bodyClass: 'tutorial',
         title: 'Edit tutorial',
@@ -64,22 +60,18 @@ exports.getTutorial = (req, res) => {
     });
 };
 // Update specific tutorial for course
-exports.editTutorial = (req, res) => {
+exports.editTutorial = (req, res, next) => {
     req.tutorial.set(req.body).save(err => {
-        if (err)
-            req.flash('error', 'An error has occurred while trying to perform operation.');
-        else
-            req.flash('success', 'Tutorial <b>%s</b> has been updated.', req.tutorial.number);
-        res.redirect(`/admin/courses/${req.course.id}/tutorials/${req.tutorial.id}/edit`);
+        if (err) return next(err);
+        req.flash('success', 'Tutorial <b>%s</b> has been updated.', req.tutorial.number);
+        res.redirect('back');
     });
 };
 // Delete specific tutorial for course
-exports.deleteTutorial = (req, res) => {
+exports.deleteTutorial = (req, res, next) => {
     req.tutorial.remove(err => {
-        if (err)
-            req.flash('error', 'An error has occurred while trying to perform operation.');
-        else
-            req.flash('success', 'Tutorial <b>%s</b> has been deleted.', req.tutorial.number);
+        if (err) return next(err);
+        req.flash('success', 'Tutorial <b>%s</b> has been deleted.', req.tutorial.number);
         res.sendStatus(200);
     });
 };

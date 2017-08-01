@@ -6,16 +6,14 @@ const _ = require('../../lib/lodash.mixin'),
 // Retrieve course
 exports.getQuestionByParam = (req, res, next, id) => {
     models.Question.findById(id, (err, question) => {
-        if (err)
-            return next(err);
-        if (!question)
-            return next(new Error('No question is found.'));
+        if (err) return next(err);
+        if (!question) return next(new Error('No question is found.'));
         req.question = question;
         next();
     });
 };
 // Retrieve list of questions for quiz
-exports.getQuestions = (req, res) => {
+exports.getQuestions = (req, res, next) => {
     req.quiz.withQuestions(true).execPopulate().then(() => {
         if (req.query.sort === 'votes') {
             req.quiz.questions = _.orderBy(req.quiz.questions, question => {
@@ -31,18 +29,17 @@ exports.getQuestions = (req, res) => {
     });
 };
 // Sort list of questions
-exports.sortQuestions = (req, res) => {
+exports.sortQuestions = (req, res, next) => {
     var o = req.body.questions || [];
     // sort questions based off order given
     req.quiz.questions.sort((a, b) => o.indexOf(a.toString()) < o.indexOf(b.toString()) ? -1 : 1);
     req.quiz.save(err => {
-        if (err)
-            return res.status(500).send('An error has occurred while trying to perform operation.');
+        if (err) return next(err);
         res.sendStatus(200);
     });
 };
 // Retrieve specific question for quiz
-exports.getQuestion = (req, res) => {
+exports.getQuestion = (req, res, next) => {
     let question = req.question || new models.Question();
     // set default options
     _.forOwn(req.quiz.default, (v, k) => {
@@ -58,46 +55,40 @@ exports.getQuestion = (req, res) => {
                 quiz: req.quiz, 
                 question: question
             });
-        });
-    });
+        }, next);
+    }, next);
 };
 // Add new question for quiz
-exports.addQuestion = (req, res) => {
+exports.addQuestion = (req, res, next) => {
     let question = new models.Question();
     let url = `/admin/courses/${req.course._id}/quizzes/${req.quiz._id}/questions`;
     async.series([
         done => question.store(req.body).save(done),
         done => req.quiz.update({ $addToSet: { questions: question._id }}, done)
-    ], function (err) {
-        if (err)
-            req.flash('error', 'An error has occurred while trying to perform operation.');
-        else
-            req.flash('success', 'Question <b>%s</b> has been created.', question.number);
-        res.redirect(req.body.back === '1' ? url : `${url}/new`);
+    ], err => {
+        if (err) return next(err);
+        req.flash('success', 'Question <b>%s</b> has been created.', question.number);
+        res.redirect(req.body.back === '1' ? url : 'back');
     });
 };
 // Update specific question for quiz
-exports.editQuestion = (req, res) => {
+exports.editQuestion = (req, res, next) => {
     req.question.store(req.body).save(err => {
-        if (err)
-            req.flash('error', 'An error has occurred while trying to perform operation.');
-        else
-            req.flash('success', 'Question <b>%s</b> has been updated.', req.question.number);
-        res.redirect(`/admin/courses/${req.course._id}/quizzes/${req.quiz._id}/questions/${req.question._id}/edit`);
+        if (err) return next(err);
+        req.flash('success', 'Question <b>%s</b> has been updated.', req.question.number);
+        res.redirect('back');
     });
 };
 // Delete specific question for quiz
-exports.deleteQuestion = (req, res) => {
+exports.deleteQuestion = (req, res, next) => {
     req.question.remove(err => {
-        if (err)
-            req.flash('error', 'An error has occurred while trying to perform operation.');
-        else
-            req.flash('success', 'Question <b>%s</b> has been deleted.', req.question.number);
+        if (err) return next(err);
+        req.flash('success', 'Question <b>%s</b> has been deleted.', req.question.number);
         res.sendStatus(200);
     });
 };
 // Preview question
-exports.previewQuestion = (req, res) => {
+exports.previewQuestion = (req, res, next) => {
     // var question = new models.Question();
     //     question.number = _.trim(req.body.number)
     //     question.question = _.trim(req.body.question);

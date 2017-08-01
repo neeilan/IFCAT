@@ -5,16 +5,14 @@ const _ = require('../../lib/lodash.mixin'),
 // Retrieve group
 exports.getGroupByParam = (req, res, next, id) => {
     models.Group.findById(id, (err, group) => {
-        if (err)
-            return next(err);
-        if (!group)
-            return next(new Error('No group is found.'));
+        if (err) return next(err);
+        if (!group) return next(new Error('No group is found.'));
         req.group = group;
         next();
     });
 };
 // Temporarily generate groups
-exports.generateGroups = (req, res) => {
+exports.generateGroups = (req, res, next) => {
     req.tutorialQuiz.populate([{
         path: 'tutorial',
         model: 'Tutorial',
@@ -39,9 +37,6 @@ exports.generateGroups = (req, res) => {
         req.flash('warning', 'Below is an <b><u>unsaved</u></b> list of new groups.');
         res.locals.flash = req.flash();
 
-        console.log('students', req.tutorialQuiz.tutorial.students.length)
-        console.log('chunks', chunks.length)
-
         res.render('admin/pages/tutorial-quiz', {
             bodyClass: 'tutorial-quiz',
             title: `Conduct ${req.tutorialQuiz.quiz.name} in Tutorial ${req.tutorialQuiz.tutorial.number}`,
@@ -52,7 +47,7 @@ exports.generateGroups = (req, res) => {
             students: req.tutorialQuiz.tutorial.students,
             groups: groups
         });
-    });
+    }, next);
 };
 // Save groups for tutorial
 exports.saveGroups = (req, res, next) => {
@@ -67,13 +62,11 @@ exports.saveGroups = (req, res, next) => {
                 let members = group.members.map(String);
                     members = _.difference(members, req.body.users);
                     members = _.union(members, dict[group._id]);
-                    delete dict[group._id];
+                    delete dict[group._id]; // mark as done
                 group.members = members;
-                console.log(group.name, members);
                 if (!group.members.length) {
                     return group.remove(err => {
-                        if (err)
-                            return done(err);
+                        if (err) return done(err);
                         req.tutorialQuiz.update({ $pull: { groups: group._id }}, done);
                     });
                 }
@@ -81,18 +74,16 @@ exports.saveGroups = (req, res, next) => {
             }, done);
         },
         done => {
-            // add new groups
+            // add remaining (new) groups
             async.eachOfSeries(dict, (members, name, done) => {
                 models.Group.create({ name: name, members: members }, (err, group) => {
-                    if (err)
-                        return done(err);
+                    if (err) return done(err);
                     req.tutorialQuiz.update({ $push: { groups: group._id }}, done);
                 });
             }, done);
         }
     ], err => {
-        if (err)
-            return req.status(400).send('An error occurred while trying to perform operation.');
+        if (err) return next(err);
         req.flash('success', '<b>%s</b> groups have been updated for <b>TUT %s</b>.', req.tutorialQuiz.quiz.name, req.tutorialQuiz.tutorial.number);
         res.send(`/admin/courses/${req.course._id}/tutorials-quizzes/${req.tutorialQuiz._id}`);
     });

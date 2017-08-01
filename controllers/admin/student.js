@@ -6,17 +6,15 @@ const _ = require('lodash'),
     
 exports.getStudentByParam = (req, res, next, id) => {
     models.User.findOne({ _id: id, roles: { $in: ['student'] }}, (err, student) => {
-        if (err)
-            return next(err);
-        if (!student)
-            return next(new Error('No student is found.'));
+        if (err) return next(err);
+        if (!student) return next(new Error('No student is found.'));
         req.student = student;
         next();
     });
 };
 // Retrieve list of students for course
-exports.getStudentsByCourse = (req, res) => {
-    req.course.withTutorials().withStudents().execPopulate().then(err => {
+exports.getStudentsByCourse = (req, res, next) => {
+    req.course.withTutorials().withStudents().execPopulate().then(() => {
         res.render('admin/pages/course-students', {
             bodyClass: 'students',
             title: 'Students',
@@ -26,7 +24,7 @@ exports.getStudentsByCourse = (req, res) => {
     }); 
 };
 // Retrieve list of students matching search query
-exports.getStudentsBySearchQuery = (req, res) => {
+exports.getStudentsBySearchQuery = (req, res, next) => {
     let page = parseInt(req.query.page, 10) || 1,
         perPage = parseInt(req.query.perPage, 10) || 5,
         re = new RegExp(`(${req.query.q.replace(/\s/g, '|').trim()})`, 'i');
@@ -41,6 +39,7 @@ exports.getStudentsBySearchQuery = (req, res) => {
         perPage: perPage,
         sort: 'name.first name.last'
     }, (err, users, count, pages) => {
+        if (err) return next(err);
         res.render('admin/partials/course-students-search-results', { 
             course: req.course, 
             students: users,
@@ -56,44 +55,41 @@ exports.getStudentsBySearchQuery = (req, res) => {
     });
 };
 // Retrieve list of students for tutorial
-exports.getStudentsByTutorial = (req, res) => {
+exports.getStudentsByTutorial = (req, res, next) => {
     req.tutorial.withStudents().execPopulate().then(() => {
         res.render('admin/pages/tutorial-students', {
             title: 'Students', 
             course: req.course, 
             tutorial: req.tutorial
         });
-    });
+    }, next);
 };
 // Add student to course
-exports.addStudents = (req, res) => {
+exports.addStudents = (req, res, next) => {
     let users = req.body.users || [];
     req.course.update({ $addToSet: { students: { $each: users }}}, err => {
-        if (err)
-            req.flash('error', 'An error has occurred while trying perform operation.');
-        else
-            req.flash('success', 'The list of students has been updated.');
-        res.redirect(`/admin/courses/${req.course.id}/students`);
+        if (err) return next(err);
+        req.flash('success', 'The list of students has been updated.');
+        res.redirect('back');
     });
 };
 // Update students in tutorials
-exports.editStudents = (req, res) => {
+exports.editStudents = (req, res, next) => {
     let dict = _.transpose(req.body['+users'] || {});
     models.Tutorial.find({ _id: req.course.tutorials }, (err, tutorials) => {
         async.eachSeries(tutorials, (tutorial, done) => {
-            let students = tutorial.students.map(String);
-                students = _.difference(students, req.body.users);
-                students = _.union(students, dict[tutorial._id]);
-            tutorial.update({ students: students }, done);
+            let users = tutorial.students.map(String);
+                users = _.difference(users, req.body.users);
+                users = _.union(users, dict[tutorial._id]);
+            tutorial.update({ students: users }, done);
         }, err => {
-            if (err)
-                return res.status(400).send('An error occurred while trying to perform operation.');
+            if (err) return next(err);
             res.send('The list of tutorials has been updated.');
         });
     });
 };
 // Delete students from course and associated tutorials
-exports.deleteStudents = (req, res) => {
+exports.deleteStudents = (req, res, next) => {
     let users = req.body['-users'] || [];
     async.series([
         done => {
@@ -109,20 +105,19 @@ exports.deleteStudents = (req, res) => {
             }, done);
         }
     ], err => {
-        if (err)
-            return res.status(400).send('error', 'An error has occurred while trying perform operation.');
+        if (err) return next(err);
         res.send('The list of students has been updated.');
     });
 };
 // Import list of students
-exports.importStudents = (req, res) => {
+exports.importStudents = (req, res, next) => {
     async.series([
         done => csv.parse(req.file.buffer.toString(), { columns: true, delimiter: ',', skip_empty_lines: true }, done),
         done => models.Tutorial.find({ _id: { $in: req.course.tutorials }}, done)
     ], (err, results) => {
         if (err) {
             req.flash('error', 'An error occurred while trying to perform operation.');
-            return res.redirect(`/admin/courses/${req.course.id}/students`);
+            return res.redirect('back');
         }
         let [rows, tutorials] = results;
         // process records
@@ -152,8 +147,7 @@ exports.importStudents = (req, res) => {
             async.series([
                 done => {
                     models.User.findOne({ 'student.UTORid': row.student.UTORid }, (err, us3r) => {
-                        if (err)
-                            return done(err);
+                        if (err) return done(err);
                         student = us3r || new models.User();
                         student.set(row);
                         student.roles.addToSet('student');
@@ -176,11 +170,9 @@ exports.importStudents = (req, res) => {
                 }
             ], done);
         }, err => {
-            if (err)
-                req.flash('error', 'An error has occurred while trying to perform operation.');
-            else
-                req.flash('success', 'The students have been imported.');
-            res.redirect(`/admin/courses/${req.course.id}/students`);
+            if (err) return next(err);
+            req.flash('success', 'The students have been imported.');
+            res.redirect('back');
         });
     });
 };

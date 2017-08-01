@@ -4,17 +4,15 @@ const _ = require('lodash'),
     models = require('../../models');
 // Retrieve tutorial quiz
 exports.getTutorialQuizByParam = (req, res, next, id) => {
-    models.TutorialQuiz.findById(id).exec((err, tutorialQuiz) => {
-        if (err)
-            return next(err);
-        if (!tutorialQuiz)
-            return next(new Error('No tutorial quiz is found.'));
+    models.TutorialQuiz.findById(id, (err, tutorialQuiz) => {
+        if (err) return next(err);
+        if (!tutorialQuiz) return next(new Error('No tutorial quiz is found.'));
         req.tutorialQuiz = tutorialQuiz;
         next();
     });
 };
 // Retrieve quizzes within course OR by tutorial
-exports.getTutorialQuizzes = (req, res) => {
+exports.getTutorialQuizzes = (req, res, next) => {
     let page = parseInt(req.query.page, 10) || 1,
         perPage = parseInt(req.query.perPage, 10) || 10;
 
@@ -26,6 +24,7 @@ exports.getTutorialQuizzes = (req, res) => {
         page: page,
         perPage: perPage
     }, (err, tutorialQuizzes, count, pages) => {
+        if (err) return next(err);
         res.render('admin/pages/tutorial-quizzes', {
             bodyClass: 'tutorial-quizzes',
             title: 'Conduct Quizzes',
@@ -41,7 +40,7 @@ exports.getTutorialQuizzes = (req, res) => {
     });
 };
 // Edit quizzes 
-exports.editTutorialQuizzes = (req, res) => {
+exports.editTutorialQuizzes = (req, res, next) => {
     let op = {
         publish: ['published', true],
         unpublish: ['published', false],
@@ -54,18 +53,16 @@ exports.editTutorialQuizzes = (req, res) => {
     async.mapSeries(req.body.tutorialQuizzes || [], (id, done) => {
         models.TutorialQuiz.findByIdAndUpdate(id, { [op[0]]: op[1] }, { new: true }, done);
     }, (err, tutorialQuizzes) => {
-        if (err) 
-            return res.status(500).send('An error occurred while trying to perform operation.');
+        if (err) return next(err);
         // notify students
         _.each(tutorialQuizzes, tutorialQuiz => {
-            console.log(tutorialQuiz)
             req.app.locals.io.in(`tutorialQuiz:${tutorialQuiz._id}`).emit('quizActivated', tutorialQuiz);
         });
         res.sendStatus(200);
     });
 };
 // Retrieve quiz for tutorial
-exports.getTutorialQuiz = (req, res) => {
+exports.getTutorialQuiz = (req, res, next) => {
     req.tutorialQuiz.populate([{
         path: 'tutorial',
         populate: {
@@ -89,7 +86,7 @@ exports.getTutorialQuiz = (req, res) => {
     });
 };
 // Edit settings for tutorial quiz
-exports.editTutorialQuizSettings = (req, res) => {
+exports.editTutorialQuizSettings = (req, res, next) => {
     async.series([
         done => {
             req.tutorialQuiz.populate('tutorial quiz', done);

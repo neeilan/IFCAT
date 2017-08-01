@@ -7,63 +7,55 @@ const async = require('async'),
 // Retrieve file
 exports.getFileByParam = (req, res, next, id) => {
     models.File.findById(id, (err, file) => {
-        if (err)
-            return next(err);
-        if (!file)
-            return next(new Error('No file is found.'));
+        if (err) return next(err);
+        if (!file) return next(new Error('No file is found.'));
         req.fil3 = file; // careful: req.file is used by multer
         next();
     });
 };
 // Retrieve all files in the course
-exports.getFiles = (req, res) => {
+exports.getFiles = (req, res, next) => {
     req.course.withFiles().execPopulate().then(() => {
         res.render('admin/pages/course-files', {
             bodyClass: 'files',
             title: 'Files',
             course: req.course
         });
-    });
+    }, next);
 };
 // Add new files
-exports.addFiles = (req, res) => {
+exports.addFiles = (req, res, next) => {
     async.eachSeries(req.files, (obj, done) => {
-        var file = new models.File();
+        let file = new models.File();
         file.store(obj).save(err => {
-            if (err)
-                return done(err);
+            if (err) return done(err);
             req.course.update({ $push: { files: file._id }}, done);
         });
     }, err => {
-        if (err)
-            req.flash('error', 'An error occurred while trying to perform operation.');
-        else
-            req.flash('success', 'The files have been added.');
+        if (err) return next(err);
+        req.flash('success', 'The files have been added.');
         res.redirect(`/admin/courses/${req.course._id}/files`);
     });
 };
 // Delete specific files from course
-exports.deleteFiles = (req, res) => {
+exports.deleteFiles = (req, res, next) => {
     let dir = `${config.uploadPath}/${req.course.id}`;
     async.eachSeries(req.body.files, (id, done) => {
         async.waterfall([
-            done => {
+            function (done) {
                 models.File.findById(id, (err, file) => {
-                    if (err)
-                        return done(err);
-                    if (!file)
-                        return done(new Error('no file'));
+                    if (err) return done(err);
+                    if (!file) return done(new Error('no file'));
                     done(null, file);
                 });
             },
-            (file, done) => {
+            function (file, done) {
                 file.remove(err => {
-                    if (err)
-                        return done(err);
+                    if (err) return done(err);
                     done(null, file);
                 });
             },
-            (file, done) => {
+            function (file, done) {
                 let filename = path.resolve(`${dir}/${file.name}`);
                 fs.stat(filename, (err, stats) => {
                     if (err && err.code === 'ENOENT')
@@ -78,10 +70,8 @@ exports.deleteFiles = (req, res) => {
             }
         ], done);
     }, err => {
-        if (err) 
-            req.flash('error', 'An error occurred while trying to perform operation.');
-        else
-            req.flash('success', 'The files have been deleted.');
+        if (err) return next(err);
+        req.flash('success', 'The files have been deleted.');
         res.sendStatus(200);
     });
 };

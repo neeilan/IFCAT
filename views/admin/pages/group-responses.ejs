@@ -9,8 +9,135 @@
 
 <h3><%- title %></h3>
 
+<table id="info" class="table table-bordered table-condensed">
+    <tr>
+        <th style="width: 100px">Group</th>
+        <td><%= group.name %></td>
+    </tr>
+    <tr>
+        <th>Members</th>
+        <td>
+            <ul>
+            <% _.each(group.members, member => { %>
+                <% if (group.driver.equals(member._id)) { %>
+                    <li><%= member.name.full %> <b>(Driver)</b></li>
+                <% } else { %>
+                    <li><%= member.name.full %></li>
+                <% } %>
+            <% }) %>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <th>Mark</th>
+        <td><%= group.getTotalPoints() %></td>
+    </tr>
+</table>
 
-<table class="table table-striped">
+
+
+<% _.each(tutorialQuiz.quiz.questions, question => { %>
+    <!-- question <%= question._id %> | response <%= question.response.isNew ? 'N/A' : question.response._id %> -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">Question <%= question.number %>: <%= question.type %></h4>
+        </div>
+        <div class="panel-body">
+            <!-- question -->
+            <div class="question"><%= question.question %></div>
+            <!-- code -->
+            <% if (question.isCodeTracing()) { %>
+            <pre class="code"><code><%= question.code %></code></pre>
+            <% } %>
+            <!-- choices -->
+            <div class="choices">
+            <% if (question.isMultipleChoice()) { %>
+                <table class="table table-bordered table-condensed">
+                    <tr>
+                        <th style="width:50%">Expected</th>
+                        <th>Given</th>
+                    </tr>
+                <% _.each(question.choices, choice => { %>
+                    <tr>
+                        <td<%- question.isAnswer(choice) ? ' class="correct"' : '' %>><%= choice %></td>
+                        <td>
+                            <input type="radio" name="response[<%= question.response._id %>]" value="<%= choice %>" disabled<%= question.response.isAnswer(choice) ? ' checked' : '' %>>
+                        </td>
+                    </tr>
+                <% }) %>
+                </table>
+            <% } else if (question.isMultipleSelect()) { %>
+                <table class="table table-bordered table-condensed">
+                    <tr>
+                        <th style="width:50%">Expected</th>
+                        <th>Given</th>
+                    </tr>
+                <% _.each(question.choices, choice => { %>
+                    <tr>
+                        <td<%- question.isAnswer(choice) ? ' class="correct"' : '' %>><%= choice %></td>
+                        <td>
+                            <input type="checkbox" name="response[<%= question.response._id %>]" value="<%= choice %>" disabled<%= question.response.isAnswer(choice) ? ' checked' : '' %>>
+                        </td>
+                    </tr>
+                <% }) %>
+                </table>
+            <% } else if (question.isShortAnswer()) { %>
+                <table class="table table-bordered table-condensed">
+                    <tr>
+                        <th style="width:50%">Expected</th>
+                        <th>Given</th>
+                    </tr>
+                <% _.each(question.answers, choice => { %>
+                    <tr>
+                        <td class="correct"><%= choice %></td>
+                        <td>
+                        <% _.each(question.response.answers, answer => { %>
+                            <input type="text" name="response[<%= question.response._id %>]" value="<%= answer %>" disabled<%= question.response.isAnswer(choice) ? ' selected' : '' %>>
+                        <% }) %>
+                        </td>
+                    </tr>
+                <% }) %>
+                </table>
+            <% } else if (question.isCodeTracing()) { %>
+                <table class="table table-bordered table-condensed">
+                    <tr>
+                        <th colspan="2">Expected</th>
+                        <th colspan="3">Given</th>
+                    </tr>
+                <% for (let i = 0, len = question.answers.length; i < len; i++) { %>
+                    <tr>
+                        <td class="line-number"><%= i + 1 %></td>
+                        <td class="line">
+                            <pre><code><%= question.answers[i] %></code></pre>
+                        </td>
+                        <% let lineByLineSummary = question.response.lineByLineSummary[i] %>
+                        <% let classname = lineByLineSummary && lineByLineSummary.correct ? 'correct' : 'incorrect' %>
+                        <td class="line-number <%= classname %>"><%= i + 1 %></td>
+                        <td class="line <%= classname %>">
+                            <pre><code><%= question.response.codeTracingAnswers[i] %></code></pre>
+                        </td>
+                        <td class="attempts <%= classname %>">
+                        <% if (lineByLineSummary) { %>
+                            <span>(<%= lineByLineSummary.attempts %> att. %>)</span>
+                        <% } %>
+                        </td>
+                    </tr>
+                <% } %>
+                </table>
+            <% } %>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <a href="#!" class="btn btn-sm btn-danger btn-delete">Delete</a>
+            <button type="button" class="btn btn-sm btn-edit">Edit</button>
+            <!-- edit mode buttons -->
+            <a href="/admin/courses/<%= course._id %>/tutorials-quizzes/<%= tutorialQuiz._id %>/groups/<%= group._id %>/responses/HUH" class="btn btn-sm btn-primary btn-update" style="display:none">Update</a>
+            <button type="button" class="btn btn-sm btn-cancel" style="display:none">Cancel</button>
+        </div>
+    </div>
+<% }) %>
+
+<!--table class="table table-striped">
     <thead>
         <tr>
             <th style="width: 10px;">No.</th>
@@ -43,6 +170,6 @@
     <% }) %>
     </tbody>
 <% } %>
-</table>
+</table-->
 
 <% include ../partials/footer %>

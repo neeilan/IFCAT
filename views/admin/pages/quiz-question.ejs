@@ -75,7 +75,7 @@
         <label class="col-sm-3 control-label">Choices &amp; Answer</label>
         <div class="col-sm-9">
             <% if (question.isNew || !question.isMultipleChoice()) { %>
-                <% for (var i = 0, len = 3; i < 3; i++) { %> 
+                <% for (let i = 0, len = 3; i < 3; i++) { %> 
                     <div class="form-group">
                         <div class="col-xs-8">
                             <textarea name="_choices[<%= i %>]" class="form-control" rows="1"></textarea>
@@ -125,7 +125,7 @@
         <label class="col-sm-3 control-label">Choices &amp; Answers</label>
         <div class="col-sm-9">
             <% if (question.isNew || !question.isMultipleSelect()) { %>
-                <% for (var i = 0, len = 3; i < 3; i++) { %>
+                <% for (let i = 0, len = 3; i < 3; i++) { %>
                     <div class="form-group">
                         <div class="col-xs-8 pr10"> 
                             <textarea name="_choices[<%= i %>]" class="form-control" rows="1"></textarea>
@@ -173,7 +173,7 @@
         <label class="col-sm-3 control-label">Acceptable Answers</label>
         <div class="col-sm-9">
             <% if (question.isNew || !question.isShortAnswer()) { %>
-                <% for (var i = 0, len = 3; i < 3; i++) { %>
+                <% for (let i = 0, len = 3; i < 3; i++) { %>
                     <div class="form-group">
                         <div class="col-xs-8"> 
                             <textarea name="_answers[<%= i %>]" class="form-control" rows="1"></textarea>
@@ -217,8 +217,8 @@
     <div class="form-group required" data-type="code tracing">
         <label class="col-sm-3 control-label">Code</label>
         <div class="col-sm-9">
-            <div contenteditable class="form-control"><%= question.code %></div>
-            <input type="hidden" name="code" value="<%= question.code %>">
+            <pre><code contenteditable data-target="#code"><%= question.code %></code></pre>
+            <input type="hidden" name="code" id="code" value="<%= question.code %>">
         </div>
     </div>
 
@@ -226,11 +226,11 @@
         <label class="col-sm-3 control-label">Answers</label>
         <div class="col-sm-9">
         <% if (question.isNew || !question.isCodeTracing()) { %>
-            <div contenteditable class="form-control"></div>
+            <pre><code contenteditable data-target="#_answers"></code></pre>
         <% } else { %>
-            <div contenteditable class="form-control"><%= question.answers.join("\n") %></div>
+            <pre><code contenteditable data-target="#_answers"><%= question.answers.join("\n") %></code></pre>
         <% } %>
-            <input type="hidden" name="_answers" value="<%= question.answers.join("\n") %>">
+            <input type="hidden" name="_answers" id="_answers" value="<%= question.answers.join("\n") %>">
         </div>
     </div>
 

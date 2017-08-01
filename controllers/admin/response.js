@@ -4,15 +4,49 @@ const _ = require('lodash'),
     csv = require('csv'),
     models = require('../../models');
 // Retrieve group responses
-exports.getResponsesByGroup = (req, res) => {
-    req.group.populate({
-        path: 'responses',
-        populate: {
-            path: 'question'
+exports.getResponsesByGroup = (req, res, next) => {
+    async.series([
+        done => {
+            // get questions
+            req.tutorialQuiz.populate({
+                path: 'quiz',
+                model: 'Quiz',
+                populate: {
+                    path: 'questions',
+                    model: 'Question'
+                }
+            }, done)
+        },
+        done => {
+            let ids = [];
+            if (req.tutorialQuiz.quiz) {
+                ids = _.map(req.tutorialQuiz.quiz.questions, '_id');
+            }
+            // get responses
+            req.group.populate([{
+                path: 'members',
+                model: 'User',
+                options: {
+                    sort: 'name.first name.last'
+                }
+            }, {
+                path: 'responses',
+                model: 'Response',
+                match: { question: { $in: ids }}
+            }], done)
         }
-    }, err => {
+    ], err => {
+        if (err) return next(err);
+        // map responses to questions
+        req.tutorialQuiz.quiz.questions = _.map(req.tutorialQuiz.quiz.questions, question => {
+            question.response =
+                _.find(req.group.responses, response => response.question.equals(question._id)) ||
+                new models.Response({ answer: [''], codeTracingAnswers: [], lineByLineSummary: [] });
+            return question;
+        });
+
         res.render('admin/pages/group-responses', {
-            bodyClass: 'group-responses',
+            bodyClass: 'responses',
             title: 'Responses',
             course: req.course,
             tutorialQuiz: req.tutorialQuiz,
@@ -21,7 +55,7 @@ exports.getResponsesByGroup = (req, res) => {
     });
 };
 // Retrieve marks by student
-exports.getMarksByStudent = (req, res) => {
+exports.getMarksByStudent = (req, res, next) => {
     models.TutorialQuiz.aggregate([{
         $match: { tutorial: { $in: req.course.tutorials }} 
     }, {
@@ -53,6 +87,7 @@ exports.getMarksByStudent = (req, res) => {
             totalPoints: { $sum: '$response.points' }
         }
     }], (err, tutorialQuizzes) => {
+        if (err) return next(err);
         res.render('admin/pages/student-marks', {
             title: 'Marks',
             course: req.course,
@@ -63,7 +98,7 @@ exports.getMarksByStudent = (req, res) => {
     });
 };
 // Retrieve students' marks by tutorial quiz
-exports.getMarksByTutorialQuiz = (req, res) => {
+exports.getMarksByTutorialQuiz = (req, res, next) => {
     models.TutorialQuiz.aggregate([{
         $match: { _id: req.tutorialQuiz._id }
     }, {
@@ -102,6 +137,7 @@ exports.getMarksByTutorialQuiz = (req, res) => {
     }, {
         $sort: { _id: 1 }
     }], (err, data) => {
+        if (err) return next(err);
         // export marks into CSV
         if (req.query.export === '1') {
             data = _.map(data, d => [
@@ -131,7 +167,7 @@ exports.getMarksByTutorialQuiz = (req, res) => {
     });
 };
 // Retrieve marks by course
-exports.getMarksByCourse = (req, res) => {
+exports.getMarksByCourse = (req, res, next) => {
     models.TutorialQuiz.aggregate([{
         $match: { _id: { $in: req.body.tutorialQuizzes || [] }}
     }, {
@@ -170,6 +206,7 @@ exports.getMarksByCourse = (req, res) => {
     }, {
         $sort: { 'member.student.UTORid': 1, 'tutorialQuiz.quiz.name': 1 }
     }], (err, data) => {
+        if (err) return next(err);
         // export marks into CSV
         if (req.query.export === 'true' && members.length) {
             data = _.map(data, d => [
@@ -194,7 +231,7 @@ exports.getMarksByCourse = (req, res) => {
 
 /*
 // Retrieve group responses
-exports.getResponsesByGroup = (req, res) => {
+exports.getResponsesByGroup = (req, res, next) => {
     async.series([
         done => models.TutorialQuiz.findOne({ tutorial: req.tutorial._id, quiz: req.quiz._id }, done),
         done => models.Response.find({ group: req.group._id }).populate('question').exec(done)
@@ -213,7 +250,7 @@ exports.getResponsesByGroup = (req, res) => {
     });
 };
 // Retrieve marks by student
-exports.getMarksByStudent = (req, res) => {
+exports.getMarksByStudent = (req, res, next) => {
     models.TutorialQuiz.find({ tutorial: req.tutorial.id }).populate([{
         path: 'quiz',
         model: models.Quiz
@@ -271,7 +308,7 @@ exports.getMarksByStudent = (req, res) => {
     });
 };
 // Retrieve marks by tutorial quiz
-exports.getMarksByTutorialQuiz = (req, res) => {
+exports.getMarksByTutorialQuiz = (req, res, next) => {
     models.TutorialQuiz.findOne({ tutorial: req.tutorial, quiz: req.quiz }).exec(function (err, tutorialQuiz) {
         models.Response.find({ _id: { $in: tutorialQuiz.responses }}).populate({
             path: 'group',
@@ -332,7 +369,7 @@ exports.getMarksByTutorialQuiz = (req, res) => {
     });
 };
 // Retrieve marks by course
-exports.getMarksByCourse = (req, res) => {
+exports.getMarksByCourse = (req, res, next) => {
     models.TutorialQuiz.find({ 
         _id: {
             $in: req.body.tutorialQuizzes || [] 
