@@ -1,15 +1,10 @@
 $(function () {
-    // small plugin for showing/hiding selector and enabling/disabling its children
-    // @usage: $(selector).enableToggle(true|false)
-    $.fn.enableToggle = function (display) {
-        this.toggle(display).find(':input').prop('disabled', !display);
-        return this;
-    };
     // Change DOM upon changing question type
     $('select[name=type]').change(function () {
         var select = this;
         $('.form-group[data-type]').each(function () {
-            $(this).enableToggle(this.dataset.type.indexOf(select.value) > -1);
+            var display = this.dataset.type.indexOf(select.value) > -1;
+            $(this).toggle(display).find(':input').prop('disabled', !display);
         });
     }).change();
     // Resize code-tracing fields

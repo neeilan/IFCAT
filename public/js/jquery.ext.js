@@ -18,13 +18,6 @@ $(function () {
         };
     });
 
-    // small plugin for showing/hiding selector and enabling/disabling its children
-    // @usage: $(selector).enableToggle(true|false)
-    $.fn.enableToggle = function (display) {
-        this.toggle(display).find(':input').prop('disabled', !display);
-        return this;
-    };
-
     // small plugin for building circle buttons
     // @usage: $(selector).buttonCircle()
     // @usage: $(selector).buttonCircle('serialize')

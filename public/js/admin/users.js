@@ -18,7 +18,7 @@ $(function () {
         });
     }
 
-    if (body.hasClass('instructors-page') || body.hasClass('tas-page') || body.hasClass('students-page')) {
+    if (body.hasClass('instructors-page') || body.hasClass('teaching-assistants-page') || body.hasClass('students-page')) {
         // create buttons
         $('tbody').buttonCircle();
 

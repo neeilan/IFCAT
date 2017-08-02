@@ -43,7 +43,8 @@ $(function () {
         $('select[name=type]').change(function () {
             var select = this;
             $('.form-group[data-type]').each(function () {
-                $(this).enableToggle(this.dataset.type.indexOf(select.value) > -1);
+                var display = this.dataset.type.indexOf(select.value) > -1;
+                $(this).toggle(display).find(':input').prop('disabled', !display);
             });
         }).change();
         // Toggle checkboxes for selecting/unselecting files
