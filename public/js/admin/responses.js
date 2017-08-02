@@ -2,10 +2,35 @@ $(function () {
     var body = $(document.body);
 
     if (body.hasClass('responses-page')) {
+        // Create hidden fields to store editable text
+        $('code[data-name]').each(function () {
+            $(this).after($('<input/>', { type: 'hidden', name: this.dataset.name, value: this.innerText, disabled: 'disabled' }));
+        });
+        // Store editable text upon typing into editable text
+        body.on('input', 'code[contenteditable][data-name]', function () {
+            $(this).next(':hidden').val(this.innerText);
+        });
+
         $('.btn-edit').click(function () {
             var btn = $(this),
                 panel = btn.closest('.panel');
-            panel.find('code').attr('contenteditable', '');
+    
+            panel.find('input[name]').each(function () {
+                var input = $(this);
+                // save old state
+                switch (input.attr('type')) {
+                    case 'radio':
+                    case 'checkbox':
+                        input.attr('data-checked', input.prop('checked') ? 1 : 0); break;
+                    default:
+                        input.attr('data-value', input.val()); break;
+                }
+                // enable input
+                input.prop('disabled', false);
+            });
+            // enable editable code
+            panel.find('code[data-name]').attr('contenteditable', '');
+            // toggle buttons
             panel.find('.btn-delete').add(this).toggle(false);
             panel.find('.btn-cancel, .btn-update').toggle(true);
         });
@@ -13,9 +38,45 @@ $(function () {
         $('.btn-cancel').click(function () {
             var btn = $(this), 
                 panel = btn.closest('.panel');
-            panel.find('code').removeAttr('contenteditable');
+
+            panel.find('input[name]').each(function () {
+                var input = $(this);
+                // set old state
+                switch (input.attr('type')) {
+                    case 'radio':
+                    case 'checkbox':
+                        input.prop('checked', !!input.data('checked')).removeAttr('data-checked'); break;
+                    default:
+                        input.val(input.data('value')).removeAttr('data-value'); break;
+                }
+                // disable input
+                input.prop('disabled', true);
+            });
+            panel.find('code[data-name]').each(function () {
+                var code = $(this);
+                // set old state and disable editable code
+                code.text(code.next('input').val()).removeAttr('contenteditable');
+            });
             panel.find('.btn-update').add(this).toggle(false);
             panel.find('.btn-edit, .btn-delete').toggle(true);
+        });
+
+        $('.btn-update').click(function (e) {
+            e.preventDefault();
+            var btn = $(this),
+                panel = btn.closest('.panel'),
+                inputs = panel.find('input[name]');
+            $.put(this.href, inputs.serialize()).then(function () {
+                // set new state and disable
+                inputs.removeAttr('data-checked').removeAttr('data-value').prop('disabled', true);
+                panel.find('code[data-name]').removeAttr('contenteditable');
+                // toggle buttons
+                panel.find('.btn-cancel').add(this).toggle(false);
+                panel.find('.btn-edit, .btn-delete').toggle(true);
+            }).fail(function () {
+                // set old state and disable
+                panel.find('.btn-cancel').click();
+            });
         });
 
         $('.btn-delete').click(function (e) {

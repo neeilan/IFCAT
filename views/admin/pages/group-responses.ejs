@@ -36,9 +36,8 @@
 
 
 
-<% _.each(tutorialQuiz.quiz.questions, question => { %>
-    <!-- question <%= question._id %> | response <%= question.response.isNew ? 'N/A' : question.response._id %> -->
-    <div class="panel panel-default">
+<% _.each(tutorialQuiz.quiz.questions, question => { response = question.response %>
+    <div class="panel panel-default" data-type="<%= question.type %>">
         <div class="panel-heading">
             <h4 class="panel-title">Question <%= question.number %>: <%= question.type %></h4>
         </div>
@@ -51,87 +50,76 @@
             <% } %>
             <!-- choices -->
             <div class="choices">
-            <% if (question.isMultipleChoice()) { %>
                 <table class="table table-bordered table-condensed">
+                <% if (question.isMultipleChoice()) { %>
                     <tr>
-                        <th style="width:50%">Expected</th>
-                        <th>Given</th>
+                        <th class="expected">Expected</th>
+                        <th class="given">Given</th>
+                        <th class="choice">Choice</th>
                     </tr>
-                <% _.each(question.choices, choice => { %>
+                    <% _.each(question.choices, choice => { %>
+                        <tr>
+                            <td class="expected"><input type="radio" disabled<%= question.isAnswer(choice) ? ' checked' : '' %>></td>
+                            <td class="given"><input type="radio" name="answer[]" value="<%= choice %>" disabled<%= response.isAnswer(choice) ? ' checked' : '' %>></td>
+                            <td class="choice"><%= choice %></td>
+                        </tr>
+                    <% }) %>
+                <% } else if (question.isMultipleSelect()) { %>
                     <tr>
-                        <td<%- question.isAnswer(choice) ? ' class="correct"' : '' %>><%= choice %></td>
-                        <td>
-                            <input type="radio" name="response[<%= question.response._id %>]" value="<%= choice %>" disabled<%= question.response.isAnswer(choice) ? ' checked' : '' %>>
-                        </td>
+                        <th class="expected">Expected</th>
+                        <th class="given">Given</th>
+                        <th class="choice">Choice</th>
                     </tr>
-                <% }) %>
-                </table>
-            <% } else if (question.isMultipleSelect()) { %>
-                <table class="table table-bordered table-condensed">
+                    <% _.each(question.choices, choice => { %>
+                        <tr>
+                            <td class="expected"><input type="checkbox" disabled<%= question.isAnswer(choice) ? ' checked' : '' %>></td>
+                            <td class="given"><input type="checkbox" name="answer[]" value="<%= choice %>" disabled<%= response.isAnswer(choice) ? ' checked' : '' %>></td>
+                            <td class="choice"><%= choice %></td>
+                        </tr>
+                    <% }) %>
+                <% } else if (question.isShortAnswer()) { %>
                     <tr>
-                        <th style="width:50%">Expected</th>
-                        <th>Given</th>
+                        <th class="expected">Expected</th>
+                        <th class="given">Given</th>
                     </tr>
-                <% _.each(question.choices, choice => { %>
+                    <% _.each(question.answers, (choice, i) => { %>
+                        <tr>
+                            <td class="expected"><%= choice %></td>
+                            <% if (!i) { %>
+                                <td class="given" rowspan="<%= question.answers.length || 1 %>">
+                                <% _.each(response.answers, answer => { %>
+                                    <input type="text" name="answer[]" value="<%= answer %>" disabled>
+                                <% }) %>
+                                </td>
+                            <% } %>
+                        </tr>
+                    <% }) %>
+                <% } else if (question.isCodeTracing()) { %>
                     <tr>
-                        <td<%- question.isAnswer(choice) ? ' class="correct"' : '' %>><%= choice %></td>
-                        <td>
-                            <input type="checkbox" name="response[<%= question.response._id %>]" value="<%= choice %>" disabled<%= question.response.isAnswer(choice) ? ' checked' : '' %>>
-                        </td>
+                        <th class="expected">Expected</th>
+                        <th class="given">Given</th>
+                        <th class="attempts">Attempts</th>
                     </tr>
-                <% }) %>
-                </table>
-            <% } else if (question.isShortAnswer()) { %>
-                <table class="table table-bordered table-condensed">
-                    <tr>
-                        <th style="width:50%">Expected</th>
-                        <th>Given</th>
-                    </tr>
-                <% _.each(question.answers, choice => { %>
-                    <tr>
-                        <td class="correct"><%= choice %></td>
-                        <td>
-                        <% _.each(question.response.answers, answer => { %>
-                            <input type="text" name="response[<%= question.response._id %>]" value="<%= answer %>" disabled<%= question.response.isAnswer(choice) ? ' selected' : '' %>>
-                        <% }) %>
-                        </td>
-                    </tr>
-                <% }) %>
-                </table>
-            <% } else if (question.isCodeTracing()) { %>
-                <table class="table table-bordered table-condensed">
-                    <tr>
-                        <th colspan="2">Expected</th>
-                        <th colspan="3">Given</th>
-                    </tr>
-                <% for (let i = 0, len = question.answers.length; i < len; i++) { %>
-                    <tr>
-                        <td class="line-number"><%= i + 1 %></td>
-                        <td class="line">
-                            <pre><code><%= question.answers[i] %></code></pre>
-                        </td>
-                        <% let lineByLineSummary = question.response.lineByLineSummary[i] %>
+                    <% for (let i = 0, len = question.answers.length; i < len; i++) { %>
+                        <% let lineByLineSummary = response.lineByLineSummary[i] %>
                         <% let classname = lineByLineSummary && lineByLineSummary.correct ? 'correct' : 'incorrect' %>
-                        <td class="line-number <%= classname %>"><%= i + 1 %></td>
-                        <td class="line <%= classname %>">
-                            <pre><code><%= question.response.codeTracingAnswers[i] %></code></pre>
-                        </td>
-                        <td class="attempts <%= classname %>">
-                        <% if (lineByLineSummary) { %>
-                            <span>(<%= lineByLineSummary.attempts %> att. %>)</span>
-                        <% } %>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td class="expected"><pre><code><%= question.answers[i] %></code></pre></td>
+                            <td class="given">
+                                <pre><code data-name="answer[]"><%= response.codeTracingAnswers[i] %></code></pre>
+                            </td>
+                            <td class="attempts"><%= lineByLineSummary ? lineByLineSummary.attempts : '' %></td>
+                        </tr>
+                    <% } %>
                 <% } %>
                 </table>
-            <% } %>
             </div>
         </div>
         <div class="panel-footer">
             <a href="#!" class="btn btn-sm btn-danger btn-delete">Delete</a>
             <button type="button" class="btn btn-sm btn-edit">Edit</button>
             <!-- edit mode buttons -->
-            <a href="/admin/courses/<%= course._id %>/tutorials-quizzes/<%= tutorialQuiz._id %>/groups/<%= group._id %>/responses/HUH" class="btn btn-sm btn-primary btn-update" style="display:none">Update</a>
+            <a href="/admin/courses/<%= course._id %>/tutorials-quizzes/<%= tutorialQuiz._id %>/groups/<%= group._id %>/responses/<%= response._id %>" class="btn btn-sm btn-primary btn-update" style="display:none">Update</a>
             <button type="button" class="btn btn-sm btn-cancel" style="display:none">Cancel</button>
         </div>
     </div>

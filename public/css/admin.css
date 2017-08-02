@@ -14,7 +14,7 @@ pre code {
     display: block;
     font-family: 'Courier New', Courier, monospace;
     height: auto;
-    min-height: 90px;
+    padding: 5px;
     white-space: inherit;
 }
 /**
@@ -290,6 +290,9 @@ tfoot .pagination {
 .question-page a.counter {
     margin-left: 10px;
 }
+.question-page pre code {
+    min-height: 90px;
+}
 
 
 #modal-show-files .modal-body {
@@ -410,9 +413,9 @@ tfoot .pagination {
 .responses-page .panel {
     background: #fff;
 }
-.responses-page .panel.panel-edit {
-    /* background: #e0f5f7; */
-}
+/* .responses-page .panel.panel-edit {
+    background: #e0f5f7; 
+} */
 .responses-page .panel .panel-heading {
     background: inherit;
     border-bottom: 0;
@@ -431,51 +434,53 @@ tfoot .pagination {
 .responses-page .code {
     margin-bottom: 10px;
 }
-.responses-page .choices table {
-    /* border: 1px solid #ddd; */
-    width: 100%;
-}
 .responses-page .choices td {
-    /* box-sizing: content-box; */
     padding-left: 5px;
     padding-right: 5px;
 }
-.responses-page .choices td.line-number {
-    background: #fff;
-    /* border-left: 1px solid #ddd; */
-    /* border-right: 1px solid #ddd; */
-    text-align: right;
-    width: 5%;
+.responses-page th.expected, .responses-page th.given, .responses-page td.expected, .responses-page td.given {
+    text-align: center;
+    width: 10%;
 }
-.responses-page .choices td.line {
-    background: #f5f5f5;
-    width: 42%;
+.responses-page [data-type="short answer"] th.expected, .responses-page [data-type="short answer"] th.given {
+    width: 50%;
 }
-.responses-page .choices td.line pre {
+.responses-page [data-type="short answer"] td.expected, .responses-page [data-type="short answer"] td.given {
+    text-align: left;
+}
+.responses-page [data-type="code tracing"] th.expected, .responses-page [data-type="code tracing"] th.given {
+    text-align: left;
+    width: 45%;
+}
+.responses-page [data-type="code tracing"] th.attempts, .responses-page [data-type="code tracing"] td.attempts {
+    text-align: center;
+    width: 10%;
+}
+.responses-page [data-type="code tracing"] td.expected, .responses-page [data-type="code tracing"] td.given {
+    text-align: left;
+    padding: 0;
+}
+.responses-page [data-type="code tracing"] td pre {
     border: 0;
 }
-.responses-page .choices td.attempts {
-    padding-right: 5px;
-    text-align: right;
-    width: 8%;
-}
 
-.responses-page .choices td.incorrect, 
+
+/* .responses-page .choices td.incorrect, 
 .responses-page .choices td.incorrect pre {
     background-color: #ffeef0;
 }
-.responses-page .choices td.correct, 
+.responses-page .choices td.correct,
 .responses-page .choices td.correct pre {
     background-color: #e6ffed;
 }
 .responses-page .choices td.line-number.incorrect {
     background-color: #ffdce0;
-    /* border-color: #fdaeb7; */
+    border-color: #fdaeb7;
 }
 .responses-page .choices td.line-number.correct {
     background-color: #cdffd8;
-    /* border-color: #bef5cb; */
-}
+    border-color: #bef5cb;
+}*/
 
 
 

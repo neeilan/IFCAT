@@ -77,9 +77,12 @@ $(function () {
             });
             $('.counter.links').text(count + ' link' + (count !== 1 ? 's' : '') + ' added');
         });
-        // Resize code-tracing fields
-        $('[contenteditable]').on('input', function () {
-            $(this.dataset.target).val(this.innerText);
+        // Create hidden fields to store editable text
+        $('code[contenteditable][data-name]').each(function () {
+            $(this).after($('<input/>', { type: 'hidden', name: this.dataset.name, value: this.innerText }))
+        // Store editable text upon typing into editable text
+        }).on('input', function () {
+            $(this).next(':hidden').val(this.innerText);
         });
         // Remove choice input
         $(document).on('click', '.glyphicon-remove', function () {

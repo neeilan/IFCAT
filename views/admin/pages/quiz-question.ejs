@@ -239,8 +239,7 @@
     <div class="form-group required" data-type="code tracing">
         <label class="col-sm-3 control-label">Code</label>
         <div class="col-sm-9">
-            <pre><code contenteditable data-target="#code"><%= question.code %></code></pre>
-            <input type="hidden" name="code" id="code" value="<%= question.code %>">
+            <pre><code contenteditable data-name="code"><%= question.code %></code></pre>
         </div>
     </div>
 
@@ -248,11 +247,10 @@
         <label class="col-sm-3 control-label">Answers</label>
         <div class="col-sm-9">
         <% if (question.isNew || !question.isCodeTracing()) { %>
-            <pre><code contenteditable data-target="#_answers"></code></pre>
+            <pre><code contenteditable data-name="_answers"></code></pre>
         <% } else { %>
-            <pre><code contenteditable data-target="#_answers"><%= question.answers.join("\n") %></code></pre>
+            <pre><code contenteditable data-name="_answers"><%= question.answers.join("\n") %></code></pre>
         <% } %>
-            <input type="hidden" name="_answers" id="_answers" value="<%= question.answers.join("\n") %>">
         </div>
     </div>
 
