@@ -1,7 +1,7 @@
 $(function () {
     var body = $(document.body);
 
-    if (body.hasClass('tutorial-quizzes')) {
+    if (body.hasClass('tutorial-quizzes-page')) {
         // update selected tutorial quizzes
         $('.nav-actions a:not(#btn-export)').click(function (e) {
             e.preventDefault();
@@ -12,7 +12,7 @@ $(function () {
         });
     }
 
-    if (body.hasClass('tutorial-quiz')) {
+    if (body.hasClass('tutorial-quiz-page')) {
         var tbody = $('tbody');
         // create buttons
         tbody.buttonCircle();

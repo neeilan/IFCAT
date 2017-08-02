@@ -46,7 +46,7 @@ exports.getResponsesByGroup = (req, res, next) => {
         });
 
         res.render('admin/pages/group-responses', {
-            bodyClass: 'responses',
+            bodyClass: 'responses-page',
             title: 'Responses',
             course: req.course,
             tutorialQuiz: req.tutorialQuiz,
@@ -158,7 +158,6 @@ exports.getMarksByTutorialQuiz = (req, res, next) => {
         }
 
         res.render('admin/pages/tutorial-quiz-marks', {
-            bodyClass: 'marks',
             title: 'Marks',
             course: req.course,
             tutorialQuiz: req.tutorialQuiz,

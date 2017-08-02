@@ -1,6 +1,7 @@
 $(function () {
     var body = $(document.body);
-    if (body.hasClass('quizzes')) {
+
+    if (body.hasClass('quizzes-page')) {
         $('.btn-copy').click(function (e) {
             e.preventDefault();
             var btn = this;

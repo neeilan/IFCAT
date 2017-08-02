@@ -4,14 +4,6 @@ body {
 body > .navbar {
     border-radius: 0px;
 }
-/* .code {
-    background-color: #eff0f1;
-    color: #000;
-    font-family: Courier;
-    font-size: 15px;
-    white-space: pre-wrap;
-} */
-
 pre {
     background: #f5f5f5;
     display: block;
@@ -104,7 +96,7 @@ input[type=checkbox][data-label] {
 .btn-file {
     display: inline-block;
 }
-.dim-wrap {
+/* .dim-wrap {
     position: relative;
 }
 .dim-wrap .dimmer {
@@ -124,7 +116,7 @@ input[type=checkbox][data-label] {
 }
 .dim-wrap.on .dimmer {
     width: 100%;
-}
+} */
 /**
  * Dropdowns
  */
@@ -263,37 +255,39 @@ tfoot .pagination {
     margin: 0 auto;
 }
 /**
- * Question pages
+ * Questions page
  */
-.questions .question {
+.questions-page .question {
     white-space: pre-wrap;
 }
-.questions .submitter {
+.questions-page .submitter {
     background-color: #ddd;
     margin-top: 5px;
     text-indent: 5px;
     text-transform: lowercase;
 }
-.questions .approved {
+.questions-page.approved {
     background-color: #F6B2AA;
     text-indent: 5px;
     text-transform: lowercase;
 }
-.questions .voting {
+.questions-page .voting {
     background-color: #ddd;
     text-indent: 5px;
     text-transform: lowercase;
 }
-.questions .voting .down {
+.questions-page .voting .down {
     padding-left: 10px;
 }
-
-.question .col-xs-1 {
+/**
+ * Question page
+ */
+.question-page .col-xs-1 {
     max-width: 40px;
     padding-right: 0;
     text-align: right;
 }
-.question a.counter {
+.question-page a.counter {
     margin-left: 10px;
 }
 
@@ -390,108 +384,108 @@ tfoot .pagination {
     }
 }
 /**
- * Responses
+ * Responses page
  */
-.responses #info ul {
+.responses-page #info ul {
     list-style: none;
     margin: 0;
     padding: 0;
 }
-.responses #info li {
+.responses-page #info li {
     display: inline;
 }
-.responses #info li.driver {
+.responses-page #info li.driver {
     font-weight: bold;
 }
-.responses #info li:after {
+.responses-page #info li:after {
     content: ", ";
 }
-.responses #info li:last-child:after {
+.responses-page #info li:last-child:after {
     content: "";
 }
 
 
 
 
-.responses .panel {
+.responses-page .panel {
     background: #fff;
 }
-.responses .panel.panel-edit {
+.responses-page .panel.panel-edit {
     /* background: #e0f5f7; */
 }
-.responses .panel .panel-heading {
+.responses-page .panel .panel-heading {
     background: inherit;
     border-bottom: 0;
     padding-bottom: 0;
 }
-.responses .panel .panel-title {
+.responses-page .panel .panel-title {
     margin-top: 0;
 }
-.responses .panel .panel-body {
+.responses-page .panel .panel-body {
     padding-top: 0;
 }
 
-.responses .panel .question {
+.responses-page .panel .question {
     margin: 5px 0;
 }
-.responses .code {
+.responses-page .code {
     margin-bottom: 10px;
 }
-.responses .choices table {
+.responses-page .choices table {
     /* border: 1px solid #ddd; */
     width: 100%;
 }
-.responses .choices td {
+.responses-page .choices td {
     /* box-sizing: content-box; */
     padding-left: 5px;
     padding-right: 5px;
 }
-.responses .choices td.line-number {
+.responses-page .choices td.line-number {
     background: #fff;
     /* border-left: 1px solid #ddd; */
     /* border-right: 1px solid #ddd; */
     text-align: right;
     width: 5%;
 }
-.responses .choices td.line {
+.responses-page .choices td.line {
     background: #f5f5f5;
     width: 42%;
 }
-.responses .choices td.line pre {
+.responses-page .choices td.line pre {
     border: 0;
 }
-.responses .choices td.attempts {
+.responses-page .choices td.attempts {
     padding-right: 5px;
     text-align: right;
     width: 8%;
 }
 
-.responses .choices td.incorrect, 
-.responses .choices td.incorrect pre {
+.responses-page .choices td.incorrect, 
+.responses-page .choices td.incorrect pre {
     background-color: #ffeef0;
 }
-.responses .choices td.correct, 
-.responses .choices td.correct pre {
+.responses-page .choices td.correct, 
+.responses-page .choices td.correct pre {
     background-color: #e6ffed;
 }
-.responses .choices td.line-number.incorrect {
+.responses-page .choices td.line-number.incorrect {
     background-color: #ffdce0;
     /* border-color: #fdaeb7; */
 }
-.responses .choices td.line-number.correct {
+.responses-page .choices td.line-number.correct {
     background-color: #cdffd8;
     /* border-color: #bef5cb; */
 }
 
 
 
-.responses .panel .panel-footer {
+.responses-page .panel .panel-footer {
     background-color: inherit;
     border-top: 0;
     padding-top: 0;
     overflow: hidden;
 }
-.responses .panel .panel-footer .btn {
+.responses-page .panel .panel-footer .btn {
     float: right;
     margin-left: 7px;
 }

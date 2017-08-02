@@ -26,7 +26,7 @@ exports.getTutorialQuizzes = (req, res, next) => {
     }, (err, tutorialQuizzes, count, pages) => {
         if (err) return next(err);
         res.render('admin/pages/tutorial-quizzes', {
-            bodyClass: 'tutorial-quizzes',
+            bodyClass: 'tutorial-quizzes-page',
             title: 'Conduct Quizzes',
             course: req.course,
             tutorial: req.tutorial,
@@ -74,7 +74,7 @@ exports.getTutorialQuiz = (req, res, next) => {
         path: 'groups'
     }]).execPopulate().then(() => {
         res.render('admin/pages/tutorial-quiz', {
-            bodyClass: 'tutorial-quiz',
+            bodyClass: 'tutorial-quiz-page',
             title: `Conduct ${req.tutorialQuiz.quiz.name} in Tutorial ${req.tutorialQuiz.tutorial.number}`,
             course: req.course,
             tutorialQuiz: req.tutorialQuiz,

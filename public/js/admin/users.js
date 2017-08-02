@@ -1,7 +1,7 @@
 $(function () {
     var body = $(document.body);
 
-    if (body.hasClass('users')) {
+    if (body.hasClass('users-page')) {
         $('.btn-delete').click(function (e) {
             e.preventDefault();
             var btn = this;
@@ -18,7 +18,7 @@ $(function () {
         });
     }
 
-    if (body.hasClass('instructors') || body.hasClass('teaching-assistants') || body.hasClass('students')) {
+    if (body.hasClass('instructors-page') || body.hasClass('tas-page') || body.hasClass('students-page')) {
         // create buttons
         $('tbody').buttonCircle();
 

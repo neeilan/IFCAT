@@ -16,7 +16,7 @@ exports.getQuizByParam = (req, res, next, id) => {
 exports.getQuizzes = (req, res, next) => {
     req.course.withQuizzes().execPopulate().then(() => {
         res.render('admin/pages/course-quizzes', {
-            bodyClass: 'quizzes',
+            bodyClass: 'quizzes-page',
             title: 'Quizzes',
             course: req.course 
         });
@@ -28,7 +28,7 @@ exports.getQuiz = (req, res, next) => {
     req.course.withTutorials().execPopulate().then(() => {
         quiz.populate('tutorialQuizzes').execPopulate().then(() => {
             res.render('admin/pages/course-quiz', {
-                bodyClass: 'quiz',
+                bodyClass: 'quiz-page',
                 title: quiz.isNew ? 'Add New Quiz' : 'Edit Quiz',
                 course: req.course,
                 quiz: quiz

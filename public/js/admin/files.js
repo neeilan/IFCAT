@@ -1,6 +1,7 @@
 $(function () {
     var body = $(document.body);
-    if (body.hasClass('files')) {
+
+    if (body.hasClass('files-page')) {
         // Confirm and delete selected rows
         $('#btn-delete').click(function (e) {
             e.preventDefault();

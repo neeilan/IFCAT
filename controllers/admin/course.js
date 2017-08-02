@@ -24,7 +24,7 @@ exports.getCourses = (req, res, next) => {
     models.Course.find(conditions, 'name code').sort('code').lean().exec((err, courses) => {
         if (err) return next(err);
         res.render('admin/pages/courses', {
-            bodyClass: 'courses',
+            bodyClass: 'courses-page',
             title: 'Courses',
             courses: courses
         });
@@ -34,7 +34,7 @@ exports.getCourses = (req, res, next) => {
 exports.getCourse = (req, res, next) => {
     let course = req.course || new models.Course();
     res.render('admin/pages/course', {
-        bodyClass: 'course',
+        bodyClass: 'course-page',
         title: course.isNew ? 'Add New Course' : 'Edit Course',
         course: course 
     });

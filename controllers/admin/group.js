@@ -38,7 +38,7 @@ exports.generateGroups = (req, res, next) => {
         res.locals.flash = req.flash();
 
         res.render('admin/pages/tutorial-quiz', {
-            bodyClass: 'tutorial-quiz',
+            bodyClass: 'tutorial-quiz-page',
             title: `Conduct ${req.tutorialQuiz.quiz.name} in Tutorial ${req.tutorialQuiz.tutorial.number}`,
             course: req.course,
             tutorialQuiz: req.tutorialQuiz,

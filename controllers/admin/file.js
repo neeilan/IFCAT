@@ -17,7 +17,7 @@ exports.getFileByParam = (req, res, next, id) => {
 exports.getFiles = (req, res, next) => {
     req.course.withFiles().execPopulate().then(() => {
         res.render('admin/pages/course-files', {
-            bodyClass: 'files',
+            bodyClass: 'files-page',
             title: 'Files',
             course: req.course
         });

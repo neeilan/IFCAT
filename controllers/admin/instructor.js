@@ -3,7 +3,7 @@ const models = require('../../models');
 exports.getInstructorsByCourse = (req, res, next) => {
     req.course.withInstructors().execPopulate().then(() => {
         res.render('admin/pages/course-instructors', { 
-            bodyClass: 'instructors',
+            bodyClass: 'instructors-page',
             title: 'Instructors',
             course: req.course
         });

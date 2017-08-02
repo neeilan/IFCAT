@@ -1,7 +1,7 @@
 $(function () {
     var body = $(document.body);
 
-    if (body.hasClass('questions')) {
+    if (body.hasClass('questions-page')) {
         // Confirm and delete selected row
         $('.btn-delete').click(function (e) {
             e.preventDefault();
@@ -38,7 +38,7 @@ $(function () {
         });
     }
 
-    if (body.hasClass('question')) {
+    if (body.hasClass('question-page')) {
         // Change DOM upon changing question type
         $('select[name=type]').change(function () {
             var select = this;

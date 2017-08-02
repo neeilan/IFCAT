@@ -1,6 +1,7 @@
 $(function () {
     var body = $(document.body);
-    if (body.hasClass('tutorials')) {
+
+    if (body.hasClass('tutorials-page')) {
         // Confirm and delete tutorial upon click
         $('.btn-delete').click(function (e) {
             e.preventDefault();

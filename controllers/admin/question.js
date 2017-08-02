@@ -21,7 +21,7 @@ exports.getQuestions = (req, res, next) => {
             }, 'desc');
         }
         res.render('admin/pages/quiz-questions', {
-            bodyClass: 'questions',
+            bodyClass: 'questions-page',
             title: 'Questions',
             course: req.course,
             quiz: req.quiz
@@ -49,7 +49,7 @@ exports.getQuestion = (req, res, next) => {
     req.course.withFiles().execPopulate().then(() => {
         question.populate('submitter').execPopulate().then(() => {
             res.render('admin/pages/quiz-question', {
-                bodyClass: 'question',
+                bodyClass: 'question-page',
                 title: question.isNew ? 'Add New Question' : 'Edit Question',
                 course: req.course, 
                 quiz: req.quiz, 

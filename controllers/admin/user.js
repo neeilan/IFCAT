@@ -15,7 +15,7 @@ exports.getUserByParam = (req, res, next, id) => {
 exports.getLogin = (req, res, next) => {
     if (req.user) return res.redirect('/admin/courses');
     res.render('admin/pages/login', { 
-        bodyClass: 'login',
+        bodyClass: 'login-page',
         title: 'Login' 
     });
 };
@@ -37,7 +37,7 @@ exports.getUsers = (req, res, next) => {
     }, (err, users, count, pages) => {
         if (err) return next(err);
         res.render('admin/pages/users', {
-            bodyClass: 'users',
+            bodyClass: 'users-page',
             title: 'Users',
             users: users,
             pagination: {

@@ -1,6 +1,7 @@
 $(function () {
     var body = $(document.body);
-    if (body.hasClass('responses')) {
+
+    if (body.hasClass('responses-page')) {
         $('.btn-edit').click(function () {
             var btn = $(this),
                 panel = btn.closest('.panel');

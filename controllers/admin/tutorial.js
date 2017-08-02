@@ -18,7 +18,7 @@ exports.getTutorials = (req, res, next) => {
     }).populate('teachingAssistants').exec((err, tutorials) => {
         if (err) return next(err);
         res.render('admin/pages/course-tutorials', {
-            bodyClass: 'tutorials',
+            bodyClass: 'tutorials-page',
             title: 'Tutorials',
             course: req.course,
             tutorials: tutorials
@@ -53,7 +53,7 @@ exports.addTutorials = (req, res, next) => {
 // Retrieve specific tutorial for tutorial
 exports.getTutorial = (req, res, next) => {
     res.render('admin/pages/course-tutorial', {
-        bodyClass: 'tutorial',
+        bodyClass: 'tutorial-page',
         title: 'Edit tutorial',
         course: req.course, 
         tutorial: req.tutorial 

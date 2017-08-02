@@ -16,7 +16,7 @@ exports.getStudentByParam = (req, res, next, id) => {
 exports.getStudentsByCourse = (req, res, next) => {
     req.course.withTutorials().withStudents().execPopulate().then(() => {
         res.render('admin/pages/course-students', {
-            bodyClass: 'students',
+            bodyClass: 'students-page',
             title: 'Students',
             course: req.course,
             students: req.course.students

@@ -5,7 +5,7 @@ const _ = require('../../lib/lodash.mixin'),
 exports.getTeachingAssistantsByCourse = (req, res, next) => {
     req.course.withTutorials().withTeachingAssistants().execPopulate().then(() => {
         res.render('admin/pages/course-teaching-assistants', {
-            bodyClass: 'teaching-assistants',
+            bodyClass: 'teaching-assistants-page',
             title: 'Teaching Assistants',
             course: req.course
         });
