@@ -74,7 +74,7 @@ exports.copyQuiz = (req, res, next) => {
                         done(null, question._id);
                     });
                 }, done);
-            });
+            }, done);
         },
         function (questions, done) {
             req.quiz._id = mongoose.Types.ObjectId();

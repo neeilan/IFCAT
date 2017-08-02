@@ -11,13 +11,18 @@ body > .navbar {
     font-size: 15px;
     white-space: pre-wrap;
 } */
+
 pre {
     background: #f5f5f5;
+    display: block;
     margin: 0;
     padding: 0;
 }
 pre code {
-    font-family: Courier New, Courier, monospace;
+    display: block;
+    font-family: 'Courier New', Courier, monospace;
+    height: auto;
+    min-height: 90px;
     white-space: inherit;
 }
 /**
@@ -283,17 +288,16 @@ tfoot .pagination {
     padding-left: 10px;
 }
 
-.question pre {
-    display: block;
-    height: auto;
-    min-height: 90px;
-}
-.question pre code {
-    display: block;
+.question .col-xs-1 {
+    max-width: 40px;
+    padding-right: 0;
+    text-align: right;
 }
 .question a.counter {
     margin-left: 10px;
 }
+
+
 #modal-show-files .modal-body {
     max-height: 500px;
     padding: 0;

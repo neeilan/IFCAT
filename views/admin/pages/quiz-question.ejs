@@ -77,11 +77,15 @@
             <% if (question.isNew || !question.isMultipleChoice()) { %>
                 <% for (let i = 0, len = 3; i < 3; i++) { %> 
                     <div class="form-group">
+                        <div class="col-xs-1">
+                            <div class="radio">
+                                <label><input type="radio" name="_answer" value="<%= i %>"<%= !i ? ' checked' : '' %>></label>
+                            </div>
+                        </div>
                         <div class="col-xs-8">
                             <textarea name="_choices[<%= i %>]" class="form-control" rows="1"></textarea>
                         </div>
-                        <div class="col-xs-4 radio">
-                            <label><input type="radio" name="_answer" value="<%= i %>"<%= !i ? ' checked' : '' %>></label>
+                        <div class="col-xs-2 radio">
                             <span class="glyphicon glyphicon-remove"></span> 
                         </div>
                     </div>
@@ -89,25 +93,31 @@
             <% } else { %>
                 <% _.each(question.choices, (choice, i) => { %>
                     <div class="form-group">
-                        <div class="col-xs-8"> 
+                        <div class="col-xs-1">
+                            <div class="radio">
+                                <label><input type="radio" name="_answer" value="<%= i %>"<%= question.isAnswer(choice) ? ' checked' : '' %>></label>
+                            </div>
+                        </div>
+                        <div class="col-xs-8">
                             <textarea name="_choices[<%= i %>]" class="form-control" rows="1"><%= choice %></textarea>
                         </div>
-                        <div class="col-xs-4 radio">
-                            <label><input type="radio" name="_answer" value="<%= i %>"<%= question.isAnswer(choice) ? ' checked' : '' %>></label>
+                        <div class="col-xs-2 radio">
                             <span class="glyphicon glyphicon-remove"></span> 
                         </div>
                     </div>
                 <% }) %>
             <% } %>
             <div class="form-group" style="display: none">
-                <div class="col-xs-8"> 
+                <div class="col-xs-1">
+                    <div class="radio">
+                        <label><input type="radio" name="_answer" value=""></label>
+                    </div>
+                </div>
+                <div class="col-xs-8">
                     <textarea name="_choices[]" class="form-control" rows="1"></textarea>
                 </div>
-                <div class="col-xs-4 radio">
-                    <label>
-                        <input type="radio" name="_answer" value="">
-                        <span class="glyphicon glyphicon-remove"></span>
-                    </label>
+                <div class="col-xs-2 radio">
+                    <span class="glyphicon glyphicon-remove"></span>
                 </div>
             </div>
             <div class="form-group">
@@ -127,11 +137,15 @@
             <% if (question.isNew || !question.isMultipleSelect()) { %>
                 <% for (let i = 0, len = 3; i < 3; i++) { %>
                     <div class="form-group">
-                        <div class="col-xs-8 pr10"> 
+                        <div class="col-xs-1">
+                            <div class="checkbox">
+                                <label><input type="checkbox" name="_answers[]" value="<%= i %>"></label>
+                            </div>
+                        </div>
+                        <div class="col-xs-8">
                             <textarea name="_choices[<%= i %>]" class="form-control" rows="1"></textarea>
                         </div>
-                        <div class="col-xs-4 checkbox">
-                            <label><input type="checkbox" name="_answers[]" value="<%= i %>"></label>
+                        <div class="col-xs-2">
                             <span class="glyphicon glyphicon-remove"></span>
                         </div>
                     </div>
@@ -139,22 +153,30 @@
             <% } else { %>
                 <% _.each(question.choices, (choice, i) => { %>
                     <div class="form-group">
-                        <div class="col-xs-8"> 
+                        <div class="col-xs-1">
+                            <div class="checkbox">
+                                <label><input type="checkbox" name="_answers[]" value="<%= i %>"<%= question.isAnswer(choice) ? ' checked' : '' %>></label>
+                            </div>
+                        </div>
+                        <div class="col-xs-8">
                             <textarea name="_choices[<%= i %>]" class="form-control" rows="1"><%= choice %></textarea>
                         </div>
-                        <div class="col-xs-4 checkbox">
-                            <label><input type="checkbox" name="_answers[]" value="<%= i %>"<%= question.isAnswer(choice) ? ' checked' : '' %>></label>
+                        <div class="col-xs-2">
                             <span class="glyphicon glyphicon-remove"></span>
                         </div>
                     </div>
                 <% }) %> 
             <% } %>
             <div class="form-group" style="display: none">
+                <div class="col-xs-1">
+                    <div class="checkbox">
+                        <label><input type="checkbox" name="_answers[]" value=""></label>
+                    </div>
+                </div>
                 <div class="col-xs-8"> 
                     <textarea name="_choices[]" class="form-control" rows="1"></textarea>
                 </div>
-                <div class="col-xs-4 checkbox">
-                    <label><input type="checkbox" name="_answers[]" value=""></label>
+                <div class="col-xs-2">
                     <span class="glyphicon glyphicon-remove"></span>
                 </div>
             </div>
