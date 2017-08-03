@@ -10,25 +10,38 @@
 
 <% include ../partials/flash %>
 
-<div class="nav-actions">
-    <a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz.id %>/questions/new"
-        class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add New Question</a>
-</div>
-
 <table class="table table-striped">
     <thead>
+        <tr class="actions">
+            <th colspan="7">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-sort"></span> Sort By <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/questions">Default</a></li>
+                        <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/questions?sort=createdAt">Date Created</a></li>
+                        <li><a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz._id %>/questions?sort=votes">Votes</a></li>
+                    </ul>
+                </div>
+
+                <a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz.id %>/questions/sort" class="btn btn-default btn-sm btn-primary" id="btn-sort"><span class="glyphicon glyphicon-pushpin"></span> Save Sort Order</a>
+
+                <a href="/admin/courses/<%= course._id %>/quizzes/<%= quiz.id %>/questions/new" class="btn btn-default btn-sm pull-right"><span class="glyphicon glyphicon-plus"></span> Add New Question</a>
+            </th>
+        </tr>
         <tr>
             <th style="width: 10px"></th>
             <th style="text-align: right;width: 40px">No.</th>
             <th style="width: 130px;">Type</th>
             <th style="min-width: 300px">Question</th>
             <th style="width: 200px">Tags</th>
+            <th style="width: 190px">Date Created</th>
             <th class="actions"></th>
         </tr>
     </thead>
     <tbody>
     <% if (_.isEmpty(quiz.questions)) { %>
-        <tr><td colspan="6">No questions have been added yet.</td></tr> 
+        <tr><td colspan="7">No questions have been added yet.</td></tr> 
     <% } else { %>
         <% _.each(quiz.questions, question => { %>
             <tr>
@@ -54,6 +67,7 @@
                     <% } %>
                 </td>
                 <td style="width: 200px"><%= question.tags.join(', ') %></td>
+                <td style="width: 190px"><%= moment(question.createdAt).format(DATEFORMAT) %></td>
                 <td class="actions">
                     <div class="dropdown">
                         <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">Actions<span class="caret"></span></button>

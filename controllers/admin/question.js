@@ -14,8 +14,14 @@ exports.getQuestionByParam = (req, res, next, id) => {
 };
 // Retrieve list of questions for quiz
 exports.getQuestions = (req, res, next) => {
-    req.quiz.withQuestions(true).execPopulate().then(() => {
-        if (req.query.sort === 'votes') {
+    let options = { 
+        populate: { path: 'submitter', model: 'User' }
+    };
+    if (req.query.sort && req.query.sort != 'votes') {
+        options.options = { sort: req.query.sort };
+    }
+    req.quiz.withQuestions(options).execPopulate().then(() => {
+        if (req.query.sort == 'votes') {
             req.quiz.questions = _.orderBy(req.quiz.questions, question => {
                 return _.lowerBound(question.votes.up.length, question.votes.length);
             }, 'desc');
@@ -26,7 +32,7 @@ exports.getQuestions = (req, res, next) => {
             course: req.course,
             quiz: req.quiz
         });
-    });
+    }, next);
 };
 // Sort list of questions
 exports.sortQuestions = (req, res, next) => {

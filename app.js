@@ -18,7 +18,7 @@ const app = express(),
 
 // locals
 app.locals._ = require('./lib/lodash.mixin');
-app.locals.dateFormat = 'MMMM Do YYYY @ h:mm a';
+app.locals.DATEFORMAT = 'MMMM Do YYYY @ h:mm a';
 app.locals.io = io;
 app.locals.moment = require('moment');  
 

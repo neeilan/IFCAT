@@ -29,7 +29,7 @@ $(function () {
                 input.prop('disabled', false);
             });
             // enable editable code
-            panel.find('code[data-name]').attr('contenteditable', '');
+            panel.find('code[data-name]').attr('contenteditable', '').first().focus();
             // toggle buttons
             panel.find('.btn-delete').add(this).toggle(false);
             panel.find('.btn-cancel, .btn-update').toggle(true);
@@ -65,7 +65,7 @@ $(function () {
             e.preventDefault();
             var btn = $(this),
                 panel = btn.closest('.panel'),
-                inputs = panel.find('input[name]');
+                inputs = panel.find('input');
             $.put(this.href, inputs.serialize()).then(function () {
                 // set new state and disable
                 inputs.removeAttr('data-checked').removeAttr('data-value').prop('disabled', true);

@@ -31,18 +31,8 @@ QuizSchema.pre('remove', function (next) {
 // Populate tutorial-quizzes
 QuizSchema.virtual('tutorialQuizzes', { ref: 'TutorialQuiz', localField: '_id', foreignField: 'quiz' });
 // Populate questions
-QuizSchema.methods.withQuestions = function (deep = false) {
-    let opts = {
-        path: 'questions',
-        model: 'Question'
-    };
-    if (deep) {
-        opts.populate = {
-            path: 'submitter',
-            model: 'User'
-        }
-    }
-    return this.populate(opts);
+QuizSchema.methods.withQuestions = function (options = {}) {
+    return this.populate(_.merge(options, { path: 'questions', model: 'Question' }));
 };
 // Set quiz
 QuizSchema.methods.store = function (opts) {

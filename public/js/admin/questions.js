@@ -21,24 +21,28 @@ $(function () {
         $('tbody').sortable({ 
             axis: 'y', 
             cancel: false,
-            handle: '.handle',
-            update: function (e, ui) {
-                var self = $(this),
-                    url = window.location.href.split(/[?#]/)[0] + '/sort',
-                    data = $('input[name^=questions]', this).serialize();
-                $.put(url, data, function () {
-                    // do nothing
-                }).fail(function (xhr) {
-                    $('.alert-danger').remove();
-                    $('#title').after('<div class="alert alert-danger alert-dismissible"><a href="#" class="close" data-dismiss="alert">&times;</a>' + xhr.responseText + '</div>');
-                    // undo change
-                    self.sortable('cancel');
-                });
-            }
+            handle: '.handle'
+        });
+        // Save sort order
+        $('#btn-sort').click(function (e) {
+            e.preventDefault();
+            $.put(this.href, $('input[name^=questions]').serialize(), function () {
+                window.location.href = location.pathname; // reload page w/o querystring
+            }).fail(function (xhr) {
+                $('.alert-danger').remove();
+                $('#title').after('<div class="alert alert-danger alert-dismissible"><a href="#" class="close" data-dismiss="alert">&times;</a>' + xhr.responseText + '</div>');
+            });
         });
     }
 
     if (body.hasClass('question-page')) {
+        // Create hidden fields to store editable text
+        $('code[contenteditable][data-name]').each(function () {
+            $(this).after($('<input/>', { type: 'hidden', name: this.dataset.name, value: this.innerText }))
+        // Store editable text upon typing into editable text
+        }).on('input', function () {
+            $(this).next(':hidden').val(this.innerText);
+        });
         // Change DOM upon changing question type
         $('select[name=type]').change(function () {
             var select = this;
@@ -76,13 +80,6 @@ $(function () {
                 count += $.trim(this.value) !== '' ? 1 : 0;
             });
             $('.counter.links').text(count + ' link' + (count !== 1 ? 's' : '') + ' added');
-        });
-        // Create hidden fields to store editable text
-        $('code[contenteditable][data-name]').each(function () {
-            $(this).after($('<input/>', { type: 'hidden', name: this.dataset.name, value: this.innerText }))
-        // Store editable text upon typing into editable text
-        }).on('input', function () {
-            $(this).next(':hidden').val(this.innerText);
         });
         // Remove choice input
         $(document).on('click', '.glyphicon-remove', function () {

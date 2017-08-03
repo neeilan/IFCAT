@@ -149,6 +149,12 @@ input[type=checkbox][data-label] {
 .table > thead > tr > th, .table > tbody > tr > td {
     font-size: 13px;
 }
+.table > thead > tr > th {
+    border: 0;
+}
+.table thead tr.actions th {
+    padding: 10px 0 15px;
+}
 .table > tfoot > tr > th {
     border-top: 2px solid #ddd;
 }
@@ -421,15 +427,11 @@ tfoot .pagination {
     border-bottom: 0;
     padding-bottom: 0;
 }
-.responses-page .panel .panel-title {
-    margin-top: 0;
-}
 .responses-page .panel .panel-body {
-    padding-top: 0;
+    padding-top: 10px;
 }
-
 .responses-page .panel .question {
-    margin: 5px 0;
+    margin: 0 0 10px;
 }
 .responses-page .code {
     margin-bottom: 10px;
@@ -463,6 +465,9 @@ tfoot .pagination {
 .responses-page [data-type="code tracing"] td pre {
     border: 0;
 }
+/* .responses-page code[contenteditable] {
+    background: #DBF5FE;
+} */
 
 
 /* .responses-page .choices td.incorrect, 
