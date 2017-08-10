@@ -69,6 +69,7 @@ export default class Question extends React.Component {
 				{this.getSubmitBtn()}
 				<br/>
 				{this.getVoteCaster()}
+				<EmptyLine />
 			</div>);
 	}
 	
@@ -76,9 +77,11 @@ export default class Question extends React.Component {
 	getVoteCaster() {
 		if (!JSON.parse(localStorage.getItem('iqcVotedOn' + this.props.questionRef._id))) {
 			return (
-			<VoteCaster 
-				upvoteCb={() => this.voteCb('up')} 
-				downvoteCb={() => this.voteCb('down')} />
+				<div style={{'textAlign' : 'center' }}>
+					<VoteCaster 
+						upvoteCb={() => this.voteCb('up')} 
+						downvoteCb={() => this.voteCb('down')} />
+				</div>
 			);
 		}
 	}

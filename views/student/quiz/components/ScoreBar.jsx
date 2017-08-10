@@ -69,7 +69,7 @@ export default class ScoreBar extends React.Component {
 												     (this.props.selectedQuestion._id === q._id)) ? 'btn-primary' : btnClass} `}
 					onClick={this.props.selectQuestionCb.bind(this, q)}
 					style={{textAlign:'center', padding: '10px', margin : '2px 5px 2px 5px'}}> 		
-							{q.number}
+							{q.number < 10 ? '0'+ q.number : q.number }
 							<br/>
 				</button>
             </span>);
@@ -83,9 +83,15 @@ export default class ScoreBar extends React.Component {
           		</MediaQuery>
 				<MediaQuery maxWidth={992}>
 					{smallButtons}
+				 	
 				 	<EmptyLine/>
+				 	<div className="well">
+					 	Score for this question:
+					 	<StarScore 
+					 		full={this.calculateStars(this.props.selectedQuestion).fullStars} 
+					 		empty={this.calculateStars(this.props.selectedQuestion).emptyStars} />
+					 </div>
           		</MediaQuery>
-				 
 			</div>);
 	}
 }

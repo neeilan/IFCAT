@@ -901,7 +901,8 @@
 					_react2.default.createElement('br', null),
 					this.getSubmitBtn(),
 					_react2.default.createElement('br', null),
-					this.getVoteCaster()
+					this.getVoteCaster(),
+					_react2.default.createElement(_EmptyLine2.default, null)
 				);
 			}
 		}, {
@@ -910,13 +911,17 @@
 				var _this2 = this;
 
 				if (!JSON.parse(localStorage.getItem('iqcVotedOn' + this.props.questionRef._id))) {
-					return _react2.default.createElement(_VoteCaster2.default, {
-						upvoteCb: function upvoteCb() {
-							return _this2.voteCb('up');
-						},
-						downvoteCb: function downvoteCb() {
-							return _this2.voteCb('down');
-						} });
+					return _react2.default.createElement(
+						'div',
+						{ style: { 'textAlign': 'center' } },
+						_react2.default.createElement(_VoteCaster2.default, {
+							upvoteCb: function upvoteCb() {
+								return _this2.voteCb('up');
+							},
+							downvoteCb: function downvoteCb() {
+								return _this2.voteCb('down');
+							} })
+					);
 				}
 			}
 		}, {
@@ -1190,7 +1195,7 @@
 			value: function render() {
 				return _react2.default.createElement(
 					"div",
-					{ className: "col-xs-12 col-md-3" },
+					{ className: "col-xs-12" },
 					_react2.default.createElement(
 						"button",
 						{ className: "btn btn-success", onClick: this.props.upvoteCb },
@@ -6228,7 +6233,7 @@
 								className: 'btn btn-default ' + (_this2.props.selectedQuestion && _this2.props.selectedQuestion._id === q._id ? 'btn-primary' : btnClass) + ' ',
 								onClick: _this2.props.selectQuestionCb.bind(_this2, q),
 								style: { textAlign: 'center', padding: '10px', margin: '2px 5px 2px 5px' } },
-							q.number,
+							q.number < 10 ? '0' + q.number : q.number,
 							_react2.default.createElement('br', null)
 						)
 					);
@@ -6247,7 +6252,15 @@
 						MediaQuery,
 						{ maxWidth: 992 },
 						smallButtons,
-						_react2.default.createElement(_EmptyLine2.default, null)
+						_react2.default.createElement(_EmptyLine2.default, null),
+						_react2.default.createElement(
+							'div',
+							{ className: 'well' },
+							'Score for this question:',
+							_react2.default.createElement(_StarScore2.default, {
+								full: this.calculateStars(this.props.selectedQuestion).fullStars,
+								empty: this.calculateStars(this.props.selectedQuestion).emptyStars })
+						)
 					)
 				);
 			}

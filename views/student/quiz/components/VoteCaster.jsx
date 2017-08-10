@@ -8,7 +8,7 @@ export default class VoteCaster extends React.Component {
 
 	render() {
 		return (
-			<div className="col-xs-12 col-md-3">
+			<div className="col-xs-12">
 				<button className="btn btn-success" onClick={this.props.upvoteCb}>
 				    <i className="fa fa-thumbs-up"></i>
 				</button>
