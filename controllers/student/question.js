@@ -66,3 +66,22 @@ exports.updateVote = (req, res) => {
         res.json(/* TBD */);
     });
 };
+
+exports.upvoteQuestion = (questionId, voterId) => {
+    models.Question.findById(questionId, (err, question) => {
+        question.votes.up.push(voterId);
+        question.save(err => {
+            console.log(err);
+        });
+    });
+} 
+
+exports.downvoteQuestion = (questionId, voterId) => {
+    models.Question.findById(questionId, (err, question) => {
+        question.votes.down.push(voterId);
+        question.save(err => {
+            console.log(err);
+        });
+    });
+} 
+

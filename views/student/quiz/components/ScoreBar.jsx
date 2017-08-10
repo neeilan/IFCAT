@@ -65,10 +65,10 @@ export default class ScoreBar extends React.Component {
 
 			return (<span key = {q.id + 'scbtn' + i}>
 				<button 
-					className = {`btn btn-default col-md-12 col-xs-1 col-xs-offset-1 ${ (this.props.selectedQuestion && 
+					className = {`btn btn-default ${ (this.props.selectedQuestion && 
 												     (this.props.selectedQuestion._id === q._id)) ? 'btn-primary' : btnClass} `}
 					onClick={this.props.selectQuestionCb.bind(this, q)}
-					style={{textAlign:'center'}}> 		
+					style={{textAlign:'center', padding: '10px', margin : '2px 5px 2px 5px'}}> 		
 							{q.number}
 							<br/>
 				</button>

@@ -1,5 +1,6 @@
 import EmptyLine from './EmptyLine.jsx'
 import CodeOutputQuestion from './CodeOutputQuestion.jsx'
+import VoteCaster from './VoteCaster.jsx'
 
 import React from 'react'
 var enums = require('../enums');
@@ -67,8 +68,33 @@ export default class Question extends React.Component {
 				<br />
 				{this.getSubmitBtn()}
 				<br/>
+				{this.getVoteCaster()}
 			</div>);
 	}
+	
+	
+	getVoteCaster() {
+		if (!JSON.parse(localStorage.getItem('iqcVotedOn' + this.props.questionRef._id))) {
+			return (
+			<VoteCaster 
+				upvoteCb={() => this.voteCb('up')} 
+				downvoteCb={() => this.voteCb('down')} />
+			);
+		}
+	}
+	
+	
+	voteCb(type) {
+		if (type === 'up') {
+			 this.props.upvoteCb(this.props.questionRef._id);
+		} else if (type === 'down') {
+			this.props.downvoteCb(this.props.questionRef._id)
+		}
+		
+		localStorage.setItem('iqcVotedOn' + this.props.questionRef._id, 'true');
+		this.setState(this.state);
+	}
+	
 
 	submitAnswer() {
 		this.props.submitCb(this.state.givenAnswer || this.state.selectedChoices);

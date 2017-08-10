@@ -20,6 +20,8 @@ export default class QuizApp extends React.Component {
         this.submitChoiceCb = this.submitChoiceCb.bind(this);
         this.selectQuestionCb = this.selectQuestionCb.bind(this);
         this.createGroupCb = this.createGroupCb.bind(this);
+        this.upvoteCb = this.upvoteCb.bind(this);
+        this.downvoteCb = this.downvoteCb.bind(this);
 
         this.state = {
             score: 0,
@@ -250,6 +252,8 @@ export default class QuizApp extends React.Component {
                 response = {this.state.responses[selectedQuestion._id]}
 				questionType = {selectedQuestion.type}
 				submitCb = {this.submitChoiceCb}
+				upvoteCb = {this.upvoteCb}
+				downvoteCb = {this.downvoteCb}
             />
         );
     }
@@ -352,6 +356,16 @@ export default class QuizApp extends React.Component {
         this.setState({
             selectedQuestion: question
         });
+    }
+    
+    upvoteCb(questionId) {
+        alert('upvote')
+        this.emit('UPVOTE_QUESTION', { questionId : questionId });
+    }
+    
+    downvoteCb(questionId) {
+        alert('downvote')
+        this.emit('DOWNVOTE_QUESTION', { questionId : questionId });
     }
 
 }
