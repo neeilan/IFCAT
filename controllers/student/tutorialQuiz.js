@@ -227,7 +227,7 @@ exports.quizComplete = (socket, emitters) => (function(data) {
             return groups.reduce((pre, curr) => pre.points + curr.points)
         })
         .then(function(score) {
-            emitters.emitToGroup(data.groupId, 'postQuiz',{
+            emitters.emitToGroup(data.groupId, 'FINISH_QUIZ', {
                 members : group.members,
                 score : score,
                 groupId : data.groupId

@@ -30,6 +30,7 @@ export default class QuizApp extends React.Component {
             },
             groupId: null,
             groupName: null,
+            teammates : [],
             userId: null,
             isDriver: false,
             hasCreatedGroup: false,
@@ -39,7 +40,6 @@ export default class QuizApp extends React.Component {
             inProgress: false,
             responses: {},
             numCorrect: 0
-
         }
     }
 
@@ -155,7 +155,6 @@ export default class QuizApp extends React.Component {
             console.log('updateScores');
             
             if (this.state.groupId && data.groupId != this.state.groupId) return;
-            console.log(data);
 
             var responsesStore = this.state.responses;
             let numCorrectInc = 0;
@@ -166,8 +165,6 @@ export default class QuizApp extends React.Component {
                 numCorrectInc += response.correct ? 1 : 0;
                 newScore += response.points;
             });
-
-            console.log(responsesStore)
 
             this.setState({
                 numCorrect: this.state.numCorrect + numCorrectInc,
@@ -186,8 +183,6 @@ export default class QuizApp extends React.Component {
         });
 
         socket.on('quizActivated', (data) => {
-            console.log('postQuiz');
-            console.log(data);
             if (data.active) {
                 swal('Quiz activated', 'You can pick a driver and start the quiz', 'info');
                 this.setState({active : true});
@@ -211,6 +206,17 @@ export default class QuizApp extends React.Component {
                 responses: responses
             });
         });
+        
+        socket.on('FINISH_QUIZ', (data) => {
+            console.log(data);
+            this.setState({
+                teammates : data.members,
+                score : data.score,
+                complete : true,
+                inProgress : false,
+                active : false
+            })
+        })
     }
 
     emit(eventName, data) {
@@ -272,11 +278,7 @@ export default class QuizApp extends React.Component {
             return null;
         }
         return (<PostQuiz finalScore = {10}
-                    teammates = {[{
-                            name: 'Kobe',
-                            id: 'KB24'
-                        }]
-			}
+                    teammates = {this.state.teammates || []}
                     awardPointCb = {this.awardPointCb}
                     />);
     }
@@ -303,7 +305,7 @@ export default class QuizApp extends React.Component {
         var preQuiz = this.state.inProgress ? null : <PreQuiz setDriverCb = {this.setDriverCb} groupName = {this.state.groupName} active={this.state.active}/>;
         var scoreBar = this.state.inProgress ? this.getScoreBar() : null;
         var question = this.state.inProgress ? this.getCurrentQuestion() : null;
-        var postQuiz = this.state.inProgress ? null : this.getPostQuiz();
+        var postQuiz = this.state.complete ? this.getPostQuiz() : null;
         var groupBuilder = this.state.inProgress ? null : this.getGroupBuilder();
 
         return (<div> 
@@ -312,6 +314,7 @@ export default class QuizApp extends React.Component {
                     {scoreBar}
                     {question} 
                     {postQuiz}
+                    <EmptyLine/>
                 </div>);
     }
 

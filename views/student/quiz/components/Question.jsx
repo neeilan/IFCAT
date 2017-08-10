@@ -65,9 +65,8 @@ export default class Question extends React.Component {
 				{this.getAttachmentBtn()}
 				{this.getAttachments()}
         		{this.getAnswerArea()}
-				<br />
-				{this.getSubmitBtn()}
 				<br/>
+				{this.getSubmitBtn()}
 				{this.getVoteCaster()}
 				<EmptyLine />
 			</div>);
@@ -77,7 +76,7 @@ export default class Question extends React.Component {
 	getVoteCaster() {
 		if (!JSON.parse(localStorage.getItem('iqcVotedOn' + this.props.questionRef._id))) {
 			return (
-				<div style={{'textAlign' : 'center' }}>
+				<div style={{'textAlign' : 'center'}}>
 					<VoteCaster 
 						upvoteCb={() => this.voteCb('up')} 
 						downvoteCb={() => this.voteCb('down')} />

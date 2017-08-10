@@ -193,7 +193,6 @@ socket.on('attemptAnswer', function(data) {
     })
     
 socket.on('UPVOTE_QUESTION', function(data) {
-    console.log(data);
     controllers.Question.upvoteQuestion(data.questionId, socket.request.user._id);
 })
 

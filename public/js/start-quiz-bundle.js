@@ -245,6 +245,7 @@
 	            },
 	            groupId: null,
 	            groupName: null,
+	            teammates: [],
 	            userId: null,
 	            isDriver: false,
 	            hasCreatedGroup: false,
@@ -254,7 +255,6 @@
 	            inProgress: false,
 	            responses: {},
 	            numCorrect: 0
-
 	        };
 	        return _this;
 	    }
@@ -373,7 +373,6 @@
 	                console.log('updateScores');
 
 	                if (_this2.state.groupId && data.groupId != _this2.state.groupId) return;
-	                console.log(data);
 
 	                var responsesStore = _this2.state.responses;
 	                var numCorrectInc = 0;
@@ -384,8 +383,6 @@
 	                    numCorrectInc += response.correct ? 1 : 0;
 	                    newScore += response.points;
 	                });
-
-	                console.log(responsesStore);
 
 	                _this2.setState({
 	                    numCorrect: _this2.state.numCorrect + numCorrectInc,
@@ -404,8 +401,6 @@
 	            });
 
 	            socket.on('quizActivated', function (data) {
-	                console.log('postQuiz');
-	                console.log(data);
 	                if (data.active) {
 	                    swal('Quiz activated', 'You can pick a driver and start the quiz', 'info');
 	                    _this2.setState({ active: true });
@@ -426,6 +421,17 @@
 	                responses[data.questionId] = data.response;
 	                _this2.setState({
 	                    responses: responses
+	                });
+	            });
+
+	            socket.on('FINISH_QUIZ', function (data) {
+	                console.log(data);
+	                _this2.setState({
+	                    teammates: data.members,
+	                    score: data.score,
+	                    complete: true,
+	                    inProgress: false,
+	                    active: false
 	                });
 	            });
 	        }
@@ -489,10 +495,7 @@
 	                return null;
 	            }
 	            return _react2.default.createElement(_PostQuiz2.default, { finalScore: 10,
-	                teammates: [{
-	                    name: 'Kobe',
-	                    id: 'KB24'
-	                }],
+	                teammates: this.state.teammates || [],
 	                awardPointCb: this.awardPointCb
 	            });
 	        }
@@ -523,7 +526,7 @@
 	            var preQuiz = this.state.inProgress ? null : _react2.default.createElement(_PreQuiz2.default, { setDriverCb: this.setDriverCb, groupName: this.state.groupName, active: this.state.active });
 	            var scoreBar = this.state.inProgress ? this.getScoreBar() : null;
 	            var question = this.state.inProgress ? this.getCurrentQuestion() : null;
-	            var postQuiz = this.state.inProgress ? null : this.getPostQuiz();
+	            var postQuiz = this.state.complete ? this.getPostQuiz() : null;
 	            var groupBuilder = this.state.inProgress ? null : this.getGroupBuilder();
 
 	            return _react2.default.createElement(
@@ -533,7 +536,8 @@
 	                groupBuilder,
 	                scoreBar,
 	                question,
-	                postQuiz
+	                postQuiz,
+	                _react2.default.createElement(_EmptyLine2.default, null)
 	            );
 	        }
 	    }, {
@@ -900,7 +904,6 @@
 					this.getAnswerArea(),
 					_react2.default.createElement('br', null),
 					this.getSubmitBtn(),
-					_react2.default.createElement('br', null),
 					this.getVoteCaster(),
 					_react2.default.createElement(_EmptyLine2.default, null)
 				);
@@ -1112,9 +1115,9 @@
 
 /***/ },
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 		value: true
@@ -1129,7 +1132,6 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	// import React from 'react'
-	var enums = __webpack_require__(3);
 
 	var EmptyLine = function (_React$Component) {
 		_inherits(EmptyLine, _React$Component);
@@ -1141,13 +1143,13 @@
 		}
 
 		_createClass(EmptyLine, [{
-			key: 'render',
+			key: "render",
 			value: function render() {
 				return React.createElement(
-					'span',
+					"span",
 					null,
-					React.createElement('br', null),
-					React.createElement('br', null)
+					React.createElement("br", null),
+					React.createElement("br", null)
 				);
 			}
 		}]);
@@ -1161,7 +1163,7 @@
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 		value: true
@@ -1191,20 +1193,20 @@
 		}
 
 		_createClass(VoteCaster, [{
-			key: "render",
+			key: 'render',
 			value: function render() {
 				return _react2.default.createElement(
-					"div",
-					{ className: "col-xs-12" },
+					'div',
+					{ className: 'col-xs-12', style: { 'marginTop': '10px' } },
 					_react2.default.createElement(
-						"button",
-						{ className: "btn btn-success", onClick: this.props.upvoteCb },
-						_react2.default.createElement("i", { className: "fa fa-thumbs-up" })
+						'button',
+						{ className: 'btn btn-success', onClick: this.props.upvoteCb },
+						_react2.default.createElement('i', { className: 'fa fa-thumbs-up' })
 					),
 					_react2.default.createElement(
-						"button",
-						{ className: "btn btn-warning", onClick: this.props.downvoteCb },
-						_react2.default.createElement("i", { className: "fa fa-thumbs-down" })
+						'button',
+						{ className: 'btn btn-warning', onClick: this.props.downvoteCb },
+						_react2.default.createElement('i', { className: 'fa fa-thumbs-down' })
 					)
 				);
 			}
@@ -6173,7 +6175,6 @@
 		_createClass(ScoreBar, [{
 			key: 'calculateStars',
 			value: function calculateStars(question) {
-				console.log(question);
 				if (!question) return { fullStars: 0, emptyStars: 0 };
 				var result = {};
 				var responses = this.props.responses;
@@ -6245,8 +6246,7 @@
 					_react2.default.createElement(
 						MediaQuery,
 						{ minWidth: 992 },
-						buttons,
-						_react2.default.createElement(_EmptyLine2.default, null)
+						buttons
 					),
 					_react2.default.createElement(
 						MediaQuery,
