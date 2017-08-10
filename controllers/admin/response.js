@@ -15,7 +15,13 @@ exports.getResponses = (req, res, next) => {
                 populate: {
                     path: 'questions',
                     model: 'Question',
-                    select: 'number type question code choices answers'
+                    select: 'number type question code choices answers',
+                    match: {
+                        $or: [
+                            { submitter: { $exists: false }},
+                            { submitter: { $exists: true }, approved: true }
+                        ]
+                    }
                 }
             }, done)
         },
@@ -56,6 +62,7 @@ exports.getResponses = (req, res, next) => {
                     question.results = _.map(question.choices, choice => {
                         let expected = question.isAnswer(choice),
                             given = response.isAnswer(choice);
+                        console.log(choice, response.answer, expected, given)
                         return {
                             choice: choice,
                             expected: expected,
@@ -78,6 +85,8 @@ exports.getResponses = (req, res, next) => {
                             lineByLineSummary = response.lineByLineSummary ? response.lineByLineSummary[i] : null,
                             attempts = lineByLineSummary ? lineByLineSummary.attempts : 0,
                             correct = lineByLineSummary ? lineByLineSummary.correct : false;
+
+                        console.log(`'${answer}'`, `'${codeTracingAnswer}'`, answer == codeTracingAnswer)
                         return {
                             expected: answer,
                             given: codeTracingAnswer,
@@ -85,11 +94,11 @@ exports.getResponses = (req, res, next) => {
                             correct: answer == codeTracingAnswer
                         };
                     });
-                    console.log("\n\n")
                     break;
                 default:
                     break;
             }
+            console.log("\n")
             return question;
         });
 
@@ -106,24 +115,59 @@ exports.getResponses = (req, res, next) => {
 };
 // Edit response
 exports.addResponse = (req, res, next) => {
-    async.series([
-        done => models.Question.findById(req.body.question, 'number', done),
-        done => models.Response.create(req.body, done)
-    ], (err, results) => {
+    let response = new models.Response(req.body);
+    models.Question.findById(req.body.question, 'number type answers', (err, question) => {
         if (err) return next(err);
-        req.flash('success', 'Response for question <b>%s</b> has been updated.', results[0].number);
-        res.redirect('back');
+        //
+        if (question.isMultipleChoice() || question.isMultipleSelect()) {
+            response.correct = _.isEqual(question.answers.sort(), response.answer.sort());
+        } else if (question.isShortAnswer()) {
+            if (!question.caseSensitive) {
+                question.answers = _.map(question.answers, answer => _.toLower(answer));
+                response.answer = _.map(response.answer, answer => _.toLower(answer));
+            }
+            response.correct = _.intersection(question.answers, response.answer).length > 0;
+        } else if (question.isCodeTracing()) {
+            response.correct = _.isEqual(question.answers, response.codeTracingAnswers);
+        }
+        response.group = req.group._id;
+        response.save(err => {
+            if (err) return next(err);
+            req.flash('success', 'Response for question <b>%s</b> has been updated.', question.number);
+            res.redirect('back');
+        });
     });
 };
 // Edit response
 exports.editResponse = (req, res, next) => {
     async.series([
-        done => models.Question.findById(req.body.question, 'number', done),
-        done => models.Response.findByIdAndUpdate(req.params.response, req.body, done)
+        done => models.Question.findById(req.body.question, 'number type answers caseSensitive', done),
+        done => models.Response.findById(req.params.response, done)
     ], (err, results) => {
         if (err) return next(err);
-        req.flash('success', 'Response for question <b>%s</b> has been updated.', results[0].number);
-        res.redirect('back');
+        let [question, response] = results;
+
+        response.group = req.group._id;
+        response.answer = [];
+        response.set(req.body);
+
+        if (question.isMultipleChoice() || question.isMultipleSelect()) {
+            response.correct = _.isEqual(question.answers.sort(), response.answer.sort());
+        } else if (question.isShortAnswer()) {
+            if (!question.caseSensitive) {
+                question.answers = _.map(question.answers, answer => _.toLower(answer));
+                response.answer = _.map(response.answer, answer => _.toLower(answer));
+            }
+            response.correct = _.intersection(question.answers, response.answer).length > 0;
+        } else if (question.isCodeTracing()) {
+            response.correct = _.isEqual(question.answers, response.codeTracingAnswers);
+        }
+
+        response.save(err => {
+            if (err) return next(err);
+            req.flash('success', 'Response for question <b>%s</b> has been updated.', question.number);
+            res.redirect('back');
+        });
     });
 };
 // Delete responses

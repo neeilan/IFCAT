@@ -72,7 +72,7 @@ $(function () {
         // Change link counter
         $('#modal-show-links').on('hidden.bs.modal', function () {
             var count = 0;
-            $('[name^=links]', this).each(function() { 
+            $('[name^=_links]', this).each(function() { 
                 count += $.trim(this.value) !== '' ? 1 : 0;
             });
             $('.counter.links').text(count + ' link' + (count !== 1 ? 's' : '') + ' added');

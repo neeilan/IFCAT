@@ -46,6 +46,7 @@ exports.sortQuestions = (req, res, next) => {
     req.quiz.questions.sort((a, b) => o.indexOf(a.toString()) < o.indexOf(b.toString()) ? -1 : 1);
     req.quiz.save(err => {
         if (err) return next(err);
+        req.flash('success', 'List of questions have been reordered.');
         res.sendStatus(200);
     });
 };
