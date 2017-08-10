@@ -1,4 +1,4 @@
-const _ = require('../../lib/lodash.mixin'),
+const _ = require('lodash'),
     async = require('async'),
     config = require('../../lib/config'),
     models = require('../../models'),
@@ -21,16 +21,21 @@ exports.getQuestions = (req, res, next) => {
         options.options = { sort: req.query.sort };
     }
     req.quiz.withQuestions(options).execPopulate().then(() => {
+        let questions = req.quiz.questions;
+        // sort questions by voting score
         if (req.query.sort == 'votes') {
-            req.quiz.questions = _.orderBy(req.quiz.questions, question => {
-                return _.lowerBound(question.votes.up.length, question.votes.length);
-            }, 'desc');
+            questions = _.orderBy(questions, 'votes.score', 'desc');
         }
+        // group questions by status
+        questions = _.groupBy(questions, question => question.submitter && !question.approved ? 'pending' : 'approved');
+
         res.render('admin/pages/quiz-questions', {
+            mathjax: true,
             bodyClass: 'questions-page',
             title: 'Questions',
             course: req.course,
-            quiz: req.quiz
+            quiz: req.quiz,
+            questions: questions
         });
     }, next);
 };

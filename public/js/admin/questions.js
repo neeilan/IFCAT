@@ -18,11 +18,7 @@ $(function () {
             });
         });
         // Drag and drop rows
-        $('tbody').sortable({ 
-            axis: 'y', 
-            cancel: false,
-            handle: '.handle'
-        });
+        $('tbody').sortable({ axis: 'y', cancel: false, handle: '.handle' });
         // Save sort order
         $('#btn-sort').click(function (e) {
             e.preventDefault();

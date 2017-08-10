@@ -61,34 +61,42 @@ $(function () {
             panel.find('.btn-edit, .btn-delete').toggle(true);
         });
 
-        $('.btn-update').click(function (e) {
-            e.preventDefault();
-            var btn = $(this),
-                panel = btn.closest('.panel'),
-                inputs = panel.find('input');
-            $.put(this.href, inputs.serialize()).then(function () {
-                // set new state and disable
-                inputs.removeAttr('data-checked').removeAttr('data-value').prop('disabled', true);
-                panel.find('code[data-name]').removeAttr('contenteditable');
-                // toggle buttons
-                panel.find('.btn-cancel').add(this).toggle(false);
-                panel.find('.btn-edit, .btn-delete').toggle(true);
-            }).fail(function () {
-                // set old state and disable
-                panel.find('.btn-cancel').click();
-            });
-        });
+        // $('.btn-update').click(function (e) {
+        //     e.preventDefault();
+        //     var btn = $(this),
+        //         panel = btn.closest('.panel'),
+        //         inputs = panel.find('input');
+        //     $.put(this.href, inputs.serialize()).then(function () {
+        //         // set new state and disable
+        //         inputs.removeAttr('data-checked').removeAttr('data-value').prop('disabled', true);
+        //         panel.find('code[data-name]').removeAttr('contenteditable');
+        //         // toggle buttons
+        //         panel.find('.btn-cancel').add(this).toggle(false);
+        //         panel.find('.btn-edit, .btn-delete').toggle(true);
+        //     }).fail(function () {
+        //         // set old state and disable
+        //         panel.find('.btn-cancel').click();
+        //     });
+        // });
 
         $('.btn-delete').click(function (e) {
             e.preventDefault();
-            var btn = this;
+            var btn = $(this);
+            var alert = $('<div/>', {
+                class: 'alert alert-dismissible',
+                html: '<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>'
+            });
             $.deletebox({
                 title: 'Delete response',
                 message: '<p>You are about to delete this response and all of its associated information.</p>\
                     <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
                 callback: function () {
-                    $.delete(btn.href, function () {
-                        window.location.reload(true);
+                    $.delete(btn.attr('href')).then(function (res) {
+                        window.location.reload();
+                    }).fail(function (xhr) {
+                        console.log(xhr)
+                        alert.addClass('alert-danger').text(xhr);
+                        btn.closest('.panel').replaceWith(alert);
                     });
                 }
             });

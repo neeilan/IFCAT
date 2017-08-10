@@ -4,55 +4,131 @@ const _ = require('lodash'),
     csv = require('csv'),
     models = require('../../models');
 // Retrieve group responses
-exports.getResponsesByGroup = (req, res, next) => {
+exports.getResponses = (req, res, next) => {
+    // get members, questions, and responses
     async.series([
         done => {
-            // get questions
             req.tutorialQuiz.populate({
                 path: 'quiz',
                 model: 'Quiz',
+                select: 'questions',
                 populate: {
                     path: 'questions',
-                    model: 'Question'
+                    model: 'Question',
+                    select: 'number type question code choices answers'
                 }
             }, done)
         },
         done => {
-            let ids = [];
-            if (req.tutorialQuiz.quiz) {
-                ids = _.map(req.tutorialQuiz.quiz.questions, '_id');
-            }
-            // get responses
+            let ids = req.tutorialQuiz.quiz ? _.map(req.tutorialQuiz.quiz.questions, '_id') : [];
             req.group.populate([{
                 path: 'members',
                 model: 'User',
+                select: 'name',
                 options: {
                     sort: 'name.first name.last'
                 }
             }, {
                 path: 'responses',
                 model: 'Response',
-                match: { question: { $in: ids }}
+                match: { 
+                    question: { $in: ids }
+                }
             }], done)
         }
     ], err => {
         if (err) return next(err);
-        // map responses to questions
-        req.tutorialQuiz.quiz.questions = _.map(req.tutorialQuiz.quiz.questions, question => {
-            question.response =
-                _.find(req.group.responses, response => response.question.equals(question._id)) ||
-                new models.Response({ answer: [''], codeTracingAnswers: [], lineByLineSummary: [] });
+        let questions = req.tutorialQuiz.quiz.questions,
+            responses = req.group.responses;
+        // organize results 
+        questions = _.map(questions, question => {
+            // find response for question
+            let response = _.find(responses, response => response.question.equals(question._id));
+            // if none, create a dummy one
+            if (!response) response = new models.Response();
+            //
+            question.response = response;
+            question.score = response.points || 0;
+            // compare expected answer w/ given answer
+            switch (question.type) {
+                case 'multiple choice':
+                case 'multiple select':
+                    question.results = _.map(question.choices, choice => {
+                        let expected = question.isAnswer(choice),
+                            given = response.isAnswer(choice);
+                        return {
+                            choice: choice,
+                            expected: expected,
+                            given: given,
+                            correct: (expected && given || (expected !== given ? false : null))
+                        };
+                    });
+                    break;
+                case 'short answer':
+                    let given = response.answer[0];
+                    question.results = {
+                        expected: question.answers,
+                        given: given,
+                        correct: question.isAnswer(given)
+                    };
+                    break;
+                case 'code tracing':
+                    question.results = _.map(question.answers, (answer, i) => {
+                        let codeTracingAnswer = response.codeTracingAnswers ? response.codeTracingAnswers[i] : null,
+                            lineByLineSummary = response.lineByLineSummary ? response.lineByLineSummary[i] : null,
+                            attempts = lineByLineSummary ? lineByLineSummary.attempts : 0,
+                            correct = lineByLineSummary ? lineByLineSummary.correct : false;
+                        return {
+                            expected: answer,
+                            given: codeTracingAnswer,
+                            attempts: attempts,
+                            correct: answer == codeTracingAnswer
+                        };
+                    });
+                    console.log("\n\n")
+                    break;
+                default:
+                    break;
+            }
             return question;
         });
 
         res.render('admin/pages/group-responses', {
+            mathjax: true,
             bodyClass: 'responses-page',
             title: 'Responses',
             course: req.course,
             tutorialQuiz: req.tutorialQuiz,
-            group: req.group
+            group: req.group,
+            questions: questions
         });
     });
+};
+// Edit response
+exports.addResponse = (req, res, next) => {
+    async.series([
+        done => models.Question.findById(req.body.question, 'number', done),
+        done => models.Response.create(req.body, done)
+    ], (err, results) => {
+        if (err) return next(err);
+        req.flash('success', 'Response for question <b>%s</b> has been updated.', results[0].number);
+        res.redirect('back');
+    });
+};
+// Edit response
+exports.editResponse = (req, res, next) => {
+    async.series([
+        done => models.Question.findById(req.body.question, 'number', done),
+        done => models.Response.findByIdAndUpdate(req.params.response, req.body, done)
+    ], (err, results) => {
+        if (err) return next(err);
+        req.flash('success', 'Response for question <b>%s</b> has been updated.', results[0].number);
+        res.redirect('back');
+    });
+};
+// Delete responses
+exports.deleteResponses = (req, res, next) => {
+
 };
 // Retrieve marks by student
 exports.getMarksByStudent = (req, res, next) => {

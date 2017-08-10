@@ -107,7 +107,10 @@ router.patch('/courses/:course/tutorials-quizzes/:tutorialQuiz/settings', contro
 router.patch('/courses/:course/tutorials-quizzes/:tutorialQuiz/groups', controllers.Group.saveGroups);
 router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroups);
 
-router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz/groups/:group/responses', controllers.Response.getResponsesByGroup);
+router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz/groups/:group/responses', controllers.Response.getResponses);
+router.post('/courses/:course/tutorials-quizzes/:tutorialQuiz/groups/:group/responses', controllers.Response.addResponse);
+router.put('/courses/:course/tutorials-quizzes/:tutorialQuiz/groups/:group/responses/:response', controllers.Response.editResponse);
+
 router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz/marks', controllers.Response.getMarksByTutorialQuiz);
 
 // ugly routes begin here...

@@ -33,6 +33,13 @@ pre code {
     font-weight: bold;
 }
 /**
+ * Labels
+ */
+.label {
+    display: inline-block;
+    font-size: 100%;
+}
+/**
  * Forms
  */
 textarea.form-control {
@@ -149,7 +156,7 @@ input[type=checkbox][data-label] {
 .table > thead > tr > th, .table > tbody > tr > td {
     font-size: 13px;
 }
-.table > thead > tr > th {
+.table > thead:first-child > tr > th {
     border: 0;
 }
 .table thead tr.actions th {
@@ -263,30 +270,60 @@ tfoot .pagination {
 /**
  * Questions page
  */
-.questions-page .question {
+.questions-page tr.pending td {
+    background: #FFF9C4;
+}
+.questions-page th.sort, .questions-page td.sort {
+    width: 10px;
+}
+.questions-page th.number, .questions-page td.number {
+    width: 50px;
+}
+.questions-page th.type, .questions-page td.type {
+    width: 120px;
+}
+.questions-page th.question, .questions-page td.question {
+    min-width: 430px;
+}
+.questions-page td.question .question {
+    margin-bottom: 10px;
     white-space: pre-wrap;
 }
-.questions-page .submitter {
-    background-color: #ddd;
-    margin-top: 5px;
-    text-indent: 5px;
-    text-transform: lowercase;
+.questions-page td.question .tags {
+    margin-bottom: 5px;
 }
-.questions-page.approved {
-    background-color: #F6B2AA;
-    text-indent: 5px;
-    text-transform: lowercase;
+.questions-page td.question .tags .label-info {
+    background-color: #E1ECF4;
+    color: #39739d;
 }
-.questions-page .voting {
-    background-color: #ddd;
-    text-indent: 5px;
-    text-transform: lowercase;
+.questions-page th.tags, .questions-page td.tags {
+    width: 105px;
 }
-.questions-page .voting .down {
-    padding-left: 10px;
+.questions-page th.submitter, .questions-page td.submitter {
+    width: 105px;
+}
+.questions-page th.votes, .questions-page td.votes {
+    text-align: center;
+    width: 80px;
+}
+.questions-page td.votes .score {
+    margin-bottom: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: inherit;
+}
+.questions-page td.votes .up {
+    color: green;
+}
+.questions-page td.votes .down {
+    color: #A00;
+}
+.questions-page th.createdAt, .questions-page td.createdAt {
+    width: 137px;
 }
 /**
- * Question page
+ * Question form page
  */
 .question-page .col-xs-1 {
     max-width: 40px;
@@ -383,14 +420,14 @@ tfoot .pagination {
     .nav-actions {
         width: 700px;
     } 
-    .table {
+    /* .table {
         min-width: 700px;
         width: auto;
     }
     .modal .table {
         min-width: auto;
         width: 100%;
-    }
+    } */
 }
 /**
  * Responses page
@@ -444,11 +481,17 @@ tfoot .pagination {
     text-align: center;
     width: 10%;
 }
-.responses-page [data-type="short answer"] th.expected, .responses-page [data-type="short answer"] th.given {
-    width: 50%;
+.responses-page th.correct, .responses-page td.correct {
+    text-align: center;
+    width: 5%;
 }
-.responses-page [data-type="short answer"] td.expected, .responses-page [data-type="short answer"] td.given {
+.responses-page [data-type="short answer"] th {
     text-align: left;
+    width: 10%;
+}
+.responses-page [data-type="short answer"] td {
+    text-align: left;
+    width: 90%;
 }
 .responses-page [data-type="code tracing"] th.expected, .responses-page [data-type="code tracing"] th.given {
     text-align: left;
@@ -459,8 +502,9 @@ tfoot .pagination {
     width: 10%;
 }
 .responses-page [data-type="code tracing"] td.expected, .responses-page [data-type="code tracing"] td.given {
-    text-align: left;
+    background-color: #f5f5f5;
     padding: 0;
+    text-align: left;
 }
 .responses-page [data-type="code tracing"] td pre {
     border: 0;

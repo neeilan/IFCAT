@@ -33,6 +33,10 @@ const QuestionSchema = new mongoose.Schema({
 QuestionSchema.virtual('votes.length').get(function () {
     return this.votes.up.length + this.votes.down.length;
 });
+// Get voting score
+QuestionSchema.virtual('votes.score').get(function () {
+    return _.lowerBound(this.votes.up.length, this.votes.length);
+});
 // Delete cascade
 QuestionSchema.pre('remove', function (next) {
     let self = this;
@@ -124,7 +128,7 @@ QuestionSchema.methods.store = function (opts) {
                 self.answers.addToSet(answer);
         });
     } else if (self.isCodeTracing()) {
-        self.answers = opts._answers.trim().split("\n");
+        self.answers = opts._answers.trim().split(/\r?\n/);
         self.points = self.maxPointsPerLine * self.answers.length + self.firstTryBonus;
     }
     return self;

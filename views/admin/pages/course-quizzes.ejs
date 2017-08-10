@@ -13,22 +13,26 @@
     <a href="/admin/courses/<%= course._id %>/quizzes/new" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-plus"></span> Add New Quiz</a>
 </div>
 
-<table class="table table-striped">
+
+
+<table class="table table-hover">
     <thead>
         <tr>
             <th>Name</th>
             <th class="text-center"># of questions</th>
+            <th style="width: 190px">Date Created</th>
             <th class="actions"></th>
         </tr>
     </thead>
     <tbody>
     <% if (_.isEmpty(course.quizzes)) { %>
-        <tr><td colspan="3">No quizzes have been added yet.</td></tr>
+        <tr><td colspan="4">No quizzes have been added yet.</td></tr>
     <% } else { %>
         <% _.each(course.quizzes, quiz => { %>
             <tr>
                 <td><%= quiz.name %></td>
                 <td class="text-center"><%= quiz.questions.length %></td>
+                <td><%= moment(quiz.createdAt).format(DATEFORMAT) %></td>
                 <td>
                     <div class="dropdown">
                         <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">Actions<span class="caret"></span>

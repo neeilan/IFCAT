@@ -18,7 +18,7 @@ const app = express(),
 
 // locals
 app.locals._ = require('./lib/lodash.mixin');
-app.locals.DATEFORMAT = 'MMMM Do YYYY @ h:mm a';
+app.locals.DATEFORMAT = 'YYYY-MM-DD';
 app.locals.io = io;
 app.locals.moment = require('moment');  
 
@@ -68,6 +68,7 @@ app.use(passport.session());
 app.use((req, res, next) => {
     res.locals.flash = req.flash();
     res.locals.path = req.path;
+    res.locals.query = req.query;
     res.locals.user = req.user;
     next();
 });

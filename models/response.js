@@ -4,8 +4,8 @@ const ResponseSchema = new mongoose.Schema({
     group: { type: mongoose.Schema.Types.ObjectId, ref : 'Group' },
     attempts: { type : Number, default: 0 },
     lineByLineSummary: [{ attempts : { type : Number, default : 1 }, correct : Boolean}],
-    codeTracingAnswers: [{type : String}],
-    answer: [{type : String}],
+    codeTracingAnswers: [String],
+    answer: [String],
     correct: Boolean,
     points: Number
 }, {
@@ -13,7 +13,7 @@ const ResponseSchema = new mongoose.Schema({
 });
 // Check if given choice is one of the answers
 ResponseSchema.methods.isAnswer = function (choice) {
-    return this.answer.indexOf(choice) > -1;
+    return this.answer && this.answer.indexOf(choice) > -1;
 };
 
 module.exports = mongoose.model('Response', ResponseSchema);
