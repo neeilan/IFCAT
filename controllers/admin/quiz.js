@@ -1,6 +1,5 @@
 const _ = require('lodash'),
     async = require('async'),
-    config = require('../../lib/config'),
     mongoose = require('mongoose'),
     models = require('../../models');
 // Retrieve course

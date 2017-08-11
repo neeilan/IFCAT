@@ -1,6 +1,5 @@
 const _ = require('lodash'),
     async = require('async'),
-    config = require('../../lib/config'),
     csv = require('csv'),
     models = require('../../models');
 // Retrieve group responses

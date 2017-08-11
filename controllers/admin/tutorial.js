@@ -1,6 +1,5 @@
 var _ = require('lodash'),
     async = require('async'),
-    config = require('../../lib/config'),
     models = require('../../models');
 // Retrieve tutorial
 exports.getTutorialByParam = (req, res, next, id) => {

@@ -1,5 +1,4 @@
-const config = require('../../lib/config'),
-    models = require('../../models');
+const models = require('../../models');
 // Retrieve file
 exports.getFileByParam = (req, res, next, id) => {
     models.File.findById(id, (err, file) => {

@@ -1,6 +1,5 @@
 const _ = require('lodash'),
     async = require('async'),
-    config = require('../../lib/config'),
     models = require('../../models');
 //
 exports.getUserByParam = (req, res, next, id) => {
