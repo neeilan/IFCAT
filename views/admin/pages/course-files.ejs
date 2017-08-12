@@ -30,12 +30,12 @@
             <tr>
                 <td><input type="checkbox" name="files[]" value="<%= file.id %>"></td>
                 <td>
-                    <a href="/upl/<%= course._id %>/<%= file.name %>" target="_preview"><%= file.name %></a>
+                    <a href="/uploads/<%= course._id %>/<%= file.name %>" target="_preview"><%= file.name %></a>
                 <% if (file.isImage()) { %>
-                    <img src="/upl/<%= course._id %>/<%= file.name %>" class="preview" style="display: none">
+                    <img src="/uploads/<%= course._id %>/<%= file.name %>" class="preview" style="display: none">
                 <% } else if (file.isAudio()) { %>
                     <audio controls class="preview" style="display: none">
-                        <source src="/upl/<%= course._id %>/<%= file.name %>" type="<%= file.type %>">
+                        <source src="/uploads/<%= course._id %>/<%= file.name %>" type="<%= file.type %>">
                     </audio>
                 <% } %>
                 </td>

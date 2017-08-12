@@ -14,7 +14,7 @@ exports.getFileByParam = (req, res, next, id) => {
 exports.getFileLinkById = (req,res) => {
     models.Course.findOne({ files: req.params.id }, course => {
         models.File.findById(req.params.id, file => {
-            res.redirect(`/upl/${course._id}/${file.name}`);
+            res.redirect(`/uploads/${course._id}/${file.name}`);
         });
     });
 };

@@ -1,4 +1,4 @@
-const _ = require('../lib/lodash.mixin'),
+const _ = require('../utils/lodash.mixin'),
     async = require('async'),
     mongoose = require('mongoose'),
     url = require('url');

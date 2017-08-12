@@ -22,14 +22,14 @@
                 <div id="attachment" class="collapse">
                 <% _.each(question.files, function (file) { %>
                     <% if (file.isImage()) { %>
-                        <br><img class="attachedImg" src="/upl/<%- course.id %>/<%- file.name %>">
-                        <br><a href="/upl/<%- course.id %>/<%- file.name %>" target="_blank"> Direct link</a>
+                        <br><img class="attachedImg" src="/uploads/<%- course.id %>/<%- file.name %>">
+                        <br><a href="/uploads/<%- course.id %>/<%- file.name %>" target="_blank"> Direct link</a>
                     <% } else if (file.isAudio()) { %>
-                        <br><audio controls><source src="/upl/<%- course.id %>/<%- file.name %>" 
+                        <br><audio controls><source src="/uploads/<%- course.id %>/<%- file.name %>" 
                             type="<%- file.type %>">Your browser does not support the audio element.</audio>
-                        <br><a href="/upl/<%- course.id %>/<%- file.name %>" target="_blank"> Direct link</a>
+                        <br><a href="/uploads/<%- course.id %>/<%- file.name %>" target="_blank"> Direct link</a>
                     <% } else { %>
-                        <br><a href="/upl/<%- course.id %>/<%- file.name %>" target="_blank"><%- file.name %></a>
+                        <br><a href="/uploads/<%- course.id %>/<%- file.name %>" target="_blank"><%- file.name %></a>
                     <% } %>
                 <% }) %>
                 <% _.each(question.links, function (link) { %>

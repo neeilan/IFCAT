@@ -243,7 +243,7 @@ function renderQuestion(quiz, n) {
     if (quiz.questions[n].files.length || quiz.questions[n].links.length) {
         quiz.questions[n].files.forEach(function(file) {
             var courseId = url.slice(url.indexOf('/courses/') + 9, url.indexOf('/quizzes'));
-            var fileUrl = '/upl/' + courseId + '/' + file.name;
+            var fileUrl = '/uploads/' + courseId + '/' + file.name;
             if (file.type.includes('image')) {
                 $('#attachment').append('<img class="attachedImg" src="' + fileUrl + '"/> <br/>\
             <a target="_blank" href="' + fileUrl + '"> Direct link</a><br/>')

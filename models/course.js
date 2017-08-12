@@ -1,5 +1,5 @@
 const async = require('async'),
-    config = require('../lib/config'),
+    config = require('../utils/config'),
     fs = require('fs-extra'),
     mongoose = require('mongoose');
 const CourseSchema = new mongoose.Schema({

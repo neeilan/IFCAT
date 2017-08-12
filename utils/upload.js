@@ -6,7 +6,7 @@ const config = require('./config'),
 exports.any = multer({ 
     storage: multer.diskStorage({
         destination: (req, file, done) => {
-            const dir = path.resolve(`${config.uploadPath}/${req.params.course}`);
+            const dir = path.join(__dirname, '..', config.upload.path, req.params.course);
             // create course directory if it does not already exist
             fs.mkdirs(dir, err => {
                 if (err)
@@ -15,9 +15,10 @@ exports.any = multer({
             });
         },
         filename: (req, file, done) => {
-            const dir = path.resolve(`${config.uploadPath}/${req.params.course}`),
+            const dir = path.join(__dirname, '..', config.upload.path, req.params.course),
                 extname = path.extname(file.originalname),
                 basename = path.basename(file.originalname, extname);
+
             let i = 1;
             fs.readdir(dir, (err, filenames) => {
                 if (err)

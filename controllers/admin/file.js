@@ -1,5 +1,5 @@
 const async = require('async'),
-    config = require('../../lib/config'),
+    config = require('../../utils/config'),
     fs = require('fs-extra'),
     models = require('../../models'),
     mongoose = require('mongoose'),
@@ -39,7 +39,7 @@ exports.addFiles = (req, res, next) => {
 };
 // Delete specific files from course
 exports.deleteFiles = (req, res, next) => {
-    let dir = `${config.uploadPath}/${req.course.id}`;
+    let dir = path.join(__dirname, '../..', config.upload.path, req.course.id);
     async.eachSeries(req.body.files, (id, done) => {
         async.waterfall([
             function (done) {
@@ -56,7 +56,7 @@ exports.deleteFiles = (req, res, next) => {
                 });
             },
             function (file, done) {
-                let filename = path.resolve(`${dir}/${file.name}`);
+                let filename = path.resolve(dir, file.name);
                 fs.stat(filename, (err, stats) => {
                     if (err && err.code === 'ENOENT')
                         return done();

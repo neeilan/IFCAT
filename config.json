@@ -1,0 +1,36 @@
+{
+  "production": {
+    "database": {
+      "url": "mongodb://selvali2:selvali2@localhost:27017/IQC"
+    },
+    "session": {
+      "secret": "thisismysecret"
+    },
+    "auth0": {
+      "domain": "uteachiqc.auth0.com",
+      "clientId": "G2iMUTLxNL8kDGPxZxSwQafhMPeEgBao",
+      "clientSecret": "xCqS5e5W2qshO4LlYQIJXWrNfGSqpJ5Y4glJ-3QHsFkrBZp1crNKcdvWnZU8bJTr",
+      "callbackUrl": "http://142.1.97.144:8080/login/callback"
+    },
+    "upload": {
+      "path": "/public/uploads"
+    }
+  },
+  "development": {
+    "database": {
+      "url": "mongodb://localhost:27017/IQC"
+    },
+    "session": {
+      "secret": "thisismysecret"
+    },
+    "auth0": {
+      "domain": "uteachiqc.auth0.com",
+      "clientId": "G2iMUTLxNL8kDGPxZxSwQafhMPeEgBao",
+      "clientSecret": "xCqS5e5W2qshO4LlYQIJXWrNfGSqpJ5Y4glJ-3QHsFkrBZp1crNKcdvWnZU8bJTr",
+      "callbackUrl": "http://localhost:8080/login/callback"
+    },
+    "upload": {
+      "path": "/public/uploads"
+    }
+  }
+}

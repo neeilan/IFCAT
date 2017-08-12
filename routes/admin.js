@@ -1,9 +1,9 @@
 const _ = require('lodash'),
     controllers = require('../controllers/admin'),
     passport = require('passport'),
-    upload = require('../lib/upload'),
-    mongoose = require('mongoose'),
-    logger = require('../lib/logger');
+    upload = require('../utils/upload'),
+    mongoose = require('mongoose');/*,
+    logger = require('../utils/logger');*/
 
 let router = require('express').Router();
 
@@ -118,19 +118,19 @@ router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz/marks', controllers
 router.post('/courses/:course/marks', controllers.Response.getMarksByCourse);
 router.get('/courses/:course/students/:student/marks', controllers.Response.getMarksByStudent);
 
-router.use((err, req, res, next) => {
-    // ignore validation errors
-    if (err instanceof mongoose.Error.ValidationError) {
-        req.flash('error', 'An error occurred while trying to perform operation.');
-        return res.redirect('back');
-    }
-    // @todo: include more info
-    logger.error('%s', err.message);
-    // handle AJAX request with 'Bad Request'
-    if (req.xhr) {
-        return res.status(400).send('An error occurred while trying to perform operation.');
-    }
-    next(err);
-});
+// router.use((err, req, res, next) => {
+//     // ignore validation errors
+//     if (err instanceof mongoose.Error.ValidationError) {
+//         req.flash('error', 'An error occurred while trying to perform operation.');
+//         return res.redirect('back');
+//     }
+//     // @todo: include more info
+//     logger.error('%s', err.message);
+//     // handle AJAX request with 'Bad Request'
+//     if (req.xhr) {
+//         return res.status(400).send('An error occurred while trying to perform operation.');
+//     }
+//     next(err);
+// });
 
 module.exports = router;

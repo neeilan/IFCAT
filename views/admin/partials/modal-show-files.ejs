@@ -12,12 +12,12 @@
                         <li class="list-group-item<%= question.files.indexOf(file.id) > -1 ? ' active' : '' %>">
                             <input type="checkbox" name="files[]" value="<%= file.id %>"<%=
                                 question.files.indexOf(file.id) > -1 ? 'checked' : '' %>> 
-                            <a href="/upl/<%= course.id %>/<%= file.name %>" target="_preview"><%= file.name %></a>
+                            <a href="/uploads/<%= course.id %>/<%= file.name %>" target="_preview"><%= file.name %></a>
                         <% if (file.isImage()) { %>
-                            <img src="/upl/<%= course.id %>/<%= file.name %>" class="img-responsive preview" style="display: none">
+                            <img src="/uploads/<%= course.id %>/<%= file.name %>" class="img-responsive preview" style="display: none">
                         <% } else if (file.isAudio()) { %>
                             <audio controls class="preview" style="display: none">
-                                <source src="/upl/<%= course.id %>/<%= file.name %>" type="<%= file.type %>">
+                                <source src="/uploads/<%= course.id %>/<%= file.name %>" type="<%= file.type %>">
                             </audio>
                         <% } %>
                         </li>

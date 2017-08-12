@@ -1,4 +1,4 @@
-const config = require('../../lib/config');
+const config = require('../../utils/config');
 // Retrieve login form
 exports.getLogin = (req, res) => {
     if (req.user)

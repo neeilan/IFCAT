@@ -123,7 +123,7 @@ export default class Question extends React.Component {
 		{
 			this.props.questionRef.files.forEach(function(file){
 				var courseId = url.slice(url.indexOf('/courses/') + 9, url.indexOf('/quizzes'));
-				var fileUrl = '/upl/' + courseId + '/' + file.name;
+				var fileUrl = '/uploads/' + courseId + '/' + file.name;
 				if (file.type.includes('image')) {
 					attachments.push(
 						<div>
