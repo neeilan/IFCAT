@@ -4,8 +4,10 @@ var _ = require('lodash'),
 // Retrieve tutorial
 exports.getTutorialByParam = (req, res, next, id) => {
     models.Tutorial.findById(id, (err, tutorial) => {
-        if (err) return next(err);
-        if (!tutorial) return next(new Error('No tutorial is found.'));
+        if (err)
+            return next(err);
+        if (!tutorial)
+            return next(new Error('No tutorial is found.'));
         req.tutorial = tutorial;
         next();
     });
@@ -15,7 +17,8 @@ exports.getTutorials = (req, res, next) => {
     models.Tutorial.find({ 
         _id: { $in: req.course.tutorials }
     }).populate('teachingAssistants').exec((err, tutorials) => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         res.render('admin/pages/course-tutorials', {
             bodyClass: 'tutorials-page',
             title: 'Tutorials',
@@ -26,27 +29,28 @@ exports.getTutorials = (req, res, next) => {
 };
 // Add multiple tutorials for course
 exports.addTutorials = (req, res, next) => {
-    let len = Math.abs(_.toInteger(req.body.len)),
-        start = Math.abs(_.toInteger(req.body.start)),
-        range = _.range(start, len + start);
-    models.Tutorial.find({ _id: { $in: req.course.tutorials }}, 'number', (err, tutorials) => {
-        // get list of tutorial numbers
-        let numbers = tutorials.map(tutorial => _.toInteger(tutorial.number));
-        // add new tutorials
-        async.eachSeries(range, (n, done) => {
-            // check whether number has not already been processed
-            if (numbers.indexOf(n) > -1)
-                return done();
-            // check whether tutorial has already been
-            models.Tutorial.create({ number: n }, (err, tutorial) => {
-                if (err) return done(err);
-                req.course.update({ $addToSet: { tutorials: tutorial.id }}, done);
-            });
-        }, err => {
-            if (err) return next(err);
-            req.flash('success', 'List of tutorials has been updated.');
-            res.redirect(`/admin/courses/${req.course.id}/tutorials`);
-        });
+    let start = Math.abs(_.toInteger(req.body.start)),
+        end = Math.abs(_.toInteger(req.body.end)),
+        range = _.range(start, end + 1);
+    async.waterfall([
+        function (done) {
+            // find old numbers
+            models.Tutorial.distinct('number', { _id: { $in: req.course.tutorials }}, done);
+        },
+        function (numbers, done) {
+            // filter and create new numbers
+            _.pullAll(range, numbers.map(Number));
+            range = _.map(range, number => { return { number: number }});
+            models.Tutorial.create(range, done);
+        },
+        function (tutorials, done) {
+            req.course.update({ $push: { tutorials: { $each: tutorials }}}, done);
+        }
+    ], err => {
+        if (err)
+            return next(err);
+        req.flash('success', 'List of tutorials has been updated.');
+        res.redirect(`/admin/courses/${req.course._id}/tutorials`);
     });
 };
 // Retrieve specific tutorial for tutorial

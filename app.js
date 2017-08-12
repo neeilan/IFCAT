@@ -46,6 +46,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 app.use(cookieParser());
 
 // database
+mongoose.Promise = global.Promise;
 mongoose.connect(config.database.url, { useMongoClient: true });
 //mongoose.set('debug', true);
 
