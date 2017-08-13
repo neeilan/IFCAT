@@ -1,0 +1,48 @@
+<div class="modal fade" id="modal-edit-tutorials-quizzes" tabindex="-1" style="display:none">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit quizzes</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">Allocate members by</label>
+                    <div class="col-xs-7">
+                        <select name="allocateMembers" class="form-control">
+                            <option value="automatically">automatically assigning users to groups as they sign in</option>
+                            <option value="self-selection">allowing users to assign themselves to groups as they sign in</option> 
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">Set group size</label>
+                    <div class="col-xs-4">
+                        <input type="number" name="maxMembersPerGroup" value="1" min="1" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">Publish quizzes?</label>
+                    <div class="col-xs-4">
+                        <input type="checkbox" value="1" class="bootstrap-switch" name="published">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">Activate quizzes?</label>
+                    <div class="col-xs-4">
+                        <input type="checkbox" value="1" class="bootstrap-switch" name="active">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-4 control-label">Archive quizzes?</label>
+                    <div class="col-xs-4">
+                        <input type="checkbox" value="1" class="bootstrap-switch" name="archived">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-sm" formaction="/admin/courses/<%= course._id %>/tutorials-quizzes?_method=patch">Update Selected</button>
+            </div>
+        </div>
+    </div>
+</div>

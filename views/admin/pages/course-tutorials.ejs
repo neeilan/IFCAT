@@ -13,26 +13,24 @@
     <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#modal-add-tutorials"><span class="glyphicon glyphicon-plus"></span> Add Tutorials</button>
 </div>
 
-<table class="table table-hover">
+<table class="table table-hover table-nofluid">
     <thead>
         <tr>
-            <th style="width: 100px">Tutorial</th>
-            <th>TA</th>
-            <th class="text-center"># of students</th>
+            <th class="number">Tutorial</th>
+            <th>Teaching Assistants</th>
+            <th class="students"># of students</th>
             <th class="actions"></th>
         </tr>
     </thead>
     <tbody>
     <% if (_.isEmpty(tutorials)) { %>
-        <tr>
-            <td colspan="4">No tutorials have been added yet.</td>
-        </tr>
+        <tr><td colspan="4">No tutorials have been added yet.</td></tr>
     <% } else { %>
         <% _.each(tutorials, tutorial => { %>
             <tr>
-                <td>TUT <%= tutorial.number %></td>
-                <td><%- _.map(tutorial.teachingAssistants, ta => ta.name.full).join('<br>') %></td>
-                <td class="text-center"><%= tutorial.students.length %></td>
+                <td class="number"><%= tutorial.number %></td>
+                <td><%- _.map(tutorial.teachingAssistants, ta => ta.name.full).join(', ') %></td>
+                <td class="students"><%= tutorial.students.length %></td>
                 <td>
                     <div class="dropdown">
                         <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">Actions<span class="caret"></span></button>

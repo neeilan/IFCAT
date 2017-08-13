@@ -4,18 +4,21 @@ const _ = require('lodash'),
 //
 exports.getUserByParam = (req, res, next, id) => {
     models.User.findById(id, (err, user) => {
-        if (err) return next(err);
-        if (!user) return next(new Error('No user is found.'));
+        if (err)
+            return next(err);
+        if (!user)
+            return next(new Error('No user is found.'));
         req.us3r = user; // careful: req.user is used by passport
         next();
     });
 };
 // Retrieve login form
 exports.getLogin = (req, res, next) => {
-    if (req.user) return res.redirect('/admin/courses');
-    res.render('admin/pages/login', { 
+    if (req.user)
+        return res.redirect('/admin/courses');
+    res.render('admin/pages/login', {
         bodyClass: 'login-page',
-        title: 'Login' 
+        title: 'Login'
     });
 };
 // Logout user
@@ -34,7 +37,8 @@ exports.getUsers = (req, res, next) => {
         perPage: perPage,
         sort: sort
     }, (err, users, count, pages) => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         res.render('admin/pages/users', {
             bodyClass: 'users-page',
             title: 'Users',
@@ -52,15 +56,16 @@ exports.getUsers = (req, res, next) => {
 exports.getUser = (req, res, next) => {
     let user = req.us3r || new models.User();
     res.render('admin/pages/user', {
-        title: user.isNew ? 'Add New User' : 'Edit User', 
-        us3r: user 
+        title: user.isNew ? 'Add New User' : 'Edit User',
+        us3r: user
     });
 };
 // Add new user
 exports.addUser = (req, res, next) => {
     let user = new models.User(req.body);
     user.save(err => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         req.flash('success', 'User <b>%s</b> has been created.', user.name.full);
         res.redirect('/admin/users');
     });
@@ -68,7 +73,8 @@ exports.addUser = (req, res, next) => {
 // Update specific user
 exports.editUser = (req, res, next) => {
     req.us3r.set(req.body).save(err => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         req.flash('success', 'User <b>%s</b> has been updated.', req.us3r.name.full);
         res.redirect('back');
     });
@@ -76,7 +82,8 @@ exports.editUser = (req, res, next) => {
 // Delete specific user
 exports.deleteUser = (req, res, next) => {
     req.us3r.remove(err => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         req.flash('success', 'User <b>%s</b> has been deleted.', req.us3r.name.full);
         res.sendStatus(200);
     });
@@ -89,7 +96,8 @@ exports.install = (req, res, next) => {
         },
         function (user, done) {
             // create admin if they don't exist
-            if (!user) user = new models.User();
+            if (!user)
+                user = new models.User();
             // update admin
             user.set({
                 name: { first: 'Admin' },
@@ -98,7 +106,8 @@ exports.install = (req, res, next) => {
             }).save(done);
         }
     ], err => {
-       if (err) return next(err);
-       res.send('Sweet Christmas.');
+        if (err)
+            return next(err);
+        res.send('Sweet Christmas.');
     });
 };

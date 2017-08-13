@@ -1,10 +1,5 @@
 $(function () {
-    
-    bootbox.setDefaults({
-        onEscape: true,
-        size: 'small'
-    });
-    
+
     // set default AJAX options
     $.ajaxSetup({ cache: false });
 
@@ -41,6 +36,12 @@ $(function () {
     if (tab) {
         $('a[href="' + tab + '"]').tab('show');
     }
+
+    // set default bootbox options
+    bootbox.setDefaults({
+        onEscape: true,
+        size: 'small'
+    });
 
     // small plugin for creating confirm dialogs on the fly
     // @usage: $.deletebox(options)

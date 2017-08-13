@@ -100,10 +100,10 @@ router.post('/courses/:course/students', controllers.Student.addStudents);
 router.patch('/courses/:course/students', controllers.Student.editStudents);
 router.delete('/courses/:course/students', controllers.Student.deleteStudents);
 
-router.get('/courses/:course/tutorials-quizzes', controllers.TutorialQuiz.getTutorialQuizzes);
-router.patch('/courses/:course/tutorials-quizzes', controllers.TutorialQuiz.editTutorialQuizzes);
+router.get('/courses/:course/tutorials-quizzes', controllers.TutorialQuiz.getTutorialsQuizzes);
+router.patch('/courses/:course/tutorials-quizzes', controllers.TutorialQuiz.editTutorialsQuizzes);
 router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz', controllers.TutorialQuiz.getTutorialQuiz);
-router.patch('/courses/:course/tutorials-quizzes/:tutorialQuiz/settings', controllers.TutorialQuiz.editTutorialQuizSettings);
+router.patch('/courses/:course/tutorials-quizzes/:tutorialQuiz', controllers.TutorialQuiz.editTutorialQuiz);
 router.patch('/courses/:course/tutorials-quizzes/:tutorialQuiz/groups', controllers.Group.saveGroups);
 router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz/groups/generate', controllers.Group.generateGroups);
 

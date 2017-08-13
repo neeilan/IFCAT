@@ -1,17 +1,6 @@
 $(function () {
     var body = $(document.body);
 
-    if (body.hasClass('tutorial-quizzes-page')) {
-        // update selected tutorial quizzes
-        $('.nav-actions a:not(#btn-export)').click(function (e) {
-            e.preventDefault();
-            var data = $(form).serializeArray().concat([{ name: 'op', value: this.innerHTML.toLowerCase() }]);
-            $.patch(this.href, data, function () {
-                window.location.reload(true);
-            });
-        });
-    }
-
     if (body.hasClass('tutorial-quiz-page')) {
         var tbody = $('tbody');
         // create buttons

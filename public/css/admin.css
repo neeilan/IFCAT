@@ -33,29 +33,10 @@ pre code {
     font-weight: bold;
 }
 /**
- * Labels
+ * Breadcrumbs
  */
-.label {
-    display: inline-block;
-    font-size: 100%;
-}
-/**
- * Forms
- */
-textarea.form-control {
-    max-width: 100%;
-}
-input[type=checkbox][data-label] {
-    display: none;
-}
-.form-group .control-label {
-    font-size: 14px;
-}
-.form-group.required .control-label:before {
-    color: red;
-    content: "*";
-    font-size: 120%;
-    margin-right: 2px;
+.breadcrumb > li {
+    font-size: 12px;
 }
 /**
  * Buttons
@@ -103,27 +84,6 @@ input[type=checkbox][data-label] {
 .btn-file {
     display: inline-block;
 }
-/* .dim-wrap {
-    position: relative;
-}
-.dim-wrap .dimmer {
-    background: rgba(0,0,0,0.2);
-    cursor: default;
-    height: 100%;
-    left: 0;
-    position: absolute;
-    top: 0;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    z-index: 10; 
-}
-.dim-wrap.on .dimmer {
-    width: 100%;
-} */
 /**
  * Dropdowns
  */
@@ -145,16 +105,40 @@ input[type=checkbox][data-label] {
     overflow-x: auto;
 }
 /**
- * Breadcrumbs
+ * Labels
  */
-.breadcrumb > li {
-    font-size: 12px;
+.label {
+    display: inline-block;
+    font-size: 100%;
+}
+/**
+ * Forms
+ */
+textarea.form-control {
+    max-width: 100%;
+}
+input[type=checkbox][data-label] {
+    display: none;
+}
+.form-group .control-label {
+    font-size: 14px;
+}
+.form-group.required .control-label:before {
+    color: red;
+    content: "*";
+    font-size: 120%;
+    margin-right: 2px;
 }
 /**
  * Tables
  */
+.table.table-nofluid {
+    min-width: 700px;
+    width: auto;
+}
 .table > thead > tr > th, .table > tbody > tr > td {
     font-size: 13px;
+    vertical-align: middle;
 }
 .table > thead:first-child > tr > th {
     border: 0;
@@ -164,6 +148,12 @@ input[type=checkbox][data-label] {
 }
 .table > tfoot > tr > th {
     border-top: 2px solid #ddd;
+}
+.table th.cb, .table td.cb {
+    width: 10px;
+}
+.table th.createdAt, .table td.createdAt {
+    width: 137px;
 }
 .table th.actions, .table td.actions {
     width: 105px;
@@ -267,6 +257,18 @@ tfoot .pagination {
     display: block;
     margin: 0 auto;
 }
+
+/**
+ * Tutorials page
+ */
+.tutorials-page th.number, .tutorials-page td.number {
+    text-align: center;
+    width: 80px;
+}
+.tutorials-page th.students, .tutorials-page td.students {
+    text-align: center;
+    width: 115px;
+}
 /**
  * Questions page
  */
@@ -319,9 +321,7 @@ tfoot .pagination {
 .questions-page td.votes .down {
     color: #A00;
 }
-.questions-page th.createdAt, .questions-page td.createdAt {
-    width: 137px;
-}
+
 /**
  * Question form page
  */
@@ -385,8 +385,18 @@ tfoot .pagination {
     margin-left: auto;
     margin-right: auto;
 }
+
 /**
- * Groups
+ * Tutorials-Quizzes page
+ */
+.tutorials-quizzes-page th.tutorial, .tutorials-quizzes-page td.tutorial, 
+.tutorials-quizzes-page th.published, .tutorials-quizzes-page td.published, 
+.tutorials-quizzes-page th.active-1, .tutorials-quizzes-page td.active-1,
+.tutorials-quizzes-page th.archived, .tutorials-quizzes-page td.archived {
+    text-align: center;
+}
+/**
+ * Groups tab
  */
 #groups table {
     border-bottom: 1px solid #ddd;
@@ -449,8 +459,6 @@ tfoot .pagination {
 .responses-page #info li:last-child:after {
     content: "";
 }
-
-
 
 
 .responses-page .panel {
@@ -543,3 +551,28 @@ tfoot .pagination {
     float: right;
     margin-left: 7px;
 }
+
+
+
+
+/* .dim-wrap {
+    position: relative;
+}
+.dim-wrap .dimmer {
+    background: rgba(0,0,0,0.2);
+    cursor: default;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    z-index: 10; 
+}
+.dim-wrap.on .dimmer {
+    width: 100%;
+} */
