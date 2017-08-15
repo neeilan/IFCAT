@@ -6,7 +6,12 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="col-xs-4 control-label">Allocate members by</label>
+                    <div class="col-xs-4">
+                        <label class="control-label pull-right">Allocate members by</label>
+                        <div class="checkbox pull-right">
+                            <label><input type="checkbox" name="update[]" value="allocateMembers"></label>
+                        </div>
+                    </div>
                     <div class="col-xs-7">
                         <select name="allocateMembers" class="form-control">
                             <option value="automatically">automatically assigning users to groups as they sign in</option>
@@ -15,25 +20,45 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-xs-4 control-label">Set group size</label>
+                    <div class="col-xs-4">
+                        <label class="control-label pull-right">Set group size</label>
+                        <div class="checkbox pull-right">
+                            <label><input type="checkbox" name="update[]" value="maxMembersPerGroup"></label>
+                        </div>
+                    </div>
                     <div class="col-xs-4">
                         <input type="number" name="maxMembersPerGroup" value="1" min="1" class="form-control">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-xs-4 control-label">Publish quizzes?</label>
+                    <div class="col-xs-4">
+                        <label class="control-label pull-right">Publish quizzes?</label>
+                        <div class="checkbox pull-right">
+                            <label><input type="checkbox" name="update[]" value="published"></label>
+                        </div>
+                    </div>
                     <div class="col-xs-4">
                         <input type="checkbox" value="1" class="bootstrap-switch" name="published">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-xs-4 control-label">Activate quizzes?</label>
+                    <div class="col-xs-4">
+                        <label class="control-label pull-right">Activate quizzes?</label>
+                        <div class="checkbox pull-right">
+                            <label><input type="checkbox" name="update[]" value="active"></label>
+                        </div>
+                    </div>
                     <div class="col-xs-4">
                         <input type="checkbox" value="1" class="bootstrap-switch" name="active">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-xs-4 control-label">Archive quizzes?</label>
+                    <div class="col-xs-4">
+                        <label class="control-label pull-right">Archive quizzes?</label>
+                        <div class="checkbox pull-right">
+                            <label><input type="checkbox" name="update[]" value="archived"></label>
+                        </div>
+                    </div>
                     <div class="col-xs-4">
                         <input type="checkbox" value="1" class="bootstrap-switch" name="archived">
                     </div>

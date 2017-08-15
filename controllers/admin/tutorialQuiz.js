@@ -44,13 +44,10 @@ exports.getTutorialsQuizzes = (req, res, next) => {
 // Edit quizzes 
 exports.editTutorialsQuizzes = (req, res, next) => {
     let items = req.body.tutorialsQuizzes || [];
-    let update = {
-        allocateMembers: req.body.allocateMembers,
-        maxMembersPerGroup: req.body.maxMembersPerGroup,
-        published: !!req.body.published,
-        active: !!req.body.active,
-        archived: !!req.body.archived
-    };
+    let update = _.reduce(req.body.update, (obj, field) => {
+        obj[field] = /^(published|active|archived)$/.test(field) ? !!req.body[field] : req.body[field];
+        return obj;
+    }, {});
     // update each tutorial-quiz
     async.eachSeries(items, (id, done) => {
         models.TutorialQuiz.findByIdAndUpdate(id, update, { new: true }, (err, tutorialQuiz) => {
