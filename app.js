@@ -10,7 +10,8 @@ const lodash = require('./utils/lodash.mixin'),
     morgan = require('morgan'),
     session = require('express-session'),
     MongoStore = require('connect-mongo')(session),
-    passportSocketIo = require('passport.socketio');
+    passportSocketIo = require('passport.socketio'),
+    logger = require('./utils/logger');
 
 const app = express(),
     http = require('http').Server(app),
@@ -86,6 +87,12 @@ app.use('/admin', routes.admin);
 
 // error handling
 app.use((err, req, res, next) => {
+    if (app.get('env') !== 'development') {
+        //logger.error(err.message);
+        delete err.stack;
+    }
+    if (req.xhr)
+        return res.status(err.status || 500).json(err);
     res.status(err.status || 500).render('error', { error: err });
 });
 

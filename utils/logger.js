@@ -1,4 +1,15 @@
-const winston = require('winston');
+const config = require('./config'),
+    fs = require('fs-extra'),
+    moment = require('moment'),
+    path = require('path'),
+    winston = require('winston');
+
+const dir = path.join(__dirname, '..', config.log.path);
+// create the log directory if it does not exist
+fs.mkdirsSync(dir);
+
+const date = moment().format('YYYY-MM-DD');
+const time = () => moment().format('h:mm:ss A');
 
 winston.emitErrs = true;
 
@@ -12,18 +23,11 @@ const logger = new winston.Logger({
         }),
         new winston.transports.File({
             level: 'error',
-            filename: './logs/error.log',
-            handleExceptions: true,
-            json: true,
-            maxsize: 5242880, //5MB
-            maxFiles: 5,
-            colorize: false
+            filename: `${dir}/${date}.log`,
+            timestamp: time
         })
     ],
     exitOnError: false
 });
 
 module.exports = logger;
-module.exports.stream = {
-    write: message => logger.info(message)
-};

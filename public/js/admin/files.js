@@ -5,7 +5,7 @@ $(function () {
         // Confirm and delete selected rows
         $('#btn-delete').click(function (e) {
             e.preventDefault();
-            var btn = this, inputs = $('tbody input[name^=files]:checked');
+            var btn = this, inputs = $('tbody input[name^=-files]:checked');
             if (inputs.length) {
                 $.deletebox({
                     title: 'Delete files',

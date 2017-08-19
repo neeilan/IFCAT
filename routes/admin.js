@@ -113,8 +113,6 @@ router.put('/courses/:course/tutorials-quizzes/:tutorialQuiz/groups/:group/respo
 
 router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz/marks', controllers.Response.getMarksByTutorialQuiz);
 
-// ugly routes begin here...
-
 router.post('/courses/:course/marks', controllers.Response.getMarksByCourse);
 router.get('/courses/:course/students/:student/marks', controllers.Response.getMarksByStudent);
 
@@ -126,11 +124,6 @@ router.get('/courses/:course/students/:student/marks', controllers.Response.getM
 //     }
 //     // @todo: include more info
 //     logger.error('%s', err.message);
-//     // handle AJAX request with 'Bad Request'
-//     if (req.xhr) {
-//         return res.status(400).send('An error occurred while trying to perform operation.');
-//     }
-//     next(err);
 // });
 
 module.exports = router;

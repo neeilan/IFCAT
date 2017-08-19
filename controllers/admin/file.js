@@ -42,7 +42,7 @@ exports.addFiles = (req, res, next) => {
 // Delete specific files from course
 exports.deleteFiles = (req, res, next) => {
     const dir = path.join(__dirname, '../..', config.upload.path, req.course.id);
-    async.eachSeries(req.body.files, (id, done) => {
+    async.eachSeries(req.body['-files'], (id, done) => {
         async.waterfall([
             function (done) {
                 models.File.findById(id, (err, file) => {
