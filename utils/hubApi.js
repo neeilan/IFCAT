@@ -7,9 +7,11 @@ function fetchAllUsers(cb) {
     
     fetch(baseUrl + '/users')
         .then(function(res) {
-            return res.json();
+            cb(null, res.json());
         })
-        .then(cb);
+        .catch(function(err) {
+            cb(err, null);
+        });
 }
 
 module.exports = {
