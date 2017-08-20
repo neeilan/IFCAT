@@ -4770,7 +4770,7 @@ var CodeOutputQuestion = function (_React$Component) {
                     this.props.question.code
                 ),
                 this.getOutputLines(),
-                this.getInputBox(true),
+                this.getInputBox(),
                 this.getCheckAnswerButton()
             );
         }
@@ -4793,10 +4793,7 @@ var CodeOutputQuestion = function (_React$Component) {
     }, {
         key: 'userInputsShouldRender',
         value: function userInputsShouldRender() {
-            // if (this.props.response) {
-            //     return !this.props.response.correct;
-            // }
-            return true;
+            return !(this.props.response && this.props.question.immediateFeedbackDisabled);
         }
     }, {
         key: 'getCheckAnswerButton',
@@ -4815,10 +4812,10 @@ var CodeOutputQuestion = function (_React$Component) {
         }
     }, {
         key: 'getInputBox',
-        value: function getInputBox(allowMultipleLines) {
+        value: function getInputBox() {
             if (!this.userInputsShouldRender()) return null;
 
-            if (allowMultipleLines) {
+            if (this.props.question.immediateFeedbackDisabled) {
                 return React.createElement(
                     'pre',
                     null,
@@ -10040,7 +10037,7 @@ var QuizApp = function (_React$Component) {
                     var attempts = llSummary[last].attempts;
                     var attemptsLeft = maxAttempts - attempts;
                     if (attempts < maxAttempts) {
-                        swal("Yikes!", 'Looks like you made a mistake somewhere...  You can try ' + attemptsLeft + '\n                      more time' + (attemptsLeft > 1 ? 's' : '') + ' before we reveal this line\'s answer', "error");
+                        swal("Yikes!", 'Looks like you\'ve made a mistake somewhere...  You can try ' + attemptsLeft + '\n                      more time' + (attemptsLeft > 1 ? 's' : '') + ' before we reveal this line\'s answer', "error");
                     }
                 }
             });

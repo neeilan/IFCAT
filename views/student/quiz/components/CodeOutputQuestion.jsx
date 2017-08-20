@@ -37,7 +37,7 @@ export default class CodeOutputQuestion extends React.Component
                     {this.props.question.code}
                 </pre>
                 {this.getOutputLines()}
-                {this.getInputBox(true)}
+                {this.getInputBox()}
                 {this.getCheckAnswerButton()}
 			</div>
 		);
@@ -61,10 +61,7 @@ export default class CodeOutputQuestion extends React.Component
     
     userInputsShouldRender()
     {
-        // if (this.props.response) {
-        //     return !this.props.response.correct;
-        // }
-        return true;
+        return !(this.props.response && this.props.question.immediateFeedbackDisabled);
     }
     
     getCheckAnswerButton()
@@ -82,12 +79,12 @@ export default class CodeOutputQuestion extends React.Component
             </button>);
     }
     
-    getInputBox(allowMultipleLines)
+    getInputBox()
     {
          if (!this.userInputsShouldRender())
             return null;  
         
-        if (allowMultipleLines) {
+        if (this.props.question.immediateFeedbackDisabled) {
             return (
                 <pre>
                 <textarea 

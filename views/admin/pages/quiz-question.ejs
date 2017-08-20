@@ -305,9 +305,16 @@
     </div>
 
     <div class="form-group" data-type="code tracing">
-        <label class="col-xs-7 col-sm-3 control-label">Maximum attempts per line</label>
+        <label class="col-xs-7 col-sm-3 control-label">Disable immediate feedback?</label>
+        <div class="col-xs-5 col-sm-2 col-md-2">
+            <input type="checkbox" name="immediateFeedbackDisabled" value="1" class="bootstrap-switch"<%= question.immediateFeedbackDisabled ? ' checked' : '' %>>
+        </div>
+    </div>
+
+    <div class="form-group" data-type="code tracing">
+        <label class="col-xs-7 col-sm-3 control-label">Attempts per line before revealing answer</label>
         <div class="col-xs-5 col-sm-2">
-            <input type="number" name="maxAttemptsPerLine" value="<%= question.maxAttemptsPerLine %>" min="1" class="form-control">
+            <input type="number" name="maxAttemptsPerLine" value="<%= question.maxAttemptsPerLine %>" placeholder="3" min="1" class="form-control">
         </div>
     </div>
 

@@ -190,7 +190,7 @@ exports.codeTracingAttempt = (socket, emitters) => (function(data) {
         .then(function(response) {
             var lineByLineSummary = buildCodeTracingAnswerSummary(question, response, data.answer);
             var numLinesCorrect = lineByLineSummary.reduce((acc, curr) => (acc + (curr.correct ? 1 : 0)), 0);
-            var questionComplete = (numLinesCorrect == question.answers.length);
+            var questionComplete = (numLinesCorrect == question.answers.length || question.immediateFeedbackDisabled);
             var revealedLines = question.answers.slice(0, numLinesCorrect);
 
             if (!response) {
@@ -200,7 +200,7 @@ exports.codeTracingAttempt = (socket, emitters) => (function(data) {
             }
             response.lineByLineSummary = lineByLineSummary;
             response.correct = questionComplete;
-            response.codeTracingAnswers = revealedLines;
+            response.codeTracingAnswers = question.immediateFeedbackDisabled ? question.answers : revealedLines;
             response.points = questionComplete ? calculateCTQPoints(lineByLineSummary, question) : calculateMaxPoints(question);
             return response.save();                      
 
@@ -273,8 +273,9 @@ function calculateCTQPoints(lineByLineSummary, question) {
     var points = 0;
     var totalAttempts = 0;
     lineByLineSummary.forEach(function(line){
+        var lineScoreLoss = question.immediateFeedbackDisabled ? 0 : (line.attempts - 1); 
         if (line.correct) {
-            points += Math.max(0, question.maxPointsPerLine - (line.attempts - 1));
+            points += Math.max(0, question.maxPointsPerLine - lineScoreLoss);
 
             totalAttempts += line.attempts;
         }
