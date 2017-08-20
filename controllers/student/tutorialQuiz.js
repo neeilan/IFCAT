@@ -180,14 +180,14 @@ exports.createGroup = (socket, emitters) => (function(data){
     });
 });
 
+
 exports.codeTracingAttempt = (socket, emitters) => (function(data) {
     models.Question.findById(data.questionId)
     .exec()
     .then(function(question) {
         models.Response.findOne({ group : data.groupId, question: data.questionId })
         .exec()
-        .then(function(response){
-
+        .then(function(response) {
             var lineByLineSummary = buildCodeTracingAnswerSummary(question, response, data.answer);
             var numLinesCorrect = lineByLineSummary.reduce((acc, curr) => (acc + (curr.correct ? 1 : 0)), 0);
             var questionComplete = (numLinesCorrect == question.answers.length);
@@ -209,6 +209,7 @@ exports.codeTracingAttempt = (socket, emitters) => (function(data) {
             emitters.emitToGroup(data.groupId, 'SYNC_RESPONSE', {
                 response: response,
                 questionId: data.questionId,
+                question : question,
                 groupId : data.groupId
             })
         })

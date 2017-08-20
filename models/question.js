@@ -22,6 +22,7 @@ const QuestionSchema = new mongoose.Schema({
     penalty: Number,
     submitter: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     approved: Boolean,
+    immediateFeedbackDisabled : Boolean,
     votes: {
         up: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
         down: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]

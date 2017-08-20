@@ -37,7 +37,7 @@ export default class CodeOutputQuestion extends React.Component
                     {this.props.question.code}
                 </pre>
                 {this.getOutputLines()}
-                {this.getInputBox()}
+                {this.getInputBox(true)}
                 {this.getCheckAnswerButton()}
 			</div>
 		);
@@ -49,7 +49,8 @@ export default class CodeOutputQuestion extends React.Component
         if (this.props.response && this.props.response.codeTracingAnswers) {
             existingOutput = this.props.response.codeTracingAnswers;
         }
-        this.props.checkInputCb(existingOutput.concat([this.state.enteredAnswer]), true);
+
+        this.props.checkInputCb(existingOutput.concat(this.state.enteredAnswer.split('\n')), true);
         this.setState({ enteredAnswer : '' });
     }
     
@@ -81,29 +82,51 @@ export default class CodeOutputQuestion extends React.Component
             </button>);
     }
     
-    getInputBox()
+    getInputBox(allowMultipleLines)
     {
          if (!this.userInputsShouldRender())
             return null;  
         
-        return (
-            <pre>
-            <input 
-                value = {this.state.enteredAnswer}
-                onChange = {this.userInputCb}
-                placeholder = "Enter the next line of output"
-                disabled = {!this.props.isDriver || (this.props.response && this.props.response.correct)}
-                type = "text"
-                style = {
-                    {
-                        width : '100%',
-                        border : 'none',
-                        padding : '5px',
-                        background : 'none'
+        if (allowMultipleLines) {
+            return (
+                <pre>
+                <textarea 
+                    value = {this.state.enteredAnswer}
+                    onChange = {this.userInputCb}
+                    placeholder = "Enter ALL the output lines here before submitting"
+                    disabled = {!this.props.isDriver || (this.props.response && this.props.response.correct)}
+                    type = "text"
+                    style = {
+                        {
+                            width : '100%',
+                            border : 'none',
+                            padding : '5px',
+                            background : 'none'
+                        }
                     }
-                }
-            />
-            </pre>);
+                />
+                </pre>);
+        }
+        else {
+            return (
+                <pre>
+                <input 
+                    value = {this.state.enteredAnswer}
+                    onChange = {this.userInputCb}
+                    placeholder = "Enter the next line of output"
+                    disabled = {!this.props.isDriver || (this.props.response && this.props.response.correct)}
+                    type = "text"
+                    style = {
+                        {
+                            width : '100%',
+                            border : 'none',
+                            padding : '5px',
+                            background : 'none'
+                        }
+                    }
+                />
+                </pre>);
+        }
     }
     
     getOutputLines()

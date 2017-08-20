@@ -198,13 +198,24 @@ export default class QuizApp extends React.Component {
         });
 
         socket.on('SYNC_RESPONSE', (data) => {
-            console.log('sync response');
-            console.log(data);
             var responses = this.state.responses;
             responses[data.questionId] = data.response;
             this.setState({
                 responses: responses
             });
+
+            var maxAttempts = data.question.maxAttemptsPerLine;
+            var llSummary = data.response.lineByLineSummary;
+            var last = (llSummary) ? llSummary.length - 1 : -1;
+
+            if (last > -1 && !llSummary[last].correct) {
+                var attempts = llSummary[last].attempts;
+                var attemptsLeft = maxAttempts - attempts;
+                if (attempts < maxAttempts) {
+                     swal("Yikes!", `Looks like you've made a mistake somewhere...  You can try ${attemptsLeft}
+                      more time${attemptsLeft > 1 ? 's' : ''} before we reveal this line's answer`, "error");
+                }
+            }
         });
         
         socket.on('FINISH_QUIZ', (data) => {
