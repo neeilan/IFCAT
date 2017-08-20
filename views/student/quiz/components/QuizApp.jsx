@@ -208,7 +208,7 @@ export default class QuizApp extends React.Component {
             var llSummary = data.response.lineByLineSummary;
             var last = (llSummary) ? llSummary.length - 1 : -1;
 
-            if (last > -1 && !llSummary[last].correct) {
+            if (!data.question.immediateFeedbackDisabled && last > -1 && !llSummary[last].correct) {
                 var attempts = llSummary[last].attempts;
                 var attemptsLeft = maxAttempts - attempts;
                 if (attempts < maxAttempts) {
@@ -236,8 +236,6 @@ export default class QuizApp extends React.Component {
         console.log(data);
         this.socket.emit(eventName, data);
     }
-
-
 
     selectQuestion(i) {
         this.setState({
