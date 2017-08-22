@@ -5,19 +5,15 @@ $(function () {
         // Confirm and delete selected rows
         $('#btn-delete').click(function (e) {
             e.preventDefault();
-            var btn = this, inputs = $('tbody input[name^=-files]:checked');
-            if (inputs.length) {
-                $.deletebox({
-                    title: 'Delete files',
-                    message: '<p>You are about to delete files <b>(' + inputs.length + ')</b> and all of their associations.</p>\
-                        <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
-                    callback: function () {
-                        $.delete(btn.href, inputs.serialize(), function () {
-                            window.location.reload(true);
-                        });
-                    }
-                })
-            }
+            var btn = $(this);
+            $.deletebox({
+                title: 'Delete files',
+                message: '<p>You are about to delete the selected files and all of their associations.</p>\
+                    <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
+                callback: function () {
+                    btn.closest('form').attr('action', btn.attr('href')).submit();
+                }
+            });
         });
         // Preview media file within a modal
         $('tbody > tr:has(.preview) a').click(function (e) {

@@ -85,7 +85,7 @@ exports.deleteUser = (req, res, next) => {
         if (err)
             return next(err);
         req.flash('success', 'User <b>%s</b> has been deleted.', req.us3r.name.full);
-        res.sendStatus(200);
+        res.redirect('back');
     });
 };
 // Reset administrator

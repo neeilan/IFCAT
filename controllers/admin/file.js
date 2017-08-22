@@ -78,6 +78,6 @@ exports.deleteFiles = (req, res, next) => {
         if (err)
             return next(err);
         req.flash('success', 'The files have been deleted.');
-        res.sendStatus(200);
+        res.redirect('back');
     });
 };

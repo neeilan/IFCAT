@@ -64,6 +64,6 @@ exports.deleteCourse = (req, res, next) => {
         if (err)
             return next(err);
         req.flash('success', 'Course <b>%s</b> has been deleted.', req.course.name);
-        res.sendStatus(200);
+        res.redirect('back');
     });
 };
