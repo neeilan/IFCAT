@@ -25,7 +25,8 @@ exports.getInstructorsBySearchQuery = (req, res, next) => {
         perPage: perPage,
         sort: 'name.first name.last'
     }, (err, users, count, pages) => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         res.render('admin/partials/course-instructors-search-results', { 
             course: req.course, 
             instructors: users,
@@ -44,7 +45,8 @@ exports.getInstructorsBySearchQuery = (req, res, next) => {
 exports.addInstructors = (req, res, next) => {
     let users = req.body.users || [];
     req.course.update({ $addToSet: { instructors: { $each: users }}}, err => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         req.flash('success', 'The list of instructors has been updated for the course.');
         res.redirect('back');
     });
@@ -53,7 +55,9 @@ exports.addInstructors = (req, res, next) => {
 exports.deleteInstructors = (req, res, next) => {
     let users = req.body['-users'] || [];
     req.course.update({ $pull: { instructors: { $in: users }}}, err => {
-        if (err) return next(err);
-        res.send('The list of instructors has been updated for the course.');
+        if (err)
+            return next(err);
+        req.flash('success', 'The list of instructors has been updated for the course.');
+        res.redirect('back');
     }); 
 };

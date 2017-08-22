@@ -61,13 +61,13 @@ passport.use(new Auth0Strategy({
 
     let UTORid = profile._json.user_metadata.UTORid ? profile._json.user_metadata.UTORid.trim().toLowerCase() : '';
 
-    models.User.findOne({ 'student.UTORid': UTORid }, (err, user) => {
+    models.User.findOne({ 'UTORid': UTORid }, (err, user) => {
         if (err) 
             return done(err);
         if (user) 
             return done(null, user);
         user = new models.User();
-        user.student.UTORid = UTORid;
+        user.UTORid = UTORid;
         user.name.first = profile._json.user_metadata.first_name;
         user.name.last = profile._json.user_metadata.last_name;
         user.oauth.id = profile._json.clientID;

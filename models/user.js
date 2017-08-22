@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema({
     local: {
         email: { 
             type: String,
+            trim: true,
             lowercase: true
         },
         password: {
@@ -19,7 +20,7 @@ const UserSchema = new mongoose.Schema({
         id: String,
         token: String,
     },
-    student: {
+    student: { // deprecated
         UTORid: {
             type: String,
             trim: true,
@@ -29,6 +30,15 @@ const UserSchema = new mongoose.Schema({
             type: String,
             trim: true
         }
+    },
+    UTORid: {
+        type: String,
+        trim: true,
+        lowercase: true
+    },
+    studentNumber: {
+        type: String,
+        trim: true
     },
     teachingPoints: {
         type: Number,

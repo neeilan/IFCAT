@@ -15,6 +15,7 @@ const QuestionSchema = new mongoose.Schema({
     caseSensitive: Boolean,
     maxPointsPerLine: { type: Number, default: 1 },
     maxAttemptsPerLine: { type: Number, default: 1 },
+    immediateFeedbackDisabled: Boolean,
     shuffleChoices: Boolean,
     useLaTeX: Boolean,
     points: Number,
@@ -22,7 +23,6 @@ const QuestionSchema = new mongoose.Schema({
     penalty: Number,
     submitter: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     approved: Boolean,
-    immediateFeedbackDisabled : Boolean,
     votes: {
         up: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
         down: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
@@ -96,8 +96,8 @@ QuestionSchema.methods.store = function (opts) {
     }
 
     if (opts._tags) {
-        _.each(opts._tags.trim().toLowerCase().split(/[,;]/g), tag => {
-            if (tag = tag.trim()) {
+        _.each(opts._tags.split(/[,;]/g), tag => {
+            if (tag = _.kebabCase(tag)) {
                 self.tags.addToSet(tag);
             }
         });
@@ -131,6 +131,7 @@ QuestionSchema.methods.store = function (opts) {
     } else if (self.isCodeTracing()) {
         self.answers = opts._answers.trim().split(/\r?\n/);
         self.points = self.maxPointsPerLine * self.answers.length + self.firstTryBonus;
+        self.immediateFeedbackDisabled = !!opts.immediateFeedbackDisabled;
     }
     return self;
 };

@@ -32,8 +32,8 @@
     <% } else { %>
         <% _.each(data, d => { %>
             <tr>
-                <td><%= d.member.student.UTORid %></td>
-                <td><%= d.member.student.number %></td>
+                <td><%= d.member.UTORid %></td>
+                <td><%= d.member.studentNumber %></td>
                 <td>
                     <a href="/admin/courses/<%= course._id %>/students/<%= d.member._id %>/marks"><%= `${d.member.name.first} ${d.member.name.last}` %></a>
                 </td>

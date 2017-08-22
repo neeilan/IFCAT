@@ -138,6 +138,7 @@ input[type=checkbox][data-label] {
 }
 .table > thead > tr > th, .table > tbody > tr > td {
     font-size: 13px;
+    min-height: 53.33px;
     vertical-align: middle;
 }
 .table > thead:first-child > tr > th {
@@ -150,7 +151,8 @@ input[type=checkbox][data-label] {
     border-top: 2px solid #ddd;
 }
 .table th.cb, .table td.cb {
-    width: 10px;
+    text-align: center;
+    width: 20px;
 }
 .table th.createdAt, .table td.createdAt {
     width: 137px;

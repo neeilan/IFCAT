@@ -5,8 +5,10 @@ const _ = require('lodash'),
 // Retrieve course
 exports.getQuizByParam = (req, res, next, id) => {
     models.Quiz.findById(id, (err, quiz) => {
-        if (err) return next(err);
-        if (!quiz) return next(new Error('No quiz is found.'));
+        if (err)
+            return next(err);
+        if (!quiz)
+            return next(new Error('No quiz is found.'));
         req.quiz = quiz;
         next();
     });
@@ -86,7 +88,8 @@ exports.copyQuiz = (req, res, next) => {
             req.course.update({ $addToSet: { quizzes: quiz }}, done)
         }
     ], err => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         req.flash('success', '<b>%s</b> has been added.', req.quiz.name);
         res.sendStatus(200);
     });
@@ -94,7 +97,8 @@ exports.copyQuiz = (req, res, next) => {
 // Delete quiz
 exports.deleteQuiz = (req, res, next) => {
     req.quiz.remove(err => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         req.flash('success', '<b>%s</b> has been deleted.', req.quiz.name);
         res.sendStatus(200);
     });

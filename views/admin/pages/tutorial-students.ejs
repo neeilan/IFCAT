@@ -28,8 +28,8 @@
         <% _.each(tutorial.students, function (student) { %>
             <tr>
                 <td><%= student.name.full %></td>
-                <td><%= student.student.UTORid %></td>
-                <td><%= student.student.number %></td>
+                <td><%= student.UTORid %></td>
+                <td><%= student.studentNumber %></td>
                 <th>
                     <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/students/<%= student.id %>/marks"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> View Marks</a>
                 </th>

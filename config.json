@@ -38,8 +38,8 @@
     "log": {
       "path": "/logs"
     },
-      "hub" : {
-      "domain" : "https://backend-projects-neeilan.c9users.io"
+    "hub": {
+      "domain": "https://backend-projects-neeilan.c9users.io"
     }
   }
 }

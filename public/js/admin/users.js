@@ -41,22 +41,5 @@ $(function () {
                 });
             }
         });
-
-        $('#btn-update').click(function (e) {
-            e.preventDefault();
-            $.patch(this.href, $(':not(.modal) input').serialize(), function () { 
-                window.location.reload(true);
-            });
-        });
-
-        $('#btn-delete').click(function (e) {
-            e.preventDefault();
-            var inputs = $(':not(.modal) input[name="-users\[\]"]:checked');
-            if (inputs.length) {
-                $.delete(this.href, inputs.serialize(), function () { 
-                    window.location.reload(true);
-                });
-            }
-        });
     }
 });

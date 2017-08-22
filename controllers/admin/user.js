@@ -111,3 +111,24 @@ exports.install = (req, res, next) => {
         res.send('Sweet Christmas.');
     });
 };
+// temporary
+exports.fixUsers = (req, res, next) => {
+    models.User.find({ 
+        //roles: { $in: ['student'] },
+        studentNumber: { $exists: false }
+    }).exec((err, us3rs) => {
+        if (err)
+            return next(err);
+        let z = 0;
+        async.eachSeries(us3rs, (us3r, done) => {
+            us3r.UTORid = us3r.student.UTORid;
+            us3r.studentNumber = us3r.student.number;
+            us3r.save(done);
+            z++;
+        }, err => {
+            if (err)
+                return next(err);
+            res.send(`${z} student records have been updated.`);
+        });
+    });
+};

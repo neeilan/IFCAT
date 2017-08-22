@@ -29,16 +29,17 @@ exports.getStudentsBySearchQuery = (req, res, next) => {
         re = new RegExp(`(${req.query.q.replace(/\s/g, '|').trim()})`, 'i');
     models.User.findAndCount({
         $and: [
-            { $or: [{ 'name.first': re },{ 'name.last': re },{ 'student.UTORid': re },{ 'student.number': re }] },
+            { $or: [{ 'name.first': re },{ 'name.last': re },{ 'UTORid': re },{ 'studentNumber': re }] },
             { roles: { $in: ['student'] }}
         ]
     }, {
-        select: 'name student',
+        select: 'name UTORid studentNumber',
         page: page,
         perPage: perPage,
         sort: 'name.first name.last'
     }, (err, users, count, pages) => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         res.render('admin/partials/course-students-search-results', { 
             course: req.course, 
             students: users,
@@ -67,7 +68,8 @@ exports.getStudentsByTutorial = (req, res, next) => {
 exports.addStudents = (req, res, next) => {
     let users = req.body.users || [];
     req.course.update({ $addToSet: { students: { $each: users }}}, err => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         req.flash('success', 'The list of students has been updated.');
         res.redirect('back');
     });
@@ -82,8 +84,10 @@ exports.editStudents = (req, res, next) => {
                 users = _.union(users, dict[tutorial._id]);
             tutorial.update({ students: users }, done);
         }, err => {
-            if (err) return next(err);
-            res.send('The list of tutorials has been updated.');
+            if (err)
+                return next(err);
+            req.flash('success', 'The list of tutorials has been updated.');
+            res.redirect('back');
         });
     });
 };
@@ -104,8 +108,10 @@ exports.deleteStudents = (req, res, next) => {
             }, done);
         }
     ], err => {
-        if (err) return next(err);
-        res.send('The list of students has been updated.');
+        if (err)
+            return next(err);
+        req.flash('success', 'The list of students has been updated.');
+        res.redirect('back');
     });
 };
 // Import list of students
@@ -127,9 +133,9 @@ exports.importStudents = (req, res, next) => {
             // normalize properties
             _.forOwn(row, (val, key) => {
                 if (/^utorid/i.test(key))
-                    row.student.UTORid = val;
+                    row.UTORid = val;
                 else if (/^student(.+)/i.test(key))
-                    row.student.number = val;
+                    row.studentNumber = val;
                 else if (/^first/i.test(key))
                     row.name.first = val;
                 else if (/^last/i.test(key))
@@ -145,7 +151,7 @@ exports.importStudents = (req, res, next) => {
             // save
             async.series([
                 done => {
-                    models.User.findOne({ 'student.UTORid': row.student.UTORid }, (err, us3r) => {
+                    models.User.findOne({ 'UTORid': row.UTORid }, (err, us3r) => {
                         if (err) return done(err);
                         student = us3r || new models.User();
                         student.set(row);

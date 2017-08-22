@@ -260,8 +260,8 @@ exports.getMarksByTutorialQuiz = (req, res, next) => {
         // export marks into CSV
         if (req.query.export === '1') {
             data = _.map(data, d => [
-                d.member.student.UTORid,
-                d.member.student.number,
+                d.member.UTORid,
+                d.member.studentNumber,
                 `${d.member.name.first} ${d.member.name.last}`,
                 `TUT ${d.tutorial.number}`,
                 d.quiz.name,
@@ -322,14 +322,14 @@ exports.getMarksByCourse = (req, res, next) => {
             totalPoints: { $sum: '$response.points' }
         }
     }, {
-        $sort: { 'member.student.UTORid': 1, 'tutorialQuiz.quiz.name': 1 }
+        $sort: { 'member.UTORid': 1, 'tutorialQuiz.quiz.name': 1 }
     }], (err, data) => {
         if (err) return next(err);
         // export marks into CSV
         if (req.query.export === 'true' && members.length) {
             data = _.map(data, d => [
-                d.member.student.UTORid,
-                d.member.student.number,
+                d.member.UTORid,
+                d.member.studentNumber,
                 `${d.member.name.first} ${d.member.name.last}`,
                 `TUT ${d.tutorial.number}`,
                 d.quiz.name,
@@ -453,13 +453,13 @@ exports.getMarksByTutorialQuiz = (req, res, next) => {
                 }
             });
             // sort by UTORid
-            students = _.sortBy(_.values(students), function (student) { return student.student.UTORid });
+            students = _.sortBy(_.values(students), function (student) { return student.UTORid });
             // either export CSV
             if (req.query.export === '1') {
                 var data = _.map(students, function (student) {
                         return [
-                            student.student.UTORid, 
-                            student.student.number, 
+                            student.UTORid, 
+                            student.studentNumber, 
                             student.name.full,
                             'TUT ' + student.tutorial.number,
                             student.quiz.name,
@@ -521,7 +521,7 @@ exports.getMarksByCourse = (req, res, next) => {
                     }
                 });
                 // sort by UTORid
-                students = _.sortBy(_.values(students), function (student) { return student.student.UTORid });
+                students = _.sortBy(_.values(students), function (student) { return student.UTORid });
                 done(null, students);
             });
         }, function (err, students) {
@@ -530,8 +530,8 @@ exports.getMarksByCourse = (req, res, next) => {
             if (req.query.export === '1' && students.length) {
                 data = _.map(students, function (student) {
                     return [
-                        student.student.UTORid, 
-                        student.student.number, 
+                        student.UTORid, 
+                        student.studentNumber, 
                         student.name.full,
                         'TUT ' + student.tutorial.number,
                         student.quiz.name,

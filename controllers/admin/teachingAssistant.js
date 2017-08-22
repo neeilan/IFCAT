@@ -27,7 +27,8 @@ exports.getTeachingAssistantsBySearchQuery = (req, res, next) => {
         perPage: perPage,
         sort: 'name.first name.last'
     }, (err, users, count, pages) => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         res.render('admin/partials/course-teaching-assistants-search-results', { 
             course: req.course, 
             teachingAssistants: users,
@@ -46,9 +47,10 @@ exports.getTeachingAssistantsBySearchQuery = (req, res, next) => {
 exports.addTeachingAssistants = (req, res, next) => {
     let users = req.body.users || [];
     req.course.update({ $addToSet: { teachingAssistants: { $each: users }}}, err => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         req.flash('success', 'List of teaching assistants has been updated.');
-        res.redirect(`/admin/courses/${req.course.id}/teaching-assistants`);
+        res.redirect(`/admin/courses/${req.course._id}/teaching-assistants`);
     });
 };
 // Update teaching assistants in tutorials
@@ -61,8 +63,10 @@ exports.editTeachingAssistants = (req, res, next) => {
                 users = _.union(users, dict[tutorial._id]);
             tutorial.update({ teachingAssistants: users }, done);
         }, err => {
-            if (err) return next(err);
-            res.send('The list of tutorials has been updated.');
+            if (err)
+                return next(err);
+            req.flash('success', 'The list of tutorials has been updated.');
+            res.redirect('back');
         });
     }, next);
 };
@@ -83,7 +87,9 @@ exports.deleteTeachingAssistants = (req, res, next) => {
             }, done);
         }
     ], err => {
-        if (err) return next(err);
-        res.send('List of teaching assistants has been updated.');
+        if (err)
+            return next(err);
+        req.flash('success', 'List of teaching assistants has been updated.');
+        res.redirect('back');
     });
 };

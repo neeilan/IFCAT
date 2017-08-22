@@ -90,15 +90,16 @@ router.delete('/courses/:course/instructors', controllers.Instructor.deleteInstr
 router.get('/courses/:course/teaching-assistants', controllers.TeachingAssistant.getTeachingAssistantsByCourse);
 router.get('/courses/:course/teaching-assistants/search', controllers.TeachingAssistant.getTeachingAssistantsBySearchQuery);
 router.post('/courses/:course/teaching-assistants', controllers.TeachingAssistant.addTeachingAssistants);
-router.patch('/courses/:course/teaching-assistants', controllers.TeachingAssistant.editTeachingAssistants);
 router.delete('/courses/:course/teaching-assistants', controllers.TeachingAssistant.deleteTeachingAssistants);
 
 router.get('/courses/:course/students', controllers.Student.getStudentsByCourse);
 router.get('/courses/:course/students/search', controllers.Student.getStudentsBySearchQuery);
 router.post('/courses/:course/students/import', upload.csv.single('file'), controllers.Student.importStudents);
 router.post('/courses/:course/students', controllers.Student.addStudents);
-router.patch('/courses/:course/students', controllers.Student.editStudents);
 router.delete('/courses/:course/students', controllers.Student.deleteStudents);
+
+router.patch('/courses/:course/tutorials/teaching-assistants', controllers.TeachingAssistant.editTeachingAssistants);
+router.patch('/courses/:course/tutorials/students', controllers.Student.editStudents);
 
 router.get('/courses/:course/tutorials-quizzes', controllers.TutorialQuiz.getTutorialsQuizzes);
 router.patch('/courses/:course/tutorials-quizzes', controllers.TutorialQuiz.editTutorialsQuizzes);
@@ -115,6 +116,12 @@ router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz/marks', controllers
 
 router.post('/courses/:course/marks', controllers.Response.getMarksByCourse);
 router.get('/courses/:course/students/:student/marks', controllers.Response.getMarksByStudent);
+
+router.get('/hub', controllers.Hub.getApi);
+router.patch('/hub/users', controllers.Hub.getUsers);
+
+// temporary!
+router.get('/users/fix', controllers.User.fixUsers);
 
 // router.use((err, req, res, next) => {
 //     // ignore validation errors
