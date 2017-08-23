@@ -48,7 +48,7 @@ exports.sortQuestions = (req, res, next) => {
         if (err) 
             return next(err);
         req.flash('success', 'List of questions have been reordered.');
-        res.sendStatus(200);
+        res.redirect('back');
     });
 };
 // Retrieve specific question for quiz
@@ -100,7 +100,7 @@ exports.deleteQuestion = (req, res, next) => {
         if (err) 
             return next(err);
         req.flash('success', 'Question <b>%s</b> has been deleted.', req.question.number);
-        res.sendStatus(200);
+        res.redirect('back');
     });
 };
 // Preview question

@@ -65,7 +65,8 @@ exports.getTutorial = (req, res, next) => {
 // Update specific tutorial for course
 exports.editTutorial = (req, res, next) => {
     req.tutorial.set(req.body).save(err => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         req.flash('success', 'Tutorial <b>%s</b> has been updated.', req.tutorial.number);
         res.redirect('back');
     });
@@ -73,8 +74,9 @@ exports.editTutorial = (req, res, next) => {
 // Delete specific tutorial for course
 exports.deleteTutorial = (req, res, next) => {
     req.tutorial.remove(err => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         req.flash('success', 'Tutorial <b>%s</b> has been deleted.', req.tutorial.number);
-        res.sendStatus(200);
+        res.redirect('back');
     });
 };

@@ -10,7 +10,7 @@
 
 <% include ../partials/flash %>
 
-<table class="table table-hover">
+<table class="table table-hover table-nofluid">
     <thead>
         <tr>
             <th>Name</th>
@@ -21,17 +21,15 @@
     </thead>
     <tbody>
     <% if (_.isEmpty(tutorial.students)) { %>
-        <tr>
-            <td colspan="4">No students have been added to this tutorial yet.</td>
-        </tr>
+        <tr><td colspan="4">No students have been added to this tutorial yet.</td></tr>
     <% } else { %>  
         <% _.each(tutorial.students, function (student) { %>
             <tr>
                 <td><%= student.name.full %></td>
                 <td><%= student.UTORid %></td>
                 <td><%= student.studentNumber %></td>
-                <th>
-                    <a class="btn btn-default btn-sm" href="/admin/courses/<%= course.id %>/students/<%= student.id %>/marks"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> View Marks</a>
+                <th class="actions">
+                    <a class="btn btn-default btn-xs" href="/admin/courses/<%= course.id %>/students/<%= student.id %>/marks"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> View Marks</a>
                 </th>
             </tr>
         <% }) %>

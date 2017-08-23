@@ -1,12 +1,13 @@
 const _ = require('../../utils/lodash.mixin'),
     async = require('async'),
-    models = require('../../models'),
-    mongoose = require('mongoose');
+    models = require('../../models');
 // Retrieve group
 exports.getGroupByParam = (req, res, next, id) => {
     models.Group.findById(id, (err, group) => {
-        if (err) return next(err);
-        if (!group) return next(new Error('No group is found.'));
+        if (err)
+            return next(err);
+        if (!group)
+            return next(new Error('No group is found.'));
         req.group = group;
         next();
     });
@@ -60,31 +61,39 @@ exports.saveGroups = (req, res, next) => {
             // update existing groups
             async.eachSeries(req.tutorialQuiz.groups, (group, done) => {
                 let members = group.members.map(String);
-                    members = _.difference(members, req.body.users);
-                    members = _.union(members, dict[group._id]);
-                    delete dict[group._id]; // mark as done
-                group.members = members;
-                if (!group.members.length) {
-                    return group.remove(err => {
-                        if (err) return done(err);
-                        req.tutorialQuiz.update({ $pull: { groups: group._id }}, done);
-                    });
-                }
-                group.save(done);
+                // ensure group consist of students from the tutorial
+                members = _.intersection(members, req.tutorialQuiz.tutorial.students);
+                // remove selected users from group
+                members = _.difference(members, req.body.users);
+                // add new users from group
+                members = _.union(members, dict[group._id]);
+                // mark as done
+                delete dict[group._id];
+                // save non-empty group
+                if (members.length)
+                    return group.update({ members: members }, done);
+                // delete empty group
+                group.remove(err => {
+                    if (err)
+                        return done(err);
+                    req.tutorialQuiz.update({ $pull: { groups: group._id }}, done);
+                });
             }, done);
         },
         done => {
             // add remaining (new) groups
             async.eachOfSeries(dict, (members, name, done) => {
                 models.Group.create({ name: name, members: members }, (err, group) => {
-                    if (err) return done(err);
+                    if (err)
+                        return done(err);
                     req.tutorialQuiz.update({ $push: { groups: group._id }}, done);
                 });
             }, done);
         }
     ], err => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         req.flash('success', '<b>%s</b> groups have been updated for <b>TUT %s</b>.', req.tutorialQuiz.quiz.name, req.tutorialQuiz.tutorial.number);
-        res.send(`/admin/courses/${req.course._id}/tutorials-quizzes/${req.tutorialQuiz._id}`);
+        res.redirect(`/admin/courses/${req.course._id}/tutorials-quizzes/${req.tutorialQuiz._id}`);
     });
 };

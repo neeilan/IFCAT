@@ -48,7 +48,7 @@ exports.addInstructors = (req, res, next) => {
         if (err)
             return next(err);
         req.flash('success', 'The list of instructors has been updated for the course.');
-        res.redirect('back');
+        res.sendStatus(200);
     });
 };
 // Delete instructor from course

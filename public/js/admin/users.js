@@ -4,13 +4,13 @@ $(function () {
     if (body.hasClass('users-page')) {
         $('.btn-delete').click(function (e) {
             e.preventDefault();
-            var btn = $(this);
+            var btn = $(this), tr = btn.closest('tr'), form = tr.closest('form');
             $.deletebox({
                 title: 'Delete user',
-                message: '<p>You are about to delete user and all of its associated information.</p>\
+                message: '<p>You are about to delete user <b>' + tr.find('.name').text() + '</b> and all of its associated information.</p>\
                     <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
                 callback: function () {
-                    btn.closest('form').attr('action', btn.attr('href')).submit();
+                    form.attr('action', btn.attr('href')).submit();
                 }
             });
         });

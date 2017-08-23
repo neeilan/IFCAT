@@ -5,13 +5,13 @@ $(function () {
         // Confirm and delete selected rows
         $('#btn-delete').click(function (e) {
             e.preventDefault();
-            var btn = $(this);
+            var btn = $(this), form = btn.closest('form');
             $.deletebox({
                 title: 'Delete files',
                 message: '<p>You are about to delete the selected files and all of their associations.</p>\
                     <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
                 callback: function () {
-                    btn.closest('form').attr('action', btn.attr('href')).submit();
+                    form.attr('action', btn.attr('href')).submit();
                 }
             });
         });

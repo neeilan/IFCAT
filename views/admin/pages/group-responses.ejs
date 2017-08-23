@@ -19,7 +19,7 @@
         <td>
             <ul>
             <% _.each(group.members, member => { %>
-                <% if (group.driver.equals(member._id)) { %>
+                <% if (group.driver && group.driver.equals(member._id)) { %>
                     <li><%= member.name.full %> <b>(Driver)</b></li>
                 <% } else { %>
                     <li><%= member.name.full %></li>
@@ -40,15 +40,19 @@
 
 <% include ../partials/flash %>
 
+
 <% _.each(questions, question => { %>
     <div class="panel panel-default" data-type="<%= question.type %>">
-        <form action="/admin/courses/<%= course._id %>/tutorials-quizzes/<%= tutorialQuiz._id %>/groups/<%= group._id %>/responses/<%= question.response.isNew ? '' : `${question.response._id}?_method=put` %>" method="post" autocomplete="off">
+        <form method="post" autocomplete="off">
             <div class="panel-heading">
                 <h4 class="panel-title">
                     <span>Question <%= question.number %>: <%= question.type %></span>
                     <span class="pull-right">
-                        <span><%= question.response.correct ? 'Correct' : 'Incorrect' %></span> &dash;
-                        <span><%= `${question.score} point${question.score != 1 ? 's' : ''}` %></span>
+                    <% if (question.response.correct) { %>
+                        <span class="correct">Correct</span>
+                    <% } else { %>
+                        <span class="incorrect">Incorrect</span>
+                    <% } %>
                     </span>
                 </h4>
             </div>
@@ -124,7 +128,7 @@
                         <tr>
                             <th class="given">Given</th>
                             <td class="given">
-                                <input type="text" name="answer[]" value="<%= question.results.given %>" class="form-control" disabled>
+                                <input type="text" name="answer[]" value="<%= question.results.given %>" class="form-control input-sm" disabled>
                             </td>
                             <td class="correct">
                             <% if (question.results.correct) { %>
@@ -162,11 +166,16 @@
                     </table>
                 <% } %>
                 </div>
+                <!-- points -->
+                <div class="points form-inline">
+                    <label class="control-label">Points</label>
+                    <input type="number" name="points" value="<%= question.score %>" min="0" class="form-control input-sm" maxlength="3" disabled>
+                </div>
             </div>
             <div class="panel-footer">
                 <button type="button" class="btn btn-sm btn-edit">Edit</button>
                 <!-- edit mode buttons -->
-                <button type="submit" class="btn btn-sm btn-primary btn-update" style="display:none">Update</button>
+                <button type="submit" formaction="/admin/courses/<%= course._id %>/tutorials-quizzes/<%= tutorialQuiz._id %>/groups/<%= group._id %>/responses/<%= question.response.isNew ? '' : `${question.response._id}?_method=patch` %>" class="btn btn-sm btn-primary btn-update" style="display:none">Update</button>
                 <button type="button" class="btn btn-sm btn-cancel" style="display:none">Cancel</button>
             </div>
         </form>

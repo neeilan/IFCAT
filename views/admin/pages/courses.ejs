@@ -18,8 +18,8 @@
     <table class="table table-hover table-nofluid">
         <thead>
             <tr>
-                <th style="width: 80px">Code</th>
-                <th>Name</th>
+                <th class="code">Code</th>
+                <th class="name">Name</th>
                 <th class="actions"></th>
             </tr>
         </thead>
@@ -29,9 +29,9 @@
         <% } else { %>
             <% _.each(courses, course => { %>
                 <tr>
-                    <td><%= course.code %></td>
-                    <td><%= course.name %></td>
-                    <td>
+                    <td class="code"><%= course.code %></td>
+                    <td class="name"><%= course.name %></td>
+                    <td class="actions">
                         <div class="dropdown">
                             <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"> Actions<span class="caret"></span>
                             </button>

@@ -4,10 +4,10 @@ $(function () {
     if (body.hasClass('quizzes-page')) {
         $('.btn-copy').click(function (e) {
             e.preventDefault();
-            var btn = this;
+            var btn = $(this), tr = btn.closest('tr'), form = tr.closest('form');
             bootbox.dialog({
                 title: 'Copy quiz',
-                message: '<p>You are about to copy quiz and all of its associated questions.</p>\
+                message: '<p>You are about to copy quiz <b>' + tr.find('.name').text() + '</b> and all of its associated questions.</p>\
                     <p>This does <b>not</b> however copy its tutorial associations.</p>\
                     <p>Do you want to proceed with this action?</p>',
                 buttons: {
@@ -20,26 +20,23 @@ $(function () {
                         className: 'btn-sm btn-success',
                         callback: function (result) {
                             if (result) {
-                                $.post(btn.href, function () {
-                                    window.location.reload(true);
-                                });
+                                form.attr('action', btn.attr('href')).submit();
                             }
                         }
                     }
                 }
             });
         });
+
         $('.btn-delete').click(function (e) {
             e.preventDefault();
-            var btn = this;
+            var btn = $(this), tr = btn.closest('tr'), form = tr.closest('form');
             $.deletebox({
                 title: 'Delete quiz',
-                message: '<p>You are about to delete quiz and all of its associated information.</p>\
+                message: '<p>You are about to delete quiz <b>' + tr.find('.name').text() + '</b> and all of its associated information.</p>\
                     <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
                 callback: function () {
-                    $.delete(btn.href, function () {
-                        window.location.reload(true);
-                    });
+                    form.attr('action', btn.attr('href')).submit();
                 }
             });
         });

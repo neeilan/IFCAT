@@ -22,11 +22,8 @@ $(function () {
         // update groups
         $('.btn-save').click(function (e) {
             e.preventDefault();
-            $.patch(this.href, tbody.find('input').serialize()).then(function (res) {
-                window.location.href = res;
-            }).fail(function () {
-
-            });
+            var btn = $(this), form = btn.closest('form');
+            form.attr('action', btn.attr('href')).submit();
         });
         // find next group number
         function getNextGroup () {

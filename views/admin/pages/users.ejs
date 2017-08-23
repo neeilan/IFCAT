@@ -15,7 +15,7 @@
     <table class="table table-hover table-nofluid">
         <thead>
             <tr>
-                <th>Name</th>
+                <th class="name">Name</th>
                 <th>Email</th>
                 <th>Roles</th>
                 <th class="actions"></th>
@@ -30,10 +30,10 @@
             <tbody>
             <% _.each(users, user => { %>
                 <tr>
-                    <td><%= user.name.full %></td>
+                    <td class="name"><%= user.name.full %></td>
                     <td><%= user.local.email %></td>
                     <td><%= user.roles.map(_.startCase).join(', ') %></td>
-                    <td>
+                    <td class="actions">
                         <div class="dropdown">
                             <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">Actions<span class="caret"></span>
                             </button>

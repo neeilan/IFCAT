@@ -28,7 +28,8 @@ exports.getUsers = (req, res, next) => {
         }, err => {
             if (err) 
                 return next(err);
-            res.sendStatus(200);
+            req.flash('success', 'Synced.');
+            res.redirect('back');
         });
     });
 };

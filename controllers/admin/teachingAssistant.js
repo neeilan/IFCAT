@@ -50,7 +50,7 @@ exports.addTeachingAssistants = (req, res, next) => {
         if (err)
             return next(err);
         req.flash('success', 'List of teaching assistants has been updated.');
-        res.redirect(`/admin/courses/${req.course._id}/teaching-assistants`);
+        res.sendStatus(200);
     });
 };
 // Update teaching assistants in tutorials

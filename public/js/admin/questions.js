@@ -5,30 +5,18 @@ $(function () {
         // Confirm and delete selected row
         $('.btn-delete').click(function (e) {
             e.preventDefault();
-            var btn = this;
+            var btn = $(this), tr = btn.closest('tr'), form = tr.closest('form');
             $.deletebox({
                 title: 'Delete question',
-                message: '<p>You are about to delete question and all of its associated information.</p>\
+                message: '<p>You are about to delete question <b>' + tr.find('.number').text() + '</b> and all of its associated information.</p>\
                     <p>This action <b>cannot be undone</b>. Do you want to proceed with this action?</p>',
                 callback: function () {
-                    $.delete(btn.href, function () {
-                        window.location.reload(true)
-                    });
+                    form.attr('action', btn.attr('href')).submit();
                 }
             });
         });
         // Drag and drop rows
         $('tbody').sortable({ axis: 'y', cancel: false, handle: '.handle' });
-        // Save sort order
-        $('#btn-sort').click(function (e) {
-            e.preventDefault();
-            $.put(this.href, $('input[name^=questions]').serialize(), function () {
-                window.location.href = location.pathname; // reload page w/o querystring
-            }).fail(function (xhr) {
-                $('.alert-danger').remove();
-                $('#title').after('<div class="alert alert-danger alert-dismissible"><a href="#" class="close" data-dismiss="alert">&times;</a>' + xhr.responseText + '</div>');
-            });
-        });
     }
 
     if (body.hasClass('question-page')) {

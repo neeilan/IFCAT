@@ -71,7 +71,7 @@ exports.addStudents = (req, res, next) => {
         if (err)
             return next(err);
         req.flash('success', 'The list of students has been updated.');
-        res.redirect('back');
+        res.sendStatus(200);
     });
 };
 // Update students in tutorials

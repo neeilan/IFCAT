@@ -91,7 +91,7 @@ exports.copyQuiz = (req, res, next) => {
         if (err)
             return next(err);
         req.flash('success', '<b>%s</b> has been added.', req.quiz.name);
-        res.sendStatus(200);
+        res.redirect('back');
     });
 };
 // Delete quiz
@@ -100,6 +100,6 @@ exports.deleteQuiz = (req, res, next) => {
         if (err)
             return next(err);
         req.flash('success', '<b>%s</b> has been deleted.', req.quiz.name);
-        res.sendStatus(200);
+        res.redirect('back');
     });
 };

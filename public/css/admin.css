@@ -400,46 +400,13 @@ tfoot .pagination {
 /**
  * Groups tab
  */
-#groups table {
-    border-bottom: 1px solid #ddd;
-}
-#groups th {
-    padding: 5px 0;
-}
-#groups td {
-    border-top: 1px solid #ddd;
-    height: 50px;
-}
-#groups tr:nth-child(even) td {
-    background: #f0f0f0;
-}
-#groups td.student {
-    padding-left: 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-    white-space: nowrap;
-    width: 200px; 
-}
-#groups td.group {
-    text-align: center;
-    width: 50px; 
-}
 #groups .btn-circle:last-child {
     display: none;
 }
 @media (min-width: 768px) {
     .nav-actions {
         width: 700px;
-    } 
-    /* .table {
-        min-width: 700px;
-        width: auto;
     }
-    .modal .table {
-        min-width: auto;
-        width: 100%;
-    } */
 }
 /**
  * Responses page
@@ -473,6 +440,14 @@ tfoot .pagination {
     background: inherit;
     border-bottom: 0;
     padding-bottom: 0;
+}
+.responses-page .panel .panel-heading .correct {
+    color: darkgreen;
+    text-transform: uppercase;
+}
+.responses-page .panel .panel-heading .incorrect {
+    color: darkred;
+    text-transform: uppercase;
 }
 .responses-page .panel .panel-body {
     padding-top: 10px;
@@ -519,27 +494,13 @@ tfoot .pagination {
 .responses-page [data-type="code tracing"] td pre {
     border: 0;
 }
-/* .responses-page code[contenteditable] {
-    background: #DBF5FE;
-} */
-
-
-/* .responses-page .choices td.incorrect, 
-.responses-page .choices td.incorrect pre {
-    background-color: #ffeef0;
+.responses-page .points {
+    padding-left: 5px;
 }
-.responses-page .choices td.correct,
-.responses-page .choices td.correct pre {
-    background-color: #e6ffed;
+.responses-page .points input {
+    margin-left: 10px;
+    width: 75px;
 }
-.responses-page .choices td.line-number.incorrect {
-    background-color: #ffdce0;
-    border-color: #fdaeb7;
-}
-.responses-page .choices td.line-number.correct {
-    background-color: #cdffd8;
-    border-color: #bef5cb;
-}*/
 
 
 

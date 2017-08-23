@@ -42,7 +42,8 @@ exports.getResponses = (req, res, next) => {
             }], done)
         }
     ], err => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         let questions = req.tutorialQuiz.quiz.questions,
             responses = req.group.responses;
         // organize results 
@@ -50,7 +51,8 @@ exports.getResponses = (req, res, next) => {
             // find response for question
             let response = _.find(responses, response => response.question.equals(question._id));
             // if none, create a dummy one
-            if (!response) response = new models.Response();
+            if (!response)
+                response = new models.Response();
             //
             question.response = response;
             question.score = response.points || 0;
@@ -116,7 +118,8 @@ exports.getResponses = (req, res, next) => {
 exports.addResponse = (req, res, next) => {
     let response = new models.Response(req.body);
     models.Question.findById(req.body.question, 'number type answers', (err, question) => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         //
         if (question.isMultipleChoice() || question.isMultipleSelect()) {
             response.correct = _.isEqual(question.answers.sort(), response.answer.sort());
@@ -131,7 +134,8 @@ exports.addResponse = (req, res, next) => {
         }
         response.group = req.group._id;
         response.save(err => {
-            if (err) return next(err);
+            if (err)
+                return next(err);
             req.flash('success', 'Response for question <b>%s</b> has been updated.', question.number);
             res.redirect('back');
         });
@@ -143,7 +147,8 @@ exports.editResponse = (req, res, next) => {
         done => models.Question.findById(req.body.question, 'number type answers caseSensitive', done),
         done => models.Response.findById(req.params.response, done)
     ], (err, results) => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         let [question, response] = results;
 
         response.group = req.group._id;
@@ -163,15 +168,12 @@ exports.editResponse = (req, res, next) => {
         }
 
         response.save(err => {
-            if (err) return next(err);
+            if (err)
+                return next(err);
             req.flash('success', 'Response for question <b>%s</b> has been updated.', question.number);
             res.redirect('back');
         });
     });
-};
-// Delete responses
-exports.deleteResponses = (req, res, next) => {
-
 };
 // Retrieve marks by student
 exports.getMarksByStudent = (req, res, next) => {
@@ -196,7 +198,7 @@ exports.getMarksByStudent = (req, res, next) => {
     }, {
         $lookup: { from: 'responses', localField: 'group._id', foreignField: 'group', as: 'response' }
     }, {
-        $unwind: '$response'
+        $unwind: { path: '$response', preserveNullAndEmptyArrays: true }
     }, {
         $group: {
             _id: '$_id',
@@ -243,7 +245,7 @@ exports.getMarksByTutorialQuiz = (req, res, next) => {
     }, {
         $lookup: { from: 'responses', localField: 'group._id', foreignField: 'group', as: 'response' }
     }, {
-        $unwind: '$response'
+        $unwind: { path: '$response', preserveNullAndEmptyArrays: true }
     }, {
         $group: {
             _id: '$member._id',
@@ -256,16 +258,17 @@ exports.getMarksByTutorialQuiz = (req, res, next) => {
     }, {
         $sort: { _id: 1 }
     }], (err, data) => {
-        if (err) return next(err);
+        if (err)
+            return next(err);
         // export marks into CSV
         if (req.query.export === '1') {
             data = _.map(data, d => [
                 d.member.UTORid,
                 d.member.studentNumber,
                 `${d.member.name.first} ${d.member.name.last}`,
-                `TUT ${d.tutorial.number}`,
+                d.tutorial.number,
                 d.quiz.name,
-                `Group ${d.group.name}`,
+                d.group.name,
                 d.totalPoints
             ]);
             // set headings
@@ -311,7 +314,7 @@ exports.getMarksByCourse = (req, res, next) => {
     }, {
         $lookup: { from: 'responses', localField: 'group._id', foreignField: 'group', as: 'response' }
     }, {
-        $unwind: '$response'
+        $unwind: { path: '$response', preserveNullAndEmptyArrays: true }
     }, {
         $group: {
             _id: { tutorialQuiz: '_id', member: '$member._id' },
@@ -331,9 +334,9 @@ exports.getMarksByCourse = (req, res, next) => {
                 d.member.UTORid,
                 d.member.studentNumber,
                 `${d.member.name.first} ${d.member.name.last}`,
-                `TUT ${d.tutorial.number}`,
+                d.tutorial.number,
                 d.quiz.name,
-                `Group ${d.group.name}`,
+                d.group.name,
                 d.totalPoints
             ]);
             // set headings
