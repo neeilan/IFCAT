@@ -10217,13 +10217,11 @@ var QuizApp = function (_React$Component) {
     }, {
         key: 'upvoteCb',
         value: function upvoteCb(questionId) {
-            alert('upvote');
             this.emit('UPVOTE_QUESTION', { questionId: questionId });
         }
     }, {
         key: 'downvoteCb',
         value: function downvoteCb(questionId) {
-            alert('downvote');
             this.emit('DOWNVOTE_QUESTION', { questionId: questionId });
         }
     }]);

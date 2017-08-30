@@ -52,7 +52,8 @@ module.exports = (io) => (function (socket) {
         tutQuiz.groups.forEach(function(group){
             if (group.members.indexOf(socket.request.user._id) > -1) {
                 socket.join('group:'+group._id);
-                console.log('Joined enrolled group ', group.name);
+                
+                // Join enrolled group
                 studentsGroup = group.name;
                 studentsGroupId = group._id;
                 socket.emit('quizData', { userId : socket.request.user._id, quiz : tutQuiz, groupName : studentsGroup, groupId: group._id} );
@@ -83,7 +84,8 @@ module.exports = (io) => (function (socket) {
             // there is a group with room, let's add the student to it
             models.Group.findByIdAndUpdate(groupsWithRoom[0]._id, { $push : { members : socket.request.user._id } }, { new : true }, function (err,doc){
                 if (err) throw err;
-                console.log('Joining existing group ', groupsWithRoom[0]._id);
+                
+                // Join an existing group with room
                 socket.join('group:' + groupsWithRoom[0]._id);
                 socket.emit('quizData', { userId : socket.request.user._id, quiz : tutQuiz, groupName : groupsWithRoom[0].name, groupId: groupsWithRoom[0]._id} );
                 return;
@@ -101,7 +103,7 @@ module.exports = (io) => (function (socket) {
                     // we also need to add the group to this tutorialQuiz
                     models.TutorialQuiz.update({ _id : tutQuiz._id }, { $push : { groups :  group._id } }, { new : true }, function(err, doc){
                     if (err) throw err;
-                    console.log('Created and joined a new group ', group.name);
+                    // Create and join a new group
                     socket.join('group:'+ group._id);
                     socket.emit('quizData', { userId : socket.request.user._id, quiz : tutQuiz, groupName : group.name, groupId: group._id } );
                     return;

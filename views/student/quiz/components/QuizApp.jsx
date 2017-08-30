@@ -378,12 +378,10 @@ export default class QuizApp extends React.Component {
     }
     
     upvoteCb(questionId) {
-        alert('upvote')
         this.emit('UPVOTE_QUESTION', { questionId : questionId });
     }
     
     downvoteCb(questionId) {
-        alert('downvote')
         this.emit('DOWNVOTE_QUESTION', { questionId : questionId });
     }
 
