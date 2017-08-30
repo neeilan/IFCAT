@@ -4858,21 +4858,25 @@ var CodeOutputQuestion = function (_React$Component) {
         value: function getOutputLines() {
             var _this2 = this;
 
-            if (!this.props.response || !this.props.response.codeTracingAnswers || this.props.response.codeTracingAnswers.length == 0) return null;
+            if (!this.props.response || !this.props.response.lineByLineSummary || this.props.response.lineByLineSummary.length == 0) return null;
             return React.createElement(
                 'pre',
                 null,
-                this.props.response.codeTracingAnswers.map(function (line, i) {
+                this.props.response.lineByLineSummary.map(function (line, i) {
                     return React.createElement(
                         'span',
                         null,
-                        line,
+                        React.createElement(
+                            'span',
+                            { className: line.correct ? 'text-success' : 'text-danger' },
+                            line.value
+                        ),
                         React.createElement(
                             'span',
                             { style: { float: 'right' } },
-                            ' (' + _this2.props.response.lineByLineSummary[i].attempts + ' attempt' + (_this2.props.response.lineByLineSummary[i].attempts > 1 ? 's' : '') + ')'
+                            ' (' + line.attempts + ' attempt' + (line.attempts > 1 ? 's' : '') + ')'
                         ),
-                        i === _this2.props.response.codeTracingAnswers.length - 1 ? null : React.createElement('br', null)
+                        i === _this2.props.response.lineByLineSummary.length - 1 ? null : React.createElement('br', null)
                     );
                 }),
                 ' '
@@ -10023,6 +10027,8 @@ var QuizApp = function (_React$Component) {
             });
 
             socket.on('SYNC_RESPONSE', function (data) {
+                console.log("SYNC");
+                console.log(data);
                 var responses = _this2.state.responses;
                 responses[data.questionId] = data.response;
                 _this2.setState({
@@ -10033,10 +10039,14 @@ var QuizApp = function (_React$Component) {
                 var llSummary = data.response.lineByLineSummary;
                 var last = llSummary ? llSummary.length - 1 : -1;
 
-                if (last > -1 && !llSummary[last].correct) {
+                if (!data.question.immediateFeedbackDisabled && last > -1) {
+
                     var attempts = llSummary[last].attempts;
                     var attemptsLeft = maxAttempts - attempts;
-                    if (attempts < maxAttempts) {
+
+                    if (attempts == maxAttempts && llSummary[last].answerProvided) {
+                        swal("You tried your best...", "We'll reveal the answer for this line - take a few moments to reason about how to get to this answer", "error");
+                    } else if (attempts < maxAttempts && !llSummary[last].correct) {
                         swal("Yikes!", 'Looks like you\'ve made a mistake somewhere...  You can try ' + attemptsLeft + '\n                      more time' + (attemptsLeft > 1 ? 's' : '') + ' before we reveal this line\'s answer', "error");
                     }
                 }
@@ -10719,7 +10729,7 @@ var Question = function (_React$Component) {
 					if (file.type.includes('image')) {
 						attachments.push(_react2.default.createElement(
 							'div',
-							null,
+							{ key: file._id },
 							_react2.default.createElement('img', { className: 'attachedImg', src: fileUrl }),
 							_react2.default.createElement('br', null),
 							_react2.default.createElement(
@@ -10732,7 +10742,7 @@ var Question = function (_React$Component) {
 					} else if (file.type.includes('audio')) {
 						attachments.push(_react2.default.createElement(
 							'div',
-							null,
+							{ key: file._id },
 							_react2.default.createElement(
 								'audio',
 								{ controls: true },
@@ -10753,7 +10763,7 @@ var Question = function (_React$Component) {
 				this.props.questionRef.links.forEach(function (link) {
 					attachments.push(_react2.default.createElement(
 						'div',
-						null,
+						{ key: link },
 						_react2.default.createElement('br', null),
 						_react2.default.createElement(
 							'a',

@@ -39,6 +39,7 @@ export default class CodeOutputQuestion extends React.Component
                 {this.getOutputLines()}
                 {this.getInputBox()}
                 {this.getCheckAnswerButton()}
+
 			</div>
 		);
 	}
@@ -128,15 +129,19 @@ export default class CodeOutputQuestion extends React.Component
     
     getOutputLines()
     {
-        if (!this.props.response || !this.props.response.codeTracingAnswers || this.props.response.codeTracingAnswers.length == 0)
+        if (!this.props.response || !this.props.response.lineByLineSummary || this.props.response.lineByLineSummary.length == 0)
             return null;
         return (<pre> 
-            { this.props.response.codeTracingAnswers.map((line, i) => (
+            { this.props.response.lineByLineSummary.map((line, i) => (
                 <span>
-                    {line}
-                    <span style={{float:'right'}}>{ ' (' + this.props.response.lineByLineSummary[i].attempts + ' attempt' + (this.props.response.lineByLineSummary[i].attempts > 1 ? 's': '') + ')'}</span>
-                    { i === this.props.response.codeTracingAnswers.length - 1 ? null : <br/>}
+                    <span className={line.correct ? 'text-success' : 'text-danger'}>
+                        {line.value} 
+                    </span> 
+                    <span style={{float:'right'}}>{ ' (' + line.attempts + ' attempt' + (line.attempts > 1 ? 's': '') + ')'}</span>
+                    { i === this.props.response.lineByLineSummary.length - 1 ? null : <br/>}
+
                 </span>) )
             } </pre>);
     }
+
 }

@@ -3,7 +3,7 @@ const ResponseSchema = new mongoose.Schema({
     question: { type: mongoose.Schema.Types.ObjectId, ref : 'Question' },
     group: { type: mongoose.Schema.Types.ObjectId, ref : 'Group' },
     attempts: { type : Number, default: 0 },
-    lineByLineSummary: [{ attempts : { type : Number, default : 1 }, correct : Boolean}],
+    lineByLineSummary: [{ attempts : { type : Number, default : 1 }, correct : Boolean, value : String, answerProvided : Boolean }],
     codeTracingAnswers: [String],
     answer: [String],
     correct: Boolean,

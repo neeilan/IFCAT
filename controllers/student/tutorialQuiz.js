@@ -254,15 +254,20 @@ function buildCodeTracingAnswerSummary(question, existingResponseObject, answer)
         if (answer[i].trim() != question.answers[i].trim()) {
             lineByLineSummary.push({
                 attempts :  (existingAnswer) ? existingAnswer.attempts + 1 : 1,
-                correct : false
+                correct : false,
+                value : answer[i]
             }); 
             if (lineByLineSummary[i].attempts == question.maxAttemptsPerLine) {
                 lineByLineSummary[i].correct = true;
+                lineByLineSummary[i].value = question.answers[i].trim();
+                lineByLineSummary[i].answerProvided = true;
             }   
         } else {
             lineByLineSummary.push({
                 attempts :  existingAnswer ? existingAnswer.attempts + (existingAnswer.correct ? 0 : 1) : 1,
-                correct : true
+                correct : true,
+                value : answer[i],
+                answerProvided : false
             });
         }
     }

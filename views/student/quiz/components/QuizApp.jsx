@@ -198,6 +198,8 @@ export default class QuizApp extends React.Component {
         });
 
         socket.on('SYNC_RESPONSE', (data) => {
+            console.log("SYNC");
+            console.log(data);
             var responses = this.state.responses;
             responses[data.questionId] = data.response;
             this.setState({
@@ -208,10 +210,15 @@ export default class QuizApp extends React.Component {
             var llSummary = data.response.lineByLineSummary;
             var last = (llSummary) ? llSummary.length - 1 : -1;
 
-            if (!data.question.immediateFeedbackDisabled && last > -1 && !llSummary[last].correct) {
+            if (!data.question.immediateFeedbackDisabled && last > -1) {
+                
                 var attempts = llSummary[last].attempts;
                 var attemptsLeft = maxAttempts - attempts;
-                if (attempts < maxAttempts) {
+                
+                if (attempts == maxAttempts && llSummary[last].answerProvided) {
+                    swal("You tried your best...", "We'll reveal the answer for this line - take a few moments to reason about how to get to this answer", "error");
+                }
+                else if (attempts < maxAttempts && !llSummary[last].correct) {
                      swal("Yikes!", `Looks like you've made a mistake somewhere...  You can try ${attemptsLeft}
                       more time${attemptsLeft > 1 ? 's' : ''} before we reveal this line's answer`, "error");
                 }
@@ -245,7 +252,7 @@ export default class QuizApp extends React.Component {
 
     getCurrentQuestion() {
         let selectedQuestion = null;
-        var _quiz = this.state.quiz;
+        let _quiz = this.state.quiz;
 
 
         if (this.state.selectedQuestion === null) {

@@ -126,14 +126,14 @@ export default class Question extends React.Component {
 				var fileUrl = '/uploads/' + courseId + '/' + file.name;
 				if (file.type.includes('image')) {
 					attachments.push(
-						<div>
+						<div key={file._id}>
 							<img className='attachedImg' src={fileUrl} /><br/>
 							<a target='_blank' href={fileUrl}>Direct link</a><br/>
 						</div>
 					);
 				} else if (file.type.includes('audio')){
 					attachments.push(
-						<div>
+						<div key={file._id}>
 							<audio controls>
 								<source src={fileUrl} type={file.type}/>
 							</audio>
@@ -146,7 +146,7 @@ export default class Question extends React.Component {
 		} 
 		if (this.props.questionRef.links) {
 			this.props.questionRef.links.forEach(function(link){
-				attachments.push(<div><br/><a target='_blank' href={link}>{link}</a><br/></div>);
+				attachments.push(<div key={link}><br/><a target='_blank' href={link}>{link}</a><br/></div>);
 			})
 		}
 		return <div><br/>{attachments}</div>;
