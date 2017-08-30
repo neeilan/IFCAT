@@ -82,7 +82,7 @@ exports.getResponses = (req, res, next) => {
                     break;
                 case 'code tracing':
                     question.results = _.map(question.answers, (answer, i) => {
-                        let codeTracingAnswer = response.codeTracingAnswers ? response.codeTracingAnswers[i] : null,
+                        let codeTracingAnswer = response.lineByLineSummary && response.lineByLineSummary[i] ? response.lineByLineSummary[i].value : null,
                             lineByLineSummary = response.lineByLineSummary ? response.lineByLineSummary[i] : null,
                             attempts = lineByLineSummary ? lineByLineSummary.attempts : 0,
                             correct = lineByLineSummary ? lineByLineSummary.correct : false;
@@ -130,7 +130,7 @@ exports.addResponse = (req, res, next) => {
             }
             response.correct = _.intersection(question.answers, response.answer).length > 0;
         } else if (question.isCodeTracing()) {
-            response.correct = _.isEqual(question.answers, response.codeTracingAnswers);
+            response.correct = _.isEqual(question.answers, response.lineByLineSummary.map(line => line.value.trim()));
         }
         response.group = req.group._id;
         response.save(err => {
@@ -164,7 +164,7 @@ exports.editResponse = (req, res, next) => {
             }
             response.correct = _.intersection(question.answers, response.answer).length > 0;
         } else if (question.isCodeTracing()) {
-            response.correct = _.isEqual(question.answers, response.codeTracingAnswers);
+            response.correct = _.isEqual(question.answers, response.lineByLineSummary.map(line => line.value.trim()));
         }
 
         response.save(err => {
