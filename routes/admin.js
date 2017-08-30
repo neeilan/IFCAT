@@ -78,7 +78,7 @@ router.patch('/courses/:course/quizzes/:quiz/questions/sort', controllers.Questi
 router.get('/courses/:course/quizzes/:quiz/questions/new', controllers.Question.getQuestion);
 router.get('/courses/:course/quizzes/:quiz/questions/:question/edit', controllers.Question.getQuestion);
 router.post('/courses/:course/quizzes/:quiz/questions', controllers.Question.addQuestion);
-router.post('/courses/:course/quizzes/:quiz/questions/preview', controllers.Question.previewQuestion);
+router.get('/courses/:course/quizzes/:quiz/questions/preview', controllers.Question.previewQuestion);
 router.put('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.editQuestion);
 router.delete('/courses/:course/quizzes/:quiz/questions/:question', controllers.Question.deleteQuestion);
 
@@ -116,6 +116,8 @@ router.get('/courses/:course/tutorials-quizzes/:tutorialQuiz/marks', controllers
 
 router.post('/courses/:course/marks', controllers.Response.getMarksByCourse);
 router.get('/courses/:course/students/:student/marks', controllers.Response.getMarksByStudent);
+
+router.get('/quizzes/:quizId', controllers.Quiz.fetchQuizJson);
 
 router.get('/hub', controllers.Hub.getApi);
 router.patch('/hub/users', controllers.Hub.getUsers);

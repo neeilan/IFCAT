@@ -109,18 +109,5 @@ $(function () {
             // add table
             $('#points-calculator').html(table);
         });
-        // @todo: fix preview question
-        var win;
-        $('#btn-preview').click(function (e) {
-            e.preventDefault();
-            if (win) {
-                win.close();
-            }
-            $.post(this.href, $(this).closest('form').serialize(), function (res) {
-                win = window.open('', '_preview', 'width=800, height=600');
-                win.document.write(res);
-                win.document.close();
-            }, 'html');
-        });
     }
 });

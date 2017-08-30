@@ -103,3 +103,11 @@ exports.deleteQuiz = (req, res, next) => {
         res.redirect('back');
     });
 };
+
+exports.fetchQuizJson = (req, res) => {
+    models.Quiz
+        .findById(req.params.quizId)
+        .populate({ path : 'questions', select : '-answers' })
+        .then((quiz) => res.json(quiz) )
+        .catch(err => console.err(err));
+};

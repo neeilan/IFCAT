@@ -58,13 +58,9 @@ export default class QuizApp extends React.Component {
         });
 
         socket.on('groupsUpdated', (data) => {
-            console.log('groupsUpdated');
-            console.log(data);
         });
 
         socket.on('quizData', (tutorialQuiz) => {
-            console.log('quizData');
-            console.log(tutorialQuiz);
             this.setState({
                 quiz: tutorialQuiz.quiz,
                 groupId: tutorialQuiz.groupId || this.state.groupId,
@@ -77,7 +73,6 @@ export default class QuizApp extends React.Component {
 
 
         socket.on('resetDriver', (data) => {
-            console.log('resetDriver');
             swal('New Driver', 'Your group now has a new driver.', 'info');
             if (this.state.groupId != data.groupId) return;
             this.setState({
@@ -87,14 +82,11 @@ export default class QuizApp extends React.Component {
         });
 
         socket.on('info', (data) => {
-            console.log('info');
             swal('Note', data.message, 'info');
         })
 
         socket.on('ctGroupAttempt', (data) => {
             if (data.groupId != this.state.groupId) return;
-            console.log('ctGroupAttempt');
-            console.log(data);
             var question = this.state.quiz.quiz.questions.filter(q => q._id == data.response.question)[0];
             question.output = data.codeOutput;
 
@@ -151,9 +143,7 @@ export default class QuizApp extends React.Component {
             });
         })
 
-        socket.on('updateScores', (data) => {
-            console.log('updateScores');
-            
+        socket.on('updateScores', (data) => {            
             if (this.state.groupId && data.groupId != this.state.groupId) return;
 
             var responsesStore = this.state.responses;
@@ -198,8 +188,6 @@ export default class QuizApp extends React.Component {
         });
 
         socket.on('SYNC_RESPONSE', (data) => {
-            console.log("SYNC");
-            console.log(data);
             var responses = this.state.responses;
             responses[data.questionId] = data.response;
             this.setState({
@@ -226,7 +214,6 @@ export default class QuizApp extends React.Component {
         });
         
         socket.on('FINISH_QUIZ', (data) => {
-            console.log(data);
             this.setState({
                 teammates : data.members,
                 score : data.score,
@@ -240,7 +227,6 @@ export default class QuizApp extends React.Component {
     emit(eventName, data) {
         data.questionId = this.state.selectedQuestion._id || null;
         data.groupId = this.state.groupId;
-        console.log(data);
         this.socket.emit(eventName, data);
     }
 
@@ -358,8 +344,6 @@ export default class QuizApp extends React.Component {
     }
 
     submitChoiceCb(answer, isCodeTracingQuestion) {
-        console.log(isCodeTracingQuestion);
-        console.log(answer);
         if (isCodeTracingQuestion) {
             this.emit('CODE_TRACING_ANSWER_ATTEMPT', {
                 answer: answer

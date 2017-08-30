@@ -61,18 +61,13 @@ const mock_io = () => ({
 	on: function(event, handler){
 		this.handlers[event] = handler;
 	},
-  emit: function(event, data) {
-
-		console.log('EMIT: ' + event);
-		console.log(data);
-		
+  emit: function(event, data) {		
 		switch (event) {
 			case 'requestQuiz' : {
 				this._emit('quizData', _quizData);
 				break;
 			}
 			case 'GROUP_ATTEMPT' : {
-				console.log(data);
 				break;
 			}
 			case 'assignSelfAsDriver' : {

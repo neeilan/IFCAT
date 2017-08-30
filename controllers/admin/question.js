@@ -105,42 +105,5 @@ exports.deleteQuestion = (req, res, next) => {
 };
 // Preview question
 exports.previewQuestion = (req, res, next) => {
-    // var question = new models.Question();
-    //     question.number = _.trim(req.body.number)
-    //     question.question = _.trim(req.body.question);
-    //     question.type = req.body.type;
-    //     question.useLaTeX = !!req.body.useLaTeX;
-
-    // req.course.withFiles().execPopulate().then(function () {
-    //     var files = req.body.files || [];
-    //     // add files
-    //     question.files = _.filter(req.course.files, function (file) {
-    //         return files.indexOf(file.id) > -1;
-    //     });
-    //     // add unique links
-    //     _.each(req.body.links, function (link) {
-    //         link = _.trim(link);
-    //         if (link) {
-    //             if (!url.parse(link).protocol)
-    //                 link = 'http://' + link;
-    //             if (question.links.indexOf(link) === -1)
-    //                 question.links.push(link);
-    //         }
-    //     });
-    //     // add unique choices
-    //     _.forOwn(req.body.choices, function (choice) {
-    //         choice = _.trim(choice);
-    //         if (choice && question.choices.indexOf(choice) === -1)
-    //             question.choices.push(choice);
-    //     });
-    //     // shuffle choices
-    //     if (!!req.body.shuffleChoices)
-    //         question.choices = _.shuffle(question.choices);
-
-    //     res.render('admin/pages/quiz-question-preview', { 
-    //         title: 'Preview Question', 
-    //         course: req.course, 
-    //         question: question 
-    //     });
-    // });
+    res.render('admin/pages/previewQuestion/preview-question.ejs', {});
 };
