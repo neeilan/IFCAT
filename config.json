@@ -17,6 +17,9 @@
     },
     "log": {
       "path": "/logs"
+    },
+    "hub": {
+      "domain": "https://backend-projects-neeilan.c9users.io"
     }
   },
   "development": {
