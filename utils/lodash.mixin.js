@@ -2,6 +2,10 @@ const _ = require('lodash'),
     stats = require('simple-statistics');
 
 _.mixin({
+    // Check if value is an empty array
+    isEmptyArray: (value) => {
+        return _.isArray(value) && _.isEmpty(value);
+    },
     // Node.js implementation of Evan Miller's algorithm for ranking stuff based on pos: 
     // http://www.evanmiller.org/how-not-to-sort-by-average-rating.html
     lowerBound: (pos, n = 0, confidence = 0.95) => {

@@ -17,11 +17,7 @@ $(function () {
         });
     });
     // convert form checkboxes to switch control
-    $(':checkbox.bootstrap-switch').bootstrapSwitch({
-        inverse: true,
-        offText: 'No',
-        onText: 'Yes'
-    });
+    $(':checkbox.bootstrap-switch').bootstrapSwitch({ inverse: true, offText: 'No', onText: 'Yes' });
     // cache last opened tab
     $('a[data-toggle=tab]').on('shown.bs.tab', function () {
         localStorage.setItem('tab-open', $(this).attr('href'));
@@ -32,10 +28,7 @@ $(function () {
         $('a[href="' + tab + '"]').tab('show');
     }
     // set default bootbox options
-    bootbox.setDefaults({
-        onEscape: true,
-        size: 'small'
-    });
+    bootbox.setDefaults({ onEscape: true, size: 'small' });
     // small plugin for creating confirm dialogs on the fly
     // @usage: $.deletebox(options)
     $.deletebox = function (options) {

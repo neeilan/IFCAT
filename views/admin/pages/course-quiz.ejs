@@ -15,7 +15,7 @@
     <div class="form-group required">
         <label class="col-sm-3 control-label">Name</label>
         <div class="col-sm-9">
-            <input type="text" name="name" value="<%= quiz.name %>" class="form-control">
+            <input type="text" name="name" value="<%= quiz.name %>" class="form-control" required>
         </div>
     </div>
 
@@ -46,6 +46,12 @@
     </div>
 
     <!-- default options -->
+    <div class="form-group">
+        <label class="col-sm-3 control-label">Tags</label>
+        <div class="col-sm-7">
+            <input type="text" name="default[_tags]" value="<%= quiz.default.tags.join(', ') %>" class="form-control" maxlength="70">
+        </div>
+    </div>
 
     <div class="form-group">
         <label class="col-xs-7 col-sm-3 control-label">Shuffle choices? (MC/MS)</label>

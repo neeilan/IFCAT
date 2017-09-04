@@ -36,7 +36,6 @@ router.use((req, res, next) => {
 router.get('/logout', controllers.User.logout);
 router.get('/courses', controllers.Student.getCourses);
 router.get('/courses/:course/quizzes', controllers.Student.getQuizzes);
-router.put('/courses/:course/quizzes/:quiz/questions/:question/votes', controllers.Question.updateVote);
 router.get('/courses/:course/quizzes/:tutorialQuiz/start', controllers.TutorialQuiz.startQuiz);
 router.get('/courses/:course/quizzes/:tutorialQuiz/submit-question', controllers.Question.getQuestionForm);
 router.post('/courses/:course/quizzes/:tutorialQuiz/submit-question', controllers.Question.addQuestion);

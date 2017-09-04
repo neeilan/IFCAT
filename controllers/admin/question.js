@@ -1,4 +1,4 @@
-const _ = require('lodash'),
+const _ = require('../../utils/lodash.mixin'),
     async = require('async'),
     models = require('../../models'),
     url = require('url');
@@ -56,7 +56,8 @@ exports.getQuestion = (req, res, next) => {
     let question = req.question || new models.Question();
     // set default options
     _.forOwn(req.quiz.default, (v, k) => {
-        question[k] = _.defaultTo(question[k], v);
+        if (_.isUndefined(question[k]) || _.isNull(question[k]) || _.isEmptyArray(question[k]))
+            question[k] = v;
     });
 
     req.course.withFiles().execPopulate().then(() => {

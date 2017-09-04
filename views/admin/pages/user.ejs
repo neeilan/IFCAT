@@ -13,10 +13,10 @@
     <div class="form-group required">
         <label class="col-sm-2 control-label">Name</label>
         <div class="col-sm-2" style="margin-bottom: 15px;">
-            <input type="text" name="name[first]" value="<%= us3r.name.first %>" placeholder="First" class="form-control">
+            <input type="text" name="name[first]" value="<%= us3r.name.first %>" placeholder="First" class="form-control" required>
         </div>
         <div class="col-sm-2"> 
-            <input type="text" name="name[last]" value="<%= us3r.name.last %>" placeholder="Last" class="form-control">
+            <input type="text" name="name[last]" value="<%= us3r.name.last %>" placeholder="Last" class="form-control" required>
         </div>
     </div>
     <div class="form-group required">
@@ -34,7 +34,7 @@
     <div class="form-group required">
         <label class="col-sm-2 control-label">E-mail Address</label>
         <div class="col-sm-8">
-            <input type="text" name="local[email]" value="<%= us3r.local.email %>" class="form-control">
+            <input type="text" name="local[email]" value="<%= us3r.local.email %>" class="form-control" required>
         </div>
     </div>
     <div class="form-group required">

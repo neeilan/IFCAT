@@ -3,3 +3,6 @@ uteach/
 public/uploads
 public/upl
 logs/
+config.json
+config.js
+*.bak

@@ -8,7 +8,7 @@ const TutorialSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-// Populate tutorial-quizzes
+// Populate tutorials-quizzes
 TutorialSchema.virtual('tutorialQuizzes', { ref: 'TutorialQuiz', localField: '_id', foreignField: 'tutorial' });
 // Delete cascade
 TutorialSchema.pre('remove', function (next) {

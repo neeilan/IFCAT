@@ -5,6 +5,7 @@ const QuizSchema = new mongoose.Schema({
     name: { type: String, required: true },
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
     default: {
+        tags: [String],
         caseSensitive: Boolean,
         maxPointsPerLine: { type: Number, default: 1 },
         maxAttemptsPerLine: { type: Number, default: 1 },
@@ -28,7 +29,7 @@ QuizSchema.pre('remove', function (next) {
         done => self.model('TutorialQuiz').remove({ quiz: self._id }, done)
     ], next);
 });
-// Populate tutorial-quizzes
+// Populate tutorials-quizzes
 QuizSchema.virtual('tutorialQuizzes', { ref: 'TutorialQuiz', localField: '_id', foreignField: 'quiz' });
 // Populate questions
 QuizSchema.methods.withQuestions = function (options = {}) {
@@ -36,13 +37,22 @@ QuizSchema.methods.withQuestions = function (options = {}) {
 };
 // Set quiz
 QuizSchema.methods.store = function (opts) {
-    this.studentChoice = !!opts.studentChoice;
-    this.voting = !!opts.voting;
-    this.default.caseSensitive = !!opts.default.caseSensitive;
-    this.default.shuffleChoices = !!opts.default.shuffleChoices;
-    this.default.useLaTeX = !!opts.default.useLaTeX;
-    this.set(opts);
-    return this;
+    let self = this;
+
+    self.studentChoice = !!opts.studentChoice;
+    self.voting = !!opts.voting;
+    self.default.caseSensitive = !!opts.default.caseSensitive;
+    self.default.shuffleChoices = !!opts.default.shuffleChoices;
+    self.default.useLaTeX = !!opts.default.useLaTeX;
+    self.set(opts);
+
+    if (opts.default._tags)
+        _.each(opts.default._tags.split(/[,;]/g), tag => {
+            if (tag = _.kebabCase(tag))
+                self.default.tags.addToSet(tag);
+        });
+
+    return self;
 };
 // Check if quiz is linked with tutorial
 QuizSchema.methods.isLinkedTo = function (tutorial) {

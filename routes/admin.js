@@ -122,9 +122,6 @@ router.get('/quizzes/:quizId', controllers.Quiz.fetchQuizJson);
 router.get('/hub', controllers.Hub.getApi);
 router.patch('/hub/users', controllers.Hub.getUsers);
 
-// temporary!
-router.get('/users/fix', controllers.User.fixUsers);
-
 // router.use((err, req, res, next) => {
 //     // ignore validation errors
 //     if (err instanceof mongoose.Error.ValidationError) {

@@ -13,8 +13,8 @@ const QuestionSchema = new mongoose.Schema({
     links: [String],
     tags: [String],
     caseSensitive: Boolean,
-    maxPointsPerLine: { type: Number, default: 1 },
-    maxAttemptsPerLine: { type: Number, default: 1 },
+    maxPointsPerLine: Number,
+    maxAttemptsPerLine: Number,
     immediateFeedbackDisabled: Boolean,
     shuffleChoices: Boolean,
     useLaTeX: Boolean,
@@ -85,7 +85,7 @@ QuestionSchema.methods.store = function (opts) {
     self.approved = !!opts.approved;
     self.set(opts);
 
-    if (opts._links) {
+    if (opts._links)
         _.each(opts._links, link => {
             if (link = link.trim()) {
                 if (!url.parse(link).protocol)
@@ -93,15 +93,12 @@ QuestionSchema.methods.store = function (opts) {
                 self.links.addToSet(link);
             }
         });
-    }
 
-    if (opts._tags) {
+    if (opts._tags)
         _.each(opts._tags.split(/[,;]/g), tag => {
-            if (tag = _.kebabCase(tag)) {
+            if (tag = _.kebabCase(tag))
                 self.tags.addToSet(tag);
-            }
         });
-    }
 
     let selected;
     if (self.isMultipleChoice()) {
