@@ -2,7 +2,7 @@ const _ = require('lodash'),
     async = require('async'),
     mongoose = require('mongoose');
 const TutorialSchema = new mongoose.Schema({
-    number: { type: String, required: true },
+    number: { type: String, required: true, alias: 'name' },
     teachingAssistants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, {
