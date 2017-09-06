@@ -49,7 +49,7 @@
     <div class="form-group">
         <label class="col-sm-3 control-label">Tags</label>
         <div class="col-sm-7">
-            <input type="text" name="default[_tags]" value="<%= quiz.default.tags.join(', ') %>" class="form-control" maxlength="70">
+            <input type="text" name="default[_tags]" value="<%= _.join(quiz.default.tags, ', ') %>" class="form-control" maxlength="70">
         </div>
     </div>
 
