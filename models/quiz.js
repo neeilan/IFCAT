@@ -5,7 +5,7 @@ const QuizSchema = new mongoose.Schema({
     name: { type: String, required: true },
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],
     default: {
-        tags: [String],
+        tags: { type: [String], default: [] },
         caseSensitive: Boolean,
         maxPointsPerLine: { type: Number, default: 1 },
         maxAttemptsPerLine: { type: Number, default: 1 },
