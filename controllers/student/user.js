@@ -6,9 +6,7 @@ exports.getLogin = (req, res) => {
     res.render('login', {
         bodyClass: 'login',
         title: 'Login',
-        domain : config.auth0.domain,
-        clientId : config.auth0.clientId,
-        callbackUrl : config.auth0.callbackUrl
+        auth0lock: config.auth0
     });
 };
 // Logout user

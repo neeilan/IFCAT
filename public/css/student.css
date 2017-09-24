@@ -1,109 +1,109 @@
 body {
-  font-family: Helvetica;
+    font-family: Helvetica;
 }
 
-.attachedImg{
-  width: 90%;
-  max-width: 300px;
-  margin: 10px auto 10px auto;
+.attachedImg {
+    width: 90%;
+    max-width: 300px;
+    margin: 10px auto 10px auto;
 }
 
 .choice {
-  font-weight: bold;
-  border-radius: 10px;
-  margin: 5px;
-  margin-bottom: 10px;
-  text-align: center;
-  color: #808080;
-  background: #D3D3D3;
-  padding: 15px;
-  /*background: white;*/
-  /*border: solid 2px #D3D3D3;*/
-  
-
+    font-weight: bold;
+    border-radius: 10px;
+    margin: 5px;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #808080;
+    background: #D3D3D3;
+    padding: 15px;
+    /*background: white;*/
+    /*border: solid 2px #D3D3D3;*/
 }
 
 .bold {
-  font-weight: bold;
+    font-weight: bold;
 }
 h4.bold #text, .quizBtn.choice {
-  white-space:pre-wrap; 
-  text-align:left; 
+    white-space:pre-wrap; 
+    text-align:left; 
 }
 
 .centerText {
-  text-align: center;
+    text-align: center;
 }
 
 .extraLarge {
-  font-weight: bold;
-  font-size: 96px;
+    font-weight: bold;
+    font-size: 96px;
 }
 
 .currentlyChosen {
-  background: #009966;
-  color: #66FFCC;
-  border: none;
-  /*box-shadow: 0px 0px 5px #66FFCC;*/
+    background: #009966;
+    color: #66FFCC;
+    border: none;
+    /*box-shadow: 0px 0px 5px #66FFCC;*/
 }
 
 .MathJax_Display {
-  pointer-events: none;
+    pointer-events: none;
 }
 
-#activeQuiz{
-  text-align: center;
+#activeQuiz {
+    text-align: center;
 }
 
 #submitQuestion {
-  margin: auto;
-  margin-bottom: 15px;
-  width: 100%;
-  border-radius: 10px;
-  font-weight: bold;
-  padding: 15px;
+    margin: auto;
+    margin-bottom: 15px;
+    width: 100%;
+    border-radius: 10px;
+    font-weight: bold;
+    padding: 15px;
 }
 
 #submitQuestion:disabled {
-  background: grey;
-  border-color: grey;
+    background: grey;
+    border-color: grey;
 }
 
 .goToQuestion {
-  margin: 5px;
+    margin: 5px;
 }
 
 #driverSelect button {
-  padding: 15px 10px 15px 10px;
-  margin-top: 15px;
+    padding: 15px 10px 15px 10px;
+    margin-top: 15px;
 }
 
 /*#questionScore{*/
 /*  display:none;*/
 /*}*/
 #questionScore .fa {
-  color: orange;
+    color: orange;
 }
 
 .fa {
-  font-size : 10px;
+    font-size: 10px;
 }
 
 @media all and (max-width: 725px) {
-    .questionPoints{display:none;}
+    .questionPoints {
+        display: none;
+    }
     #questionScore{
-      display:block;
+        display: block;
     }
 }
 #questionScore .fa {
-  font-size : 30px;
+    font-size : 30px;
 }
 
 input:focus{
-  outline: none;
+    outline: none;
 }
 .prettyprint ol.linenums > li { 
-  list-style-type: decimal; 
+    list-style-type: decimal; 
 }
 
 

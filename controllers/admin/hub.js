@@ -5,7 +5,7 @@ const async = require('async'),
 exports.getApi = (req, res, next) => {
     res.render('admin/pages/hub', {
         bodyClass: 'hub-page',
-        title: 'Hub'
+        title: 'Hub (Offline)'
     });
 };
 // 
