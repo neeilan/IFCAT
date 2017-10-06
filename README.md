@@ -1,2 +1,2 @@
 # IFCAT
-Immediate-Feedback Collaborative Assessment Tool is a quiz application for the classroom, based on [immediate feedback assessment technique](https://s3.amazonaws.com/academia.edu.documents/29570058/Immediate_Feedback_Assessment_Technique_Promotes_Learning_and_Cor.pdf?AWSAccessKeyId=AKIAIWOWYYGZ2Y53UL3A&Expires=1506831457&Signature=wpIks0YfKzXW6ZqutulblghxIAA%3D&response-content-disposition=inline%3B%20filename%3DImmediate_feedback_assessment_technique.pdf)
+Immediate-Feedback Collaborative Assessment Tool is a quiz application for the classroom, based on [immediate feedback assessment technique](https://link.springer.com/article/10.1007/BF03395423)
