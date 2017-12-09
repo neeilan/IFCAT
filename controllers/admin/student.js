@@ -20,12 +20,12 @@ exports.getStudentsByCourse = (req, res, next) => {
             course: req.course,
             students: req.course.students
         });
-    }); 
+    });
 };
 // Retrieve list of students matching search query
 exports.getStudentsBySearchQuery = (req, res, next) => {
     let page = parseInt(req.query.page, 10) || 1,
-        perPage = parseInt(req.query.perPage, 10) || 5,
+        perPage = parseInt(req.query.perPage, 10) || 20,
         re = new RegExp(`(${req.query.q.replace(/\s/g, '|').trim()})`, 'i');
     models.User.findAndCount({
         $and: [
@@ -40,8 +40,8 @@ exports.getStudentsBySearchQuery = (req, res, next) => {
     }, (err, users, count, pages) => {
         if (err)
             return next(err);
-        res.render('admin/partials/course-students-search-results', { 
-            course: req.course, 
+        res.render('admin/partials/course-students-search-results', {
+            course: req.course,
             students: users,
             pagination: {
                 count: `${count} user${count !== 1 ? 's' : ''} matched`,
@@ -58,8 +58,8 @@ exports.getStudentsBySearchQuery = (req, res, next) => {
 exports.getStudentsByTutorial = (req, res, next) => {
     req.tutorial.withStudents().execPopulate().then(() => {
         res.render('admin/pages/tutorial-students', {
-            title: 'Students', 
-            course: req.course, 
+            title: 'Students',
+            course: req.course,
             tutorial: req.tutorial
         });
     }, next);
@@ -99,9 +99,9 @@ exports.deleteStudents = (req, res, next) => {
             req.course.update({ $pull: { students: { $in: users }}}, done);
         },
         done => {
-            models.Tutorial.update({ 
+            models.Tutorial.update({
                 _id: { $in: req.course.tutorials }
-            }, { 
+            }, {
                 $pull: { students: { $in: users }}
             }, {
                 multi: true
@@ -170,7 +170,7 @@ exports.importStudents = (req, res, next) => {
                             else
                                 tutorial.update({ $pull: { students: student._id }}, done);
                         }, done);
-                    } else 
+                    } else
                         return done();
                 }
             ], done);
