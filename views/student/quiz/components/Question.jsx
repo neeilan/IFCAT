@@ -4,6 +4,7 @@ import VoteCaster from './VoteCaster.jsx'
 
 import React from 'react'
 var enums = require('../enums');
+var MathJax = require('react-mathjax');
 
 export default class Question extends React.Component {
 	constructor(props) {
@@ -54,13 +55,20 @@ export default class Question extends React.Component {
 			}
 		}
 	}
-
+	
 	render() {
+		let questionText = this.props.questionRef.useLaTeX ? (
+			<MathJax.Context>
+				<MathJax.Node>
+					{ this.props.questionRef.question }
+				</MathJax.Node>
+			</MathJax.Context>
+		) : this.props.questionRef.question;
 	
 		return (
 			<div className="col-xs-12 col-md-9 text-center">
 				<br/>
-				{this.props.questionRef.question}
+				{questionText}
 				<EmptyLine/>
 				{this.getAttachmentBtn()}
 				{this.getAttachments()}
@@ -71,7 +79,6 @@ export default class Question extends React.Component {
 				<EmptyLine />
 			</div>);
 	}
-	
 	
 	getVoteCaster() {
 		if (!JSON.parse(localStorage.getItem('iqcVotedOn' + this.props.questionRef._id))) {
