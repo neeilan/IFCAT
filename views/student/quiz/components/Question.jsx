@@ -168,7 +168,7 @@ export default class Question extends React.Component {
 									 type="text"
 									 style={{padding: '10px'}}
 									 placeholder = "Your answer"
-									 onChange={(e) => this.setState( { givenAnswer : e.target.value } ) } />
+									 onChange={(e) => this.setState( { givenAnswer : [e.target.value] } ) } />
 				}
 			case (enums.questionTypes.multipleChoice):
 			case (enums.questionTypes.multiSelect):

@@ -156,7 +156,7 @@ socket.on('attemptAnswer', function(data) {
         
         models.Response.findOne({ group : data.groupId, question: data.questionId })
         .exec()
-        .then(function(response){
+        .then(function(response) {
             if (!response) {
                 var res = new models.Response();
                 res.group = data.groupId;
@@ -182,7 +182,7 @@ socket.on('attemptAnswer', function(data) {
                 .exec()
             }
         })
-        .then(function(response){
+        .then(function(response) {
             emitters.emitToGroup(data.groupId, 'GROUP_ATTEMPT', {
                 response: response,
                 questionNumber: data.questionNumber,
